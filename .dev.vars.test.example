@@ -1,0 +1,12 @@
+# Test environment variables
+# Copy this file to .dev.vars.test and update with your values
+
+JWT_SECRET = "your-test-jwt-secret-here"
+
+# Debug settings for testing - typically more verbose for debugging tests
+DEBUG = "hono-auth-api:*"
+
+# Rate limiting settings - disable for testing to avoid interference
+RATE_LIMIT_DISABLED = "true"
+
+ENV = "test"

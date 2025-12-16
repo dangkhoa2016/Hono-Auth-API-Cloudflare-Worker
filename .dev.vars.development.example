@@ -1,0 +1,20 @@
+# Development environment variables
+# Copy this file to .dev.vars.development and update with your values
+
+JWT_SECRET = "your-development-jwt-secret-here"
+
+# Debug settings - control what gets logged
+# Available options:
+# - "hono-auth-api:*" = All debug logs (full debug mode)
+# - "hono-auth-api:routes:*" = Only route logs
+# - "hono-auth-api:security:*" = Only security logs  
+# - "hono-auth-api:error:*" = Only error logs
+# - "hono-auth-api:validation:*" = Only validation logs
+# - "hono-auth-api:i18n:*" = Only i18n logs
+# - "hono-auth-api:database:*" = Only database logs
+# - "hono-auth-api:services:*" = Only service logs
+# - "hono-auth-api:middleware:*" = Only middleware logs
+# - "" = No debug logs (silent mode)
+DEBUG = "hono-auth-api:*"
+
+ENV = "development"

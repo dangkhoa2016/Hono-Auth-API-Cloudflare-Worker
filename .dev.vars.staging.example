@@ -1,0 +1,12 @@
+# Staging environment variables
+# Copy this file to .dev.vars.staging and update with your values
+
+JWT_SECRET = "your-staging-jwt-secret-here"
+
+# Debug settings for staging - typically limited to errors and security
+DEBUG = "hono-auth-api:error:*,hono-auth-api:security:*"
+
+ENV = "staging"
+
+# Rate limiting settings - disable for testing to avoid interference
+RATE_LIMIT_DISABLED = "true"
