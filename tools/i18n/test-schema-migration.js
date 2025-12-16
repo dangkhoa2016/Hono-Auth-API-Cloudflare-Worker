@@ -1,0 +1,144 @@
+#!/usr/bin/env node
+
+/**
+ * Quick Schema Validation Test
+ * Test updated i18n schema validation with new key structure
+ */
+
+import { createSchemaBuilder } from '../../src/schemas/base.js';
+import { createLoginSchema } from '../../src/schemas/auth.js';
+import { createUserRegistrationSchema } from '../../src/schemas/zodDemo.js';
+
+console.log('🧪 Testing Updated i18n Schema Validation...\n');
+
+// Test 1: Base Schema Builder
+console.log('1️⃣ Testing Base Schema Builder...');
+try {
+  const builder = createSchemaBuilder('en');
+
+  // Test email validation
+  const emailSchema = builder.email();
+  const validEmail = emailSchema.safeParse('test@example.com');
+  const invalidEmail = emailSchema.safeParse('invalid-email');
+
+  console.log(`✅ Valid email: ${validEmail.success}`);
+  console.log(`❌ Invalid email error: ${invalidEmail.success ? 'UNEXPECTED SUCCESS' : invalidEmail.error.errors[0].message}`);
+
+} catch (error) {
+  console.log(`❌ Base schema builder error: ${error.message}`);
+}
+
+// Test 2: Login Schema
+console.log('\n2️⃣ Testing Login Schema...');
+try {
+  const loginSchema = createLoginSchema('en');
+
+  const validLogin = loginSchema.safeParse({
+    email: 'user@example.com',
+    password: 'password123'
+  });
+
+  const invalidLogin = loginSchema.safeParse({
+    email: 'invalid-email',
+    password: '123' // too short
+  });
+
+  console.log(`✅ Valid login: ${validLogin.success}`);
+  console.log(`❌ Invalid login errors: ${invalidLogin.success ? 'UNEXPECTED SUCCESS' : invalidLogin.error.errors.length + ' errors'}`);
+
+  if (!invalidLogin.success) {
+    invalidLogin.error.errors.forEach((err, index) => {
+      console.log(`   ${index + 1}. ${err.path.join('.')}: ${err.message}`);
+    });
+  }
+
+} catch (error) {
+  console.log(`❌ Login schema error: ${error.message}`);
+}
+
+// Test 3: Registration Schema
+console.log('\n3️⃣ Testing User Registration Schema...');
+try {
+  const registrationSchema = createUserRegistrationSchema('en');
+
+  const validRegistration = registrationSchema.safeParse({
+    full_name: 'John Doe',
+    email: 'john@example.com',
+    password: 'securePassword123',
+    confirmPassword: 'securePassword123',
+    age: 25,
+    terms_accepted: true
+  });
+
+  const invalidRegistration = registrationSchema.safeParse({
+    full_name: '',
+    email: 'invalid-email',
+    password: '123',
+    confirmPassword: 'different',
+    age: 15, // too young
+    terms_accepted: false
+  });
+
+  console.log(`✅ Valid registration: ${validRegistration.success}`);
+  console.log(`❌ Invalid registration errors: ${invalidRegistration.success ? 'UNEXPECTED SUCCESS' : invalidRegistration.error.errors.length + ' errors'}`);
+
+  if (!invalidRegistration.success) {
+    invalidRegistration.error.errors.forEach((err, index) => {
+      console.log(`   ${index + 1}. ${err.path.join('.')}: ${err.message}`);
+    });
+  }
+
+} catch (error) {
+  console.log(`❌ Registration schema error: ${error.message}`);
+}
+
+// Test 4: i18n Key Structure
+console.log('\n4️⃣ Testing i18n Key Structure...');
+try {
+  const { initI18n } = await import('../../src/i18n/config.js');
+  const { tl } = await import('../../src/i18n/service.js');
+
+  // Initialize i18n first
+  console.log('Initializing i18n...');
+  await initI18n();
+  console.log('i18n initialized successfully');
+
+  // Test new validation keys
+  console.log('Testing fieldRequired keys...');
+  const requiredFieldError = tl('en', 'validation.fieldRequired.email');
+  console.log(`✅ Required field key: "${requiredFieldError}"`);
+
+  console.log('Testing formatValidation keys...');
+  const formatError = tl('en', 'validation.formatValidation.email.invalid');
+  console.log(`✅ Format validation key: "${formatError}"`);
+
+  console.log('Testing lengthValidation keys...');
+  const lengthError = tl('en', 'validation.lengthValidation.password.tooShort', { minLength: 6 });
+  console.log(`✅ Length validation key: "${lengthError}"`);
+
+  console.log('Testing error keys...');
+  // Test new error keys
+  const authError = tl('en', 'errors.auth.invalidCredentials');
+  const userError = tl('en', 'errors.user.registrationFailed');
+
+  console.log(`✅ Auth error key: "${authError}"`);
+  console.log(`✅ User error key: "${userError}"`);
+
+  console.log('Testing success keys...');
+  // Test new success keys
+  const authSuccess = tl('en', 'success.auth.loginSuccess');
+  const userSuccess = tl('en', 'success.user.created', { userName: 'John', email: 'john@example.com' });
+
+  console.log(`✅ Auth success key: "${authSuccess}"`);
+  console.log(`✅ User success key: "${userSuccess}"`);
+
+} catch (error) {
+  console.log(`❌ i18n key test error: ${error.message}`);
+  console.log(`❌ Stack: ${error.stack}`);
+}
+
+console.log('\n🎉 Schema validation test completed!');
+console.log('\n📚 Next steps:');
+console.log('   1. Run full test suite: npm run test:validation');
+console.log('   2. Test API endpoints: npm run test:zod');
+console.log('   3. Check multi-language support: npm run test:validation:multilang');

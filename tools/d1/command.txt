@@ -1,0 +1,63 @@
+
+-- work
+npx wrangler d1 execute <database_name> --env <environment> --file ./tools/d1/seeds.sql --local
+
+npx wrangler d1 execute hono-auth-api-db-development --env dev --command="SELECT * FROM Users"
+npx wrangler d1 execute hono-auth-api-db-development --env dev --local --file ./tools/d1/seeds.sql
+
+npx wrangler d1 execute hono-auth-api-db-test --env test --command="SELECT * FROM Users"
+npx wrangler d1 execute hono-auth-api-db-test --env test --local --file ./tools/d1/seeds.sql
+
+npx wrangler d1 migrations list hono-auth-api-db-development --env dev
+CI=true NO_D1_WARNING=true npx wrangler d1 migrations apply hono-auth-api-db-development --env dev
+npx wrangler d1 migrations list hono-auth-api-db-test --env test
+CI=true NO_D1_WARNING=true npx wrangler d1 migrations apply hono-auth-api-db-test --env test
+
+npx wrangler d1 execute hono-auth-api-db-test --env test --local --command="SELECT name FROM sqlite_schema;"
+npx wrangler d1 execute hono-auth-api-db-development --env dev --local --command="SELECT name FROM sqlite_schema;"
+
+npx wrangler d1 export hono-auth-api-db-test --env test --local --output ./hono-export.sql
+
+
+-----
+
+
+
+
+-- not work
+
+npx wrangler d1 execute hono-auth-api-db-development --local --command="SELECT * FROM Users"
+=> ✘ [ERROR] Couldn't find a D1 DB with the name or binding 'hono-auth-api-db-development' in your wrangler.toml file.
+
+npx wrangler d1 execute hono-auth-api-worker-test --env test --command="SELECT * FROM Users"
+=> ✘ [ERROR] Couldn't find a D1 DB with the name or binding 'hono-auth-api-worker-test' in your wrangler.toml file.
+
+npx wrangler d1 execute hono-auth-api-worker-test --local --command="SELECT * FROM Users"
+=> ✘ [ERROR] Couldn't find a D1 DB with the name or binding 'hono-auth-api-worker-test' in your wrangler.toml file.
+
+npx wrangler d1 execute hono-auth-api-worker-test --env TEST --command="SELECT * FROM Users"
+=> 
+✘ [ERROR] Processing wrangler.toml configuration:
+
+- No environment found in configuration with name "TEST".
+  Before using `--env=TEST` there should be an equivalent environment section in the
+configuration.
+  The available configured environment names are: ["dev","test","staging"]
+
+  Consider adding an environment configuration section to the wrangler.toml file:
+  ```
+  [env.TEST]
+  ```
+
+
+
+
+
+-----
+
+
+npx wrangler d1 execute hono-auth-api-db-staging --env staging --command="SELECT * FROM Users"
+🌀 Executing on local database hono-auth-api-db-staging (staging-placeholder) from .wrangler/state/v3/d1:
+🌀 To execute on your remote database, add a --remote flag to your wrangler command.
+
+✘ [ERROR] no such table: Users: SQLITE_ERROR
