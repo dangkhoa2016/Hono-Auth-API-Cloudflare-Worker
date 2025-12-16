@@ -120,41 +120,61 @@ class KVAdminTests {
   }
 
   /**
+   * Helper function to login with retry logic
+   * @param {object} credentials - User credentials
+   * @param {string} roleName - Role name for logging
+   * @param {number} maxRetries - Maximum number of retries
+   * @returns {Promise<string>} - Access token
+   */
+  async loginWithRetry(credentials, roleName, maxRetries = 3) {
+    let lastError = null;
+
+    for (let attempt = 1; attempt <= maxRetries; attempt++) {
+      try {
+        const response = await this.client.post(API_ENDPOINTS.login, credentials);
+
+        if (response.success && response.data?.data?.access_token) {
+          return response.data.data.access_token;
+        }
+
+        // Extract error message for debugging
+        const errorMsg = response.data?.error || response.data?.message || 'Unknown error';
+        lastError = new Error(`${roleName} login failed: ${errorMsg}`);
+
+        if (attempt < maxRetries) {
+          this.logger.info(`${roleName} login attempt ${attempt}/${maxRetries} failed, retrying in 1s...`);
+          await new Promise(resolve => setTimeout(resolve, 1000));
+        }
+      } catch (error) {
+        lastError = error;
+        if (attempt < maxRetries) {
+          this.logger.info(`${roleName} login attempt ${attempt}/${maxRetries} error, retrying in 1s...`);
+          await new Promise(resolve => setTimeout(resolve, 1000));
+        }
+      }
+    }
+
+    throw lastError || new Error(`Failed to get ${roleName} access token after ${maxRetries} attempts`);
+  }
+
+  /**
    * Test authentication for different roles
    */
   async setupAuthentication() {
     this.logger.info('Setting up authentication for different roles...');
 
     try {
-      // Login as super admin
-      const superAdminResponse = await this.client.post(API_ENDPOINTS.login, TEST_USERS.super_admin);
+      // Login as super admin with retry
+      this.superAdminToken = await this.loginWithRetry(TEST_USERS.super_admin, 'Super Admin');
+      this.logger.success('Super Admin login successful');
 
-      if (superAdminResponse.success && superAdminResponse.data?.data?.access_token) {
-        this.superAdminToken = superAdminResponse.data.data.access_token;
-        this.logger.success('Super Admin login successful');
-      } else {
-        throw new Error('Failed to get super admin access token');
-      }
+      // Login as admin with retry
+      this.adminToken = await this.loginWithRetry(TEST_USERS.admin, 'Admin');
+      this.logger.success('Admin login successful');
 
-      // Login as admin
-      const adminResponse = await this.client.post(API_ENDPOINTS.login, TEST_USERS.admin);
-
-      if (adminResponse.success && adminResponse.data?.data?.access_token) {
-        this.adminToken = adminResponse.data.data.access_token;
-        this.logger.success('Admin login successful');
-      } else {
-        throw new Error('Failed to get admin access token');
-      }
-
-      // Login as regular user
-      const userResponse = await this.client.post(API_ENDPOINTS.login, TEST_USERS.regular);
-
-      if (userResponse.success && userResponse.data?.data?.access_token) {
-        this.userToken = userResponse.data.data.access_token;
-        this.logger.success('Regular user login successful');
-      } else {
-        throw new Error('Failed to get regular user access token');
-      }
+      // Login as regular user with retry
+      this.userToken = await this.loginWithRetry(TEST_USERS.regular, 'Regular user');
+      this.logger.success('Regular user login successful');
 
       this.logger.success('Authentication setup completed successfully');
     } catch (error) {
