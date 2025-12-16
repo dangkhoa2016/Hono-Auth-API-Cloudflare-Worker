@@ -1,0 +1,27 @@
+node_modules/
+.wrangler/
+
+# Environment variables (NEVER commit these)
+.dev.vars.development
+.dev.vars.test
+.dev.vars.staging
+.dev.vars.production
+.dev.vars.prod
+.env
+.env.local
+.env.development
+.env.production
+.dev.vars
+
+# Wrangler configuration (contains environment-specific database IDs)
+wrangler.toml
+
+dist/
+*.log
+.DS_Store
+.vscode/settings.json
+
+# Temporary và cache files
+.tmp/
+.cache/
+temp.txt

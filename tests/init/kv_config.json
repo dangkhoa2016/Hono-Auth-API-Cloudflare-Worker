@@ -1,0 +1,337 @@
+[
+  {
+    "key": "APP_NAME",
+    "value": "Hono Auth API",
+    "expiration_ttl": 2147483647
+  },
+  {
+    "key": "APP_VERSION",
+    "value": "1.0.0",
+    "expiration_ttl": 2147483647
+  },
+  {
+    "key": "DEBUG",
+    "value": "hono-auth-api:*",
+    "expiration_ttl": 2147483647
+  },
+  {
+    "key": "RATE_LIMIT_MAX_ATTEMPTS",
+    "value": "5",
+    "expiration_ttl": 2147483647
+  },
+  {
+    "key": "RATE_LIMIT_LOCKOUT_DURATION",
+    "value": "120",
+    "expiration_ttl": 2147483647
+  },
+  {
+    "key": "DEFAULT_PAGE_SIZE",
+    "value": "10",
+    "expiration_ttl": 2147483647
+  },
+  {
+    "key": "MAX_PAGE_SIZE",
+    "value": "100",
+    "expiration_ttl": 2147483647
+  },
+  {
+    "key": "SECURITY_HIGH_RISK_THRESHOLD",
+    "value": "10",
+    "expiration_ttl": 2147483647
+  },
+  {
+    "key": "SECURITY_X_CONTENT_TYPE_OPTIONS",
+    "value": "nosniff",
+    "expiration_ttl": 2147483647
+  },
+  {
+    "key": "SECURITY_X_FRAME_OPTIONS",
+    "value": "DENY",
+    "expiration_ttl": 2147483647
+  },
+  {
+    "key": "SECURITY_X_XSS_PROTECTION",
+    "value": "1; mode=block",
+    "expiration_ttl": 2147483647
+  },
+  {
+    "key": "SECURITY_CSP",
+    "value": "default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; img-src 'self' data: https:; font-src 'self'; connect-src 'self'; media-src 'self'; object-src 'none'; frame-src 'none'; worker-src 'self'; manifest-src 'self'; base-uri 'self'; form-action 'self'",
+    "expiration_ttl": 2147483647
+  },
+  {
+    "key": "SECURITY_REFERRER_POLICY",
+    "value": "strict-origin-when-cross-origin",
+    "expiration_ttl": 2147483647
+  },
+  {
+    "key": "SECURITY_PERMISSIONS_POLICY",
+    "value": "camera=(), microphone=(), geolocation=(), payment=(), usb=(), magnetometer=(), accelerometer=(), gyroscope=()",
+    "expiration_ttl": 2147483647
+  },
+  {
+    "key": "SECURITY_HSTS",
+    "value": "max-age=31536000; includeSubDomains; preload",
+    "expiration_ttl": 2147483647
+  },
+  {
+    "key": "PERFORMANCE_GOOD_THRESHOLD",
+    "value": "1000",
+    "expiration_ttl": 2147483647
+  },
+  {
+    "key": "AUTO_ACTIVATE_USER_ON_REGISTER",
+    "value": "false",
+    "expiration_ttl": 2147483647
+  },
+  {
+    "key": "RATE_LIMIT_DISABLED",
+    "value": "false",
+    "expiration_ttl": 2147483647
+  },
+  {
+    "key": "ENABLE_DETAILED_ERRORS",
+    "value": "true",
+    "expiration_ttl": 2147483647
+  },
+  {
+    "key": "ENABLE_RESPONSE_BODY_CAPTURE",
+    "value": "true", 
+    "expiration_ttl": 2147483647
+  },
+  {
+    "key": "LOG_SQL_QUERIES",
+    "value": "true",
+    "expiration_ttl": 2147483647
+  },
+  {
+    "key": "CORS_ORIGIN",
+    "value": "*",
+    "expiration_ttl": 2147483647
+  },
+  {
+    "key": "AUDIT_DEFAULT_RETENTION_DAYS",
+    "value": "90",
+    "expiration_ttl": 2147483647
+  },
+  {
+    "key": "AUDIT_SENSITIVE_RETENTION_DAYS",
+    "value": "365",
+    "expiration_ttl": 2147483647
+  },
+  {
+    "key": "AUDIT_COMPLIANCE_RETENTION_DAYS",
+    "value": "2555",
+    "expiration_ttl": 2147483647
+  },
+  {
+    "key": "AUDIT_AUTO_ARCHIVE_ENABLED",
+    "value": "true",
+    "expiration_ttl": 2147483647
+  },
+  {
+    "key": "AUDIT_AUTO_ARCHIVE_THRESHOLD_DAYS",
+    "value": "30",
+    "expiration_ttl": 2147483647
+  },
+  {
+    "key": "AUDIT_MAX_QUERY_RESULTS",
+    "value": "1000",
+    "expiration_ttl": 2147483647
+  },
+  {
+    "key": "AUDIT_DEFAULT_PAGE_SIZE",
+    "value": "50",
+    "expiration_ttl": 2147483647
+  },
+  {
+    "key": "AUDIT_MAX_PAGE_SIZE",
+    "value": "500",
+    "expiration_ttl": 2147483647
+  },
+  {
+    "key": "AUDIT_QUERY_TIMEOUT_MS",
+    "value": "30000",
+    "expiration_ttl": 2147483647
+  },
+  {
+    "key": "AUDIT_BATCH_SIZE",
+    "value": "100",
+    "expiration_ttl": 2147483647
+  },
+  {
+    "key": "AUDIT_FAILED_LOGIN_THRESHOLD",
+    "value": "5",
+    "expiration_ttl": 2147483647
+  },
+  {
+    "key": "AUDIT_SUSPICIOUS_ACTIVITY_THRESHOLD",
+    "value": "10",
+    "expiration_ttl": 2147483647
+  },
+  {
+    "key": "AUDIT_HIGH_RISK_ACTION_THRESHOLD",
+    "value": "3",
+    "expiration_ttl": 2147483647
+  },
+  {
+    "key": "AUDIT_PERFORMANCE_ALERT_THRESHOLD_MS",
+    "value": "5000",
+    "expiration_ttl": 2147483647
+  },
+  {
+    "key": "AUDIT_ENABLE_REAL_TIME_MONITORING",
+    "value": "true",
+    "expiration_ttl": 2147483647
+  },
+  {
+    "key": "AUDIT_ENABLE_ADVANCED_ANALYTICS",
+    "value": "true",
+    "expiration_ttl": 2147483647
+  },
+  {
+    "key": "AUDIT_ENABLE_EXPORT",
+    "value": "true",
+    "expiration_ttl": 2147483647
+  },
+  {
+    "key": "AUDIT_ENABLE_ARCHIVAL",
+    "value": "true",
+    "expiration_ttl": 2147483647
+  },
+  {
+    "key": "AUDIT_ENABLE_COMPLIANCE_REPORTING",
+    "value": "true",
+    "expiration_ttl": 2147483647
+  },
+  {
+    "key": "AUDIT_ENABLE_PERFORMANCE_MONITORING",
+    "value": "true",
+    "expiration_ttl": 2147483647
+  },
+  {
+    "key": "AUDIT_ENABLE_ADVANCED_SEARCH",
+    "value": "true",
+    "expiration_ttl": 2147483647
+  },
+  {
+    "key": "AUDIT_REALTIME_MONITORING_ENABLED",
+    "value": "true",
+    "expiration_ttl": 2147483647
+  },
+  {
+    "key": "AUDIT_REALTIME_MONITORING_BUFFER_SIZE",
+    "value": "1000",
+    "expiration_ttl": 2147483647
+  },
+  {
+    "key": "AUDIT_REALTIME_MONITORING_FLUSH_INTERVAL_MS",
+    "value": "5000",
+    "expiration_ttl": 2147483647
+  },
+  {
+    "key": "AUDIT_REALTIME_MONITORING_MAX_CONNECTIONS",
+    "value": "100",
+    "expiration_ttl": 2147483647
+  },
+  {
+    "key": "AUDIT_REALTIME_BUFFER_SIZE",
+    "value": "1000",
+    "expiration_ttl": 2147483647
+  },
+  {
+    "key": "AUDIT_REALTIME_FLUSH_INTERVAL_MS",
+    "value": "5000",
+    "expiration_ttl": 2147483647
+  },
+  {
+    "key": "AUDIT_REALTIME_MAX_CONNECTIONS",
+    "value": "100",
+    "expiration_ttl": 2147483647
+  },
+  {
+    "key": "AUDIT_THREAT_DETECTION_ENABLED",
+    "value": "true",
+    "expiration_ttl": 2147483647
+  },
+  {
+    "key": "AUDIT_EXPORT_MAX_RECORDS",
+    "value": "10000",
+    "expiration_ttl": 2147483647
+  },
+  {
+    "key": "AUDIT_EXPORT_ALLOWED_FORMATS",
+    "value": "csv,json,excel",
+    "expiration_ttl": 2147483647
+  },
+  {
+    "key": "AUDIT_EXPORT_TIMEOUT_MS",
+    "value": "120000",
+    "expiration_ttl": 2147483647
+  },
+  {
+    "key": "AUDIT_EXPORT_COMPRESSION_ENABLED",
+    "value": "true",
+    "expiration_ttl": 2147483647
+  },
+  {
+    "key": "AUDIT_ANALYTICS_CACHE_TTL_MS",
+    "value": "300000",
+    "expiration_ttl": 2147483647
+  },
+  {
+    "key": "AUDIT_ANALYTICS_MAX_TIME_RANGE_DAYS",
+    "value": "365",
+    "expiration_ttl": 2147483647
+  },
+  {
+    "key": "AUDIT_ANALYTICS_ENABLE_BEHAVIORAL",
+    "value": "true",
+    "expiration_ttl": 2147483647
+  },
+  {
+    "key": "AUDIT_ANALYTICS_ENABLE_SECURITY",
+    "value": "true",
+    "expiration_ttl": 2147483647
+  },
+  {
+    "key": "AUDIT_INCIDENT_AUTO_DETECTION_ENABLED",
+    "value": "true",
+    "expiration_ttl": 2147483647
+  },
+  {
+    "key": "AUDIT_INCIDENT_RESPONSE_TIMEOUT_MS",
+    "value": "60000",
+    "expiration_ttl": 2147483647
+  },
+  {
+    "key": "AUDIT_INCIDENT_MAX_SEVERITY_LEVEL",
+    "value": "5",
+    "expiration_ttl": 2147483647
+  },
+  {
+    "key": "AUDIT_INCIDENT_EMAIL_NOTIFICATIONS_ENABLED",
+    "value": "false",
+    "expiration_ttl": 2147483647
+  },
+  {
+    "key": "AUDIT_COMPLIANCE_GDPR_ENABLED",
+    "value": "true",
+    "expiration_ttl": 2147483647
+  },
+  {
+    "key": "AUDIT_COMPLIANCE_SOX_ENABLED",
+    "value": "false",
+    "expiration_ttl": 2147483647
+  },
+  {
+    "key": "AUDIT_COMPLIANCE_HIPAA_ENABLED",
+    "value": "false",
+    "expiration_ttl": 2147483647
+  },
+  {
+    "key": "AUDIT_COMPLIANCE_AUTO_REPORT_ENABLED",
+    "value": "false",
+    "expiration_ttl": 2147483647
+  }
+]

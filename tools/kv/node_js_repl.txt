@@ -1,0 +1,8 @@
+
+const configFile = "wrangler.toml";
+const { getPlatformProxy } = await import("wrangler");
+const { createKvConfigService } = await import("./src/utils/serviceFactory.js");
+
+const { env } = await getPlatformProxy({ configPath: configFile, environment: 'test' });
+const kvConfigService = createKvConfigService(env.CONFIG_KV);
+const allKeys = await kvConfigService.getAll();

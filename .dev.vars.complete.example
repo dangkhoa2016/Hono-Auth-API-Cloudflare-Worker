@@ -1,0 +1,95 @@
+# ==============================================================================
+# COMPLETE ENVIRONMENT VARIABLES CONFIGURATION
+# Copy this file to .dev.vars.development/.dev.vars.test/.dev.vars.staging
+# and update with your specific environment values
+# ==============================================================================
+
+# ==============================================================================
+# 🔐 SECURITY & JWT CONFIGURATION
+# ==============================================================================
+JWT_SECRET = "your-super-secure-jwt-secret-key-here-minimum-32-characters"
+JWT_ACCESS_TOKEN_EXPIRES = "3600"          # 1 hour in seconds
+JWT_REFRESH_TOKEN_EXPIRES = "259200"       # 3 days in seconds
+
+# ==============================================================================
+# 🚦 RATE LIMITING CONFIGURATION  
+# ==============================================================================
+RATE_LIMIT_MAX_ATTEMPTS = "5"              # Maximum failed login attempts
+RATE_LIMIT_LOCKOUT_DURATION = "120"        # Lockout duration in minutes (2 hours)
+
+# ==============================================================================
+# 🔑 PASSWORD HASHING CONFIGURATION
+# ==============================================================================
+BCRYPT_SALT_ROUNDS = "12"                  # bcrypt salt rounds (10-12 recommended)
+
+# ==============================================================================
+# 🌐 CORS CONFIGURATION
+# ==============================================================================
+CORS_ORIGIN = "*"                          # Allowed origins (use specific domains in production)
+CORS_ALLOW_METHODS = "GET,POST,PUT,DELETE,OPTIONS"
+CORS_ALLOW_HEADERS = "Content-Type,Authorization,Accept-Language"
+
+# ==============================================================================
+# 📄 PAGINATION CONFIGURATION
+# ==============================================================================
+DEFAULT_PAGE_SIZE = "10"                   # Default number of items per page
+MAX_PAGE_SIZE = "100"                      # Maximum items per page
+
+# ==============================================================================
+# ⏰ METRICS & ANALYTICS TIME RANGES
+# ==============================================================================
+METRICS_RECENT_HOURS = "24"                # Recent activity tracking (hours)
+METRICS_WEEKLY_DAYS = "7"                  # Weekly statistics (days)
+METRICS_MONTHLY_DAYS = "30"                # Monthly statistics (days)  
+METRICS_QUARTERLY_DAYS = "90"              # Quarterly statistics (days)
+
+# ==============================================================================
+# 🛡️ SECURITY THRESHOLDS
+# ==============================================================================
+SECURITY_HIGH_RISK_THRESHOLD = "10"        # Failed attempts threshold for high risk
+PERFORMANCE_GOOD_THRESHOLD = "1000"        # Response time threshold for good performance (ms)
+
+# ==============================================================================
+# 🎛️ APPLICATION CONFIGURATION
+# ==============================================================================
+APP_NAME = "Hono Auth API"
+APP_VERSION = "1.0.0"
+ENV = "development"                         # Environment: development/test/staging/production
+
+# ==============================================================================
+# 🐛 DEBUG CONFIGURATION
+# ==============================================================================
+# Available debug namespaces:
+# - "hono-auth-api:*"           = All debug logs (full debug mode)
+# - "hono-auth-api:routes:*"    = Only route logs
+# - "hono-auth-api:security:*"  = Only security logs  
+# - "hono-auth-api:error:*"     = Only error logs
+# - "hono-auth-api:validation:*"= Only validation logs
+# - "hono-auth-api:i18n:*"      = Only i18n logs
+# - "hono-auth-api:database:*"  = Only database logs
+# - "hono-auth-api:services:*"  = Only service logs
+# - "hono-auth-api:middleware:*"= Only middleware logs
+# - ""                          = No debug logs (silent mode)
+DEBUG = "hono-auth-api:*"
+
+# ==============================================================================
+# 👤 USER MANAGEMENT CONFIGURATION
+# ==============================================================================
+AUTO_ACTIVATE_USER_ON_REGISTER = "false"   # Auto-activate users on registration
+
+# ==============================================================================
+# 🔧 DEVELOPMENT/TEST SPECIFIC SETTINGS
+# ==============================================================================
+# Uncomment these for development/testing
+# RATE_LIMIT_DISABLED = "true"           # Disable rate limiting for testing
+# ENABLE_DETAILED_ERRORS = "true"          # Show detailed error messages
+# LOG_SQL_QUERIES = "true"                 # Log all SQL queries for debugging
+
+# ==============================================================================
+# 📝 NOTES
+# ==============================================================================
+# 1. For production, use strong secrets and set appropriate rate limits
+# 2. CORS_ORIGIN should be specific domains in production, not "*"  
+# 3. Increase BCRYPT_SALT_ROUNDS for better security (12-14) but slower performance
+# 4. Adjust time ranges based on your analytics needs
+# 5. Set DEBUG to empty string "" or specific namespaces in production

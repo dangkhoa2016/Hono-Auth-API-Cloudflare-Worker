@@ -1,0 +1,12 @@
+
+npx wrangler kv key list --local --env test --binding CONFIG_KV
+npx wrangler kv key put --local --env test --binding CONFIG_KV "RATE_LIMIT_MAX_ATTEMPTS" "5"
+npx wrangler kv key get --local --env test --binding CONFIG_KV "RATE_LIMIT_MAX_ATTEMPTS"
+npx wrangler kv key delete --local --env test --binding CONFIG_KV "RATE_LIMIT_MAX_ATTEMPTS"
+
+npx wrangler kv bulk --local --env test --binding CONFIG_KV put ./tests/init/kv_config.json
+npx wrangler kv bulk --local --env test --binding CONFIG_KV get ./tools/kv/kv-config-key.json
+
+CI=true npx wrangler kv bulk --local --env test --binding CONFIG_KV delete ./tools/kv/kv-config-key.json
+npx wrangler kv bulk --local --env test --binding CONFIG_KV delete ./tools/kv/kv-config-key.json
+
