@@ -173,6 +173,25 @@ export default {
     'updatedAt': 'Updated at {{date, datetime}}',
     'userJoined': 'Joined on {{date, date}}'
   },
+  'emails': {
+    'registration': {
+      'activateButton': 'Activate My Account',
+      'activateLinkText': 'Or copy and paste this link into your browser:',
+      'details': 'Account Details',
+      'disclaimer': 'If you did not create this account, you can safely ignore this email. No action is required.',
+      'email': 'Email: {{email}}',
+      'expiryWarning': 'This activation link will expire in {{hours}} hours.',
+      'footer': 'This is an automated message from {{appName}}. Please do not reply to this email.',
+      'greeting': 'Hello {{userName}},',
+      'instructions': 'To complete your registration and start using your account, please click the button below:',
+      'intro': 'Welcome to {{appName}}! Your account has been created successfully.',
+      'ip': 'IP Address: {{ip}}',
+      'securityNote': 'For your security, never share this link with anyone.',
+      'subject': '{{appName}} - Activate your account',
+      'thanks': 'Best regards,\nThe {{appName}} Team',
+      'time': 'Registered on: {{date}} at {{time}}'
+    }
+  },
   'endpoints': {
     'admin': {
       'changeRole': 'Change user role (Super Admin access required)',
@@ -979,25 +998,6 @@ export default {
       'unsuspended': 'User account suspension lifted for {{userName}} by {{liftedBy}}',
       'updated': 'User profile updated successfully for {{userName}} - fields: {{updatedFields}}',
       'updated_other': '{{count}} user profiles updated successfully'
-    }
-  },
-  'emails': {
-    'registration': {
-      'subject': '{{appName}} - Activate your account',
-      'greeting': 'Hello {{userName}},',
-      'intro': 'Welcome to {{appName}}! Your account has been created successfully.',
-      'instructions': 'To complete your registration and start using your account, please click the button below:',
-      'activateButton': 'Activate My Account',
-      'activateLinkText': 'Or copy and paste this link into your browser:',
-      'details': 'Account Details',
-      'email': 'Email: {{email}}',
-      'time': 'Registered on: {{date}} at {{time}}',
-      'ip': 'IP Address: {{ip}}',
-      'expiryWarning': 'This activation link will expire in {{hours}} hours.',
-      'disclaimer': 'If you did not create this account, you can safely ignore this email. No action is required.',
-      'securityNote': 'For your security, never share this link with anyone.',
-      'thanks': 'Best regards,\nThe {{appName}} Team',
-      'footer': 'This is an automated message from {{appName}}. Please do not reply to this email.'
     }
   },
   'system': {

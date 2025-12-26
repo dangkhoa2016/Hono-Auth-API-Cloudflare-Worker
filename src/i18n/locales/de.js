@@ -125,6 +125,14 @@ export default {
       'stats': 'Audit-Statistiken abrufen'
     },
     'accountNotActive': 'Konto ist nicht aktiv',
+    'activationAlreadyActive': 'Dein Konto ist bereits aktiviert. Du kannst dich jetzt anmelden.',
+    'activationDisabledByAdmin': 'Dein Konto wurde von einem Administrator deaktiviert. Bitte wende dich an den Support.',
+    'activationFailed': 'Kontoaktivierung fehlgeschlagen. Bitte versuche es erneut.',
+    'activationInvalidToken': 'Ungültiger oder abgelaufener Aktivierungslink',
+    'activationMissingToken': 'Aktivierungstoken fehlt',
+    'activationServerError': 'Bei der Aktivierung ist ein Fehler aufgetreten. Bitte versuche es später erneut.',
+    'activationSuccess': 'Dein Konto wurde erfolgreich aktiviert! Du kannst dich jetzt anmelden.',
+    'activationTokenExpired': 'Aktivierungslink ist abgelaufen. Bitte fordere einen neuen an.',
     'cannotAccessOtherUsers': 'Kann nicht auf Ressourcen anderer Benutzer zugreifen',
     'cannotAccessSuperAdmin': 'Kann nicht auf Super-Administrator-Ressourcen zugreifen',
     'cannotChangeAdminRole': 'Kann Rolle anderer Administratoren nicht ändern',
@@ -164,6 +172,25 @@ export default {
     'deletedAt': 'Gelöscht am {{date, datetime}}',
     'updatedAt': 'Aktualisiert am {{date, datetime}}',
     'userJoined': 'Beigetreten am {{date, date}}'
+  },
+  'emails': {
+    'registration': {
+      'activateButton': 'Mein Konto aktivieren',
+      'activateLinkText': 'Oder kopiere und füge diesen Link in deinen Browser ein:',
+      'details': 'Kontodetails',
+      'disclaimer': 'Wenn du dieses Konto nicht angefordert hast, ignoriere diese E-Mail oder kontaktiere den Support.',
+      'email': 'Registrierungs-E-Mail: {{email}}',
+      'expiryWarning': 'Dieser Aktivierungslink läuft in {{hours}} Stunden ab.',
+      'footer': 'Dies ist eine automatische Nachricht von {{appName}}. Bitte antworte nicht auf diese E-Mail.',
+      'greeting': 'Hallo {{userName}},',
+      'instructions': 'Diese E-Mail bestätigt, dass wir deine Kontodaten erhalten haben. Falls eine Aktivierung oder Freigabe nötig ist, erhältst du eine weitere E-Mail.',
+      'intro': 'Danke für deine Registrierung bei {{appName}}.',
+      'ip': 'Anfrage-IP: {{ip}}',
+      'securityNote': 'Teile diesen Link aus Sicherheitsgründen niemals mit anderen.',
+      'subject': '{{appName}} - Bestätige deine Registrierung',
+      'thanks': 'Vielen Dank,\nDas {{appName}} Team',
+      'time': 'Registrierungszeit: {{timestamp}}'
+    }
   },
   'endpoints': {
     'admin': {
@@ -964,25 +991,13 @@ export default {
       'profileUpdated': 'Benutzerprofil erfolgreich aktualisiert für {{userName}} - {{fieldsCount}} Feld geändert',
       'profileUpdated_other': 'Benutzerprofil erfolgreich aktualisiert für {{userName}} - {{fieldsCount}} Felder geändert',
       'registered': 'Benutzer {{userName}} erfolgreich mit Rolle {{userRole}} registriert',
+      'registeredPendingActivation': 'Registrierung für {{userName}} erhalten. Bitte überprüfe deine E-Mail, um dein Konto zu bestätigen und zu aktivieren, bevor du dich anmeldest.',
       'roleChanged': 'Benutzerrolle von {{oldRole}} zu {{newRole}} für {{userName}} geändert',
       'sessionTerminated': 'Alle Sitzungen erfolgreich für {{userName}} beendet',
       'suspended': 'Benutzerkonto erfolgreich für {{userName}} bis {{suspendedUntil, datetime}} gesperrt',
       'unsuspended': 'Benutzerkontosperrung für {{userName}} von {{liftedBy}} aufgehoben',
       'updated': 'Benutzerprofil erfolgreich für {{userName}} aktualisiert – Felder: {{updatedFields}}',
       'updated_other': '{{count}} Benutzerprofile erfolgreich aktualisiert'
-    }
-  },
-  'emails': {
-    'registration': {
-      'subject': '{{appName}} - Bestätige deine Registrierung',
-      'greeting': 'Hallo {{userName}},',
-      'intro': 'Danke für deine Registrierung bei {{appName}}.',
-      'instructions': 'Diese E-Mail bestätigt, dass wir deine Kontodaten erhalten haben. Falls eine Aktivierung oder Freigabe nötig ist, erhältst du eine weitere E-Mail.',
-      'email': 'Registrierungs-E-Mail: {{email}}',
-      'time': 'Registrierungszeit: {{timestamp}}',
-      'ip': 'Anfrage-IP: {{ip}}',
-      'disclaimer': 'Wenn du dieses Konto nicht angefordert hast, ignoriere diese E-Mail oder kontaktiere den Support.',
-      'thanks': 'Vielen Dank,\nDas {{appName}} Team'
     }
   },
   'system': {

@@ -125,6 +125,14 @@ export default {
       'stats': 'obtener estadísticas de auditoría'
     },
     'accountNotActive': 'La cuenta no está activa',
+    'activationAlreadyActive': 'Tu cuenta ya está activa. Ya puedes iniciar sesión.',
+    'activationDisabledByAdmin': 'Tu cuenta ha sido desactivada por un administrador. Por favor contacta al soporte.',
+    'activationFailed': 'No se pudo activar la cuenta. Inténtalo de nuevo.',
+    'activationInvalidToken': 'Enlace de activación inválido o expirado',
+    'activationMissingToken': 'Falta el token de activación',
+    'activationServerError': 'Ocurrió un error durante la activación. Inténtalo de nuevo más tarde.',
+    'activationSuccess': 'Tu cuenta ha sido activada exitosamente. Ya puedes iniciar sesión.',
+    'activationTokenExpired': 'El enlace de activación ha expirado. Solicita uno nuevo.',
     'cannotAccessOtherUsers': 'No se puede acceder a recursos de otros usuarios',
     'cannotAccessSuperAdmin': 'No se puede acceder a recursos de Super Administrador',
     'cannotChangeAdminRole': 'No se puede cambiar el rol de otros administradores',
@@ -164,6 +172,25 @@ export default {
     'deletedAt': 'Eliminado el {{date, datetime}}',
     'updatedAt': 'Actualizado el {{date, datetime}}',
     'userJoined': 'Se unió el {{date, date}}'
+  },
+  'emails': {
+    'registration': {
+      'activateButton': 'Activar mi cuenta',
+      'activateLinkText': 'O copia y pega este enlace en tu navegador:',
+      'details': 'Detalles de la cuenta',
+      'disclaimer': 'Si no solicitaste esta cuenta, ignora este correo o contacta al soporte.',
+      'email': 'Correo de registro: {{email}}',
+      'expiryWarning': 'Este enlace de activación expirará en {{hours}} horas.',
+      'footer': 'Este es un mensaje automático de {{appName}}. No respondas a este correo.',
+      'greeting': 'Hola {{userName}},',
+      'instructions': 'Este correo confirma que recibimos los datos de tu cuenta. Si se requiere activación o aprobación, recibirás otro correo.',
+      'intro': 'Gracias por registrarte en {{appName}}.',
+      'ip': 'IP de la solicitud: {{ip}}',
+      'securityNote': 'Por tu seguridad, no compartas este enlace con nadie.',
+      'subject': '{{appName}} - Confirma tu registro',
+      'thanks': 'Gracias,\nEl equipo de {{appName}}',
+      'time': 'Hora de registro: {{timestamp}}'
+    }
   },
   'endpoints': {
     'admin': {
@@ -964,25 +991,13 @@ export default {
       'profileUpdated': 'Perfil de usuario actualizado con éxito para {{userName}} - {{fieldsCount}} campo modificado',
       'profileUpdated_other': 'Perfil de usuario actualizado con éxito para {{userName}} - {{fieldsCount}} campos modificados',
       'registered': 'Usuario {{userName}} registrado exitosamente con el rol {{userRole}}',
+      'registeredPendingActivation': 'Registro recibido para {{userName}}. Revisa tu correo para confirmar y activar tu cuenta antes de iniciar sesión.',
       'roleChanged': 'Rol de usuario cambiado de {{oldRole}} a {{newRole}} para {{userName}}',
       'sessionTerminated': 'Todas las sesiones terminadas exitosamente para {{userName}}',
       'suspended': 'Cuenta de usuario suspendida exitosamente para {{userName}} hasta {{suspendedUntil, datetime}}',
       'unsuspended': 'Suspensión de cuenta de usuario levantada para {{userName}} por {{liftedBy}}',
       'updated': 'Perfil de usuario actualizado exitosamente para {{userName}} - campos: {{updatedFields}}',
       'updated_other': '{{count}} perfiles de usuario actualizados exitosamente'
-    }
-  },
-  'emails': {
-    'registration': {
-      'subject': '{{appName}} - Confirma tu registro',
-      'greeting': 'Hola {{userName}},',
-      'intro': 'Gracias por registrarte en {{appName}}.',
-      'instructions': 'Este correo confirma que recibimos los datos de tu cuenta. Si se requiere activación o aprobación, recibirás otro correo.',
-      'email': 'Correo de registro: {{email}}',
-      'time': 'Hora de registro: {{timestamp}}',
-      'ip': 'IP de la solicitud: {{ip}}',
-      'disclaimer': 'Si no solicitaste esta cuenta, ignora este correo o contacta al soporte.',
-      'thanks': 'Gracias,\nEl equipo de {{appName}}'
     }
   },
   'system': {

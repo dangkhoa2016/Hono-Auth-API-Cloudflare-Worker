@@ -125,6 +125,14 @@ export default {
       'stats': '監査統計を取得'
     },
     'accountNotActive': 'アカウントがアクティブではありません',
+    'activationAlreadyActive': 'アカウントは既に有効化されています。すぐにログインできます。',
+    'activationDisabledByAdmin': 'アカウントは管理者によって無効化されています。サポートへお問い合わせください。',
+    'activationFailed': 'アカウントの有効化に失敗しました。もう一度お試しください。',
+    'activationInvalidToken': '無効または期限切れの有効化リンクです',
+    'activationMissingToken': '有効化トークンがありません',
+    'activationServerError': '有効化処理中にエラーが発生しました。しばらくしてからお試しください。',
+    'activationSuccess': 'アカウントが正常に有効化されました。ログインできます。',
+    'activationTokenExpired': '有効化リンクの期限が切れています。新しいリンクをリクエストしてください。',
     'cannotAccessOtherUsers': '他のユーザーのリソースにアクセスできません',
     'cannotAccessSuperAdmin': 'スーパー管理者のリソースにアクセスできません',
     'cannotChangeAdminRole': '他の管理者の役割を変更できません',
@@ -164,6 +172,25 @@ export default {
     'deletedAt': '{{date, datetime}} に削除',
     'updatedAt': '{{date, datetime}} に更新',
     'userJoined': '{{date, date}} に参加'
+  },
+  'emails': {
+    'registration': {
+      'activateButton': 'アカウントを有効化',
+      'activateLinkText': 'またはこのリンクをブラウザにコピー＆ペーストしてください:',
+      'details': 'アカウント詳細',
+      'disclaimer': 'このアカウントに心当たりがない場合は、このメールを無視するかサポートまでご連絡ください。',
+      'email': '登録メールアドレス: {{email}}',
+      'expiryWarning': 'この有効化リンクは{{hours}}時間後に期限切れになります。',
+      'footer': 'このメールは{{appName}}からの自動送信です。返信しないでください。',
+      'greeting': '{{userName}} 様',
+      'instructions': 'このメールはアカウント情報を受け取ったことを確認するものです。承認や有効化が必要な場合、別途メールをお送りします。',
+      'intro': '{{appName}} にご登録いただきありがとうございます。',
+      'ip': 'リクエストIP: {{ip}}',
+      'securityNote': '安全のため、このリンクを他人と共有しないでください。',
+      'subject': '{{appName}} - 登録確認',
+      'thanks': 'ありがとうございます。\n{{appName}} チーム',
+      'time': '登録日時: {{timestamp}}'
+    }
   },
   'endpoints': {
     'admin': {
@@ -964,25 +991,13 @@ export default {
       'profileUpdated': '{{userName}} のユーザープロフィールが正常に更新されました - {{fieldsCount}} 個のフィールドが変更されました',
       'profileUpdated_other': '{{userName}} のユーザープロフィールが正常に更新されました - {{fieldsCount}} 個のフィールドが変更されました',
       'registered': 'って {{userName}} が {{userRole}} ロールで正常に登録されました',
+      'registeredPendingActivation': '{{userName}} の登録を受け付けました。ログインする前に、メールを確認してアカウントを確認・有効化してください。',
       'roleChanged': '{{userName}} のユーザーロールを {{oldRole}} から {{newRole}} に変更しました',
       'sessionTerminated': '{{userName}} のすべてのセッションを正常に終了しました',
       'suspended': '{{userName}} のユーザーアカウントを {{suspendedUntil, datetime}} まで正常に停止しました',
       'unsuspended': '{{liftedBy}} によって {{userName}} のユーザーアカウントの停止が解除されました',
       'updated': '{{userName}} のユーザープロファイルを正常に更新しました - フィールド: {{updatedFields}}',
       'updated_other': '{{count}} 件のユーザープロファイルを正常に更新しました'
-    }
-  },
-  'emails': {
-    'registration': {
-      'subject': '{{appName}} - 登録確認',
-      'greeting': '{{userName}} 様',
-      'intro': '{{appName}} にご登録いただきありがとうございます。',
-      'instructions': 'このメールはアカウント情報を受け取ったことを確認するものです。承認や有効化が必要な場合、別途メールをお送りします。',
-      'email': '登録メールアドレス: {{email}}',
-      'time': '登録日時: {{timestamp}}',
-      'ip': 'リクエストIP: {{ip}}',
-      'disclaimer': 'このアカウントに心当たりがない場合は、このメールを無視するかサポートまでご連絡ください。',
-      'thanks': 'ありがとうございます。\n{{appName}} チーム'
     }
   },
   'system': {

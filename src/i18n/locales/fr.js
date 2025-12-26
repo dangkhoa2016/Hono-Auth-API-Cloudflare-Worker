@@ -117,27 +117,35 @@ export default {
   },
   'auth': {
     'operations': {
-      'export': 'exporter les journaux d’audit',
-      'healthCheck': 'vérification de santé du système d’audit',
+      'export': 'exporter les journaux d\'audit',
+      'healthCheck': 'vérification de santé du système d\'audit',
       'login': 'connexion utilisateur',
-      'logsView': 'voir les journaux d’audit',
-      'search': 'rechercher dans les journaux d’audit',
-      'stats': 'récupérer les statistiques d’audit'
+      'logsView': 'voir les journaux d\'audit',
+      'search': 'rechercher dans les journaux d\'audit',
+      'stats': 'récupérer les statistiques d\'audit'
     },
     'accountNotActive': 'Le compte n\'est pas actif',
+    'activationAlreadyActive': 'Votre compte est déjà actif. Vous pouvez vous connecter.',
+    'activationDisabledByAdmin': 'Votre compte a été désactivé par un administrateur. Veuillez contacter le support.',
+    'activationFailed': 'Échec de l\'activation du compte. Veuillez réessayer.',
+    'activationInvalidToken': 'Lien d\'activation invalide ou expiré',
+    'activationMissingToken': 'Jeton d\'activation manquant',
+    'activationServerError': 'Une erreur s\'est produite lors de l\'activation. Veuillez réessayer plus tard.',
+    'activationSuccess': 'Votre compte a été activé avec succès. Vous pouvez maintenant vous connecter.',
+    'activationTokenExpired': 'Le lien d\'activation a expiré. Veuillez en demander un nouveau.',
     'cannotAccessOtherUsers': 'Impossible d\'accéder aux ressources d\'autres utilisateurs',
     'cannotAccessSuperAdmin': 'Impossible d\'accéder aux ressources du Super Administrateur',
     'cannotChangeAdminRole': 'Impossible de changer le rôle d\'autres administrateurs',
-    'cannotChangeOwnRole': 'Impossible de changer votre propre rôle',
+    'cannotChangeOwnRole': '{{userName}} ({{currentRole}}) ne peut pas changer son propre rôle - {{reason}}',
     'cannotCreateAdmin': 'Impossible de créer des comptes administrateur',
     'cannotCreateHigherRole': '{{currentRole}} ne peut pas créer de comptes {{requestedRole}} en raison des restrictions de hiérarchie des rôles',
     'cannotCreateSuperAdmin': 'Impossible de créer des comptes Super Administrateur',
     'cannotDeleteOwnAccount': '{{userName}} ({{role}}) ne peut pas supprimer son propre compte. {{suggestion}}',
-    'cannotDeleteSuperAdmin': 'Impossible de supprimer le compte Super Administrateur',
+    'cannotDeleteSuperAdmin': 'Impossible de supprimer le compte {{targetRole}} - {{reason}} (tentative par {{currentRole}})',
     'cannotDeleteYourself': 'Impossible de supprimer votre propre compte',
-    'cannotModifyHigherRoleUser': 'Impossible de modifier {{targetUserName}} ({{targetRole}}) - {{currentRole}} {{reason}}',
+    'cannotModifyHigherRoleUser': '{{currentRole}} ne peut pas modifier {{targetUserName}} ({{targetRole}}) - {{reason}}',
     'cannotModifySuperAdmin': 'Impossible de modifier les comptes Super Administrateur',
-    'cannotPromoteToHigherRole': '{{currentRole}} ne peut pas promouvoir les utilisateurs à {{requestedRole}} - {{reason}}',
+    'cannotPromoteToHigherRole': '{{currentRole}} ne peut pas promouvoir les utilisateurs vers {{requestedRole}} - {{reason}}',
     'cannotPromoteToSuperAdmin': 'Impossible de promouvoir l\'utilisateur au rang de Super Administrateur',
     'deleteNotAllowed': 'Opération de suppression non autorisée pour votre rôle',
     'forbidden': 'Accès interdit - privilèges insuffisants',
@@ -164,6 +172,25 @@ export default {
     'deletedAt': 'Supprimé le {{date, datetime}}',
     'updatedAt': 'Mis à jour le {{date, datetime}}',
     'userJoined': 'Rejoint le {{date, date}}'
+  },
+  'emails': {
+    'registration': {
+      'activateButton': 'Activer mon compte',
+      'activateLinkText': 'Ou copiez et collez ce lien dans votre navigateur :',
+      'details': 'Détails du compte',
+      'disclaimer': 'Si vous n\'avez pas demandé ce compte, ignorez cet e-mail ou contactez le support.',
+      'email': 'E-mail d\'inscription : {{email}}',
+      'expiryWarning': 'Ce lien d\'activation expirera dans {{hours}} heures.',
+      'footer': 'Ceci est un message automatique de {{appName}}. Ne répondez pas à cet email.',
+      'greeting': 'Bonjour {{userName}},',
+      'instructions': 'Cet e-mail confirme que nous avons reçu vos informations de compte. Si une activation ou approbation est nécessaire, vous recevrez un autre e-mail.',
+      'intro': 'Merci de vous être inscrit(e) sur {{appName}}.',
+      'ip': 'Adresse IP de la requête : {{ip}}',
+      'securityNote': 'Pour votre sécurité, ne partagez jamais ce lien avec personne.',
+      'subject': '{{appName}} - Confirmez votre inscription',
+      'thanks': 'Merci,\nL\'équipe {{appName}}',
+      'time': 'Heure d\'inscription : {{timestamp}}'
+    }
   },
   'endpoints': {
     'admin': {
@@ -964,25 +991,13 @@ export default {
       'profileUpdated': 'Profil utilisateur mis à jour avec succès pour {{userName}} - {{fieldsCount}} champ modifié',
       'profileUpdated_other': 'Profil utilisateur mis à jour avec succès pour {{userName}} - {{fieldsCount}} champs modifiés',
       'registered': 'Utilisateur {{userName}} enregistré avec succès avec le rôle {{userRole}}',
+      'registeredPendingActivation': 'Inscription reçue pour {{userName}}. Veuillez vérifier votre email pour confirmer et activer votre compte avant de vous connecter.',
       'roleChanged': 'Rôle utilisateur changé de {{oldRole}} à {{newRole}} pour {{userName}}',
       'sessionTerminated': 'Toutes les sessions terminées avec succès pour {{userName}}',
       'suspended': 'Compte utilisateur suspendu avec succès pour {{userName}} jusqu\'à {{suspendedUntil, datetime}}',
       'unsuspended': 'Suspension de compte utilisateur levée pour {{userName}} par {{liftedBy}}',
       'updated': 'Profil utilisateur mis à jour avec succès pour {{userName}} - champs : {{updatedFields}}',
       'updated_other': '{{count}} profils utilisateur mis à jour avec succès'
-    }
-  },
-  'emails': {
-    'registration': {
-      'subject': '{{appName}} - Confirmez votre inscription',
-      'greeting': 'Bonjour {{userName}},',
-      'intro': 'Merci de vous être inscrit(e) sur {{appName}}.',
-      'instructions': 'Cet e-mail confirme que nous avons reçu vos informations de compte. Si une activation ou approbation est nécessaire, vous recevrez un autre e-mail.',
-      'email': 'E-mail d\'inscription : {{email}}',
-      'time': 'Heure d\'inscription : {{timestamp}}',
-      'ip': 'Adresse IP de la requête : {{ip}}',
-      'disclaimer': 'Si vous n\'avez pas demandé ce compte, ignorez cet e-mail ou contactez le support.',
-      'thanks': 'Merci,\nL\'équipe {{appName}}'
     }
   },
   'system': {

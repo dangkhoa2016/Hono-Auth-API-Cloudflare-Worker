@@ -125,6 +125,14 @@ export default {
       'stats': 'ดึงสถิติการตรวจสอบ'
     },
     'accountNotActive': 'บัญชีไม่เปิดใช้งาน',
+    'activationAlreadyActive': 'บัญชีของคุณเปิดใช้งานแล้ว คุณสามารถเข้าสู่ระบบได้ทันที',
+    'activationDisabledByAdmin': 'บัญชีของคุณถูกผู้ดูแลระบบปิดการใช้งาน โปรดติดต่อฝ่ายสนับสนุน',
+    'activationFailed': 'เปิดใช้งานบัญชีไม่สำเร็จ โปรดลองอีกครั้ง',
+    'activationInvalidToken': 'ลิงก์เปิดใช้งานไม่ถูกต้องหรือหมดอายุ',
+    'activationMissingToken': 'ไม่มีโทเค็นสำหรับเปิดใช้งาน',
+    'activationServerError': 'เกิดข้อผิดพลาดระหว่างการเปิดใช้งาน โปรดลองอีกครั้งในภายหลัง',
+    'activationSuccess': 'บัญชีของคุณเปิดใช้งานเรียบร้อยแล้ว คุณสามารถเข้าสู่ระบบได้',
+    'activationTokenExpired': 'ลิงก์เปิดใช้งานหมดอายุแล้ว กรุณาขอลิงก์ใหม่',
     'cannotAccessOtherUsers': 'ไม่สามารถเข้าถึงทรัพยากรของผู้ใช้อื่นได้',
     'cannotAccessSuperAdmin': 'ไม่สามารถเข้าถึงทรัพยากรของผู้ดูแลระบบสูงสุดได้',
     'cannotChangeAdminRole': 'ไม่สามารถเปลี่ยนบทบาทของผู้ดูแลระบบคนอื่นได้',
@@ -164,6 +172,25 @@ export default {
     'deletedAt': 'ลบที่ {{date, datetime}}',
     'updatedAt': 'อัพเดทที่ {{date, datetime}}',
     'userJoined': 'เข้าร่วมเมื่อ {{date, date}}'
+  },
+  'emails': {
+    'registration': {
+      'activateButton': 'เปิดใช้งานบัญชีของฉัน',
+      'activateLinkText': 'หรือคัดลอกลิงก์นี้ไปวางในเบราว์เซอร์ของคุณ:',
+      'details': 'รายละเอียดบัญชี',
+      'disclaimer': 'หากคุณไม่ได้ขอบัญชีนี้ โปรดละเว้นอีเมลหรือ ติดต่อฝ่ายสนับสนุน',
+      'email': 'อีเมลที่ใช้สมัคร: {{email}}',
+      'expiryWarning': 'ลิงก์เปิดใช้งานนี้จะหมดอายุภายใน {{hours}} ชั่วโมง',
+      'footer': 'นี่คืออีเมลอัตโนมัติจาก {{appName}} โปรดอย่าตอบกลับอีเมลนี้',
+      'greeting': 'สวัสดี {{userName}},',
+      'instructions': 'อีเมลนี้ยืนยันว่าเราได้รับข้อมูลบัญชีของคุณแล้ว หากต้องมีการเปิดใช้งานหรืออนุมัติ คุณจะได้รับอีเมลติดตามผล',
+      'intro': 'ขอบคุณที่สมัครใช้งาน {{appName}}',
+      'ip': 'IP ที่ร้องขอ: {{ip}}',
+      'securityNote': 'เพื่อความปลอดภัย ห้ามแชร์ลิงก์นี้กับผู้อื่น',
+      'subject': '{{appName}} - ยืนยันการสมัครสมาชิก',
+      'thanks': 'ขอบคุณ\nทีมงาน {{appName}}',
+      'time': 'เวลาที่สมัคร: {{timestamp}}'
+    }
   },
   'endpoints': {
     'admin': {
@@ -964,25 +991,13 @@ export default {
       'profileUpdated': 'อัปเดตโปรไฟล์ผู้ใช้สำเร็จสำหรับ {{userName}} - แก้ไข {{fieldsCount}} ฟิลด์',
       'profileUpdated_other': 'อัปเดตโปรไฟล์ผู้ใช้สำเร็จสำหรับ {{userName}} - แก้ไข {{fieldsCount}} ฟิลด์',
       'registered': 'ลงทะเบียนผู้ใช้ {{userName}} สำเร็จด้วยบทบาท {{userRole}}',
+      'registeredPendingActivation': 'ได้รับคำขอลงทะเบียนของ {{userName}} แล้ว โปรดตรวจสอบอีเมลเพื่อยืนยันและเปิดใช้งานบัญชีก่อนเข้าสู่ระบบ',
       'roleChanged': 'เปลี่ยนบทบาทผู้ใช้จาก {{oldRole}} เป็น {{newRole}} สำหรับ {{userName}}',
       'sessionTerminated': 'สิ้นสุดเซสชันทั้งหมดสำเร็จสำหรับ {{userName}}',
       'suspended': 'ระงับบัญชีผู้ใช้สำเร็จสำหรับ {{userName}} จนถึง {{suspendedUntil, datetime}}',
       'unsuspended': 'ยกเลิกการระงับบัญชีผู้ใช้สำหรับ {{userName}} โดย {{liftedBy}}',
       'updated': 'อัพเดทโปรไฟล์ผู้ใช้สำเร็จสำหรับ {{userName}} - ฟิลด์: {{updatedFields}}',
       'updated_other': 'อัพเดทโปรไฟล์ผู้ใช้ {{count}} โปรไฟล์สำเร็จ'
-    }
-  },
-  'emails': {
-    'registration': {
-      'subject': '{{appName}} - ยืนยันการสมัครสมาชิก',
-      'greeting': 'สวัสดี {{userName}},',
-      'intro': 'ขอบคุณที่สมัครใช้งาน {{appName}}',
-      'instructions': 'อีเมลนี้ยืนยันว่าเราได้รับข้อมูลบัญชีของคุณแล้ว หากต้องมีการเปิดใช้งานหรืออนุมัติ คุณจะได้รับอีเมลติดตามผล',
-      'email': 'อีเมลที่ใช้สมัคร: {{email}}',
-      'time': 'เวลาที่สมัคร: {{timestamp}}',
-      'ip': 'IP ที่ร้องขอ: {{ip}}',
-      'disclaimer': 'หากคุณไม่ได้ขอบัญชีนี้ โปรดละเว้นอีเมลหรือ ติดต่อฝ่ายสนับสนุน',
-      'thanks': 'ขอบคุณ\nทีมงาน {{appName}}'
     }
   },
   'system': {

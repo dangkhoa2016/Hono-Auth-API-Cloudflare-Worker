@@ -173,6 +173,25 @@ export default {
     'updatedAt': 'Được cập nhật lúc {{date, datetime}}',
     'userJoined': 'Đã tham gia vào {{date, date}}'
   },
+  'emails': {
+    'registration': {
+      'activateButton': 'Kích hoạt tài khoản',
+      'activateLinkText': 'Hoặc sao chép và dán liên kết này vào trình duyệt:',
+      'details': 'Thông tin tài khoản',
+      'disclaimer': 'Nếu bạn không tạo tài khoản này, bạn có thể bỏ qua email này. Không cần thực hiện thêm hành động nào.',
+      'email': 'Email: {{email}}',
+      'expiryWarning': 'Liên kết kích hoạt này sẽ hết hạn sau {{hours}} giờ.',
+      'footer': 'Đây là email tự động từ {{appName}}. Vui lòng không trả lời email này.',
+      'greeting': 'Xin chào {{userName}},',
+      'instructions': 'Để hoàn tất đăng ký và bắt đầu sử dụng tài khoản, vui lòng nhấn vào nút bên dưới:',
+      'intro': 'Chào mừng bạn đến với {{appName}}! Tài khoản của bạn đã được tạo thành công.',
+      'ip': 'Địa chỉ IP: {{ip}}',
+      'securityNote': 'Vì lý do bảo mật, vui lòng không chia sẻ liên kết này với bất kỳ ai.',
+      'subject': '{{appName}} - Kích hoạt tài khoản của bạn',
+      'thanks': 'Trân trọng,\nĐội ngũ {{appName}}',
+      'time': 'Đăng ký lúc: {{time}} ngày {{date}}'
+    }
+  },
   'endpoints': {
     'admin': {
       'changeRole': 'Thay đổi vai trò người dùng (yêu cầu quyền Super Admin)',
@@ -979,25 +998,6 @@ export default {
       'unsuspended': 'Việc đình chỉ tài khoản người dùng đã được gỡ bỏ cho {{userName}} bởi {{liftedBy}}',
       'updated': 'Thông tin cá nhân đã được cập nhật thành công cho {{userName}}. Các trường được cập nhật: {{updatedFields}}',
       'updated_other': '{{count}} hồ sơ người dùng đã được cập nhật thành công'
-    }
-  },
-  'emails': {
-    'registration': {
-      'subject': '{{appName}} - Kích hoạt tài khoản của bạn',
-      'greeting': 'Xin chào {{userName}},',
-      'intro': 'Chào mừng bạn đến với {{appName}}! Tài khoản của bạn đã được tạo thành công.',
-      'instructions': 'Để hoàn tất đăng ký và bắt đầu sử dụng tài khoản, vui lòng nhấn vào nút bên dưới:',
-      'activateButton': 'Kích hoạt tài khoản',
-      'activateLinkText': 'Hoặc sao chép và dán liên kết này vào trình duyệt:',
-      'details': 'Thông tin tài khoản',
-      'email': 'Email: {{email}}',
-      'time': 'Đăng ký lúc: {{time}} ngày {{date}}',
-      'ip': 'Địa chỉ IP: {{ip}}',
-      'expiryWarning': 'Liên kết kích hoạt này sẽ hết hạn sau {{hours}} giờ.',
-      'disclaimer': 'Nếu bạn không tạo tài khoản này, bạn có thể bỏ qua email này. Không cần thực hiện thêm hành động nào.',
-      'securityNote': 'Vì lý do bảo mật, vui lòng không chia sẻ liên kết này với bất kỳ ai.',
-      'thanks': 'Trân trọng,\nĐội ngũ {{appName}}',
-      'footer': 'Đây là email tự động từ {{appName}}. Vui lòng không trả lời email này.'
     }
   },
   'system': {
