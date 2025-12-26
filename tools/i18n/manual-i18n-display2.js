@@ -1,7 +1,10 @@
 #!/usr/bin/env node
 
 /**
- * Manual Test for Security Incident i18n Messages - ALL LOCALES
+ * EN:
+ *   - Manual test for security incident i18n messages across all locales.
+ * VI:
+ *   - Kiểm thử thủ công thông điệp i18n cho sự cố bảo mật trên tất cả locale.
  */
 
 import { initI18n } from '../../src/i18n/config.js';
@@ -10,10 +13,12 @@ import { tl, tpl } from '../../src/i18n/service.js';
 console.log('🧪 Testing Security Incident i18n Messages - ALL 7 LOCALES...\n');
 
 try {
-  // Initialize i18n
+  // EN: Initialize i18n
+  // VI: Khởi tạo i18n
   await initI18n();
 
-  // Test data for interpolation
+  // EN: Test data for interpolation
+  // VI: Dữ liệu thử cho nội suy
   const testData = {
     actor: 'John Administrator',
     incidentCount: 15,

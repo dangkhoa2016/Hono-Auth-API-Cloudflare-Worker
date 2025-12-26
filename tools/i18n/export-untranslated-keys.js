@@ -1,19 +1,14 @@
 /**
- * Export Untranslated Keys Tool
- *
- * This script finds keys with English values in locale files and exports them
- * to separate [locale]-auto-english.js files for easier translation.
- *
- * Usage:
- *   node export_untranslated_keys.js
- *
- * Output files:
- *   - de-auto-english.js
- *   - es-auto-english.js
- *   - fr-auto-english.js
- *   - ja-auto-english.js
- *   - th-auto-english.js
- *   - vi-auto-english.js
+ * EN:
+ *   - Export untranslated keys to separate [locale]-auto-english.js files.
+ *   - Scans locale files for values that are still English.
+ *   - Usage: node export_untranslated_keys.js
+ *   - Output files: de-auto-english.js, es-auto-english.js, fr-auto-english.js, ja-auto-english.js, th-auto-english.js, vi-auto-english.js.
+ * VI:
+ *   - Xuất các key chưa dịch vào file [locale]-auto-english.js riêng.
+ *   - Quét file locale để tìm giá trị vẫn còn tiếng Anh.
+ *   - Cách dùng: node export_untranslated_keys.js
+ *   - File tạo ra: de-auto-english.js, es-auto-english.js, fr-auto-english.js, ja-auto-english.js, th-auto-english.js, vi-auto-english.js.
  */
 
 import { fileURLToPath } from 'url';
@@ -23,7 +18,8 @@ import { writeFileSync } from 'fs';
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
 
-// Function to flatten nested object and collect key-value pairs
+// EN: Flatten nested object and collect key/value pairs
+// VI: Làm phẳng object lồng nhau để gom key/value
 function flattenObject(obj, prefix = '') {
   const result = {};
   for (const key in obj) {
@@ -39,7 +35,8 @@ function flattenObject(obj, prefix = '') {
   return result;
 }
 
-// Function to rebuild nested object from flattened keys
+// EN: Rebuild nested object from flattened keys
+// VI: Dựng lại object lồng nhau từ key phẳng
 function buildNestedObject(flatObj) {
   const result = {};
 
@@ -60,7 +57,8 @@ function buildNestedObject(flatObj) {
   return result;
 }
 
-// Function to format object as JavaScript code
+// EN: Format object as JavaScript code
+// VI: Định dạng object thành mã JavaScript
 function formatAsJavaScript(obj, indent = 0) {
   const spaces = '  '.repeat(indent);
   const items = [];

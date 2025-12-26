@@ -1,8 +1,8 @@
 #!/usr/bin/env node
 
 /**
- * Quick Schema Validation Test
- * Test updated i18n schema validation with new key structure
+ * EN: Quick schema validation test using updated i18n keys
+ * VI: Kiểm thử nhanh validate schema với cấu trúc key i18n mới
  */
 
 import { createSchemaBuilder } from '../../src/schemas/base.js';
@@ -11,12 +11,14 @@ import { createUserRegistrationSchema } from '../../src/schemas/zodDemo.js';
 
 console.log('🧪 Testing Updated i18n Schema Validation...\n');
 
-// Test 1: Base Schema Builder
+// EN: Test 1 - Base schema builder
+// VI: Kiểm thử 1 - Bộ dựng schema cơ bản
 console.log('1️⃣ Testing Base Schema Builder...');
 try {
   const builder = createSchemaBuilder('en');
 
-  // Test email validation
+  // EN: Test email validation
+  // VI: Kiểm tra validate email
   const emailSchema = builder.email();
   const validEmail = emailSchema.safeParse('test@example.com');
   const invalidEmail = emailSchema.safeParse('invalid-email');
@@ -28,7 +30,8 @@ try {
   console.log(`❌ Base schema builder error: ${error.message}`);
 }
 
-// Test 2: Login Schema
+// EN: Test 2 - Login schema
+// VI: Kiểm thử 2 - Schema đăng nhập
 console.log('\n2️⃣ Testing Login Schema...');
 try {
   const loginSchema = createLoginSchema('en');
@@ -40,7 +43,8 @@ try {
 
   const invalidLogin = loginSchema.safeParse({
     email: 'invalid-email',
-    password: '123' // too short
+    password: '123' // EN: Too short
+    // VI: Quá ngắn
   });
 
   console.log(`✅ Valid login: ${validLogin.success}`);
@@ -56,7 +60,8 @@ try {
   console.log(`❌ Login schema error: ${error.message}`);
 }
 
-// Test 3: Registration Schema
+// EN: Test 3 - Registration schema
+// VI: Kiểm thử 3 - Schema đăng ký
 console.log('\n3️⃣ Testing User Registration Schema...');
 try {
   const registrationSchema = createUserRegistrationSchema('en');
@@ -75,7 +80,8 @@ try {
     email: 'invalid-email',
     password: '123',
     confirmPassword: 'different',
-    age: 15, // too young
+    age: 15, // EN: Too young
+    // VI: Quá trẻ
     terms_accepted: false
   });
 
@@ -92,18 +98,21 @@ try {
   console.log(`❌ Registration schema error: ${error.message}`);
 }
 
-// Test 4: i18n Key Structure
+// EN: Test 4 - i18n key structure
+// VI: Kiểm thử 4 - Cấu trúc key i18n
 console.log('\n4️⃣ Testing i18n Key Structure...');
 try {
   const { initI18n } = await import('../../src/i18n/config.js');
   const { tl } = await import('../../src/i18n/service.js');
 
-  // Initialize i18n first
+  // EN: Initialize i18n first
+  // VI: Khởi tạo i18n trước
   console.log('Initializing i18n...');
   await initI18n();
   console.log('i18n initialized successfully');
 
-  // Test new validation keys
+  // EN: Test new validation keys
+  // VI: Kiểm thử các key validation mới
   console.log('Testing fieldRequired keys...');
   const requiredFieldError = tl('en', 'validation.fieldRequired.email');
   console.log(`✅ Required field key: "${requiredFieldError}"`);

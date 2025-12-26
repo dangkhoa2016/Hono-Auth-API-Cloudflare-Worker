@@ -1,14 +1,17 @@
 #!/usr/bin/env node
 
 /**
- * Find Extra Keys Tool
- * Find keys that exist in target locale but not in en.js (base)
- * 
- * Created: August 13, 2025
- * Purpose: Detect key discrepancies between locale files to maintain consistency
- * Features: Missing keys detection, extra keys detection, key count comparison
- * Integration: Works with master.js workflow for comprehensive key management
- * 
+ * EN:
+ *   - Find extra keys existing in target locale but not in en.js.
+ *   - Detect discrepancies across locales (missing/extra keys, counts).
+ *   - Works with master.js workflow.
+ *   - Created: August 13, 2025.
+ * VI:
+ *   - Tìm các key dư thừa có trong locale đích nhưng không có ở en.js.
+ *   - Phát hiện sai lệch giữa locale (thiếu/dư key, so sánh số lượng).
+ *   - Tích hợp cùng workflow trong master.js.
+ *   - Tạo ngày: 13/08/2025.
+ *
  * Usage:
  *   node find-extra-keys.js <target-locale> [base-locale]
  *   node find-extra-keys.js vi en    # Compare Vietnamese vs English
@@ -43,7 +46,8 @@ async function loadLocaleKeys(localeCode) {
     throw new Error(`Locale file not found: ${filePath}`);
   }
   
-  // Import the locale module
+  // EN: Import the locale module
+  // VI: Import module locale
   const localeModule = await import(`file://${filePath}`);
   const localeData = localeModule.default;
   
@@ -60,10 +64,12 @@ async function compareKeys(baseCode, targetCode) {
     console.log(`📊 ${baseCode}: ${baseKeys.length} keys`);
     console.log(`📊 ${targetCode}: ${targetKeys.length} keys`);
     
-    // Find extra keys in target
+    // EN: Find extra keys in target locale
+    // VI: Tìm key dư trong locale đích
     const extraKeys = targetKeys.filter(key => !baseKeys.includes(key));
     
-    // Find missing keys in target
+    // EN: Find missing keys in target locale
+    // VI: Tìm key thiếu trong locale đích
     const missingKeys = baseKeys.filter(key => !targetKeys.includes(key));
     
     if (extraKeys.length > 0) {
@@ -97,7 +103,8 @@ async function compareKeys(baseCode, targetCode) {
   }
 }
 
-// Main execution
+  // EN: Main execution
+  // VI: Thực thi chính
 if (process.argv[1] === fileURLToPath(import.meta.url)) {
   const targetCode = process.argv[2];
   const baseCode = process.argv[3] || 'en';

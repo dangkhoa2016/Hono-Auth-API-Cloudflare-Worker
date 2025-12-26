@@ -1,7 +1,6 @@
 /**
- * i18n Key Comparison Tool
- * Compares translation keys between en.js (base) and other locale files
- * Finds missing keys and provides options to auto-add them
+ * EN: i18n key comparison tool (base en.js vs other locales)
+ * VI: Công cụ so sánh key i18n giữa en.js và các locale khác, hỗ trợ thêm key thiếu
  */
 
 import fs from 'fs';
@@ -15,10 +14,17 @@ const LOCALES_DIR = path.resolve(__dirname, '../../src/i18n/locales');
 const BASE_LOCALE = 'en.js';
 
 /**
- * Extract all keys from a translation object recursively
- * @param {Object} obj - Translation object
- * @param {string} prefix - Key prefix for nested objects
- * @returns {Array} Array of key paths
+ * EN: Extract all keys from a translation object recursively
+ * VI: Đệ quy lấy toàn bộ key từ object dịch
+ * @param {Object} obj
+ *   EN: Translation object
+ *   VI: Object dịch
+ * @param {string} prefix
+ *   EN: Prefix for nested keys
+ *   VI: Tiền tố cho key lồng
+ * @returns {Array}
+ *   EN: Array of key paths
+ *   VI: Mảng đường dẫn key
  */
 function extractKeys(obj, prefix = '') {
   const keys = [];
@@ -37,9 +43,14 @@ function extractKeys(obj, prefix = '') {
 }
 
 /**
- * Load and parse a translation file
- * @param {string} filePath - Path to translation file
- * @returns {Object} Parsed translation object
+ * EN: Load and parse a translation file
+ * VI: Nạp và parse file dịch
+ * @param {string} filePath
+ *   EN: File path
+ *   VI: Đường dẫn file
+ * @returns {Object}
+ *   EN: Parsed translation object
+ *   VI: Object dịch đã parse
  */
 async function loadTranslationFile(filePath) {
   try {
@@ -52,10 +63,17 @@ async function loadTranslationFile(filePath) {
 }
 
 /**
- * Get value from nested object using dot notation
- * @param {Object} obj - Object to search in
- * @param {string} keyPath - Dot notation key path
- * @returns {*} Value or undefined
+ * EN: Get value from nested object via dot path
+ * VI: Lấy giá trị trong object lồng qua path dạng chấm
+ * @param {Object} obj
+ *   EN: Object to search
+ *   VI: Object cần tìm
+ * @param {string} keyPath
+ *   EN: Dot path
+ *   VI: Đường dẫn chấm
+ * @returns {*}
+ *   EN: Value or undefined
+ *   VI: Giá trị hoặc undefined
  */
 function getNestedValue(obj, keyPath) {
   return keyPath.split('.').reduce((current, key) => {
@@ -64,10 +82,17 @@ function getNestedValue(obj, keyPath) {
 }
 
 /**
- * Set value in nested object using dot notation
- * @param {Object} obj - Object to modify
- * @param {string} keyPath - Dot notation key path
- * @param {*} value - Value to set
+ * EN: Set nested value via dot path
+ * VI: Gán giá trị lồng qua path dạng chấm
+ * @param {Object} obj
+ *   EN: Target object
+ *   VI: Object cần chỉnh
+ * @param {string} keyPath
+ *   EN: Dot path
+ *   VI: Đường dẫn chấm
+ * @param {*} value
+ *   EN: Value to set
+ *   VI: Giá trị cần gán
  */
 function setNestedValue(obj, keyPath, value) {
   const keys = keyPath.split('.');
@@ -85,10 +110,17 @@ function setNestedValue(obj, keyPath, value) {
 }
 
 /**
- * Generate JavaScript code for nested object
- * @param {Object} obj - Object to convert
- * @param {number} indent - Indentation level
- * @returns {string} JavaScript object code
+ * EN: Generate JS code for nested object
+ * VI: Sinh mã JS cho object lồng
+ * @param {Object} obj
+ *   EN: Object to convert
+ *   VI: Object cần chuyển
+ * @param {number} indent
+ *   EN: Indentation level
+ *   VI: Mức thụt lề
+ * @returns {string}
+ *   EN: JS object code
+ *   VI: Mã object JS
  */
 function objectToJS(obj, indent = 0) {
   const spaces = '  '.repeat(indent);
@@ -112,10 +144,17 @@ function objectToJS(obj, indent = 0) {
 }
 
 /**
- * Update translation file with missing keys
- * @param {string} filePath - Path to translation file
- * @param {Object} missingKeys - Object containing missing keys and values
- * @returns {boolean} Success status
+ * EN: Update translation file with missing keys
+ * VI: Cập nhật file dịch với các key thiếu
+ * @param {string} filePath
+ *   EN: File path
+ *   VI: Đường dẫn file
+ * @param {Object} missingKeys
+ *   EN: Missing key/value pairs
+ *   VI: Các key/giá trị còn thiếu
+ * @returns {boolean}
+ *   EN: Success flag
+ *   VI: Cờ thành công
  */
 async function updateTranslationFile(filePath, missingKeys) {
   try {
@@ -151,12 +190,14 @@ export default ${objectToJS(currentTranslation)};
 }
 
 /**
- * Compare translation files and find missing keys
+ * EN: Compare translation files and find missing keys
+ * VI: So sánh file dịch để tìm key thiếu
  */
 async function compareTranslations() {
   console.log('🔍 i18n Key Comparison Tool\n');
 
-  // Load base translation (en.js)
+  // EN: Load base translation (en.js)
+  // VI: Tải bản dịch gốc (en.js)
   const baseFilePath = path.join(LOCALES_DIR, BASE_LOCALE);
   console.log(`📖 Loading base translation: ${BASE_LOCALE}`);
 
@@ -169,7 +210,8 @@ async function compareTranslations() {
   const baseKeys = extractKeys(baseTranslation);
   console.log(`✅ Found ${baseKeys.length} keys in base translation\n`);
 
-  // Get all locale files (except base)
+  // EN: Get all locale files except base
+  // VI: Lấy các file locale khác ngoài base
   const allFiles = fs.readdirSync(LOCALES_DIR);
   const localeFiles = allFiles.filter(file =>
     file.endsWith('.js') && file !== BASE_LOCALE
@@ -182,7 +224,8 @@ async function compareTranslations() {
 
   const results = [];
 
-  // Compare each locale file
+  // EN: Compare each locale file
+  // VI: So sánh từng file locale
   for (const localeFile of localeFiles) {
     const localePath = path.join(LOCALES_DIR, localeFile);
     const locale = path.basename(localeFile, '.js');
@@ -229,7 +272,8 @@ async function compareTranslations() {
     }
   }
 
-  // Summary
+  // EN: Summary
+  // VI: Tóm tắt
   console.log('📊 Summary:');
   console.log(`   Base locale (${BASE_LOCALE}): ${baseKeys.length} keys`);
 
@@ -246,8 +290,11 @@ async function compareTranslations() {
 }
 
 /**
- * Auto-fix missing keys by copying from base translation
- * @param {Array} results - Results from comparison
+ * EN: Auto-fix missing keys using base translation
+ * VI: Tự động bổ sung key thiếu từ bản gốc
+ * @param {Array} results
+ *   EN: Comparison results
+ *   VI: Kết quả so sánh
  */
 async function autoFixMissingKeys(results) {
   if (results.length === 0) {

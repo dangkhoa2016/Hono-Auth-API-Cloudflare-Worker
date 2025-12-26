@@ -3,18 +3,24 @@
 /**
  * i18n Master Management Tool
  *
- * Tổng hợp tất cả các công cụ quản lý i18n thành một interface duy nhất
- * Consolidated tool for all i18n translation management needs
- *
- * Tính năng / Features:
- * - Quản lý khóa dịch thuật nâng cao / Advanced translation key management
- * - Workflow dịch thuật hoàn chỉnh / Complete translation workflow
- * - Test và xác minh hệ thống / System testing and verification
- * - Thêm ngôn ngữ mới / Add new languages
- * - So sánh và sửa lỗi / Compare and auto-fix
- *
- * Usage:
- *   node tools/i18n/master.js [command] [options]
+ * EN:
+ *   - Consolidated tool for all i18n translation management needs.
+ *   - Features:
+ *     - Advanced translation key management.
+ *     - Complete translation workflow.
+ *     - System testing and verification.
+ *     - Add new languages.
+ *     - Compare and auto-fix.
+ *   - Usage: node tools/i18n/master.js [command] [options].
+ * VI:
+ *   - Tổng hợp tất cả công cụ quản lý i18n vào một interface duy nhất.
+ *   - Tính năng:
+ *     - Quản lý khóa dịch thuật nâng cao.
+ *     - Workflow dịch thuật hoàn chỉnh.
+ *     - Test và xác minh hệ thống.
+ *     - Thêm ngôn ngữ mới.
+ *     - So sánh và sửa lỗi.
+ *   - Cách dùng: node tools/i18n/master.js [command] [options].
  */
 
 import fs from 'fs';

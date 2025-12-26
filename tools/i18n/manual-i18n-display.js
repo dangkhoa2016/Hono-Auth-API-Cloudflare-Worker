@@ -1,7 +1,8 @@
 #!/usr/bin/env node
 
 /**
- * Quick test for datetime formatting in success messages
+ * EN: Quick test for datetime formatting in success messages
+ * VI: Kiểm thử nhanh định dạng thời gian trong thông điệp thành công
  */
 
 import { initI18n } from '../../src/i18n/config.js';
@@ -10,7 +11,8 @@ import { tl, tpl } from '../../src/i18n/service.js';
 console.log('🧪 Testing Fixed i18n Messages...\n');
 
 try {
-  // Initialize i18n
+  // EN: Initialize i18n
+  // VI: Khởi tạo i18n
   await initI18n();
 
   console.log('1️⃣ Testing User Registration Error...');
@@ -57,7 +59,8 @@ try {
 
   console.log('\n5️⃣ Testing Proper Pluralization with tpl() Helper...');
   
-  // Test pluralization with the new tpl() helper function  
+  // EN: Test pluralization with the new tpl() helper
+  // VI: Kiểm tra plural bằng helper tpl() mới
   const processingSingle = tpl('en', 'success.file.processingCompleted', 1, {
     filename: 'document.pdf',
     operationsCount: 1
@@ -70,7 +73,8 @@ try {
   });
   console.log(`✅ Processing multiple: "${processingMultiple}"`);
 
-  // Test count-based pluralization with tpl()
+  // EN: Test count-based pluralization with tpl()
+  // VI: Kiểm tra plural dựa trên count với tpl()
   const itemsSingle = tpl('en', 'info.itemsFound', 1);
   console.log(`✅ Items found single: "${itemsSingle}"`);
 
@@ -82,7 +86,8 @@ try {
 
   console.log('\n6️⃣ Testing Different Languages with Pluralization...');
   
-  // Test Vietnamese pluralization (if we add plural forms to vi.js)
+  // EN: Test Vietnamese pluralization (if vi.js has plural forms)
+  // VI: Thử plural tiếng Việt (nếu vi.js có plural)
   const itemsViSingle = tpl('vi', 'info.itemsFound', 1);
   const itemsViMultiple = tpl('vi', 'info.itemsFound', 10);
   console.log(`✅ Items Vietnamese single: "${itemsViSingle}"`);
@@ -90,7 +95,8 @@ try {
 
   console.log('\n7️⃣ Testing Practical Examples...');
   
-  // Practical examples with different counts
+  // EN: Practical examples with different counts
+  // VI: Ví dụ thực tế với nhiều giá trị count
   const examples = [
     { count: 0, name: 'zero files' },
     { count: 1, name: 'single file' },

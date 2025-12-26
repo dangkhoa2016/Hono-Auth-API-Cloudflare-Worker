@@ -1,5 +1,6 @@
 /**
- * Debug i18n pluralization issue
+ * EN: Debug i18n pluralization issue
+ * VI: Gỡ lỗi vấn đề số nhiều trong i18n
  */
 
 import { i18next } from '../../src/i18n/config.js';
@@ -11,7 +12,8 @@ async function testPluralization() {
 
   console.log('\n📊 Testing i18next pluralization:');
   
-  // Test totalUsersCount
+  // EN: Test totalUsersCount pluralization
+  // VI: Kiểm tra plural cho totalUsersCount
   console.log('\n--- totalUsersCount ---');
   console.log('Count 0:', i18next.t('admin.totalUsersCount', { count: 0 }));
   console.log('Count 1:', i18next.t('admin.totalUsersCount', { count: 1 }));
@@ -19,7 +21,8 @@ async function testPluralization() {
   console.log('Count 5:', i18next.t('admin.totalUsersCount', { count: 5 }));
   console.log('Count 10:', i18next.t('admin.totalUsersCount', { count: 10 }));
 
-  // Test usersListRetrieved
+  // EN: Test usersListRetrieved pluralization
+  // VI: Kiểm tra plural cho usersListRetrieved
   console.log('\n--- usersListRetrieved ---');
   console.log('Count 1:', i18next.t('admin.usersListRetrieved', { 
     count: 1, 
@@ -43,7 +46,8 @@ async function testPluralization() {
     requestedBy: 'Test User' 
   }));
 
-  // Debug i18next configuration
+  // EN: Inspect i18next configuration
+  // VI: Kiểm tra cấu hình i18next
   console.log('\n🔧 i18next Configuration:');
   console.log('Language:', i18next.language);
   console.log('Languages:', i18next.languages);
@@ -51,7 +55,8 @@ async function testPluralization() {
   console.log('Plural separator:', i18next.options.pluralSeparator);
   console.log('Compatibility JSON:', i18next.options.compatibilityJSON);
   
-  // Check what keys exist for totalUsersCount
+  // EN: Check available resource keys for totalUsersCount
+  // VI: Xem các key resource cho totalUsersCount
   console.log('\n🔍 Available translation keys:');
   const store = i18next.getResourceBundle('en', 'translation');
   console.log('admin.totalUsersCount:', store.admin?.totalUsersCount);
@@ -59,13 +64,15 @@ async function testPluralization() {
   console.log('admin.usersListRetrieved:', store.admin?.usersListRetrieved);
   console.log('admin.usersListRetrieved_other:', store.admin?.usersListRetrieved_other);
   
-  // Test direct pluralization functionality
+  // EN: Test direct pluralization APIs
+  // VI: Kiểm tra API plural hoá trực tiếp
   console.log('\n🧪 Testing direct pluralization:');
   console.log('Exists method result for count 1:', i18next.exists('admin.totalUsersCount', { count: 1 }));
   console.log('Exists method result for count 5:', i18next.exists('admin.totalUsersCount', { count: 5 }));
   console.log('Exists method result for plural:', i18next.exists('admin.totalUsersCount_other'));
   
-  // Test plural resolver
+  // EN: Inspect plural resolver suffixes
+  // VI: Kiểm tra hậu tố của plural resolver
   const PluralResolver = i18next.services.pluralResolver;
   console.log('Plural resolver suffix for count 1:', PluralResolver.getSuffix('en', 1));
   console.log('Plural resolver suffix for count 5:', PluralResolver.getSuffix('en', 5));

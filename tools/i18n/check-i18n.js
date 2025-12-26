@@ -1,20 +1,24 @@
 #!/usr/bin/env node
 
 /**
- * Dynamic i18n System Validation
- * Updated to work with the new dynamic language system
+ * EN: Dynamic i18n system validation
+ * VI: Kiểm tra hệ thống i18n động
+ * EN: Compatible with new dynamic language flow
+ * VI: Tương thích luồng ngôn ngữ động mới
  */
 
 import fs from 'fs';
 
-// Manual path utilities for better compatibility
+// EN: Manual path utilities for compatibility
+// VI: Tiện ích nối đường dẫn để tương thích
 function join(...parts) {
   return parts.join('/').replace(/\/+/g, '/');
 }
 
 console.log('🔍 Testing Dynamic i18n System Integration...\n');
 
-// Test 1: Check translation files structure
+// EN: Test 1 - Check translation file structure
+// VI: Kiểm thử 1 - Cấu trúc file dịch
 console.log('1️⃣ Checking dynamic translation files...');
 const localesDir = join(process.cwd(), 'src/i18n/locales');
 
@@ -22,7 +26,8 @@ try {
   const files = fs.readdirSync(localesDir);
   console.log('   ✅ Found files:', files);
 
-  // Count different file types
+  // EN: Count different file types
+  // VI: Đếm các loại file
   const jsFiles = files.filter(f => f.endsWith('.js'));
   const jsonFiles = files.filter(f => f.endsWith('.json'));
   const yamlFiles = files.filter(f => f.endsWith('.yml') || f.endsWith('.yaml'));
@@ -37,21 +42,24 @@ try {
     console.log('   ⚠️ Legacy files detected - consider cleanup');
   }
 
-  // Test each JS file
+  // EN: Test each JS locale file
+  // VI: Kiểm tra từng file locale JS
   for (const file of jsFiles) {
     if (file.endsWith('.js')) {
       const filePath = join(localesDir, file);
       try {
         const content = fs.readFileSync(filePath, 'utf8');
 
-        // Check if it's a proper ES module
+        // EN: Verify ES module export
+        // VI: Kiểm tra định dạng ES module
         if (content.includes('export default')) {
           console.log(`   ✅ ${file} - Valid ES module`);
         } else {
           console.log(`   ❌ ${file} - Missing export default`);
         }
 
-        // Check for required sections
+        // EN: Verify required translation sections
+        // VI: Kiểm tra các section bắt buộc
         const requiredSections = ['auth', 'user', 'validation', 'system', 'endpoints'];
         const missingSections = requiredSections.filter(section =>
           !content.includes(`'${section}':`) && !content.includes(`"${section}":`) && !content.includes(`${section}:`)
@@ -73,7 +81,8 @@ try {
   console.log('   ❌ Error reading locales directory:', error.message);
 }
 
-// Test 2: Check dynamic system integration
+// EN: Test 2 - Dynamic system integration
+// VI: Kiểm thử 2 - Tích hợp hệ thống động
 console.log('\n2️⃣ Testing dynamic system components...');
 
 const systemFiles = [
@@ -87,7 +96,8 @@ systemFiles.forEach(file => {
     if (fs.existsSync(file)) {
       const content = fs.readFileSync(file, 'utf8');
 
-      // Check for dynamic patterns
+      // EN: Check for dynamic patterns
+      // VI: Kiểm tra pattern động
       const isDynamic = content.includes('async function') ||
                        content.includes('await import') ||
                        content.includes('getSupportedLanguages');
@@ -98,7 +108,8 @@ systemFiles.forEach(file => {
         console.log(`   ⚠️ ${file} - May need dynamic updates`);
       }
 
-      // Check for hard-coded language lists
+      // EN: Check for hard-coded language lists
+      // VI: Kiểm tra danh sách ngôn ngữ hard-code
       const hasHardCode = content.includes('[\'en\', \'vi\']') ||
                          content.includes('["en", "vi"]');
 
@@ -116,7 +127,8 @@ systemFiles.forEach(file => {
   }
 });
 
-// Test 3: Check for legacy files
+// EN: Test 3 - Check for legacy files
+// VI: Kiểm thử 3 - Kiểm tra file legacy
 console.log('\n3️⃣ Checking for legacy files that should be cleaned up...');
 
 const legacyFiles = [
@@ -138,7 +150,8 @@ if (!legacyFound) {
   console.log('   ✅ No legacy files found - cleanup complete!');
 }
 
-// Test 4: Test management tools
+// EN: Test 4 - Check management tools
+// VI: Kiểm thử 4 - Kiểm tra công cụ quản trị
 console.log('\n4️⃣ Checking management tools...');
 
 const toolFiles = [
@@ -156,7 +169,8 @@ toolFiles.forEach(file => {
   }
 });
 
-// Summary
+// EN: Summary
+// VI: Tóm tắt
 console.log('\n📊 SYSTEM STATUS SUMMARY:');
 console.log('========================');
 

@@ -4,7 +4,8 @@ import { initI18n } from '../../src/i18n/config.js';
 async function testAllRoutesI18n() {
   console.log('🧪 Testing All Routes i18n Messages...\n');
 
-  // Initialize i18n
+  // EN: Initialize i18n
+  // VI: Khởi tạo i18n
   await initI18n();
 
   const env = {
@@ -12,9 +13,11 @@ async function testAllRoutesI18n() {
     DB: null // Mock DB for testing
   };
 
-  // Use the imported app directly
+  // EN: Use the imported app instance directly
+  // VI: Dùng thẳng instance app đã import
 
-  // Test cases that cover different routes
+  // EN: Test cases covering multiple routes
+  // VI: Bộ test bao phủ nhiều route
   const testCases = [
     {
       name: 'User Registration',
@@ -22,8 +25,12 @@ async function testAllRoutesI18n() {
       path: '/api/user/register',
       body: {
         full_name: 'Test User',
-        email: 'invalid-email', // Invalid to trigger validation
-        password: '123' // Too short
+        // EN: Invalid to trigger validation
+        // VI: Giá trị sai để kích hoạt validation
+        email: 'invalid-email',
+        // EN: Too short
+        // VI: Quá ngắn
+        password: '123'
       }
     },
     {
@@ -69,7 +76,8 @@ async function testAllRoutesI18n() {
       if (result.error) {
         console.log(`   ❌ Error: ${result.error}`);
 
-        // Check if it's a missing translation key
+        // EN: Check if error hints a missing i18n key
+        // VI: Kiểm tra lỗi có phải thiếu key i18n hay không
         if (typeof result.error === 'string' && result.error.includes('.')) {
           console.log(`   ⚠️  Possible missing i18n key: ${result.error}`);
         }
@@ -84,7 +92,8 @@ async function testAllRoutesI18n() {
         result.data.validationErrors.forEach(err => {
           console.log(`      - ${err.field}: ${err.message}`);
 
-          // Check for untranslated validation messages
+          // EN: Check for untranslated validation messages
+          // VI: Kiểm tra thông điệp validation chưa dịch
           if (typeof err.message === 'string' && err.message.includes('validation.')) {
             console.log(`      ⚠️  Possible missing validation key: ${err.message}`);
           }
@@ -99,5 +108,6 @@ async function testAllRoutesI18n() {
   console.log('\n🎯 i18n Route Testing Complete!');
 }
 
-// Run the test
+// EN: Run the test
+// VI: Chạy kịch bản kiểm thử
 testAllRoutesI18n().catch(console.error);
