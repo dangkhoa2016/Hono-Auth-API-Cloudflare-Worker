@@ -141,7 +141,7 @@ export class EmailSendTester extends BaseService {
     * @param {boolean} [params.debug=false] - Debug mode (return error details)
    * @returns {Promise<Object>} Result from EmailService
    */
-    async manuallySendRegistrationConfirmation({ to, name, locale = 'en', ipAddress = '203.0.113.10', baseUrl, preview = false, debug = false }) {
+  async manuallySendRegistrationConfirmation({ to, name, locale = 'en', ipAddress = '203.0.113.10', baseUrl, preview = false, debug = false }) {
     if (!to) {
       return { success: false, error: 'MISSING_RECIPIENT', message: 'Recipient email is required' };
     }
@@ -157,8 +157,8 @@ export class EmailSendTester extends BaseService {
       ipAddress,
       baseUrl,
       userAgent: 'email-manual-tester',
-          preview,
-          debug
+      preview,
+      debug
     };
 
     return await this.emailService.sendRegistrationConfirmation(user, context);

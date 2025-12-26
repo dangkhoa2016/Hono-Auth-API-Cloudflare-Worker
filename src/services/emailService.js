@@ -315,44 +315,44 @@ export class EmailService extends BaseService {
 
     const payload = provider === 'brevo'
       ? {
-          sender: {
-            email: emailConfig.fromAddress,
-            name: emailConfig.fromName || appSettings.name
-          },
-          to: [{ email: user.email, name: recipientName }],
-          subject,
-          htmlContent: htmlBody,
-          textContent: plainText,
-          ...(emailConfig.replyTo
-            ? { replyTo: { email: emailConfig.replyTo, name: emailConfig.fromName || appSettings.name } }
-            : {}),
-          ...(context.userAgent ? { headers: { 'User-Agent': context.userAgent } } : {})
-        }
+        sender: {
+          email: emailConfig.fromAddress,
+          name: emailConfig.fromName || appSettings.name
+        },
+        to: [{ email: user.email, name: recipientName }],
+        subject,
+        htmlContent: htmlBody,
+        textContent: plainText,
+        ...(emailConfig.replyTo
+          ? { replyTo: { email: emailConfig.replyTo, name: emailConfig.fromName || appSettings.name } }
+          : {}),
+        ...(context.userAgent ? { headers: { 'User-Agent': context.userAgent } } : {})
+      }
       : {
-          personalizations: [
-            {
-              to: [{ email: user.email, name: recipientName }],
-              ...(context.userAgent ? { headers: { 'User-Agent': context.userAgent } } : {})
+        personalizations: [
+          {
+            to: [{ email: user.email, name: recipientName }],
+            ...(context.userAgent ? { headers: { 'User-Agent': context.userAgent } } : {})
+          }
+        ],
+        from: {
+          email: emailConfig.fromAddress,
+          name: emailConfig.fromName || appSettings.name
+        },
+        subject,
+        content: [
+          { type: 'text/plain', value: plainText },
+          { type: 'text/html', value: htmlBody }
+        ],
+        ...(emailConfig.replyTo
+          ? {
+            reply_to: {
+              email: emailConfig.replyTo,
+              name: emailConfig.fromName || appSettings.name
             }
-          ],
-          from: {
-            email: emailConfig.fromAddress,
-            name: emailConfig.fromName || appSettings.name
-          },
-          subject,
-          content: [
-            { type: 'text/plain', value: plainText },
-            { type: 'text/html', value: htmlBody }
-          ],
-          ...(emailConfig.replyTo
-            ? {
-                reply_to: {
-                  email: emailConfig.replyTo,
-                  name: emailConfig.fromName || appSettings.name
-                }
-              }
-            : {})
-        };
+          }
+          : {})
+      };
 
     const headers = {
       'content-type': 'application/json'

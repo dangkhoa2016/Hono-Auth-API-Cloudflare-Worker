@@ -1,4 +1,6 @@
 
+export const DEFAULT_APP_URL = 'https://your-app.com';
+
 /**
  * Default configurations - fallback values when KV is not available
 */
@@ -6,7 +8,7 @@ export const DEFAULT_CONFIGS = {
   // App Info
   APP_NAME: 'Hono Auth API',
   APP_VERSION: '1.0.0',
-  APP_URL: 'https://your-app.com',
+  APP_URL: DEFAULT_APP_URL,
 
   // Debug & Development
   DEBUG: 'hono-auth-api:*',
