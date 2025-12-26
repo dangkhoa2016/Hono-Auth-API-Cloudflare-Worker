@@ -1,6 +1,6 @@
 /**
- * Script to find values that match English (en.js) in other locale files
- * These are likely untranslated values that need translation
+ * EN: Find values identical to English (en.js) in other locales
+ * VI: Tìm các giá trị trùng với tiếng Anh (en.js) ở locale khác để dịch
  */
 
 import { fileURLToPath } from 'url';
@@ -9,7 +9,8 @@ import { dirname, join } from 'path';
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
 
-// Function to flatten nested object and collect key-value pairs
+// EN: Flatten nested object to key/value pairs
+// VI: Trải phẳng object lồng thành cặp key/giá trị
 function flattenObject(obj, prefix = '') {
   const result = {};
   for (const key in obj) {
@@ -39,7 +40,8 @@ async function findUntranslatedValues() {
   console.log('🔍 Finding untranslated values (matching en.js) in locale files...\n');
 
   try {
-    // Load English base file
+    // EN: Load English base file
+    // VI: Nạp file gốc tiếng Anh
     const enModule = await import(join(__dirname, '../../src/i18n/locales/en.js'));
     const enData = flattenObject(enModule.default);
 
@@ -53,7 +55,8 @@ async function findUntranslatedValues() {
         const untranslatedValues = [];
         for (const [key, enValue] of Object.entries(enData)) {
           const localeValue = localeData[key];
-          // Check if the value exists and is exactly the same as English
+          // EN: Check if value exists and matches English exactly
+          // VI: Kiểm tra giá trị tồn tại và trùng với tiếng Anh
           if (localeValue && localeValue === enValue && typeof enValue === 'string') {
             untranslatedValues.push({ key, value: enValue });
           }
@@ -64,7 +67,8 @@ async function findUntranslatedValues() {
         if (untranslatedValues.length > 0) {
           console.log('   🔤 Keys needing translation:');
           untranslatedValues.slice(0, 15).forEach(({ key, value }) => {
-            // Truncate long values for readability
+            // EN: Truncate long values for readability
+            // VI: Rút gọn giá trị dài cho dễ đọc
             const displayValue = value.length > 60 ? value.substring(0, 60) + '...' : value;
             console.log(`     • ${key}: "${displayValue}"`);
           });

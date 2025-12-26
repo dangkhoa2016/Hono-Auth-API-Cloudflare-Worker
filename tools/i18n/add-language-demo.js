@@ -7,7 +7,8 @@
 
 import fs from 'fs';
 
-// Manual path utilities for better compatibility
+// EN: Manual path utilities for better compatibility
+// VI: Tiện ích ghép đường dẫn thủ công để tăng tương thích
 function join(...parts) {
   return parts.join('/').replace(/\/+/g, '/');
 }
@@ -19,9 +20,11 @@ const languageName = process.argv[3] || 'French';
 
 console.log(`Adding language: ${languageCode} (${languageName})`);
 
-// Template for new language file (dynamic based on language)
+// EN: Template for new language file (dynamic)
+// VI: Mẫu file ngôn ngữ mới (tạo động theo ngôn ngữ)
 const getLanguageTemplate = (languageCode, languageName) => {
-  // Sample translations for different languages
+  // EN: Sample translations for several languages
+  // VI: Mẫu bản dịch cho một số ngôn ngữ
   const sampleTranslations = {
     fr: {
       loginSuccess: 'Connexion réussie',
@@ -62,95 +65,217 @@ const getLanguageTemplate = (languageCode, languageName) => {
  */
 
 export default {
-  // Authentication messages
+  // EN: Authentication messages
+  // VI: Thông điệp xác thực
   auth: {
-    loginSuccess: "${samples.loginSuccess}", // Login successful
-    login_failed: "Login failed (${languageName})", // Login failed
-    invalid_credentials: "Invalid credentials (${languageName})", // Invalid credentials
-    token_expired: "Token expired (${languageName})", // Token expired
-    token_invalid: "Token invalid (${languageName})", // Token invalid
-    token_missing: "Token missing (${languageName})", // Token missing
-    logout_success: "Logout successful (${languageName})", // Logout successful
-    password_required: "Password required (${languageName})", // Password required
-    email_required: "Email required (${languageName})", // Email required
-    refresh_token_invalid: "Refresh token invalid (${languageName})" // Refresh token invalid
+    // EN: Login successful
+    // VI: Đăng nhập thành công
+    loginSuccess: "${samples.loginSuccess}",
+    // EN: Login failed
+    // VI: Đăng nhập thất bại
+    login_failed: "Login failed (${languageName})",
+    // EN: Invalid credentials
+    // VI: Thông tin xác thực không hợp lệ
+    invalid_credentials: "Invalid credentials (${languageName})",
+    // EN: Token expired
+    // VI: Token hết hạn
+    token_expired: "Token expired (${languageName})",
+    // EN: Token invalid
+    // VI: Token không hợp lệ
+    token_invalid: "Token invalid (${languageName})",
+    // EN: Token missing
+    // VI: Thiếu token
+    token_missing: "Token missing (${languageName})",
+    // EN: Logout successful
+    // VI: Đăng xuất thành công
+    logout_success: "Logout successful (${languageName})",
+    // EN: Password required
+    // VI: Cần mật khẩu
+    password_required: "Password required (${languageName})",
+    // EN: Email required
+    // VI: Cần email
+    email_required: "Email required (${languageName})",
+    // EN: Refresh token invalid
+    // VI: Refresh token không hợp lệ
+    refresh_token_invalid: "Refresh token invalid (${languageName})"
   },
 
-  // User management
+  // EN: User management
+  // VI: Quản lý người dùng
   user: {
-    profile_updated: "Profile updated (${languageName})", // Profile updated
-    profile_not_found: "Profile not found (${languageName})", // Profile not found
-    user_created: "User created (${languageName})", // User created
-    user_deleted: "User deleted (${languageName})", // User deleted
-    user_not_found: "User not found (${languageName})", // User not found
-    email_already_exists: "Email already exists (${languageName})", // Email already exists
-    invalid_user_data: "Invalid user data (${languageName})" // Invalid user data
+    // EN: Profile updated
+    // VI: Cập nhật hồ sơ
+    profile_updated: "Profile updated (${languageName})",
+    // EN: Profile not found
+    // VI: Không tìm thấy hồ sơ
+    profile_not_found: "Profile not found (${languageName})",
+    // EN: User created
+    // VI: Tạo người dùng
+    user_created: "User created (${languageName})",
+    // EN: User deleted
+    // VI: Xoá người dùng
+    user_deleted: "User deleted (${languageName})",
+    // EN: User not found
+    // VI: Không tìm thấy người dùng
+    user_not_found: "User not found (${languageName})",
+    // EN: Email already exists
+    // VI: Email đã tồn tại
+    email_already_exists: "Email already exists (${languageName})",
+    // EN: Invalid user data
+    // VI: Dữ liệu người dùng không hợp lệ
+    invalid_user_data: "Invalid user data (${languageName})"
   },
 
-  // Validation messages
+  // EN: Validation messages
+  // VI: Thông báo kiểm tra dữ liệu
   validation: {
-    required_field: "This field is required (${languageName})", // This field is required
-    invalid_email: "Invalid email format (${languageName})", // Invalid email format
-    password_too_short: "Password too short (${languageName})", // Password too short
-    invalid_format: "Invalid format (${languageName})", // Invalid format
-    max_length_exceeded: "Maximum length exceeded (${languageName})", // Maximum length exceeded
-    min_length_required: "Minimum length required (${languageName})", // Minimum length required
-    invalid_characters: "Invalid characters (${languageName})", // Invalid characters
-    passwords_dont_match: "Passwords don't match (${languageName})" // Passwords don't match
+    // EN: This field is required
+    // VI: Trường này là bắt buộc
+    required_field: "This field is required (${languageName})",
+    // EN: Invalid email format
+    // VI: Định dạng email không hợp lệ
+    invalid_email: "Invalid email format (${languageName})",
+    // EN: Password too short
+    // VI: Mật khẩu quá ngắn
+    password_too_short: "Password too short (${languageName})",
+    // EN: Invalid format
+    // VI: Định dạng không hợp lệ
+    invalid_format: "Invalid format (${languageName})",
+    // EN: Maximum length exceeded
+    // VI: Vượt quá độ dài tối đa
+    max_length_exceeded: "Maximum length exceeded (${languageName})",
+    // EN: Minimum length required
+    // VI: Yêu cầu độ dài tối thiểu
+    min_length_required: "Minimum length required (${languageName})",
+    // EN: Invalid characters
+    // VI: Ký tự không hợp lệ
+    invalid_characters: "Invalid characters (${languageName})",
+    // EN: Passwords do not match
+    // VI: Mật khẩu không khớp
+    passwords_dont_match: "Passwords don't match (${languageName})"
   },
 
-  // System messages
+  // EN: System messages
+  // VI: Thông báo hệ thống
   system: {
-    welcome: "${samples.welcome}", // Welcome to Hono Auth Worker API
-    success: "${samples.success}", // Success
-    error: "Error (${languageName})", // Error
-    not_found: "Not found (${languageName})", // Not found
-    internal_error: "Internal server error (${languageName})", // Internal server error
-    bad_request: "Bad request (${languageName})", // Bad request
-    unauthorized: "Unauthorized (${languageName})", // Unauthorized
-    forbidden: "Forbidden (${languageName})", // Forbidden
-    service_unavailable: "Service unavailable (${languageName})", // Service unavailable
-    language_changed: "Language changed to ${languageName.toLowerCase()}" // Language changed to [Language]
+    // EN: Welcome to Hono Auth Worker API
+    // VI: Chào mừng tới Hono Auth Worker API
+    welcome: "${samples.welcome}",
+    // EN: Success
+    // VI: Thành công
+    success: "${samples.success}",
+    // EN: Error
+    // VI: Lỗi
+    error: "Error (${languageName})",
+    // EN: Not found
+    // VI: Không tìm thấy
+    not_found: "Not found (${languageName})",
+    // EN: Internal server error
+    // VI: Lỗi máy chủ
+    internal_error: "Internal server error (${languageName})",
+    // EN: Bad request
+    // VI: Yêu cầu không hợp lệ
+    bad_request: "Bad request (${languageName})",
+    // EN: Unauthorized
+    // VI: Chưa xác thực
+    unauthorized: "Unauthorized (${languageName})",
+    // EN: Forbidden
+    // VI: Bị cấm
+    forbidden: "Forbidden (${languageName})",
+    // EN: Service unavailable
+    // VI: Dịch vụ tạm ngưng
+    service_unavailable: "Service unavailable (${languageName})",
+    // EN: Language changed to ...
+    // VI: Đã chuyển ngôn ngữ sang ...
+    language_changed: "Language changed to ${languageName.toLowerCase()}"
   },
 
-  // API response messages
+  // EN: API response messages
+  // VI: Thông báo phản hồi API
   api: {
-    healthCheck: "Health check successful (${languageName})", // Health check successful
-    versionInfo: "Version information (${languageName})", // Version information
-    endpointList: "Endpoint list (${languageName})", // Endpoint list
-    rateLimitExceeded: "Rate limit exceeded (${languageName})", // Rate limit exceeded
-    invalidRequest: "Invalid request (${languageName})", // Invalid request
-    dataRetrieved: "Data retrieved successfully (${languageName})", // Data retrieved successfully
-    operationCompleted: "Operation completed (${languageName})", // Operation completed
-    processingError: "Processing error (${languageName})" // Processing error
+    // EN: Health check successful
+    // VI: Kiểm tra sức khoẻ thành công
+    healthCheck: "Health check successful (${languageName})",
+    // EN: Version information
+    // VI: Thông tin phiên bản
+    versionInfo: "Version information (${languageName})",
+    // EN: Endpoint list
+    // VI: Danh sách endpoint
+    endpointList: "Endpoint list (${languageName})",
+    // EN: Rate limit exceeded
+    // VI: Vượt giới hạn truy cập
+    rateLimitExceeded: "Rate limit exceeded (${languageName})",
+    // EN: Invalid request
+    // VI: Yêu cầu không hợp lệ
+    invalidRequest: "Invalid request (${languageName})",
+    // EN: Data retrieved successfully
+    // VI: Lấy dữ liệu thành công
+    dataRetrieved: "Data retrieved successfully (${languageName})",
+    // EN: Operation completed
+    // VI: Thao tác hoàn tất
+    operationCompleted: "Operation completed (${languageName})",
+    // EN: Processing error
+    // VI: Lỗi xử lý
+    processingError: "Processing error (${languageName})"
   },
 
-  // API endpoint descriptions
+  // EN: API endpoint descriptions
+  // VI: Mô tả endpoint API
   endpoints: {
     auth: {
-      login: "User login with email and password (${languageName})", // User login with email and password
-      refresh: "Refresh access token (${languageName})", // Refresh access token
-      logout: "User logout (${languageName})" // User logout
+      // EN: User login with email and password
+      // VI: Đăng nhập bằng email và mật khẩu
+      login: "User login with email and password (${languageName})",
+      // EN: Refresh access token
+      // VI: Làm mới access token
+      refresh: "Refresh access token (${languageName})",
+      // EN: User logout
+      // VI: Đăng xuất
+      logout: "User logout (${languageName})"
     },
     user: {
-      profile: "Get user profile (${languageName})", // Get user profile
-      me: "Get current user information (${languageName})" // Get current user information
+      // EN: Get user profile
+      // VI: Lấy hồ sơ người dùng
+      profile: "Get user profile (${languageName})",
+      // EN: Get current user information
+      // VI: Lấy thông tin người dùng hiện tại
+      me: "Get current user information (${languageName})"
     },
     system: {
-      health: "Check API health status (${languageName})", // Check API health status
-      version: "Get API version information (${languageName})" // Get API version information
+      // EN: Check API health status
+      // VI: Kiểm tra tình trạng API
+      health: "Check API health status (${languageName})",
+      // EN: Get API version information
+      // VI: Lấy thông tin phiên bản API
+      version: "Get API version information (${languageName})"
     },
     translations: {
-      list: "List all available translations (${languageName})", // List all available translations
-      get: "Get translations for a language (${languageName})", // Get translations for a language
-      validate: "Validate translation structure (${languageName})", // Validate translation structure
-      section: "Get specific translation section (${languageName})" // Get specific translation section
+      // EN: List all available translations
+      // VI: Liệt kê toàn bộ bản dịch
+      list: "List all available translations (${languageName})",
+      // EN: Get translations for a language
+      // VI: Lấy bản dịch cho một ngôn ngữ
+      get: "Get translations for a language (${languageName})",
+      // EN: Validate translation structure
+      // VI: Kiểm tra cấu trúc bản dịch
+      validate: "Validate translation structure (${languageName})",
+      // EN: Get specific translation section
+      // VI: Lấy một phần bản dịch cụ thể
+      section: "Get specific translation section (${languageName})"
     },
     demo: {
-      info: "Zod demo information (${languageName})", // Zod demo information
-      register: "Demo registration with validation (${languageName})", // Demo registration with validation
-      search: "Demo search with parameters (${languageName})", // Demo search with parameters
-      upload: "Demo file upload (${languageName})" // Demo file upload
+      // EN: Zod demo information
+      // VI: Thông tin demo Zod
+      info: "Zod demo information (${languageName})",
+      // EN: Demo registration with validation
+      // VI: Đăng ký demo có kiểm tra
+      register: "Demo registration with validation (${languageName})",
+      // EN: Demo search with parameters
+      // VI: Tìm kiếm demo với tham số
+      search: "Demo search with parameters (${languageName})",
+      // EN: Demo file upload
+      // VI: Upload tệp demo
+      upload: "Demo file upload (${languageName})"
     }
   }
 };

@@ -1,10 +1,12 @@
 /**
- * Simple test of context translation
+ * EN: Simple test of context translation
+ * VI: Kiểm thử đơn giản về dịch theo context
  */
 
 import i18next from 'i18next';
 
-// Simple initialization with our translation structure
+// EN: Simple initialization with a minimal translation resource
+// VI: Khởi tạo đơn giản với resource dịch tối giản
 const resources = {
   en: {
     translation: {
@@ -34,7 +36,8 @@ await i18next.init({
 
 console.log('=== Testing Context Translation ===');
 
-// Test different approaches
+// EN: Test different approaches
+// VI: Thử các cách truy cập khác nhau
 console.log('Base key:', i18next.t('roles.displayName'));
 console.log('Context user:', i18next.t('roles.displayName', { context: 'user' }));
 console.log('Context admin:', i18next.t('roles.displayName', { context: 'admin' }));

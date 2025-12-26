@@ -1,8 +1,6 @@
 /**
- * Merge Translated Keys Tool
- *
- * This script merges translated keys from [locale]-auto-english.js files
- * back into the original locale files.
+ * EN: Merge translated keys from [locale]-auto-english.js back to originals
+ * VI: Gộp các key đã dịch từ file [locale]-auto-english.js vào file locale gốc
  *
  * Usage:
  *   node merge_translated_keys.js [locale]     # Merge specific locale
@@ -22,7 +20,8 @@ import { readFileSync, writeFileSync, existsSync } from 'fs';
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
 
-// Function to flatten nested object and collect key-value pairs
+// EN: Flatten nested object to key/value pairs
+// VI: Trải phẳng object lồng thành cặp key/giá trị
 function flattenObject(obj, prefix = '') {
   const result = {};
   for (const key in obj) {
@@ -38,7 +37,8 @@ function flattenObject(obj, prefix = '') {
   return result;
 }
 
-// Function to deep merge objects
+// EN: Deep merge two objects
+// VI: Gộp sâu hai object
 function deepMerge(target, source) {
   const result = { ...target };
 
@@ -55,7 +55,8 @@ function deepMerge(target, source) {
   return result;
 }
 
-// Function to format object as JavaScript code
+// EN: Format object back to JS code
+// VI: Định dạng object thành mã JS
 function formatAsJavaScript(obj, indent = 0) {
   const spaces = '  '.repeat(indent);
   const items = [];
@@ -64,7 +65,8 @@ function formatAsJavaScript(obj, indent = 0) {
     if (typeof value === 'object' && value !== null) {
       items.push(`${spaces}  ${key}: {\n${formatAsJavaScript(value, indent + 1)}\n${spaces}  }`);
     } else {
-      // Escape quotes and format string
+      // EN: Escape quotes and format string
+      // VI: Thoát ký tự nháy và định dạng chuỗi
       const escapedValue = typeof value === 'string'
         ? `'${value.replace(/'/g, '\\\'').replace(/\n/g, '\\n')}'`
         : JSON.stringify(value);
@@ -112,14 +114,17 @@ async function mergeTranslatedKeys(targetLocale = 'all', isDryRun = false) {
         continue;
       }
 
-      // Load both files
+      // EN: Load both locale variants
+      // VI: Nạp cả hai phiên bản locale
       const autoEnglishModule = await import(autoEnglishPath);
       const originalModule = await import(originalPath);
 
-      // Merge the objects
+      // EN: Merge original with auto-english
+      // VI: Gộp bản gốc với auto-english
       const mergedObject = deepMerge(originalModule.default, autoEnglishModule.default);
 
-      // Count changes
+      // EN: Count how many entries change
+      // VI: Đếm số mục thay đổi
       const originalFlat = flattenObject(originalModule.default);
       const autoEnglishFlat = flattenObject(autoEnglishModule.default);
       const mergedFlat = flattenObject(mergedObject);
@@ -139,7 +144,8 @@ async function mergeTranslatedKeys(targetLocale = 'all', isDryRun = false) {
       console.log(`📝 ${languageNames[locale]} (${locale}): ${changesCount} translations to merge`);
 
       if (!isDryRun) {
-        // Generate new file content
+        // EN: Generate new file content
+        // VI: Tạo nội dung file mới
         const fileContent = `/**
  * ${languageNames[locale]} (${locale}) translations
  * Last updated: ${new Date().toISOString()}
@@ -151,12 +157,14 @@ ${formatAsJavaScript(mergedObject)}
 };
 `;
 
-        // Backup original file
+        // EN: Backup original file
+        // VI: Sao lưu file gốc
         const backupPath = `${originalPath}.backup-${Date.now()}`;
         const originalContent = readFileSync(originalPath, 'utf8');
         writeFileSync(backupPath, originalContent, 'utf8');
 
-        // Write merged content
+        // EN: Write merged content
+        // VI: Ghi nội dung đã gộp
         writeFileSync(originalPath, fileContent, 'utf8');
 
         console.log('   ✅ Merged successfully');
@@ -166,7 +174,8 @@ ${formatAsJavaScript(mergedObject)}
       } else {
         console.log(`   👁️  Preview: ${changesCount} translations would be merged`);
 
-        // Show some example changes
+        // EN: Show a few sample changes
+        // VI: Hiển thị một vài thay đổi mẫu
         const examples = [];
         for (const key in autoEnglishFlat) {
           if (originalFlat[key] !== autoEnglishFlat[key] && examples.length < 3) {
@@ -207,7 +216,8 @@ ${formatAsJavaScript(mergedObject)}
   }
 }
 
-// Parse command line arguments
+// EN: Parse command line arguments
+// VI: Phân tích tham số dòng lệnh
 const args = process.argv.slice(2);
 const isDryRun = args.includes('--dry-run');
 const targetLocale = args.find(arg => arg !== '--dry-run') || 'all';

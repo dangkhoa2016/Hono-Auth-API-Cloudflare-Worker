@@ -8,14 +8,16 @@
 import fs from 'fs';
 import path from 'path';
 
-// Manual path utilities for better compatibility
+// EN: Manual path utilities for compatibility
+// VI: Tiện ích ghép đường dẫn thủ công để tương thích tốt hơn
 function join(...parts) {
   return parts.join('/').replace(/\/+/g, '/');
 }
 
 console.log('🔍 i18n Tools Analysis & Health Check\n');
 
-// Dynamically scan tools/i18n directory
+// EN: Dynamically scan tools/i18n directory
+// VI: Quét thư mục tools/i18n một cách động
 const toolsDir = join(process.cwd(), 'tools', 'i18n');
 const allFiles = fs.readdirSync(toolsDir)
   .filter(file => file.endsWith('.js') || file.endsWith('.mjs'))
@@ -39,14 +41,16 @@ for (const file of allFiles) {
     const content = fs.readFileSync(file, 'utf8');
     const fileName = path.basename(file);
 
-    // Improved analysis logic
+    // EN: Improved analysis logic
+    // VI: Logic phân tích được cải tiến
     const hasModernSyntax = content.includes('getSupportedLanguages') ||
                            content.includes('loadTranslation');
 
     const isWellStructured = content.includes('console.log') &&
                             (content.includes('✅') || content.includes('❌'));
 
-    // Check for actual legacy patterns (not detection code)
+    // EN: Check for real legacy patterns (not just detection code)
+    // VI: Kiểm tra pattern legacy thực sự (không phải mã dò)
     const hasHardcodedLanguages = content.includes('[\'en\', \'vi\']') &&
                                  !content.includes('hasHardCode') &&
                                  !content.includes('hasLegacyPatterns');
@@ -58,7 +62,8 @@ for (const file of allFiles) {
                              content.includes('import ') ||
                              file.endsWith('.mjs');
 
-    // Categorize files
+    // EN: Categorize files
+    // VI: Phân loại tập tin
     let category = 'Analysis/Validation';
     if (fileName.includes('add-language') || fileName.includes('demo')) {
       category = 'Demo/Development';
@@ -80,7 +85,8 @@ for (const file of allFiles) {
       category: category
     };
 
-    // Better status indicators
+    // EN: Better status indicators
+    // VI: Thêm chỉ báo trạng thái rõ ràng hơn
     const qualityScore = [hasModernSyntax, isWellStructured, !hasLegacyPatterns, usesModernModules]
       .filter(Boolean).length;
     const qualityStatus = qualityScore >= 3 ? '✅ Good' :
@@ -97,7 +103,8 @@ for (const file of allFiles) {
   }
 }
 
-// Analysis & Recommendations
+// EN: Analysis & Recommendations
+// VI: Phân tích và khuyến nghị
 console.log('\n2️⃣ Quality Analysis...');
 
 const qualityStats = {
@@ -111,18 +118,21 @@ console.log(`      ✅ Good quality: ${qualityStats.good} files`);
 console.log(`      ⚠️ Fair quality: ${qualityStats.fair} files`);
 console.log(`      ❌ Poor quality: ${qualityStats.poor} files`);
 
-// Smart recommendations
+// EN: Smart recommendations
+// VI: Khuyến nghị thông minh
 console.log('\n3️⃣ Smart Recommendations...');
 
 const recommendations = [];
 
-// Check for legacy patterns
+// EN: Check for legacy patterns
+// VI: Kiểm tra các pattern cũ
 const legacyFiles = Object.keys(fileStatus).filter(f => fileStatus[f].legacy);
 if (legacyFiles.length > 0) {
   recommendations.push(`🔧 Update legacy patterns in: ${legacyFiles.map(f => path.basename(f)).join(', ')}`);
 }
 
-// Check for poor quality files
+// EN: Check for poor quality files
+// VI: Kiểm tra file chất lượng thấp
 const poorFiles = Object.keys(fileStatus).filter(f => {
   const s = fileStatus[f];
   return [s.modernSyntax, s.wellStructured, !s.legacy, s.moduleSystem].filter(Boolean).length < 2;
@@ -131,7 +141,8 @@ if (poorFiles.length > 0) {
   recommendations.push(`🛠️ Improve structure in: ${poorFiles.map(f => path.basename(f)).join(', ')}`);
 }
 
-// Check for redundant test files
+// EN: Check for redundant test files
+// VI: Kiểm tra file test dư thừa
 const testFiles = Object.keys(fileStatus).filter(f => path.basename(f).startsWith('test-'));
 if (testFiles.length > 4) {
   recommendations.push(`📦 Consider consolidating ${testFiles.length} test files for better maintainability`);
@@ -145,7 +156,8 @@ if (recommendations.length === 0) {
   });
 }
 
-// Category Summary
+// EN: Category Summary
+// VI: Tóm tắt theo danh mục
 console.log('\n4️⃣ Tools by Category...');
 
 Object.entries(categories).forEach(([categoryName, files]) => {
@@ -167,7 +179,8 @@ Object.entries(categories).forEach(([categoryName, files]) => {
   });
 });
 
-// Usage recommendations
+// EN: Usage recommendations
+// VI: Khuyến nghị sử dụng
 console.log('\n5️⃣ Recommended Usage...');
 
 const usageMap = {

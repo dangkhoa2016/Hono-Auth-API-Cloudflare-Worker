@@ -44,7 +44,8 @@ let reportPath = null;
 if (reportArgIndex !== -1) {
   const candidate = args[reportArgIndex + 1];
   if (!candidate || candidate.startsWith('--')) {
-    // No filename provided; use default
+    // EN: No filename provided; use default
+    // VI: Không truyền tên file nên dùng mặc định
     reportPath = 'i18n-cleanup-report.json';
     console.log('[i18n-cleanup] No report filename supplied after --report; using default i18n-cleanup-report.json');
   } else {
@@ -54,17 +55,23 @@ if (reportArgIndex !== -1) {
 const backupEnabled = args.includes('--backup') || args.includes('-b');
 const showHelp = args.includes('-h') || args.includes('--help');
 
-// Optional include/exclude simple substring filters (not full glob for simplicity)
+// EN: Optional include/exclude substring filters (not full glob)
+// VI: Bộ lọc include/exclude đơn giản (không dùng glob)
 const includeIndex = args.indexOf('--include');
 const includes = includeIndex !== -1 ? args[includeIndex + 1].split(',').map(s => s.trim()).filter(Boolean) : [];
 const excludeIndex = args.indexOf('--exclude');
 const excludes = excludeIndex !== -1 ? args[excludeIndex + 1].split(',').map(s => s.trim()).filter(Boolean) : [];
-const aggressive = args.includes('--aggressive'); // if not aggressive we'll use extra safety (require multi evidence before delete?)
-const noI18nKeyScan = args.includes('--no-i18nkey-scan'); // allow disabling new feature
+// EN: Aggressive skips safety heuristics
+// VI: Aggressive bỏ qua heuristic an toàn
+const aggressive = args.includes('--aggressive');
+// EN: Disable scanning i18nKey fields
+// VI: Cho phép tắt quét trường i18nKey
+const noI18nKeyScan = args.includes('--no-i18nkey-scan');
 const prefixStatsEnabled = args.includes('--prefix-stats');
 const prefixDepthIndex = args.indexOf('--prefix-depth');
 const prefixDepth = prefixDepthIndex !== -1 ? parseInt(args[prefixDepthIndex + 1], 10) : 1;
-// New targeted deletion options
+// EN: Targeted deletion options
+// VI: Tuỳ chọn xoá theo tiền tố
 const onlyPrefixIndex = args.indexOf('--only-prefix');
 const onlyPrefixes = onlyPrefixIndex !== -1 ? args[onlyPrefixIndex + 1].split(',').map(s => s.trim()).filter(Boolean) : [];
 const excludePrefixIndex = args.indexOf('--exclude-prefix');
@@ -131,11 +138,13 @@ function walk(dir, fileList = []) {
   for (const e of entries) {
     const full = path.join(dir, e.name);
     if (e.isDirectory()) {
-      // skip node_modules, .git
+      // EN: Skip node_modules and .git
+      // VI: Bỏ qua node_modules và .git
       if (e.name === 'node_modules' || e.name === '.git') continue;
       fileList.push(...walk(full, []));
     } else {
-      // Track only js / mjs / cjs
+      // EN: Track only js/mjs/cjs files
+      // VI: Chỉ theo dõi file js/mjs/cjs
       if (!/\.(js|mjs|cjs)$/i.test(e.name)) continue;
       const rel = path.relative(projectRoot, full);
       if (includes.length && !includes.some(f => rel.includes(f))) continue;
@@ -156,10 +165,14 @@ function collectSourceFiles() {
   return files;
 }
 
-// Extract translation keys from code. Patterns covered now:
-// t('key'), t("key"), t(`key`), t(c,'key'), i18n.t variants
-// tl('key'), tl(lang,'key'), builder.tl('key') static
-// Backtick variants without interpolation
+// EN: Extract translation keys from code via common patterns
+// VI: Trích xuất key dịch từ code theo các pattern phổ biến
+// EN: Covers t('key'), t("key"), t(`key`), t(c,'key') and i18n.t variants
+// VI: Bao gồm t('key'), t("key"), t(`key`), t(c,'key') và các biến thể i18n.t
+// EN: Covers tl(...) and builder.tl(...) static usage
+// VI: Bao quát tl(...) và builder.tl(...) dạng tĩnh
+// EN: Handles backtick usage without interpolation
+// VI: Hỗ trợ backtick không nội suy
 const CALL_PATTERNS = [
   /\bt\(\s*(['"])([A-Za-z0-9_.:-]+)\1/g,                               // t('key')
   /\bt\(\s*[^,]+,\s*(['"])([A-Za-z0-9_.:-]+)\1/g,                     // t(c,'key')
@@ -189,11 +202,19 @@ function extractKeysFromContent(content) {
 
 function extractAllUsedKeys(files) {
   const used = new Set();
-  const i18nKeyPattern = /i18nKey\s*:\s*['"]([A-Za-z0-9_.:-]+)['"]/g; // route definitions, etc.
+  // EN: Route definitions etc.
+  // VI: Dùng trong định nghĩa route
+  const i18nKeyPattern = /i18nKey\s*:\s*['"]([A-Za-z0-9_.:-]+)['"]/g;
   const dynamicPrefixes = new Set();
-  const dynamicTemplatePattern = /`(validation\.[^`$]*?)\$\{[A-Za-z0-9_]+\}/g; // capture prefix before interpolation
-  const tErrorLiteralPattern = /tError\(\s*[^,]+,\s*(['"])([A-Za-z0-9_.:-]+)\1/g; // tError(c,'keyType') -> errors.keyType
-  const tSuccessLiteralPattern = /tSuccess\(\s*[^,]+,\s*(['"])([A-Za-z0-9_.:-]+)\1/g; // tSuccess(c,'keyType') -> success.keyType
+  // EN: Capture validation prefix before interpolation
+  // VI: Bắt prefix validation trước nội suy
+  const dynamicTemplatePattern = /`(validation\.[^`$]*?)\$\{[A-Za-z0-9_]+\}/g;
+  // EN: tError(c,'type') -> errors.type
+  // VI: tError(c,'type') -> errors.type
+  const tErrorLiteralPattern = /tError\(\s*[^,]+,\s*(['"])([A-Za-z0-9_.:-]+)\1/g;
+  // EN: tSuccess(c,'type') -> success.type
+  // VI: tSuccess(c,'type') -> success.type
+  const tSuccessLiteralPattern = /tSuccess\(\s*[^,]+,\s*(['"])([A-Za-z0-9_.:-]+)\1/g;
   for (const file of files) {
     try {
       const content = fs.readFileSync(file, 'utf8');
@@ -205,15 +226,18 @@ function extractAllUsedKeys(files) {
           used.add(m[1]);
         }
       }
-      // Detect dynamic validation prefixes inside template literals
+      // EN: Detect dynamic validation prefixes inside template literals
+      // VI: Phát hiện prefix validation động trong template literal
       let dm;
       while ((dm = dynamicTemplatePattern.exec(content)) !== null) {
         const pref = dm[1];
         if (pref) dynamicPrefixes.add(pref);
       }
-      // Detect tError / tSuccess usages (literal and dynamic)
+      // EN: Detect tError/tSuccess usages (literal and dynamic)
+      // VI: Bắt các trường hợp tError/tSuccess (literal và dynamic)
       if (/tError\(/.test(content)) {
-        // If any non-literal usages exist, keep entire prefix
+        // EN: Keep entire prefix if any non-literal usage exists
+        // VI: Nếu có cách dùng không literal thì giữ nguyên prefix
         dynamicPrefixes.add('errors.');
         let em;
         while ((em = tErrorLiteralPattern.exec(content)) !== null) {
@@ -236,7 +260,8 @@ function extractAllUsedKeys(files) {
   return { used, dynamicPrefixes };
 }
 
-// Load locale files (ES module default export objects)
+// EN: Load locale files (ES module default exports)
+// VI: Nạp file locale (export default dạng ES module)
 async function loadLocale(localeFile) {
   const rel = path.relative(projectRoot, localeFile);
   const modPath = path.resolve(localeFile);
@@ -282,7 +307,8 @@ function unflatten(flat) {
 function ensureDir(dir) { if (!fs.existsSync(dir)) fs.mkdirSync(dir, { recursive: true }); }
 
 function writeLocaleFile(localeFile, dataObj, originalContent) {
-  // Backup original if enabled
+  // EN: Backup original file if enabled
+  // VI: Sao lưu file gốc nếu bật tuỳ chọn
   if (backupEnabled && originalContent) {
     const ts = new Date().toISOString().replace(/[:.]/g, '-');
     const backupDir = path.join(__dirname, 'backups', ts);
@@ -311,22 +337,26 @@ function writeLocaleFile(localeFile, dataObj, originalContent) {
       return;
     }
 
-    // Collect used keys from source
+    // EN: Collect used keys from source files
+    // VI: Thu thập key sử dụng từ mã nguồn
     const sourceFiles = collectSourceFiles();
     log(`Scanning ${sourceFiles.length} source files for key usage...`);
   const { used: usedKeysRaw, dynamicPrefixes } = extractAllUsedKeys(sourceFiles);
 
-    // Expand used keys considering plural suffix _other and segments
+    // EN: Expand used keys with plural suffix _other and related segments
+    // VI: Mở rộng key dùng với hậu tố số nhiều _other và các segment
     const usedKeys = new Set(usedKeysRaw);
     for (const k of Array.from(usedKeysRaw)) {
       if (k.endsWith('_other')) {
         usedKeys.add(k.replace(/_other$/, ''));
       } else {
-        usedKeys.add(`${k}_other`); // keep plural variant if base used
+        usedKeys.add(`${k}_other`); // EN: Keep plural variant when base is used
+        // VI: Thêm biến thể số nhiều khi base đang dùng
       }
     }
 
-    // We'll accumulate report
+    // EN: Accumulate report data
+    // VI: Gom dữ liệu báo cáo
     const report = {
       generatedAt: new Date().toISOString(),
       dryRun,
@@ -347,28 +377,33 @@ function writeLocaleFile(localeFile, dataObj, originalContent) {
         const hasDynamic = [...dynamicPrefixes].some(p => key.startsWith(p));
         const isUsed = hasDynamic || usedKeys.has(key) || usedKeys.has(key.replace(/^[^.]+:/, ''));
         if (!isUsed && !whitelist.has(key)) {
-          // Safe mode: if not aggressive, keep keys in top-level categories that have at least 1 sibling used
+          // EN: Safe mode keeps siblings when one is used (unless aggressive)
+          // VI: Chế độ an toàn giữ key cùng cấp nếu có anh em được dùng (trừ khi aggressive)
           if (!aggressive) {
             const parent = key.includes('.') ? key.split('.').slice(0, -1).join('.') : null;
             if (parent) {
-              // If any sibling is used, we assume potential dynamic access and skip deletion of this key.
+              // EN: If any sibling is used, assume potential dynamic access and skip deletion
+              // VI: Có anh em đang dùng thì giả định truy cập động và không xoá
               const siblingPrefix = parent + '.';
               const hasUsedSibling = keys.some(k2 => k2.startsWith(siblingPrefix) && usedKeys.has(k2));
-              if (hasUsedSibling) continue; // skip marking as unused
+              if (hasUsedSibling) continue; // EN: Skip marking as unused
+              // VI: Bỏ qua, không đánh dấu unused
             }
           }
           unusedAll.push(key);
         }
       }
 
-      // Apply prefix filters (only & exclude)
+      // EN: Apply prefix filters (only & exclude)
+      // VI: Áp dụng bộ lọc tiền tố only/exclude
       const unused = unusedAll.filter(k => {
         if (onlyPrefixes.length && !onlyPrefixes.some(p => k.startsWith(p))) return false;
         if (excludePrefixes.some(p => k.startsWith(p))) return false;
         return true;
       });
 
-      // Remove unused in fix mode
+      // EN: Remove unused keys when running with --fix
+      // VI: Xoá key không dùng khi chạy --fix
       let removedCount = 0;
       if (!dryRun && unused.length) {
         const flatCopy = { ...flat };
@@ -418,7 +453,8 @@ function writeLocaleFile(localeFile, dataObj, originalContent) {
       report.totals.removed += !dryRun ? removedCount : 0;
     }
 
-    // Output summary
+    // EN: Output summary
+    // VI: Xuất tóm tắt
     log('Scan complete. Summary:');
     for (const [loc, info] of Object.entries(report.locales)) {
       log(`  ${loc}: ${info.unusedCount} unused / ${info.totalKeys} total`);

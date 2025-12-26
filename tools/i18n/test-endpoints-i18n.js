@@ -1,23 +1,30 @@
 #!/usr/bin/env node
 
 /**
- * Test Dynamic i18n Endpoints in API Responses
- * Updated to use fully dynamic language system
+ * EN:
+ *   - Test dynamic i18n endpoints in API responses.
+ *   - Uses fully dynamic language discovery.
+ * VI:
+ *   - Kiểm thử endpoint API với hệ thống i18n động.
+ *   - Sử dụng cơ chế phát hiện ngôn ngữ động.
  */
 
 console.log('🌍 Testing Dynamic i18n Endpoints API Responses');
 console.log('==============================================\n');
 
-// Import dynamic language functions
+// EN: Import dynamic language helpers
+// VI: Import các helper ngôn ngữ động
 import { getSupportedLanguagesSync, getSupportedLanguages, initI18n } from '../../src/i18n/config.js';
 
 async function testI18nEndpoints() {
   try {
-    // Initialize i18n system first
+    // EN: Initialize i18n system first
+    // VI: Khởi tạo hệ thống i18n trước
     console.log('🔍 Initializing i18n system...');
     await initI18n();
 
-    // Get supported languages dynamically
+    // EN: Get supported languages dynamically
+    // VI: Lấy danh sách ngôn ngữ một cách động
     console.log('🔍 Discovering supported languages...');
     const languagesAsync = await getSupportedLanguages();
     const languagesSync = getSupportedLanguagesSync();
@@ -48,7 +55,8 @@ async function testI18nEndpoints() {
   }
 }
 
-// Run the test
+// EN: Run the test
+// VI: Chạy kịch bản kiểm thử
 testI18nEndpoints().then(languages => {
   console.log(`\n🎉 Test plan generated for ${languages.length} languages!`);
   console.log('🚀 Run "npm run dev" and test the endpoints above.');

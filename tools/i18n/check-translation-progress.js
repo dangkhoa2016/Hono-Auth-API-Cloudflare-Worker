@@ -1,8 +1,6 @@
 /**
- * Translation Progress Checker
- *
- * This script checks the translation progress by comparing
- * *-auto-english.js files with original locale files.
+ * EN: Translation progress checker comparing *-auto-english.js with originals
+ * VI: Công cụ kiểm tra tiến độ dịch bằng cách so sánh *-auto-english.js với bản gốc
  *
  * Usage:
  *   node check_translation_progress.js           # Check all locales
@@ -20,7 +18,8 @@ import { existsSync } from 'fs';
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
 
-// Function to flatten nested object and collect key-value pairs
+// EN: Flatten nested object to key/value pairs
+// VI: Trải phẳng object lồng thành cặp key/giá trị
 function flattenObject(obj, prefix = '') {
   const result = {};
   for (const key in obj) {
@@ -71,7 +70,8 @@ async function checkTranslationProgress(targetLocale = 'all') {
         continue;
       }
 
-      // Load original locale file
+      // EN: Load original locale file
+      // VI: Nạp file locale gốc
       const originalModule = await import(originalPath);
       const originalFlat = flattenObject(originalModule.default);
       const originalCount = Object.keys(originalFlat).length;
@@ -80,12 +80,14 @@ async function checkTranslationProgress(targetLocale = 'all') {
       let translatedCount = 0;
 
       if (existsSync(autoEnglishPath)) {
-        // Load auto-english file
+        // EN: Load auto-english file
+        // VI: Nạp file auto-english
         const autoEnglishModule = await import(autoEnglishPath);
         const autoEnglishFlat = flattenObject(autoEnglishModule.default);
         needTranslationCount = Object.keys(autoEnglishFlat).length;
 
-        // Count how many have been translated (changed from original English)
+        // EN: Count how many entries have translated values
+        // VI: Đếm số mục đã được dịch khác với tiếng Anh
         for (const [key, englishValue] of Object.entries(autoEnglishFlat)) {
           const currentValue = originalFlat[key];
           if (currentValue && currentValue !== englishValue) {
@@ -98,7 +100,8 @@ async function checkTranslationProgress(targetLocale = 'all') {
         ? Math.round((translatedCount / needTranslationCount) * 100)
         : 100;
 
-      // Status indicators
+      // EN: Status indicators
+      // VI: Chỉ báo trạng thái
       const statusIcon = progressPercent === 100 ? '✅' :
         progressPercent >= 75 ? '🟡' :
           progressPercent >= 25 ? '🟠' : '🔴';
@@ -111,7 +114,8 @@ async function checkTranslationProgress(targetLocale = 'all') {
         console.log(`   ✅ Translated: ${translatedCount}`);
         console.log(`   📊 Progress: ${progressPercent}% (${translatedCount}/${needTranslationCount})`);
 
-        // Progress bar
+        // EN: Progress bar
+        // VI: Thanh tiến độ
         const barLength = 20;
         const filledLength = Math.round((progressPercent / 100) * barLength);
         const bar = '█'.repeat(filledLength) + '░'.repeat(barLength - filledLength);
@@ -127,7 +131,8 @@ async function checkTranslationProgress(targetLocale = 'all') {
 
       console.log('');
 
-      // Accumulate totals
+      // EN: Accumulate totals
+      // VI: Cộng dồn số liệu tổng
       totalOriginal += originalCount;
       totalNeedTranslation += needTranslationCount;
       totalTranslated += translatedCount;
@@ -137,7 +142,8 @@ async function checkTranslationProgress(targetLocale = 'all') {
     }
   }
 
-  // Overall summary
+  // EN: Overall summary
+  // VI: Tổng quan
   if (processLocales.length > 1) {
     console.log('=' .repeat(50));
     console.log('📈 OVERALL SUMMARY');
@@ -152,7 +158,8 @@ async function checkTranslationProgress(targetLocale = 'all') {
     console.log(`✅ Total keys translated: ${totalTranslated}`);
     console.log(`📊 Overall progress: ${overallProgress}% (${totalTranslated}/${totalNeedTranslation})`);
 
-    // Overall progress bar
+    // EN: Overall progress bar
+    // VI: Thanh tiến độ tổng
     const barLength = 30;
     const filledLength = Math.round((overallProgress / 100) * barLength);
     const bar = '█'.repeat(filledLength) + '░'.repeat(barLength - filledLength);
@@ -172,7 +179,8 @@ async function checkTranslationProgress(targetLocale = 'all') {
   console.log('   • Run find_english_values.js to verify completion');
 }
 
-// Parse command line arguments
+// EN: Parse command line arguments
+// VI: Phân tích tham số dòng lệnh
 const args = process.argv.slice(2);
 const targetLocale = args[0] || 'all';
 

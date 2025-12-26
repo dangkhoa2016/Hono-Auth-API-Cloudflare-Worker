@@ -30,7 +30,8 @@ import { fileURLToPath } from 'url';
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
-// Màu sắc cho console
+// EN: Console colors helper
+// VI: Bộ màu cho console
 const colors = {
   red: '\x1b[31m',
   green: '\x1b[32m',
@@ -89,7 +90,8 @@ function removeKeyFromObject(obj, keyPath) {
   let current = obj;
   for (const key of keys) {
     if (!(key in current) || typeof current[key] !== 'object') {
-      return false; // Key không tồn tại
+      return false; // EN: Key does not exist
+             // VI: Key không tồn tại
     }
     current = current[key];
   }
@@ -109,7 +111,8 @@ function cleanupObject(obj) {
   for (const key in obj) {
     if (typeof obj[key] === 'object' && obj[key] !== null && !Array.isArray(obj[key])) {
       cleanupObject(obj[key]);
-      // Xóa object nếu rỗng
+      // EN: Remove nested object if empty
+      // VI: Xóa object lồng nếu rỗng
       if (Object.keys(obj[key]).length === 0) {
         delete obj[key];
       }
@@ -161,11 +164,13 @@ async function isKeyUsedInCode(key) {
   const testsDir = path.resolve(__dirname, '../../tests');
 
   try {
-    // Tìm trong src và tests
+    // EN: Search in src and tests
+    // VI: Tìm trong src và tests
     const { execSync } = await import('child_process');
     const searchPattern = key.replace(/\./g, '\\.');
 
-    // Tìm các pattern phổ biến của việc sử dụng i18n key
+    // EN: Common i18n usage patterns to search
+    // VI: Các pattern phổ biến khi dùng i18n key
     const patterns = [
       `t\\('${searchPattern}'`,
       `t\\("${searchPattern}"`,
@@ -181,13 +186,15 @@ async function isKeyUsedInCode(key) {
           return true;
         }
       } catch (error) {
-        // Ignore grep errors
+        // EN: Ignore grep errors
+        // VI: Bỏ qua lỗi từ grep
       }
     }
 
     return false;
   } catch (error) {
-    // Nếu không thể check, giả định key được sử dụng để an toàn
+    // EN: If detection fails, assume key is used for safety
+    // VI: Nếu không kiểm tra được, giả định key đang dùng để an toàn
     return true;
   }
 }
@@ -240,7 +247,8 @@ ${colors.yellow}Examples:${colors.reset}
     console.log(`${colors.cyan}🔍 Will check if keys are used in code before removing${colors.reset}\n`);
   }
 
-  // Load base file (en.js)
+  // EN: Load base locale file (en.js)
+  // VI: Tải file locale gốc (en.js)
   const baseFilePath = path.join(localesDir, baseFile);
   if (!fs.existsSync(baseFilePath)) {
     console.error(`${colors.red}❌ Base file not found: ${baseFilePath}${colors.reset}`);
@@ -257,7 +265,8 @@ ${colors.yellow}Examples:${colors.reset}
   const baseKeys = getAllKeys(baseContent);
   console.log(`${colors.green}✅ Base keys: ${baseKeys.size}${colors.reset}\n`);
 
-  // Lấy tất cả file locale
+  // EN: Collect all locale files
+  // VI: Lấy tất cả các file locale
   const localeFiles = fs.readdirSync(localesDir)
     .filter(file => file.endsWith('.js') && file !== baseFile)
     .filter(file => onlySpecificFiles.length === 0 || onlySpecificFiles.includes(file))
@@ -271,7 +280,8 @@ ${colors.yellow}Examples:${colors.reset}
   let totalExtraKeys = 0;
   let totalFilesModified = 0;
 
-  // Process each locale file
+  // EN: Process each locale file
+  // VI: Xử lý từng file locale
   for (const file of localeFiles) {
     const filePath = path.join(localesDir, file);
     console.log(`${colors.blue}🔍 Checking ${file}...${colors.reset}`);
@@ -329,10 +339,12 @@ ${colors.yellow}Examples:${colors.reset}
     }
 
     if (!isDryRun) {
-      // Tạo bản copy để modify
+      // EN: Create a copy to modify
+      // VI: Tạo bản copy để chỉnh sửa
       const modifiedContent = JSON.parse(JSON.stringify(content));
 
-      // Xóa các key dư thừa
+      // EN: Remove extra keys
+      // VI: Xóa các key dư thừa
       let removedCount = 0;
       for (const key of keysToRemove) {
         if (removeKeyFromObject(modifiedContent, key)) {
@@ -340,10 +352,12 @@ ${colors.yellow}Examples:${colors.reset}
         }
       }
 
-      // Cleanup object rỗng
+      // EN: Cleanup empty nested objects
+      // VI: Dọn các object rỗng
       cleanupObject(modifiedContent);
 
-      // Ghi file
+      // EN: Write locale file
+      // VI: Ghi file locale
       try {
         writeLocaleFile(filePath, modifiedContent);
         console.log(`${colors.green}  ✅ Removed ${removedCount} keys from ${file}${colors.reset}`);
@@ -359,7 +373,8 @@ ${colors.yellow}Examples:${colors.reset}
     console.log('');
   }
 
-  // Summary
+  // EN: Summary
+  // VI: Tóm tắt
   console.log(`${colors.bright}${colors.magenta}📊 Summary:${colors.reset}`);
   console.log(`${colors.white}  • Files processed: ${localeFiles.length}${colors.reset}`);
   console.log(`${colors.white}  • Total extra keys found: ${totalExtraKeys}${colors.reset}`);

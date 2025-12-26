@@ -1,11 +1,13 @@
 /**
- * Temporary script to find key differences between locale files
+ * EN: Temporary script to find key differences between locale files
+ * VI: Script tạm để so sánh khác biệt key giữa các locale
  */
 
 import { readFileSync } from 'fs';
 import { join } from 'path';
 
-// Function to flatten nested object keys
+// EN: Flatten nested object into key list
+// VI: Trải phẳng object lồng thành danh sách key
 function flattenKeys(obj, prefix = '') {
   const keys = [];
   for (const key in obj) {
@@ -21,13 +23,15 @@ function flattenKeys(obj, prefix = '') {
   return keys;
 }
 
-// Load locale files
+// EN: Load locale files
+// VI: Nạp các file locale
 async function loadLocale(filename) {
   try {
     const filePath = join(process.cwd(), 'src/i18n/locales', filename);
     const content = readFileSync(filePath, 'utf-8');
 
-    // Create a temporary module to evaluate the export
+    // EN: Build a temporary module to evaluate export
+    // VI: Tạo module tạm để đánh giá export
     const moduleCode = content.replace('export default', 'const localeData =') + '\nlocaleData;';
     const localeData = eval(moduleCode);
 
@@ -50,14 +54,16 @@ async function main() {
     const keys = await loadLocale(locale);
     console.log(`\n🔍 Checking ${locale}: ${keys.length} keys`);
 
-    // Find keys in this locale but not in en.js
+    // EN: Keys present in this locale but missing in en.js
+    // VI: Các key có ở locale này nhưng không có trong en.js
     const extraKeys = keys.filter(key => !enKeys.includes(key));
     if (extraKeys.length > 0) {
       console.log(`  ➕ Extra keys (${extraKeys.length}):`);
       extraKeys.forEach(key => console.log(`    • ${key}`));
     }
 
-    // Find keys in en.js but not in this locale
+    // EN: Keys present in en.js but missing here
+    // VI: Key có trong en.js nhưng thiếu ở locale này
     const missingKeys = enKeys.filter(key => !keys.includes(key));
     if (missingKeys.length > 0) {
       console.log(`  ❌ Missing keys (${missingKeys.length}):`);

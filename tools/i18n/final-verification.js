@@ -1,8 +1,12 @@
 #!/usr/bin/env node
 
 /**
- * Final Verification - Dynamic i18n System
- * Verifies the complete optimization is working perfectly
+ * EN:
+ *   - Final verification for the dynamic i18n system.
+ *   - Confirms the optimization works end-to-end.
+ * VI:
+ *   - Kiểm tra cuối cùng cho hệ thống i18n động.
+ *   - Xác nhận tối ưu hoá hoạt động toàn bộ.
  */
 
 import { getSupportedLanguagesSync, initI18n } from '../../src/i18n/config.js';
@@ -11,7 +15,8 @@ console.log('🎯 FINAL VERIFICATION - DYNAMIC i18n SYSTEM\n');
 
 async function verifySystem() {
   try {
-    // Initialize i18n system first
+    // EN: Initialize i18n system first
+    // VI: Khởi tạo hệ thống i18n trước
     await initI18n();
 
     console.log('🌍 Currently supported languages:');

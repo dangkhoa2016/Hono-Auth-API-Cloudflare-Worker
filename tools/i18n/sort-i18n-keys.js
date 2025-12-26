@@ -2,13 +2,22 @@
 /**
  * i18n Key Sorting Tool
  * ---------------------------------
- * Sắp xếp lại thứ tự key trong tất cả các file locale (7 ngôn ngữ) theo thứ tự alphabet ổn định.
- * - Giữ nguyên cấu trúc lồng nhau
- * - Sắp xếp keys ở mỗi cấp theo unicode localeCompare (en) để ổn định
- * - Tùy chọn --fix để ghi đè file
- * - Tùy chọn --backup để tạo bản sao lưu *.bak trước khi ghi
- * - Giữ nguyên comment header đầu file (block comment đầu tiên) nếu có
- * - Không thay đổi giá trị
+ * EN:
+ *   - Sort locale keys alphabetically while keeping structure intact.
+ *   - Preserve nested structure.
+ *   - Sort per level with localeCompare('en').
+ *   - Use --fix to write changes.
+ *   - Use --backup to create *.bak before writing.
+ *   - Keep first block comment header if present.
+ *   - Do not change values.
+ * VI:
+ *   - Sắp xếp key trong mọi file locale theo alphabet nhưng giữ nguyên cấu trúc.
+ *   - Giữ nguyên cấu trúc lồng nhau.
+ *   - Sắp xếp từng tầng với localeCompare('en').
+ *   - Dùng --fix để ghi thay đổi.
+ *   - Dùng --backup để tạo bản sao lưu *.bak.
+ *   - Giữ comment header đầu nếu có.
+ *   - Không thay đổi giá trị.
  *
  * Usage:
  *   node tools/i18n/sort-i18n-keys.js           # Chỉ preview thay đổi (dry-run)
@@ -21,7 +30,8 @@ import path from 'path';
 import url from 'url';
 
 const __dirname = path.dirname(url.fileURLToPath(import.meta.url));
-// Project root: hiện file ở tools/i18n => lên 2 cấp là root
+// EN: Current file is tools/i18n so go up 2 levels to reach project root
+// VI: File nằm ở tools/i18n nên lùi 2 cấp để tới root
 const ROOT = path.resolve(__dirname, '../../');
 const LOCALES_DIR = path.join(ROOT, 'src/i18n/locales');
 
@@ -30,7 +40,8 @@ const isFix = args.includes('--fix');
 const makeBackup = args.includes('--backup');
 
 function sortObjectDeep(obj) {
-  if (Array.isArray(obj)) return obj; // không sắp xếp mảng
+  if (Array.isArray(obj)) return obj; // EN: Do not sort arrays
+  // VI: Không sắp xếp mảng
   if (obj && typeof obj === 'object') {
     const sorted = {};
     Object.keys(obj)
@@ -44,7 +55,8 @@ function sortObjectDeep(obj) {
 }
 
 function extractHeader(content) {
-  // Lấy block comment đầu tiên nếu ở đầu file
+  // EN: Grab the first block comment at file start if present
+  // VI: Lấy block comment đầu file nếu có
   const headerMatch = content.match(/^\s*\/\*([\s\S]*?)\*\//);
   let header = '';
   let rest = content;
@@ -56,12 +68,15 @@ function extractHeader(content) {
 }
 
 function parseExportObject(content) {
-  // Tìm export default { ... } kết thúc bằng };
+  // EN: Find export default { ... } that ends with };
+  // VI: Tìm export default { ... } kết thúc bằng };
   const exportMatch = content.match(/export\s+default\s+({[\s\S]*});?/);
   if (!exportMatch) throw new Error('Không tìm thấy export default object');
   const objectCode = exportMatch[1];
-  // Dùng Function để parse an toàn tương đối (file kiểm soát nội bộ)
-  // Thay export default bằng return
+  // EN: Parse via Function for controlled internal files
+  // VI: Dùng Function để parse vì file nội bộ đã kiểm soát
+  // EN: Replace export default with return
+  // VI: Thay export default bằng return
   const wrapped = `return (${objectCode});`;
   // eslint-disable-next-line no-new-func
   const fn = new Function(wrapped);
@@ -69,7 +84,8 @@ function parseExportObject(content) {
 }
 
 function formatObject(obj, indent = 2) {
-  // Tự format để đảm bảo single quotes & dấu phẩy cuối cùng nhất quán
+  // EN: Self-format to enforce single quotes and trailing commas consistently
+  // VI: Tự format để giữ dấu nháy đơn và dấu phẩy cuối nhất quán
   const space = ' '.repeat(indent);
   function inner(value, level) {
     if (Array.isArray(value)) {
@@ -85,7 +101,8 @@ function formatObject(obj, indent = 2) {
 ${lines.join(',\n')}
 ${pad}}`;
     }
-    // primitive: string assumed
+    // EN: Primitive branch assumes string
+    // VI: Nhánh primitive giả định kiểu string
     if (typeof value === 'string') {
       return `'${value.replace(/'/g, "\\'")}'`;
     }
