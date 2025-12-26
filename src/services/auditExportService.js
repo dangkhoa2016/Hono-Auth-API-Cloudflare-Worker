@@ -222,14 +222,7 @@ export class AuditExportService {
       const query = this.buildAggregatedQuery(filters, aggregation);
       const aggregatedData = await this.db.prepare(query.sql).bind(...query.params).all();
 
-      auditExportService_log(`Error in CSV export: ${error.message}`);
-      return {
-        success: true,
-        data: '',
-        size: 0,
-        filename: `audit_export_${new Date().toISOString().split('T')[0]}.csv`,
-        warning: 'CSV export fallback due to internal error'
-      };
+      const csvLines = [];
       if (aggregatedData.results && aggregatedData.results.length > 0) {
         // Header based on group_by and metrics
         const headers = [...(aggregation.group_by || []), ...(aggregation.metrics || [])];

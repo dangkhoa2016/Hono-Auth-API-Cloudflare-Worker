@@ -1000,16 +1000,4 @@ function convertComplianceReportToCSV(report) {
   return lines.join('\n');
 }
 
-// Helper function to get content type for different formats
-function getContentType(format) {
-  const contentTypes = {
-    'json': 'application/json',
-    'csv': 'text/csv',
-    'excel': 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
-    'pdf': 'application/pdf',
-    'xml': 'application/xml'
-  };
-  return contentTypes[format] || 'application/octet-stream';
-}
-
 export default advancedAudit;

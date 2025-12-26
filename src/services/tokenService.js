@@ -659,7 +659,7 @@ export class TokenService extends BaseService {
   async cleanupExpiredTokens(limit = 100) {
     try {
       const now = nowIso();
-      
+
       // Delete tokens that are expired OR revoked more than 30 days ago
       const result = await this.dbService.delete(
         `DELETE FROM refresh_tokens 
@@ -673,7 +673,7 @@ export class TokenService extends BaseService {
         tokenService_log(`Cleaned up ${result.changes} expired/revoked refresh tokens`);
         return result.changes;
       }
-      
+
       return 0;
     } catch (error) {
       error_log(`Failed to cleanup expired tokens: ${error.message}`);
@@ -703,7 +703,7 @@ export class TokenService extends BaseService {
     const normalized = String(scopeValue);
 
     if (separator && separator !== ' ') {
-      const escapedSeparator = separator.replace(/[-\/\\^$*+?.()|[\]{}]/g, '\\$&');
+      const escapedSeparator = separator.replace(/[-/\\^$*+?.()|[\]{}]/g, '\\$&');
       return normalized
         .replace(new RegExp(escapedSeparator, 'g'), ' ')
         .split(/[\s,]+/)

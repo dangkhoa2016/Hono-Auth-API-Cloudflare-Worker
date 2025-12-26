@@ -47,6 +47,8 @@ class AuthTests {
 
     const tests = [
       this.testUserRegistration,
+      this.testRegistrationRequiresActivation,
+      this.testRegistrationEmailNotification,
       this.testValidLogin,
       this.testInvalidLogin,
       this.testMissingCredentials,
@@ -109,6 +111,84 @@ class AuthTests {
       this.logger.success('User registration test completed successfully');
     } catch (error) {
       this.logger.error(`[testUserRegistration] User registration test failed: ${error.message}`);
+      throw error;
+    }
+  }
+
+  /**
+   * Test registration flow requires activation before login (default inactive status)
+   */
+  async testRegistrationRequiresActivation() {
+    this.logger.info('Testing registration requires activation before login...');
+
+    try {
+      const pendingUser = {
+        email: `inactive_${Date.now()}@example.com`,
+        password: 'SecurePass123!',
+        full_name: 'Pending User'
+      };
+
+      const registerResponse = await this.client.post(API_ENDPOINTS.register, pendingUser);
+
+      this.assert.assertEqual(registerResponse.status, 201, 'Registration should return 201');
+      this.assert.assertEqual(registerResponse.data.success, true, 'Registration should be successful');
+      this.assert.assertHasField(registerResponse.data, 'data', 'Registration should return data');
+      this.assert.assertEqual(registerResponse.data.data.status, 'inactive', 'New user should be inactive until activation');
+
+      // Attempt login should fail while inactive
+      const loginAttempt = await this.client.post(API_ENDPOINTS.login, {
+        email: pendingUser.email,
+        password: pendingUser.password
+      });
+
+      this.assert.assertEqual(loginAttempt.status, 401, 'Inactive user login should return 401');
+      this.assert.assertFalse(loginAttempt.success, 'Inactive user login should not succeed');
+
+      this.logger.success('Registration requires activation test completed successfully');
+    } catch (error) {
+      this.logger.error(`[testRegistrationRequiresActivation] failed: ${error.message}`);
+      throw error;
+    }
+  }
+
+  /**
+   * Test registration returns email notification metadata (sent or skipped)
+   */
+  async testRegistrationEmailNotification() {
+    this.logger.info('Testing registration email notification payload...');
+
+    try {
+      // Prefer a non-English language to ensure locale path is exercised
+      this.client.setLanguage('vi');
+
+      const newUser = {
+        email: `email_notice_${Date.now()}@example.com`,
+        password: 'SecurePass123!',
+        full_name: 'Email Notice User'
+      };
+
+      const response = await this.client.post(API_ENDPOINTS.register, newUser);
+
+      this.assert.assertEqual(response.status, 201, 'Registration should return 201');
+      this.assert.assertHasField(response.data, 'data', 'Registration should return data');
+
+      const payload = response.data.data;
+      this.assert.assertHasField(payload, 'email_notification', 'Registration should include email_notification');
+
+      const notice = payload.email_notification;
+      this.assert.assertHasFields(notice, ['sent', 'skipped'], 'email_notification should have sent/skipped');
+      this.assert.assertType(notice.sent, 'boolean', 'email_notification.sent should be boolean');
+      this.assert.assertType(notice.skipped, 'boolean', 'email_notification.skipped should be boolean');
+
+      // Either sent or skipped is acceptable depending on environment config
+      this.assert.assertTrue(notice.sent || notice.skipped, 'Email notification should be sent or explicitly skipped');
+
+      // Reset language for subsequent tests
+      this.client.setLanguage('en');
+
+      this.logger.success('Registration email notification test completed successfully');
+    } catch (error) {
+      this.logger.error(`[testRegistrationEmailNotification] failed: ${error.message}`);
       throw error;
     }
   }

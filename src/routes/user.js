@@ -1,7 +1,7 @@
 import { Hono } from 'hono';
-import { createUserService } from '../utils/serviceFactory.js';
+import { createUserService, createEmailService } from '../utils/serviceFactory.js';
 import { authMiddleware } from '../middleware/auth.js';
-import { createSuccessResponse } from '../utils/helpers.js';
+import { createSuccessResponse, getClientIP } from '../utils/helpers.js';
 import { userRoutes_log, error_log } from '../utils/debug.js';
 import { tSuccess } from '../i18n/index.js';
 import { i18nValidatorsMiddleware } from '../middleware/i18nValidator.js';
@@ -74,6 +74,7 @@ user.post('/register', i18nValidatorsMiddleware.register(), async (c) => {
     const { full_name, email, password } = c.req.valid('json');
 
     const userService = createUserService(c.env);
+    const emailService = createEmailService(c.env);
 
     // Use register method from UserService
     const featureFlags = await getFeatureFlags(c.env);
@@ -106,7 +107,40 @@ user.post('/register', i18nValidatorsMiddleware.register(), async (c) => {
 
     userRoutes_log(`User registered successfully with ID: ${result.data.id}, email: ${email}`);
 
-    return c.json(createSuccessResponse(result.data, tSuccess(c, 'user.registered', {
+    // Send confirmation email (best-effort; does not block registration success)
+    const emailStatus = { sent: false, skipped: false, provider: null };
+    try {
+      const sendResult = await emailService.sendRegistrationConfirmation({
+        id: result.data.id,
+        full_name,
+        email,
+        status: result.data.status
+      }, {
+        locale: c.get('language'),
+        ipAddress: getClientIP(c),
+        userAgent: c.req.header('user-agent') || 'Unknown'
+      });
+
+      emailStatus.sent = sendResult?.success && !sendResult?.skipped;
+      emailStatus.skipped = Boolean(sendResult?.skipped);
+      emailStatus.provider = sendResult?.provider || null;
+      emailStatus.reason = sendResult?.reason || sendResult?.error || null;
+
+      if (!sendResult?.success) {
+        userRoutes_log(`Registration email send did not complete successfully: ${emailStatus.reason || 'unknown reason'}`);
+      }
+    } catch (emailError) {
+      emailStatus.sent = false;
+      emailStatus.reason = emailError.message;
+      userRoutes_log(`Registration email send error: ${emailError.message}`);
+    }
+
+    const successKey = result.data.status === 'active' ? 'user.registered' : 'user.registeredPendingActivation';
+
+    return c.json(createSuccessResponse({
+      ...result.data,
+      email_notification: emailStatus
+    }, tSuccess(c, successKey, {
       userName: full_name,
       userRole: result.data.role || ROLES.USER
     })), 201);

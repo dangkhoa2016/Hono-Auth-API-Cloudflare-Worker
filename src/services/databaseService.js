@@ -473,7 +473,7 @@ export class DatabaseService {
         dbError_log(`${errorMessage} (attempt ${attempt}/${maxRetries}): ${error.message}`);
 
         if (attempt === maxRetries) {
-          dbError_log(`All database operation attempts failed, returning fallback value`);
+          dbError_log('All database operation attempts failed, returning fallback value');
           return fallbackValue; // All retries failed
         }
 

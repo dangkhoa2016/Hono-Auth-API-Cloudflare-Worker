@@ -48,7 +48,7 @@ export const authMiddleware = async (c, next) => {
   try {
     let userDetails = null;
     const cacheKey = `user:cache:${payload.user_id}`;
-    
+
     // Try to get from cache first
     if (c.env.CONFIG_KV) {
       try {

@@ -1,7 +1,11 @@
 import { dynamicConfig_log } from './debug.js';
 import { DEFAULT_CONFIGS, isValidKVKey } from '../constants/kvKeys.js';
 import { DEFAULT_JWT_SECRET } from '../constants/security.js';
-import { createKvConfigService } from '../utils/serviceFactory.js';
+// Lazy-load to avoid circular dependency with serviceFactory during tests
+async function getKvConfigService(env) {
+  const { createKvConfigService } = await import('../utils/serviceFactory.js');
+  return createKvConfigService(env);
+}
 
 /**
  * Get dynamic config: if key is in KV, get from KV, otherwise get from env
@@ -22,7 +26,7 @@ import { createKvConfigService } from '../utils/serviceFactory.js';
 export async function getDynamicConfig(env, key, defaultValue = null, preferKV = true) {
   try {
     const isKVKey = isValidKVKey(key);
-    const kvConfig = createKvConfigService(env);
+    const kvConfig = isKVKey ? await getKvConfigService(env) : null;
 
     if (isKVKey && kvConfig && preferKV) {
       // first: get from KV, fallback to env, then default
@@ -482,14 +486,44 @@ export async function isStaging(env) {
  * @returns {Promise<Object>} Application configuration
  * @property {string} name - Application name
  * @property {string} version - Application version
+ * @property {string} url - Application base URL
  * @example
  * const appConfig = getAppSettings(env);
- * console.log(appConfig); // { name: 'Hono Auth API', version: '1.0.0' }
+ * console.log(appConfig); // { name: 'Hono Auth API', version: '1.0.0', url: 'https://your-app.com' }
 */
 export async function getAppSettings(env) {
   return {
     name: await getStringConfig(env, 'APP_NAME', 'Hono Auth API'),
-    version: await getStringConfig(env, 'APP_VERSION', '1.0.0')
+    version: await getStringConfig(env, 'APP_VERSION', '1.0.0'),
+    url: await getStringConfig(env, 'APP_URL', 'https://your-app.com')
+  };
+}
+
+/**
+ * Get email delivery settings
+ * @param {Object} env - Hono Environment context
+ * @returns {Promise<Object>} Email configuration
+ * @property {boolean} enabled - Master switch for all emails
+ * @property {boolean} confirmationEnabled - Whether to send registration confirmation emails
+ * @property {string} fromAddress - Sender email address
+ * @property {string} fromName - Sender display name
+ * @property {string} replyTo - Optional reply-to address
+ * @property {string} provider - Email provider identifier
+ * @property {string} providerEndpoint - Provider HTTP endpoint
+ */
+export async function getEmailSettings(env) {
+  const enabled = await getBooleanConfig(env, 'EMAIL_ENABLED', false);
+  return {
+    enabled,
+    confirmationEnabled: await getBooleanConfig(env, 'EMAIL_CONFIRMATION_ENABLED', enabled),
+    fromAddress: await getStringConfig(env, 'EMAIL_FROM_ADDRESS', ''),
+    fromName: await getStringConfig(env, 'EMAIL_FROM_NAME', 'Hono Auth API'),
+    replyTo: await getStringConfig(env, 'EMAIL_REPLY_TO', ''),
+    provider: await getStringConfig(env, 'EMAIL_PROVIDER', 'mailchannels'),
+    providerEndpoint: await getStringConfig(env, 'EMAIL_PROVIDER_ENDPOINT', 'https://api.mailchannels.net/tx/v1/send'),
+    providerApiKey: await getStringConfig(env, 'EMAIL_PROVIDER_API_KEY', ''),
+    providerAuthHeader: await getStringConfig(env, 'EMAIL_PROVIDER_AUTH_HEADER', 'Authorization'),
+    appUrl: await getStringConfig(env, 'APP_URL', 'https://your-app.com')
   };
 }
 

@@ -10,7 +10,7 @@
  * - Support for both middleware-detected and manual language detection
 */
 
-import { i18next, getDefaultLanguage, getSupportedLanguages, isLanguageSupported, isLanguageLoaded, loadLanguage } from './config.js';
+import { i18next, getDefaultLanguage, getSupportedLanguages, isLanguageSupported } from './config.js';
 import { i18nService_log } from '../utils/debug.js';
 import { languageDetector } from 'hono/language';
 

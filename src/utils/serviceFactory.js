@@ -18,6 +18,7 @@ import { SecurityIncidentResponseService } from '../services/securityIncidentRes
 import { TokenService } from '../services/tokenService.js';
 import { TokenBlacklistService } from '../services/tokenBlacklistService.js';
 import { TokenAuditService } from '../services/tokenAuditService.js';
+import { EmailService } from '../services/emailService.js';
 import { serviceConfigManager } from './serviceConfigManager.js';
 
 /**
@@ -153,6 +154,15 @@ export function createAuditDashboardService(env) {
 */
 export function createSecurityIncidentResponseService(env) {
   return serviceConfigManager.getServiceInstance('SecurityIncidentResponseService', SecurityIncidentResponseService, env);
+}
+
+/**
+ * Create EmailService with optimized config management
+ * @param {Object} env - Environment context (contains DB)
+ * @returns {EmailService} EmailService instance
+*/
+export function createEmailService(env) {
+  return serviceConfigManager.getServiceInstance('EmailService', EmailService, env);
 }
 
 /**

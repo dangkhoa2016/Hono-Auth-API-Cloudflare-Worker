@@ -10,7 +10,7 @@ import { i18n_log } from '../utils/debug.js';
 let isInitialized = false;
 let defaultLanguage = 'en';
 let supportedLanguages = [];
-let loadedLanguages = new Set(); // Track which languages are loaded
+const loadedLanguages = new Set(); // Track which languages are loaded
 
 /**
  * Initialize i18next with lazy loading

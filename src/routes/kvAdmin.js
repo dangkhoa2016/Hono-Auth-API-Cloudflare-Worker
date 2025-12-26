@@ -192,14 +192,17 @@ kvAdmin.put('/configs/:key', i18nValidatorsMiddleware.configUpdate('json'), asyn
       }, 500);
     }
 
-    kvAdminRoutes_log(`Config updated: ${key} = ${value} (was: ${oldValue})`);
+    // Auto-clear service caches to ensure new value is used immediately
+    clearServiceCaches();
+    kvAdminRoutes_log(`Config updated: ${key} = ${value} (was: ${oldValue}) - service caches cleared`);
 
     return c.json({
       success: true,
       data: {
         key,
         oldValue,
-        newValue: value
+        newValue: value,
+        cacheCleared: true
       },
       message: tSuccess(c, 'kv.adminConfigUpdated', {
         actor: c.get('user')?.fullName || 'System',
@@ -255,6 +258,13 @@ kvAdmin.post('/configs/batch', i18nValidatorsMiddleware.configBatchUpdate('json'
     }
   }
 
+  // Auto-clear service caches if any config was updated successfully
+  const updatedCount = Object.keys(results).length;
+  if (updatedCount > 0) {
+    clearServiceCaches();
+    kvAdminRoutes_log(`Batch update completed: ${updatedCount} configs updated - service caches cleared`);
+  }
+
   return c.json({
     success: Object.keys(errors).length === 0,
     data: {
@@ -262,9 +272,10 @@ kvAdmin.post('/configs/batch', i18nValidatorsMiddleware.configBatchUpdate('json'
       errors: errors,
       summary: {
         total: configs.length,
-        updated: Object.keys(results).length,
+        updated: updatedCount,
         failed: Object.keys(errors).length
-      }
+      },
+      cacheCleared: updatedCount > 0
     },
     message: tSuccess(c, 'kv.batchConfigUpdated', {
       actor: c.get('user')?.fullName || 'System',
@@ -301,14 +312,17 @@ kvAdmin.delete('/configs/:key', async (c) => {
       }, 500);
     }
 
-    kvAdminRoutes_log(`Config reset to default: ${key} (was: ${oldValue})`);
+    // Auto-clear service caches to ensure default value is used immediately
+    clearServiceCaches();
+    kvAdminRoutes_log(`Config reset to default: ${key} (was: ${oldValue}) - service caches cleared`);
 
     return c.json({
       success: true,
       data: {
         key,
         oldValue,
-        defaultValue: DEFAULT_CONFIGS[key]
+        defaultValue: DEFAULT_CONFIGS[key],
+        cacheCleared: true
       },
       message: tSuccess(c, 'kv.adminConfigReset', {
         actor: c.get('user')?.fullName || 'System',

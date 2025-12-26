@@ -320,13 +320,13 @@ export function createUnifiedRequestMiddleware(
       });
 
       const auditLogService = new AuditLogService(c.env);
-      
+
       // Use waitUntil to prevent blocking the response
       if (c.executionCtx && typeof c.executionCtx.waitUntil === 'function') {
         c.executionCtx.waitUntil(
           auditLogService.log(auditEntry)
             .then(() => handleMiddleware_log(`📋 Audit logged (async): ${auditEntry.action} by ${auditEntry.actor_role}`))
-            .catch(err => auditMiddleware_log(`❌ Failed to log audit entry (async):`, err))
+            .catch(err => auditMiddleware_log('❌ Failed to log audit entry (async):', err))
         );
       } else {
         // Fallback for environments without executionCtx (e.g. some tests)

@@ -7,6 +7,7 @@ import {
   getMetricsSettings,
   getBcryptSettings,
   getFeatureFlags,
+  getEmailSettings,
   getTokenSecuritySettings,
   getEnvConfig,
   isProduction,
@@ -186,6 +187,14 @@ export class BaseService {
    */
   async getFeatureFlags() {
     return await this._getCachedConfig('featureFlags', () => getFeatureFlags(this.env));
+  }
+
+  /**
+   * Get Email settings with caching
+   * @returns {Promise<Object>} Email configuration
+   */
+  async getEmailConfig() {
+    return await this._getCachedConfig('email', () => getEmailSettings(this.env));
   }
 
   /**
