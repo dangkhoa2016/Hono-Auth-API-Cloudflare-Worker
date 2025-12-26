@@ -92,7 +92,7 @@ export async function loadTranslation(language) {
 
     // Try to dynamically import the language file
     let module;
-    
+
     // Try known languages map first (better for bundlers)
     if (KNOWN_LANGUAGES[language]) {
       module = await KNOWN_LANGUAGES[language]();
@@ -110,9 +110,9 @@ export async function loadTranslation(language) {
       i18n_log(`📥 Loaded translations for: ${language}`);
       // DEBUG: Check if validation keys exist
       if (module.default.validation) {
-         i18n_log(`[DEBUG_LOADER] ${language} has validation keys: ${Object.keys(module.default.validation).join(',')}`);
+        i18n_log(`[DEBUG_LOADER] ${language} has validation keys: ${Object.keys(module.default.validation).join(',')}`);
       } else {
-         i18n_log(`[DEBUG_LOADER] ${language} MISSING validation keys`);
+        i18n_log(`[DEBUG_LOADER] ${language} MISSING validation keys`);
       }
       return module.default;
     }

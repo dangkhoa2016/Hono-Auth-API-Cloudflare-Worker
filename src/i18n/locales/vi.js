@@ -125,6 +125,14 @@ export default {
       'stats': 'lấy thống kê audit'
     },
     'accountNotActive': 'Tài khoản không hoạt động',
+    'activationAlreadyActive': 'Tài khoản của bạn đã được kích hoạt. Bạn có thể đăng nhập ngay.',
+    'activationDisabledByAdmin': 'Tài khoản của bạn đã bị vô hiệu hóa bởi quản trị viên. Vui lòng liên hệ hỗ trợ.',
+    'activationFailed': 'Kích hoạt tài khoản thất bại. Vui lòng thử lại.',
+    'activationInvalidToken': 'Liên kết kích hoạt không hợp lệ hoặc đã hết hạn',
+    'activationMissingToken': 'Thiếu token kích hoạt',
+    'activationServerError': 'Đã xảy ra lỗi khi kích hoạt. Vui lòng thử lại sau.',
+    'activationSuccess': 'Tài khoản của bạn đã được kích hoạt thành công! Bạn có thể đăng nhập ngay.',
+    'activationTokenExpired': 'Liên kết kích hoạt đã hết hạn. Vui lòng yêu cầu liên kết mới.',
     'cannotAccessOtherUsers': 'Không thể truy cập tài nguyên của người dùng khác',
     'cannotAccessSuperAdmin': 'Không thể truy cập tài nguyên Super Administrator',
     'cannotChangeAdminRole': 'Không thể thay đổi vai trò của administrator khác',
@@ -964,12 +972,32 @@ export default {
       'profileUpdated': 'Hồ sơ người dùng đã được cập nhật thành công cho {{userName}} - {{fieldsCount}} trường đã sửa đổi',
       'profileUpdated_other': 'Hồ sơ người dùng đã được cập nhật thành công cho {{userName}} - {{fieldsCount}} trường đã sửa đổi',
       'registered': 'Người dùng {{userName}} đã đăng ký thành công với vai trò {{userRole}}',
+      'registeredPendingActivation': 'Đã nhận đăng ký cho {{userName}}. Vui lòng kiểm tra email để xác nhận và kích hoạt tài khoản trước khi đăng nhập.',
       'roleChanged': 'Vai trò người dùng đã được thay đổi từ {{oldRole}} thành {{newRole}} cho {{userName}}',
       'sessionTerminated': 'Tất cả phiên đã được chấm dứt thành công cho {{userName}}',
       'suspended': 'Tài khoản người dùng đã được đình chỉ thành công cho {{userName}} đến {{suspendedUntil, datetime}}',
       'unsuspended': 'Việc đình chỉ tài khoản người dùng đã được gỡ bỏ cho {{userName}} bởi {{liftedBy}}',
       'updated': 'Thông tin cá nhân đã được cập nhật thành công cho {{userName}}. Các trường được cập nhật: {{updatedFields}}',
       'updated_other': '{{count}} hồ sơ người dùng đã được cập nhật thành công'
+    }
+  },
+  'emails': {
+    'registration': {
+      'subject': '{{appName}} - Kích hoạt tài khoản của bạn',
+      'greeting': 'Xin chào {{userName}},',
+      'intro': 'Chào mừng bạn đến với {{appName}}! Tài khoản của bạn đã được tạo thành công.',
+      'instructions': 'Để hoàn tất đăng ký và bắt đầu sử dụng tài khoản, vui lòng nhấn vào nút bên dưới:',
+      'activateButton': 'Kích hoạt tài khoản',
+      'activateLinkText': 'Hoặc sao chép và dán liên kết này vào trình duyệt:',
+      'details': 'Thông tin tài khoản',
+      'email': 'Email: {{email}}',
+      'time': 'Đăng ký lúc: {{time}} ngày {{date}}',
+      'ip': 'Địa chỉ IP: {{ip}}',
+      'expiryWarning': 'Liên kết kích hoạt này sẽ hết hạn sau {{hours}} giờ.',
+      'disclaimer': 'Nếu bạn không tạo tài khoản này, bạn có thể bỏ qua email này. Không cần thực hiện thêm hành động nào.',
+      'securityNote': 'Vì lý do bảo mật, vui lòng không chia sẻ liên kết này với bất kỳ ai.',
+      'thanks': 'Trân trọng,\nĐội ngũ {{appName}}',
+      'footer': 'Đây là email tự động từ {{appName}}. Vui lòng không trả lời email này.'
     }
   },
   'system': {

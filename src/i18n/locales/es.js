@@ -972,6 +972,19 @@ export default {
       'updated_other': '{{count}} perfiles de usuario actualizados exitosamente'
     }
   },
+  'emails': {
+    'registration': {
+      'subject': '{{appName}} - Confirma tu registro',
+      'greeting': 'Hola {{userName}},',
+      'intro': 'Gracias por registrarte en {{appName}}.',
+      'instructions': 'Este correo confirma que recibimos los datos de tu cuenta. Si se requiere activación o aprobación, recibirás otro correo.',
+      'email': 'Correo de registro: {{email}}',
+      'time': 'Hora de registro: {{timestamp}}',
+      'ip': 'IP de la solicitud: {{ip}}',
+      'disclaimer': 'Si no solicitaste esta cuenta, ignora este correo o contacta al soporte.',
+      'thanks': 'Gracias,\nEl equipo de {{appName}}'
+    }
+  },
   'system': {
     'apiInfo': 'Información de la API',
     'error': 'Ha ocurrido un error',

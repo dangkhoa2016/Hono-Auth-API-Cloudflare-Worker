@@ -125,6 +125,14 @@ export default {
       'stats': 'retrieve audit statistics'
     },
     'accountNotActive': 'Account is not active',
+    'activationAlreadyActive': 'Your account is already active. You can log in now.',
+    'activationDisabledByAdmin': 'Your account has been disabled by an administrator. Please contact support.',
+    'activationFailed': 'Failed to activate account. Please try again.',
+    'activationInvalidToken': 'Invalid or expired activation link',
+    'activationMissingToken': 'Missing activation token',
+    'activationServerError': 'An error occurred during activation. Please try again later.',
+    'activationSuccess': 'Your account has been activated successfully! You can now log in.',
+    'activationTokenExpired': 'Activation link has expired. Please request a new one.',
     'cannotAccessOtherUsers': 'Cannot access other users\' resources',
     'cannotAccessSuperAdmin': 'Cannot access Super Administrator resources',
     'cannotChangeAdminRole': 'Cannot change role of other administrators',
@@ -964,12 +972,32 @@ export default {
       'profileUpdated': 'User profile updated successfully for {{userName}} - {{fieldsCount}} field modified',
       'profileUpdated_other': 'User profile updated successfully for {{userName}} - {{fieldsCount}} fields modified',
       'registered': 'User {{userName}} registered successfully with {{userRole}} role',
+      'registeredPendingActivation': 'Registration received for {{userName}}. Please check your email to confirm and activate your account before logging in.',
       'roleChanged': 'User role changed from {{oldRole}} to {{newRole}} for {{userName}}',
       'sessionTerminated': 'All sessions terminated successfully for {{userName}}',
       'suspended': 'User account suspended successfully for {{userName}} until {{suspendedUntil, datetime}}',
       'unsuspended': 'User account suspension lifted for {{userName}} by {{liftedBy}}',
       'updated': 'User profile updated successfully for {{userName}} - fields: {{updatedFields}}',
       'updated_other': '{{count}} user profiles updated successfully'
+    }
+  },
+  'emails': {
+    'registration': {
+      'subject': '{{appName}} - Activate your account',
+      'greeting': 'Hello {{userName}},',
+      'intro': 'Welcome to {{appName}}! Your account has been created successfully.',
+      'instructions': 'To complete your registration and start using your account, please click the button below:',
+      'activateButton': 'Activate My Account',
+      'activateLinkText': 'Or copy and paste this link into your browser:',
+      'details': 'Account Details',
+      'email': 'Email: {{email}}',
+      'time': 'Registered on: {{date}} at {{time}}',
+      'ip': 'IP Address: {{ip}}',
+      'expiryWarning': 'This activation link will expire in {{hours}} hours.',
+      'disclaimer': 'If you did not create this account, you can safely ignore this email. No action is required.',
+      'securityNote': 'For your security, never share this link with anyone.',
+      'thanks': 'Best regards,\nThe {{appName}} Team',
+      'footer': 'This is an automated message from {{appName}}. Please do not reply to this email.'
     }
   },
   'system': {

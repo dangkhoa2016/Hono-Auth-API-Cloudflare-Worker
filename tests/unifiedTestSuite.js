@@ -572,7 +572,7 @@ class UnifiedTestSuite {
       };
 
       const result = await this.client.put(API_ENDPOINTS.userChangePassword, passwordData);
-      
+
       if (result.success) {
         // Revert password change to avoid breaking other tests
         const revertData = {

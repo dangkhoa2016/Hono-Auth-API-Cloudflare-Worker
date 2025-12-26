@@ -151,7 +151,7 @@ export class RateLimitService extends BaseService {
     const key = `ratelimit:${resolved.context}:${normalized}`;
     try {
       const record = await this.env.CONFIG_KV.get(key, 'json');
-      
+
       if (!record) {
         return { allowed: true, attempts: 0, limit: resolved.limit, context: resolved.context };
       }
@@ -166,12 +166,12 @@ export class RateLimitService extends BaseService {
       if (record.attempts >= resolved.limit) {
         // Check lockout
         if (record.lastAttempt && resolved.blockDurationSeconds > 0) {
-             const elapsed = (now - record.lastAttempt) / 1000;
-             if (elapsed < resolved.blockDurationSeconds) {
-                 const retryAfter = Math.ceil(resolved.blockDurationSeconds - elapsed);
-                 rateLimit_log(`Rate limit exceeded (KV) for context ${resolved.context}, retry after ${retryAfter}s`);
-                 return { allowed: false, attempts: record.attempts, limit: resolved.limit, context: resolved.context, retryAfterSeconds: retryAfter, blockDurationSeconds: resolved.blockDurationSeconds };
-             }
+          const elapsed = (now - record.lastAttempt) / 1000;
+          if (elapsed < resolved.blockDurationSeconds) {
+            const retryAfter = Math.ceil(resolved.blockDurationSeconds - elapsed);
+            rateLimit_log(`Rate limit exceeded (KV) for context ${resolved.context}, retry after ${retryAfter}s`);
+            return { allowed: false, attempts: record.attempts, limit: resolved.limit, context: resolved.context, retryAfterSeconds: retryAfter, blockDurationSeconds: resolved.blockDurationSeconds };
+          }
         }
         // Lockout expired
         await this.resetFailedAttemptsKV(normalized, resolved);
@@ -181,9 +181,9 @@ export class RateLimitService extends BaseService {
       return { allowed: true, attempts: record.attempts, limit: resolved.limit, context: resolved.context };
 
     } catch (e) {
-        dbError_log(`KV Rate limit check error: ${e.message}`);
-        // Fallback to allow if KV fails
-        return { allowed: true, attempts: 0, limit: resolved.limit, context: resolved.context, error: e.message };
+      dbError_log(`KV Rate limit check error: ${e.message}`);
+      // Fallback to allow if KV fails
+      return { allowed: true, attempts: 0, limit: resolved.limit, context: resolved.context, error: e.message };
     }
   }
 
@@ -225,7 +225,7 @@ export class RateLimitService extends BaseService {
           `INSERT INTO rate_limit_counters (
              context, identifier, attempts_count, first_attempt_at,
              last_attempt_at, metadata, created_at, updated_at
-           ) VALUES (?, ?, 1, ?, ?, ?, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP)` ,
+           ) VALUES (?, ?, 1, ?, ?, ?, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP)`,
           [resolved.context, normalized, nowIso, nowIso, metadataJson]
         );
         return true;
@@ -269,32 +269,32 @@ export class RateLimitService extends BaseService {
    * @param {Object} resolved - Resolved options
    */
   async recordFailedAttemptKV(normalized, resolved) {
-      const key = `ratelimit:${resolved.context}:${normalized}`;
-      const now = Date.now();
-      
-      try {
-        let record = await this.env.CONFIG_KV.get(key, 'json');
-        
-        if (!record) {
-            record = { attempts: 1, firstAttempt: now, lastAttempt: now, metadata: resolved.metadata };
+    const key = `ratelimit:${resolved.context}:${normalized}`;
+    const now = Date.now();
+
+    try {
+      let record = await this.env.CONFIG_KV.get(key, 'json');
+
+      if (!record) {
+        record = { attempts: 1, firstAttempt: now, lastAttempt: now, metadata: resolved.metadata };
+      } else {
+        if (resolved.windowSeconds > 0 && (now - record.firstAttempt) / 1000 > resolved.windowSeconds) {
+          record = { attempts: 1, firstAttempt: now, lastAttempt: now, metadata: resolved.metadata };
         } else {
-            if (resolved.windowSeconds > 0 && (now - record.firstAttempt) / 1000 > resolved.windowSeconds) {
-                record = { attempts: 1, firstAttempt: now, lastAttempt: now, metadata: resolved.metadata };
-            } else {
-                record.attempts++;
-                record.lastAttempt = now;
-                if (resolved.metadata) record.metadata = resolved.metadata;
-            }
+          record.attempts++;
+          record.lastAttempt = now;
+          if (resolved.metadata) {record.metadata = resolved.metadata;}
         }
-        
-        // Calculate TTL: Max of window or block duration
-        const ttl = Math.max(resolved.windowSeconds, resolved.blockDurationSeconds, 60); // Min 60s
-        await this.env.CONFIG_KV.put(key, JSON.stringify(record), { expirationTtl: ttl });
-        return true;
-      } catch (e) {
-        dbError_log(`Failed to record rate limit attempt (KV): ${e.message}`);
-        return false;
       }
+
+      // Calculate TTL: Max of window or block duration
+      const ttl = Math.max(resolved.windowSeconds, resolved.blockDurationSeconds, 60); // Min 60s
+      await this.env.CONFIG_KV.put(key, JSON.stringify(record), { expirationTtl: ttl });
+      return true;
+    } catch (e) {
+      dbError_log(`Failed to record rate limit attempt (KV): ${e.message}`);
+      return false;
+    }
   }
 
   /**
@@ -318,7 +318,7 @@ export class RateLimitService extends BaseService {
 
     try {
       await this.dbService.delete(
-        `DELETE FROM rate_limit_counters WHERE context = ? AND identifier = ?`,
+        'DELETE FROM rate_limit_counters WHERE context = ? AND identifier = ?',
         [resolved.context, normalized]
       );
       return true;

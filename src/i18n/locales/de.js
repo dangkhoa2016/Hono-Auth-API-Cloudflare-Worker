@@ -972,6 +972,19 @@ export default {
       'updated_other': '{{count}} Benutzerprofile erfolgreich aktualisiert'
     }
   },
+  'emails': {
+    'registration': {
+      'subject': '{{appName}} - Bestätige deine Registrierung',
+      'greeting': 'Hallo {{userName}},',
+      'intro': 'Danke für deine Registrierung bei {{appName}}.',
+      'instructions': 'Diese E-Mail bestätigt, dass wir deine Kontodaten erhalten haben. Falls eine Aktivierung oder Freigabe nötig ist, erhältst du eine weitere E-Mail.',
+      'email': 'Registrierungs-E-Mail: {{email}}',
+      'time': 'Registrierungszeit: {{timestamp}}',
+      'ip': 'Anfrage-IP: {{ip}}',
+      'disclaimer': 'Wenn du dieses Konto nicht angefordert hast, ignoriere diese E-Mail oder kontaktiere den Support.',
+      'thanks': 'Vielen Dank,\nDas {{appName}} Team'
+    }
+  },
   'system': {
     'apiInfo': 'API-Informationen',
     'error': 'Ein Fehler ist aufgetreten',

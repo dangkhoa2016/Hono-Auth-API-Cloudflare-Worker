@@ -6,6 +6,7 @@ export const DEFAULT_CONFIGS = {
   // App Info
   APP_NAME: 'Hono Auth API',
   APP_VERSION: '1.0.0',
+  APP_URL: 'https://your-app.com',
 
   // Debug & Development
   DEBUG: 'hono-auth-api:*',
@@ -59,6 +60,17 @@ export const DEFAULT_CONFIGS = {
 
   // User Management
   AUTO_ACTIVATE_USER_ON_REGISTER: false,
+
+  // Email Delivery
+  EMAIL_ENABLED: false,
+  EMAIL_CONFIRMATION_ENABLED: false,
+  EMAIL_FROM_ADDRESS: 'no-reply@hono-auth.local',
+  EMAIL_FROM_NAME: 'Hono Auth API',
+  EMAIL_REPLY_TO: '',
+  EMAIL_PROVIDER: 'brevo',
+  EMAIL_PROVIDER_ENDPOINT: 'https://api.brevo.com/v3/smtp/email',
+  EMAIL_PROVIDER_API_KEY: '',
+  EMAIL_PROVIDER_AUTH_HEADER: 'api-key',
 
   // CORS
   CORS_ORIGIN: '*',

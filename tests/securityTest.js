@@ -208,24 +208,24 @@ class SecurityTests {
       // Make sequential requests to trigger rate limiting
       // Limit is 5, so 6th request should fail
       let rateLimitedResponse = null;
-      
+
       for (let i = 1; i <= 7; i++) {
         const response = await rateLimitClient.post(loginEndpoint, invalidCredentials);
-        
+
         if (response.status === 429) {
           rateLimitedResponse = response;
           this.logger.info(`Rate limit triggered on attempt ${i}`);
           break;
         }
-        
+
         // If we haven't hit the limit yet, we expect 401 (invalid credentials)
         if (i <= 5) {
-           this.assert.assertEqual(response.status, 401, `Attempt ${i} should fail with 401`);
+          this.assert.assertEqual(response.status, 401, `Attempt ${i} should fail with 401`);
         }
       }
 
       this.assert.exists(rateLimitedResponse, 'Rate limiting should be enforced');
-      
+
       // Check rate limit headers
       if (rateLimitedResponse) {
         this.assert.exists(rateLimitedResponse.headers['retry-after'] ||

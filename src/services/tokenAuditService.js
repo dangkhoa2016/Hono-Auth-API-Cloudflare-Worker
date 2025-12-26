@@ -61,7 +61,7 @@ export class TokenAuditService extends BaseService {
     }
   }
 
-  async logSuspiciousActivity(action, userId, details = {}) {
+  logSuspiciousActivity(action, userId, details = {}) {
     return this.logTokenAction(action, userId, {
       ...details,
       success: false

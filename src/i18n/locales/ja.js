@@ -972,6 +972,19 @@ export default {
       'updated_other': '{{count}} 件のユーザープロファイルを正常に更新しました'
     }
   },
+  'emails': {
+    'registration': {
+      'subject': '{{appName}} - 登録確認',
+      'greeting': '{{userName}} 様',
+      'intro': '{{appName}} にご登録いただきありがとうございます。',
+      'instructions': 'このメールはアカウント情報を受け取ったことを確認するものです。承認や有効化が必要な場合、別途メールをお送りします。',
+      'email': '登録メールアドレス: {{email}}',
+      'time': '登録日時: {{timestamp}}',
+      'ip': 'リクエストIP: {{ip}}',
+      'disclaimer': 'このアカウントに心当たりがない場合は、このメールを無視するかサポートまでご連絡ください。',
+      'thanks': 'ありがとうございます。\n{{appName}} チーム'
+    }
+  },
   'system': {
     'apiInfo': 'API情報',
     'error': 'エラーが発生しました',

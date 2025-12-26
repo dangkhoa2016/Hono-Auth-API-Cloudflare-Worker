@@ -59,8 +59,8 @@ api.get('/api', authMiddleware, async (c) => {
           filteredCategoryRoutes[routeKey] = t(c, routeData.i18nKey);
         }
       } catch (err) {
-        console.error(`Error processing route ${routeKey} in category ${category}:`, err);
-        console.error('Route data:', JSON.stringify(routeData, null, 2));
+        // console.error(`Error processing route ${routeKey} in category ${category}:`, err);
+        // console.error('Route data:', JSON.stringify(routeData, null, 2));
       }
     });
 

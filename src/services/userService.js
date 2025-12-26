@@ -956,4 +956,232 @@ export class UserService extends BaseService {
       }
     }
   }
+
+  /**
+   * Generate a secure random activation token
+   * @returns {string} 64 character random token
+   */
+  generateActivationToken() {
+    const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
+    let token = '';
+    for (let i = 0; i < 64; i++) {
+      token += chars.charAt(Math.floor(Math.random() * chars.length));
+    }
+    return token;
+  }
+
+  /**
+   * Create user with activation token
+   * @param {Object} userData - User data
+   * @param {number} tokenExpiryDays - Token expiry in days (default: 2)
+   * @returns {Promise<Object|null>} Created user with activation token or null
+   */
+  async createWithActivationToken(userData, tokenExpiryDays = 2) {
+    userService_log(`Creating new user with activation token: ${userData.email}`);
+
+    try {
+      const { full_name, email, password, role = DEFAULT_USER_ROLE, status = 'inactive' } = userData;
+
+      const activationToken = this.generateActivationToken();
+      const expiresAt = new Date(Date.now() + tokenExpiryDays * 24 * 60 * 60 * 1000).toISOString();
+
+      const result = await this.dbService.insert(
+        `INSERT INTO users (full_name, email, password, role, status, activation_token, activation_token_expires_at) 
+         VALUES (?, ?, ?, ?, ?, ?, ?)`,
+        [full_name, email, password, role, status, activationToken, expiresAt]
+      );
+
+      if (result && result.success) {
+        userService_log(`User created with activation token, ID: ${result.insertId}, expires: ${expiresAt}`);
+        const user = await this.findById(result.insertId);
+        return {
+          ...user,
+          activationToken,
+          activationTokenExpiresAt: expiresAt
+        };
+      }
+
+      userService_log('Failed to create user with activation token');
+      return null;
+    } catch (error) {
+      dbError_log(`Error creating user with activation token: ${error.message}`);
+      return null;
+    }
+  }
+
+  /**
+   * Find user by activation token
+   * @param {string} token - Activation token
+   * @returns {Promise<Object|null>} User object or null
+   */
+  async findByActivationToken(token) {
+    query_log('Finding user by activation token');
+
+    try {
+      const user = await this.dbService.select(
+        `SELECT id, full_name, email, role, status, activation_token, activation_token_expires_at, 
+                activated_at, disabled_by_admin, created_at 
+         FROM users WHERE activation_token = ?`,
+        [token],
+        true
+      );
+
+      if (user) {
+        userService_log(`User found by activation token, ID: ${user.id}`);
+      } else {
+        userService_log('No user found for activation token');
+      }
+
+      return user;
+    } catch (error) {
+      dbError_log(`Error finding user by activation token: ${error.message}`);
+      return null;
+    }
+  }
+
+  /**
+   * Activate user account via token
+   * Token is unique and sufficient to identify the user - no email needed in URL for security
+   * @param {string} token - Activation token (unique identifier)
+   * @returns {Promise<Object>} Activation result
+   */
+  async activateByToken(token) {
+    userService_log('Attempting to activate user by token');
+
+    try {
+      const user = await this.findByActivationToken(token);
+
+      if (!user) {
+        userService_log('Activation failed: invalid token');
+        return { success: false, error: 'INVALID_TOKEN', message: 'Invalid or expired activation token' };
+      }
+
+      // Check if token expired
+      const now = new Date();
+      const expiresAt = new Date(user.activation_token_expires_at);
+      if (now > expiresAt) {
+        userService_log('Activation failed: token expired');
+        return { success: false, error: 'TOKEN_EXPIRED', message: 'Activation token has expired' };
+      }
+
+      // Check if user was disabled by admin (prevents re-activation)
+      if (user.disabled_by_admin === 1) {
+        userService_log('Activation failed: account disabled by admin');
+        return {
+          success: false,
+          error: 'DISABLED_BY_ADMIN',
+          message: 'Your account has been disabled by an administrator. Please contact support.'
+        };
+      }
+
+      // Check if already active
+      if (user.status === 'active') {
+        userService_log('Account already active');
+        return { success: true, alreadyActive: true, message: 'Account is already active' };
+      }
+
+      // Activate the account
+      const activatedAt = new Date().toISOString();
+      const updateResult = await this.dbService.update(
+        'UPDATE users SET status = \'active\', activated_at = ?, activation_token = NULL WHERE id = ?',
+        [activatedAt, user.id]
+      );
+
+      if (updateResult && updateResult.success) {
+        userService_log(`User activated successfully, ID: ${user.id}`);
+        await this.invalidateUserCache(user.id);
+        return {
+          success: true,
+          user: {
+            id: user.id,
+            email: user.email,
+            full_name: user.full_name,
+            status: 'active',
+            activated_at: activatedAt
+          },
+          message: 'Account activated successfully'
+        };
+      }
+
+      userService_log('Activation failed: database update error');
+      return { success: false, error: 'UPDATE_FAILED', message: 'Failed to activate account' };
+
+    } catch (error) {
+      dbError_log(`Error activating user: ${error.message}`);
+      return { success: false, error: 'ACTIVATION_ERROR', message: error.message };
+    }
+  }
+
+  /**
+   * Disable user by admin (sets flag to prevent re-activation via link)
+   * @param {number} userId - User ID
+   * @param {boolean} setAdminFlag - Whether to set disabled_by_admin flag
+   * @returns {Promise<boolean>} Success status
+   */
+  async disableUserByAdmin(userId, setAdminFlag = true) {
+    userService_log(`Disabling user by admin, ID: ${userId}, setAdminFlag: ${setAdminFlag}`);
+
+    try {
+      const query = setAdminFlag
+        ? 'UPDATE users SET status = \'inactive\', disabled_by_admin = 1 WHERE id = ?'
+        : 'UPDATE users SET status = \'inactive\' WHERE id = ?';
+
+      const result = await this.dbService.update(query, [userId]);
+
+      if (result && result.success) {
+        userService_log(`User disabled by admin successfully, ID: ${userId}`);
+        await this.invalidateUserCache(userId);
+        return true;
+      }
+
+      return false;
+    } catch (error) {
+      dbError_log(`Error disabling user by admin: ${error.message}`);
+      return false;
+    }
+  }
+
+  /**
+   * Regenerate activation token for user
+   * @param {number} userId - User ID
+   * @param {number} tokenExpiryDays - Token expiry in days (default: 2)
+   * @returns {Promise<Object|null>} New token info or null
+   */
+  async regenerateActivationToken(userId, tokenExpiryDays = 2) {
+    userService_log(`Regenerating activation token for user ID: ${userId}`);
+
+    try {
+      const user = await this.findById(userId);
+      if (!user) {
+        return null;
+      }
+
+      // Don't regenerate if disabled by admin
+      if (user.disabled_by_admin === 1) {
+        userService_log('Cannot regenerate token: user disabled by admin');
+        return { error: 'DISABLED_BY_ADMIN' };
+      }
+
+      const newToken = this.generateActivationToken();
+      const expiresAt = new Date(Date.now() + tokenExpiryDays * 24 * 60 * 60 * 1000).toISOString();
+
+      const result = await this.dbService.update(
+        'UPDATE users SET activation_token = ?, activation_token_expires_at = ? WHERE id = ?',
+        [newToken, expiresAt, userId]
+      );
+
+      if (result && result.success) {
+        userService_log(`Activation token regenerated for user ID: ${userId}`);
+        return {
+          token: newToken,
+          expiresAt
+        };
+      }
+
+      return null;
+    } catch (error) {
+      dbError_log(`Error regenerating activation token: ${error.message}`);
+      return null;
+    }
+  }
 }
