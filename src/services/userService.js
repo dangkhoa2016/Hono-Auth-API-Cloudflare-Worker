@@ -188,13 +188,20 @@ export class UserService extends BaseService {
       const hashedPassword = await bcrypt.hash(password, bcryptConfig.saltRounds);
       userService_log(`Password hashed successfully for registration using ${bcryptConfig.saltRounds} salt rounds`);
 
-      // Create new user with hashed password
-      const newUser = await this.create({
-        full_name,
-        email,
-        status: autoSetActiveStatus ? USER_STATUSES.ACTIVE : USER_STATUSES.INACTIVE, // Default is inactive, needs to be activated later
-        password: hashedPassword
-      });
+      // Create new user (with activation token when activation is required)
+      const newUser = autoSetActiveStatus
+        ? await this.create({
+          full_name,
+          email,
+          status: USER_STATUSES.ACTIVE,
+          password: hashedPassword
+        })
+        : await this.createWithActivationToken({
+          full_name,
+          email,
+          status: USER_STATUSES.INACTIVE,
+          password: hashedPassword
+        });
 
       if (!newUser) {
         userService_log('Registration failed: could not create user');
@@ -207,15 +214,22 @@ export class UserService extends BaseService {
       userService_log(`User registered successfully with ID: ${newUser.id}, email: ${email}`);
 
       // Return user data (excluding password)
+      const baseData = {
+        id: newUser.id,
+        full_name: newUser.full_name,
+        email: newUser.email,
+        status: newUser.status,
+        created_at: newUser.created_at
+      };
+
+      if (newUser.activation_token) {
+        baseData.activation_token = newUser.activation_token;
+        baseData.activation_token_expires_at = newUser.activation_token_expires_at;
+      }
+
       return {
         success: true,
-        data: {
-          id: newUser.id,
-          full_name: newUser.full_name,
-          email: newUser.email,
-          status: newUser.status,
-          created_at: newUser.created_at
-        }
+        data: baseData
       };
 
     } catch (error) {
@@ -996,8 +1010,8 @@ export class UserService extends BaseService {
         const user = await this.findById(result.insertId);
         return {
           ...user,
-          activationToken,
-          activationTokenExpiresAt: expiresAt
+          activation_token: activationToken,
+          activation_token_expires_at: expiresAt
         };
       }
 
