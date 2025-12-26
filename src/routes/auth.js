@@ -1,6 +1,7 @@
 import { Hono } from 'hono';
 import { createAuthService } from '../utils/serviceFactory.js';
 import { getClientIP, createSuccessResponse } from '../utils/helpers.js';
+import { getAppSettings } from '../utils/dynamicConfig.js';
 import { authRoutes_log, zod_log, error_log } from '../utils/debug.js';
 import { i18nValidatorsMiddleware } from '../middleware/i18nValidator.js';
 import { t, tSuccess } from '../i18n/index.js';
@@ -233,6 +234,7 @@ auth.get('/activate', async (c) => {
   authRoutes_log(`Activation attempt from IP: ${getClientIP(c)}`);
 
   try {
+    const { name: appName } = await getAppSettings(c.env);
     const token = c.req.query('token');
 
     if (!token) {
@@ -240,7 +242,8 @@ auth.get('/activate', async (c) => {
       return c.html(renderActivationPage({
         success: false,
         error: 'MISSING_PARAMS',
-        message: t(c, 'auth.activationMissingToken', {}, 'Missing activation token')
+        message: t(c, 'auth.activationMissingToken', {}, 'Missing activation token'),
+        appName
       }), 400);
     }
 
@@ -261,7 +264,8 @@ auth.get('/activate', async (c) => {
       return c.html(renderActivationPage({
         success: false,
         error: result.error,
-        message: errorMessages[result.error] || result.message
+        message: errorMessages[result.error] || result.message,
+        appName
       }), result.error === 'DISABLED_BY_ADMIN' ? 403 : 400);
     }
 
@@ -270,7 +274,8 @@ auth.get('/activate', async (c) => {
       return c.html(renderActivationPage({
         success: true,
         alreadyActive: true,
-        message: t(c, 'auth.activationAlreadyActive', {}, 'Your account is already active. You can log in now.')
+        message: t(c, 'auth.activationAlreadyActive', {}, 'Your account is already active. You can log in now.'),
+        appName
       }));
     }
 
@@ -278,7 +283,8 @@ auth.get('/activate', async (c) => {
     return c.html(renderActivationPage({
       success: true,
       user: result.user,
-      message: t(c, 'auth.activationSuccess', {}, 'Your account has been activated successfully!')
+      message: t(c, 'auth.activationSuccess', {}, 'Your account has been activated successfully!'),
+      appName
     }));
 
   } catch (error) {
@@ -286,7 +292,8 @@ auth.get('/activate', async (c) => {
     return c.html(renderActivationPage({
       success: false,
       error: 'SERVER_ERROR',
-      message: t(c, 'auth.activationServerError', {}, 'An error occurred. Please try again later.')
+      message: t(c, 'auth.activationServerError', {}, 'An error occurred. Please try again later.'),
+      appName: 'Hono Auth API'
     }), 500);
   }
 });
@@ -294,8 +301,9 @@ auth.get('/activate', async (c) => {
 /**
  * Render activation result page (HTML)
  */
-function renderActivationPage({ success, alreadyActive, user, error, message }) {
+function renderActivationPage({ success, alreadyActive, user, error, message, appName = 'Hono Auth API' }) {
   const title = success ? '✅ Account Activated' : '❌ Activation Failed';
+  const fullTitle = `${appName} | ${title}`;
   // eslint-disable-next-line no-unused-vars
   const bgColor = success ? '#10b981' : '#ef4444';
 
@@ -304,7 +312,7 @@ function renderActivationPage({ success, alreadyActive, user, error, message }) 
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>${title}</title>
+  <title>${fullTitle}</title>
   <style>
     * { margin: 0; padding: 0; box-sizing: border-box; }
     body { 
