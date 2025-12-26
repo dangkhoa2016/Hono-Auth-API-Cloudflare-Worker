@@ -369,6 +369,7 @@ export class KVConfigService {
    */
   async getFeatureFlags() {
     return {
+      enableAuditLogging: await this.getBooleanConfig('AUDIT_ENABLE_AUDIT_LOGGING'),
       enableRealTimeMonitoring: await this.getBooleanConfig('AUDIT_ENABLE_REAL_TIME_MONITORING'),
       enableAdvancedAnalytics: await this.getBooleanConfig('AUDIT_ENABLE_ADVANCED_ANALYTICS'),
       enableExport: await this.getBooleanConfig('AUDIT_ENABLE_EXPORT'),
