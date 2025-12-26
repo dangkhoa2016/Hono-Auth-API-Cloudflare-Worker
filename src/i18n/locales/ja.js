@@ -125,6 +125,14 @@ export default {
       'stats': '監査統計を取得'
     },
     'accountNotActive': 'アカウントがアクティブではありません',
+    'activationAlreadyActive': 'アカウントは既に有効化されています。すぐにログインできます。',
+    'activationDisabledByAdmin': 'アカウントは管理者によって無効化されています。サポートへお問い合わせください。',
+    'activationFailed': 'アカウントの有効化に失敗しました。もう一度お試しください。',
+    'activationInvalidToken': '無効または期限切れの有効化リンクです',
+    'activationMissingToken': '有効化トークンがありません',
+    'activationServerError': '有効化処理中にエラーが発生しました。しばらくしてからお試しください。',
+    'activationSuccess': 'アカウントが正常に有効化されました。ログインできます。',
+    'activationTokenExpired': '有効化リンクの期限が切れています。新しいリンクをリクエストしてください。',
     'cannotAccessOtherUsers': '他のユーザーのリソースにアクセスできません',
     'cannotAccessSuperAdmin': 'スーパー管理者のリソースにアクセスできません',
     'cannotChangeAdminRole': '他の管理者の役割を変更できません',
@@ -164,6 +172,25 @@ export default {
     'deletedAt': '{{date, datetime}} に削除',
     'updatedAt': '{{date, datetime}} に更新',
     'userJoined': '{{date, date}} に参加'
+  },
+  'emails': {
+    'registration': {
+      'activateButton': 'アカウントを有効化',
+      'activateLinkText': 'またはこのリンクをブラウザにコピー＆ペーストしてください:',
+      'details': 'アカウント詳細',
+      'disclaimer': 'このアカウントに心当たりがない場合は、このメールを無視するかサポートまでご連絡ください。',
+      'email': '登録メールアドレス: {{email}}',
+      'expiryWarning': 'この有効化リンクは{{hours}}時間後に期限切れになります。',
+      'footer': 'このメールは{{appName}}からの自動送信です。返信しないでください。',
+      'greeting': '{{userName}} 様',
+      'instructions': 'このメールはアカウント情報を受け取ったことを確認するものです。承認や有効化が必要な場合、別途メールをお送りします。',
+      'intro': '{{appName}} にご登録いただきありがとうございます。',
+      'ip': 'リクエストIP: {{ip}}',
+      'securityNote': '安全のため、このリンクを他人と共有しないでください。',
+      'subject': '{{appName}} - 登録確認',
+      'thanks': 'ありがとうございます。\n{{appName}} チーム',
+      'time': '登録日時: {{timestamp}}'
+    }
   },
   'endpoints': {
     'admin': {
@@ -420,22 +447,22 @@ export default {
       'businessHoursOnly': '操作は営業時間中のみ許可されます ({{businessHours}})',
       'conflictingOperation': '競合する操作が進行中です: {{operation}}',
       'deadlineExpired': '操作期限は {{deadline, datetime}} に期限切れになりました',
-      'duplicateEntry': '重複エントリが検出されました: {{field}} = "{{value}}" を持つ {{entity}}',
+      'duplicateEntry': '重複エントリが検出されました: {{field}} = \"{{value}}\" を持つ {{entity}}',
       'insufficientBalance': '残高不足: {{available, currency}} 利用可能、{{required, currency}} 必要',
-      'operationNotAllowed': '操作 "{{operation}}" は許可されていません: {{reason}}',
+      'operationNotAllowed': '操作 \"{{operation}}\" は許可されていません: {{reason}}',
       'preconditionFailed': '前提条件が満たされていません: {{condition}}',
       'quotaReached': 'クォータ制限に達しました: {{used, number}}/{{limit, number}} {{resource}}',
       'referenceConstraint': '{{referencingCount}} 件の他のレコードによって参照されているため、{{entity}} を削除できません',
       'referenceConstraint_other': '{{referencingCount}} 件の他のレコードによって参照されているため、{{entity}} を削除できません',
-      'resourceLocked': 'リソース "{{resource}}" は {{lockedBy}} によって {{lockedUntil, datetime}} までロックされています',
+      'resourceLocked': 'リソース \"{{resource}}\" は {{lockedBy}} によって {{lockedUntil, datetime}} までロックされています',
       'workflowViolation': 'ワークフロー違反: 現在の状態 {{currentState}} では {{step}} を実行できません'
     },
     'file': {
-      'accessDenied': 'ファイル "{{filename}}" へのアクセスが拒否されました: {{reason}}',
+      'accessDenied': 'ファイル \"{{filename}}\" へのアクセスが拒否されました: {{reason}}',
       'corrupted': 'ファイルが破損しているか不完全なようです',
       'formatUnsupported': '操作でファイル形式がサポートされていません: {{operation}}',
-      'invalidType': 'ファイルタイプ "{{fileType}}" は許可されていません - サポートされているタイプ: {{allowedTypes}}',
-      'notFound': 'ファイル "{{filename}}" が見つかりません',
+      'invalidType': 'ファイルタイプ \"{{fileType}}\" は許可されていません - サポートされているタイプ: {{allowedTypes}}',
+      'notFound': 'ファイル \"{{filename}}\" が見つかりません',
       'processingFailed': 'ファイル処理に失敗しました: {{reason}}',
       'quotaExceeded': 'ストレージクォータを超過しました: {{used, number}}MB / {{quota, number}}MB',
       'tooLarge': 'ファイルサイズ {{actualSize, number}}MB は {{maxSize, number}}MB の制限を超えています',
@@ -445,15 +472,15 @@ export default {
     },
     'i18n': {
       'context_demo_failed': 'コンテキスト翻訳のデモンストレーションを実行できませんでした：{{reason}}',
-      'context_test_failed': 'キー "{{key}}" のコンテキスト翻訳をテストできませんでした：{{reason}}',
+      'context_test_failed': 'キー \"{{key}}\" のコンテキスト翻訳をテストできませんでした：{{reason}}',
       'enhanced_demo_failed': '拡張i18n機能のデモンストレーションを実行できませんでした：{{reason}}',
       'error_demo_failed': 'エラーメッセージのデモンストレーションを実行できませんでした：{{reason}}',
       'formatting_demo_failed': 'フォーマットのデモンストレーションを実行できませんでした：{{reason}}',
-      'formatting_test_failed': 'キー "{{key}}" のフォーマット機能をテストできませんでした：{{reason}}',
-      'languageNotSupported': '言語 "{{language}}" はサポートされていません。利用可能な言語：{{supportedLanguages}}',
+      'formatting_test_failed': 'キー \"{{key}}\" のフォーマット機能をテストできませんでした：{{reason}}',
+      'languageNotSupported': '言語 \"{{language}}\" はサポートされていません。利用可能な言語：{{supportedLanguages}}',
       'plurals_demo_failed': '複数形のデモンストレーションを実行できませんでした：{{reason}}',
-      'plurals_test_failed': 'キー "{{key}}" の複数形機能をテストできませんでした：{{reason}}',
-      'sectionNotFound': '言語 "{{language}}" の翻訳セクション "{{section}}" が見つかりません',
+      'plurals_test_failed': 'キー \"{{key}}\" の複数形機能をテストできませんでした：{{reason}}',
+      'sectionNotFound': '言語 \"{{language}}\" の翻訳セクション \"{{section}}\" が見つかりません',
       'success_demo_failed': '成功メッセージのデモンストレーションを実行できませんでした：{{reason}}',
       'translationsFailed': '翻訳情報の取得に失敗しました：{{reason}}'
     },
@@ -468,7 +495,7 @@ export default {
       'webhookTimeout': '{{serviceName}} からのウェブフックが {{timeout, number}}ms 後にタイムアウトしました'
     },
     'kv': {
-      'accessDenied': '設定キー "{{key}}" へのアクセスが拒否されました - {{requiredRole}} ロールが必要です',
+      'accessDenied': '設定キー \"{{key}}\" へのアクセスが拒否されました - {{requiredRole}} ロールが必要です',
       'alertThresholdsRetrieveFailed': 'アラート閾値の取得に失敗しました: {{reason}}',
       'auditConfigsRetrieveFailed': '監査設定の取得に失敗しました: {{reason}}',
       'batchUpdateFailed': '{{totalCount}} 件中 {{failedCount}} 件の設定のバッチ更新に失敗しました',
@@ -486,14 +513,14 @@ export default {
       'featureNotFound': 'フィーチャーが見つからないか、許可されていません',
       'featureToggleFailed': 'フィーチャー「{{feature}}」の切り替えに失敗しました: {{reason}}',
       'invalidFeatureValue': '無効なフィーチャー値 - ブール値である必要があります',
-      'invalidKey': '設定キー "{{key}}" は許可されていません - 有効なキー: {{validKeys}}',
-      'keyNotFound': '設定キー "{{key}}" が見つかりません',
+      'invalidKey': '設定キー \"{{key}}\" は許可されていません - 有効なキー: {{validKeys}}',
+      'keyNotFound': '設定キー \"{{key}}\" が見つかりません',
       'performanceSettingsRetrieveFailed': 'パフォーマンス設定の取得に失敗しました: {{reason}}',
       'realtimeSettingsRetrieveFailed': 'リアルタイムモニタリング設定の取得に失敗しました: {{reason}}',
-      'resetFailed': '設定 "{{key}}" をデフォルト値にリセットできませんでした: {{reason}}',
+      'resetFailed': '設定 \"{{key}}\" をデフォルト値にリセットできませんでした: {{reason}}',
       'retentionPoliciesRetrieveFailed': '保持ポリシーの取得に失敗しました: {{reason}}',
-      'updateFailed': '設定 "{{key}}" の更新に失敗しました: {{reason}}',
-      'valueInvalid': '設定 "{{key}}" の値が無効です: {{expectedType}} が必要ですが、{{actualType}} が与えられました'
+      'updateFailed': '設定 \"{{key}}\" の更新に失敗しました: {{reason}}',
+      'valueInvalid': '設定 \"{{key}}\" の値が無効です: {{expectedType}} が必要ですが、{{actualType}} が与えられました'
     },
     'kvAdmin': {
       'alertThresholdsRetrieveFailed': '{{actor}}のアラートしきい値取得に失敗しました (理由: {{reason}}, 操作: {{operation}})',
@@ -625,7 +652,7 @@ export default {
       'inactive': 'ユーザーアカウント {{userName}} は非アクティブです',
       'insufficientPermissions': 'ユーザー {{userName}} ({{userRole}}) を変更する権限がありません',
       'listFailed': 'ユーザーリストの取得に失敗しました: {{reason}}',
-      'notFound': 'ユーザー "{{userName}}" が見つからないか、削除されています',
+      'notFound': 'ユーザー \"{{userName}}\" が見つからないか、削除されています',
       'notFoundById': 'ID {{userId}} のユーザーが見つかりません',
       'passwordChangeFailed': '{{userName}} のパスワードの変更に失敗しました: {{reason}}',
       'passwordIncorrect': '現在のパスワードが正しくありません - もう一度お試しください',
@@ -635,14 +662,14 @@ export default {
       'roleChangeFailed': '{{userName}} のロールを {{oldRole}} から {{newRole}} に変更できませんでした: {{reason}}',
       'sessionLimitExceeded': 'ユーザー {{userName}} は最大同時セッション数 ({{currentSessions}}/{{maxSessions}}) を超えました',
       'updateFailed': '{{userName}} のユーザープロファイルの更新に失敗しました: {{reason}}',
-      'usernameExists': 'ユーザー名 "{{username}}" はすでに使用されています'
+      'usernameExists': 'ユーザー名 \"{{username}}\" はすでに使用されています'
     },
     'zodDemo': {
       'file': {
-        'uploadFailed': 'ファイルアップロードが失敗しました - {{actor}}が"{{fileName}}" ({{fileSize}} バイト)の{{operation}}を完了できませんでした: {{reason}}'
+        'uploadFailed': 'ファイルアップロードが失敗しました - {{actor}}が\"{{fileName}}\" ({{fileSize}} バイト)の{{operation}}を完了できませんでした: {{reason}}'
       },
       'search': {
-        'failed': '検索操作が失敗しました - {{actor}}がクエリ"{{query}}" ({{searchType}})の{{operation}}を完了できませんでした: {{reason}}'
+        'failed': '検索操作が失敗しました - {{actor}}がクエリ\"{{query}}\" ({{searchType}})の{{operation}}を完了できませんでした: {{reason}}'
       },
       'user': {
         'registrationFailed': 'ユーザー登録が失敗しました - {{actor}}が{{userName}} ({{email}})の{{operation}}を完了できませんでした: {{reason}}'
@@ -654,7 +681,7 @@ export default {
     'schemaViolation': 'データスキーマ違反: {{violations}}',
     'validation': 'バリデーションエラーが発生しました: {{details}}',
     'validation_other': '{{count}} 件のバリデーションエラーが発生しました: {{details}}',
-    'validationField': 'フィールド "{{field}}" のバリデーションに失敗しました: {{error}}',
+    'validationField': 'フィールド \"{{field}}\" のバリデーションに失敗しました: {{error}}',
     'validationGeneric': 'バリデーションエラー',
     'validationMultiple': '{{count}} 個のフィールドで複数の検証エラー',
     'validationMultiple_other': '{{count}} 個のフィールドで複数の検証エラー'
@@ -762,7 +789,7 @@ export default {
       'passwordChanged': '{{userName}} のパスワードを {{changeTime}} に正常に変更しました',
       'passwordReset': 'パスワードリセットメールを {{email}} に送信しました - {{expiryMinutes}} 分後に期限切れになります',
       'passwordReset_other': 'パスワードリセットメールを {{email}} に送信しました - {{expiryMinutes}} 分後に期限切れになります',
-      'permissionGranted': '{{userName}} にパーミッション "{{permission}}" を付与しました',
+      'permissionGranted': '{{userName}} にパーミッション \"{{permission}}\" を付与しました',
       'rateLimitReset': '{{ipAddress}} のレート制限を正常にリセットしました',
       'roleAssigned': '{{assignedBy}} によって {{newRole}} ロールが {{userName}} に正常に割り当てられました',
       'sessionCreated': '{{sessionDuration}} 分の有効期間を持つ新しいユーザーセッションを作成しました',
@@ -776,33 +803,33 @@ export default {
       'auditPassed_other': 'ビジネス監査がスコア {{auditScore, number}}% で合格しました - {{criteriaCount}} 件の基準を満たしました',
       'complianceVerified': 'コンプライアンス検証が完了しました - {{standardsCount}} 件の標準を検証しました',
       'complianceVerified_other': 'コンプライアンス検証が完了しました - {{standardsCount}} 件の標準を検証しました',
-      'operationApproved': 'ビジネス操作 "{{operation}}" が {{approvedBy}} によって承認されました',
+      'operationApproved': 'ビジネス操作 \"{{operation}}\" が {{approvedBy}} によって承認されました',
       'processAutomated': 'ビジネスプロセスを正常に自動化しました - {{automatedTasks}} 件のタスクを自動化しました',
       'processAutomated_other': 'ビジネスプロセスを正常に自動化しました - {{automatedTasks}} 件のタスクを自動化しました',
-      'ruleApplied': 'ビジネスルール "{{ruleName}}" を {{affectedRecords}} 件のレコードに正常に適用しました',
-      'ruleApplied_other': 'ビジネスルール "{{ruleName}}" を {{affectedRecords}} 件のレコードに正常に適用しました',
+      'ruleApplied': 'ビジネスルール \"{{ruleName}}\" を {{affectedRecords}} 件のレコードに正常に適用しました',
+      'ruleApplied_other': 'ビジネスルール \"{{ruleName}}\" を {{affectedRecords}} 件のレコードに正常に適用しました',
       'validationPassed': '{{entityType}} のビジネス検証に合格しました - すべての {{checkCount}} 件のチェックが成功しました',
       'validationPassed_other': '{{entityType}} のビジネス検証に合格しました - すべての {{checkCount}} 件のチェックが成功しました',
-      'workflowCompleted': 'ワークフロー "{{workflowName}}" が {{steps}} ステップで正常に完了しました',
-      'workflowCompleted_other': 'ワークフロー "{{workflowName}}" が {{steps}} ステップで正常に完了しました'
+      'workflowCompleted': 'ワークフロー \"{{workflowName}}\" が {{steps}} ステップで正常に完了しました',
+      'workflowCompleted_other': 'ワークフロー \"{{workflowName}}\" が {{steps}} ステップで正常に完了しました'
     },
     'file': {
-      'backup': 'ファイル "{{filename}}" のバックアップを正常に作成しました',
+      'backup': 'ファイル \"{{filename}}\" のバックアップを正常に作成しました',
       'compressed': 'ファイルを正常に圧縮しました - サイズが {{compressionRatio, number}}% 削減されました',
       'converted': 'ファイルを {{sourceFormat}} から {{targetFormat}} に正常に変換しました',
       'copied': 'ファイルを {{destinationPath}} に正常にコピーしました',
-      'deleted': 'ファイル "{{filename}}" を正常に削除しました',
-      'downloadCompleted': 'ファイル "{{filename}}" を正常にダウンロードしました',
+      'deleted': 'ファイル \"{{filename}}\" を正常に削除しました',
+      'downloadCompleted': 'ファイル \"{{filename}}\" を正常にダウンロードしました',
       'extracted': 'アーカイブを正常に解凍しました - {{extractedCount}} 件のファイルを解凍しました',
       'extracted_other': 'アーカイブを正常に解凍しました - {{extractedCount}} 件のファイルを解凍しました',
       'moved': 'ファイルを {{sourcePath}} から {{destinationPath}} に正常に移動しました',
-      'processingCompleted': 'ファイル "{{filename}}" の処理が完了しました - {{operationsCount}} 件の操作を実行しました',
-      'processingCompleted_other': 'ファイル "{{filename}}" の処理が完了しました - {{operationsCount}} 件の操作を実行しました',
+      'processingCompleted': 'ファイル \"{{filename}}\" の処理が完了しました - {{operationsCount}} 件の操作を実行しました',
+      'processingCompleted_other': 'ファイル \"{{filename}}\" の処理が完了しました - {{operationsCount}} 件の操作を実行しました',
       'restored': '{{backupDate, date}} に作成されたバックアップからファイルを正常に復元しました',
-      'uploadCompleted': 'ファイル "{{filename}}" を正常にアップロードしました ({{fileSize}})',
+      'uploadCompleted': 'ファイル \"{{filename}}\" を正常にアップロードしました ({{fileSize}})',
       'uploadsBatch': 'バッチアップロードが完了しました: {{totalCount}} 件中 {{successCount}} 件のファイルを処理しました',
       'uploadsBatch_other': 'バッチアップロードが完了しました: {{totalCount}} 件中 {{successCount}} 件のファイルを処理しました',
-      'validated': 'ファイル "{{filename}}" の検証に合格しました - 形式: {{fileFormat}}'
+      'validated': 'ファイル \"{{filename}}\" の検証に合格しました - 形式: {{fileFormat}}'
     },
     'integration': {
       'apiCall': '{{serviceName}} への API 呼び出しが {{responseTime, number}}ms で正常に完了しました',
@@ -841,12 +868,12 @@ export default {
       'batchUpdateCompleted': 'バッチ設定更新が完了しました: {{totalCount}} 件中 {{successCount}} 件が成功',
       'cacheCleared': '設定キャッシュを正常にクリアしました - {{clearedCount}} 件のエントリを削除しました',
       'cacheCleared_other': '設定キャッシュを正常にクリアしました - {{clearedCount}} 件のエントリを削除しました',
-      'configReset': '設定 "{{key}}" をデフォルト値 {{defaultValue}} にリセットしました',
-      'configRetrieved': '設定 "{{key}}" を正常に取得しました: {{value}}',
-      'configUpdated': '設定 "{{key}}" を {{oldValue}} から {{newValue}} に正常に更新しました',
+      'configReset': '設定 \"{{key}}\" をデフォルト値 {{defaultValue}} にリセットしました',
+      'configRetrieved': '設定 \"{{key}}\" を正常に取得しました: {{value}}',
+      'configUpdated': '設定 \"{{key}}\" を {{oldValue}} から {{newValue}} に正常に更新しました',
       'defaultsRestored': '{{restoredCount}} 件のキーのデフォルト設定を正常に復元しました',
       'defaultsRestored_other': '{{restoredCount}} 件のキーのデフォルト設定を正常に復元しました',
-      'featureToggled': '機能 "{{feature}}" を正常に {{status}} しました'
+      'featureToggled': '機能 \"{{feature}}\" を正常に {{status}} しました'
     },
     'operation': {
       'batchProcessed': 'バッチ操作が完了しました: {{successCount}}/{{totalCount}} アイテムが正常に処理されました',
@@ -925,7 +952,7 @@ export default {
       'databaseConnected': '{{databaseName}} へのデータベース接続を正常に確立しました',
       'healthCheckPassed': 'システムヘルスチェックに合格しました - すべての {{componentCount}} コンポーネントが正常です',
       'healthCheckPassed_other': 'システムヘルスチェックに合格しました - すべての {{componentCount}} コンポーネントが正常です',
-      'operationCompleted': 'システム操作 "{{operation}}" が {{duration, number}}ms で正常に完了しました',
+      'operationCompleted': 'システム操作 \"{{operation}}\" が {{duration, number}}ms で正常に完了しました',
       'queueProcessed': 'タスクキューを正常に処理しました - {{processedCount}} 件のタスクが完了しました',
       'queueProcessed_other': 'タスクキューを正常に処理しました - {{processedCount}} 件のタスクが完了しました',
       'resourceAllocated': 'システムリソースを正常に割り当てました: {{allocatedMemory, number}}MB メモリ',
@@ -964,25 +991,13 @@ export default {
       'profileUpdated': '{{userName}} のユーザープロフィールが正常に更新されました - {{fieldsCount}} 個のフィールドが変更されました',
       'profileUpdated_other': '{{userName}} のユーザープロフィールが正常に更新されました - {{fieldsCount}} 個のフィールドが変更されました',
       'registered': 'って {{userName}} が {{userRole}} ロールで正常に登録されました',
+      'registeredPendingActivation': '{{userName}} の登録を受け付けました。ログインする前に、メールを確認してアカウントを確認・有効化してください。',
       'roleChanged': '{{userName}} のユーザーロールを {{oldRole}} から {{newRole}} に変更しました',
       'sessionTerminated': '{{userName}} のすべてのセッションを正常に終了しました',
       'suspended': '{{userName}} のユーザーアカウントを {{suspendedUntil, datetime}} まで正常に停止しました',
       'unsuspended': '{{liftedBy}} によって {{userName}} のユーザーアカウントの停止が解除されました',
       'updated': '{{userName}} のユーザープロファイルを正常に更新しました - フィールド: {{updatedFields}}',
       'updated_other': '{{count}} 件のユーザープロファイルを正常に更新しました'
-    }
-  },
-  'emails': {
-    'registration': {
-      'subject': '{{appName}} - 登録確認',
-      'greeting': '{{userName}} 様',
-      'intro': '{{appName}} にご登録いただきありがとうございます。',
-      'instructions': 'このメールはアカウント情報を受け取ったことを確認するものです。承認や有効化が必要な場合、別途メールをお送りします。',
-      'email': '登録メールアドレス: {{email}}',
-      'time': '登録日時: {{timestamp}}',
-      'ip': 'リクエストIP: {{ip}}',
-      'disclaimer': 'このアカウントに心当たりがない場合は、このメールを無視するかサポートまでご連絡ください。',
-      'thanks': 'ありがとうございます。\n{{appName}} チーム'
     }
   },
   'system': {
@@ -1449,7 +1464,7 @@ export default {
     'retentionPolicyUpdate': {
       'atLeastOneFieldRequired': '少なくとも1つのフィールドを更新する必要があります',
       'atLeastOneFieldRequired_other': '少なくとも{{min}}個のフィールドを更新する必要があります',
-      'immutableField': 'フィールド"{{field}}"は作成後に変更できません',
+      'immutableField': 'フィールド\"{{field}}\"は作成後に変更できません',
       'invalid': '無効な保持ポリシー更新'
     },
     'security': {
@@ -1463,7 +1478,7 @@ export default {
         'invalid': '設定構成が無効です'
       },
       'configUpdate': {
-        'invalid': '設定更新フォーマットが無効です。必須フィールド "value" が不足しているか、認識されないフィールドが含まれています'
+        'invalid': '設定更新フォーマットが無効です。必須フィールド \"value\" が不足しているか、認識されないフィールドが含まれています'
       },
       'incidentCreation': {
         'invalid': 'インシデント作成の構造が無効です'
@@ -1506,11 +1521,11 @@ export default {
       'invalid': 'ユーザー名は文字、数字、アンダースコアのみを含めることができます',
       'invalidCharacters': 'ユーザー名は文字、数字、アンダースコアのみを含めることができます',
       'required': 'ユーザー名は必須です',
-      'reserved': 'ユーザー名 "{{username}}" は予約されており使用できません',
+      'reserved': 'ユーザー名 \"{{username}}\" は予約されており使用できません',
       'tooLong': '長すぎます: ユーザー名は30文字を超えることはできません',
       'tooShort': '短すぎます: ユーザー名は少なくとも3文字である必要があります',
       'tooShort_other': '短すぎます: ユーザー名は少なくとも{{minLength}}文字である必要があります',
-      'unavailable': 'ユーザー名 "{{username}}" は使用できません'
+      'unavailable': 'ユーザー名 \"{{username}}\" は使用できません'
     },
     'filterArrayTooLarge': 'フィルター配列が大きすぎます（最大500項目）',
     'filterArrayTooLarge_other': '{{count}}個のアイテムを含むフィルター配列は、最大{{max}}個を超えています',

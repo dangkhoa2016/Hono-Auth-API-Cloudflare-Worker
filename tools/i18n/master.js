@@ -161,6 +161,76 @@ function sortTranslationObject(obj) {
   }, {});
 }
 
+// Sorting helpers reused from standalone sort tool to avoid duplication
+function sortObjectDeep(obj) {
+  if (Array.isArray(obj)) {return obj;}
+  if (obj && typeof obj === 'object') {
+    const sorted = {};
+    Object.keys(obj)
+      .sort((a, b) => {
+        const aIsObj = obj[a] && typeof obj[a] === 'object' && !Array.isArray(obj[a]);
+        const bIsObj = obj[b] && typeof obj[b] === 'object' && !Array.isArray(obj[b]);
+        if (aIsObj && !bIsObj) {return -1;}
+        if (!aIsObj && bIsObj) {return 1;}
+        return a.localeCompare(b, 'en');
+      })
+      .forEach(key => {
+        sorted[key] = sortObjectDeep(obj[key]);
+      });
+    return sorted;
+  }
+  return obj;
+}
+
+function extractHeader(content) {
+  const headerMatch = content.match(/^\s*\/\*([\s\S]*?)\*\//);
+  let header = '';
+  let rest = content;
+  if (headerMatch && headerMatch.index === 0) {
+    header = headerMatch[0].trim();
+    rest = content.slice(headerMatch[0].length).trimStart();
+  }
+  return { header, rest };
+}
+
+function parseExportObject(content) {
+  const exportMatch = content.match(/export\s+default\s+({[\s\S]*});?/);
+  if (!exportMatch) {
+    throw new Error('Không tìm thấy export default object');
+  }
+  const objectCode = exportMatch[1];
+  // eslint-disable-next-line no-new-func
+  const fn = new Function(`return (${objectCode});`);
+  return { object: fn(), objectCode, fullMatch: exportMatch[0] };
+}
+
+function formatObject(obj, indent = 2) {
+  const space = ' '.repeat(indent);
+  function inner(value, level) {
+    if (Array.isArray(value)) {
+      return '[' + value.map(v => inner(v, level + 1)).join(', ') + ']';
+    }
+    if (value && typeof value === 'object') {
+      const entries = Object.entries(value);
+      if (!entries.length) {return '{}';}
+      const pad = ' '.repeat(level * indent);
+      const padInner = ' '.repeat((level + 1) * indent);
+      const lines = entries.map(([k, v]) => `${padInner}'${k}': ${inner(v, level + 1)}`);
+      return `{
+${lines.join(',\n')}
+${pad}}`;
+    }
+    if (typeof value === 'string') {
+      // Use JSON.stringify for correct escaping (newlines, backslashes) then wrap with single quotes
+      const jsonEscaped = JSON.stringify(value).slice(1, -1); // drop surrounding quotes
+      const singleQuoted = jsonEscaped.replace(/'/g, "\\'");
+      return `'${singleQuoted}'`;
+    }
+    return JSON.stringify(value);
+  }
+  return inner(obj, 0);
+}
+
 function objectToJS(obj, indent = 0) {
   const spaces = '  '.repeat(indent);
   const innerSpaces = '  '.repeat(indent + 1);
@@ -204,6 +274,56 @@ export default ${objectToJS(sortedTranslation)};
     printError(`Error sorting ${filePath}: ${error.message}`);
     return false;
   }
+}
+
+function sortLocaleKeys(targetLocales = [], options = {}) {
+  const files = fs.readdirSync(LOCALES_DIR).filter(file => file.endsWith('.js'));
+  const targetSet = new Set(targetLocales.map(locale => `${locale}.js`));
+
+  if (targetLocales.length > 0) {
+    const missing = [...targetSet].filter(file => !files.includes(file));
+    missing.forEach(file => printWarning(`Locale file not found: ${file}`));
+  }
+
+  const filesToProcess = targetLocales.length > 0
+    ? files.filter(file => targetSet.has(file))
+    : files;
+
+  if (filesToProcess.length === 0) {
+    printWarning('No locale files to sort');
+    return { changed: 0, total: 0, report: [] };
+  }
+
+  let changedCount = 0;
+  const report = [];
+
+  for (const file of filesToProcess) {
+    const filePath = path.join(LOCALES_DIR, file);
+    try {
+      const original = fs.readFileSync(filePath, 'utf8');
+      const { header, rest } = extractHeader(original);
+      const { object: data } = parseExportObject(rest);
+      const sorted = sortObjectDeep(data);
+      const formatted = `${header ? header + '\n\n' : ''}export default ${formatObject(sorted)};\n`;
+
+      const changed = formatted.trim() !== original.trim();
+      if (changed) {
+        changedCount++;
+        if (options.fix) {
+          if (options.backup) {
+            fs.writeFileSync(`${filePath}.bak`, original, 'utf8');
+          }
+          fs.writeFileSync(filePath, formatted, 'utf8');
+        }
+      }
+
+      report.push({ file, changed });
+    } catch (error) {
+      report.push({ file, error: error.message });
+    }
+  }
+
+  return { changed: changedCount, total: report.length, report };
 }
 
 /**
@@ -355,43 +475,6 @@ async function autoFixMissingKeys(results) {
 
   console.log(`\n${colors.green}📈 Fixed ${fixedCount}/${results.length} locales${colors.reset}`);
   return fixedCount === results.length;
-}
-
-async function sortTranslations(targetLocales = []) {
-  const localeFiles = fs.readdirSync(LOCALES_DIR).filter(file => file.endsWith('.js'));
-  const targetFileSet = new Set(targetLocales.map(locale => `${locale}.js`));
-
-  if (targetLocales.length > 0) {
-    const missing = [...targetFileSet].filter(file => !localeFiles.includes(file));
-    missing.forEach(file => printWarning(`Locale file not found: ${file}`));
-  }
-
-  const filesToProcess = targetLocales.length > 0
-    ? localeFiles.filter(file => targetFileSet.has(file))
-    : localeFiles;
-
-  if (filesToProcess.length === 0) {
-    printWarning('No locale files to sort');
-    return false;
-  }
-
-  let sortedCount = 0;
-  for (const file of filesToProcess) {
-    const locale = path.basename(file, '.js');
-    const filePath = path.join(LOCALES_DIR, file);
-    printInfo(`Sorting keys for ${locale}...`);
-
-    const success = await sortTranslationFile(filePath);
-    if (success) {
-      sortedCount++;
-      printSuccess(`Sorted ${locale}`);
-    } else {
-      printError(`Failed to sort ${locale}`);
-    }
-  }
-
-  console.log(`\n${colors.green}📑 Sorted ${sortedCount}/${filesToProcess.length} locale files${colors.reset}`);
-  return sortedCount === filesToProcess.length;
 }
 
 /**
@@ -598,7 +681,63 @@ async function main() {
     case 'sort':
     case 's':
       printHeader('🔠 SORTING TRANSLATION KEYS');
-      await sortTranslations(options);
+      {
+        const flags = new Set(options.filter(opt => opt.startsWith('--')));
+        const locales = options.filter(opt => !opt.startsWith('--'));
+        const fix = flags.has('--fix');
+        const backup = flags.has('--backup');
+        const { changed, total, report } = sortLocaleKeys(locales, { fix, backup });
+
+        console.log('I18N Key Sorting Report');
+        console.log('------------------------');
+        report.forEach(r => {
+          if (r.error) {
+            console.log(`✗ ${r.file} - ERROR: ${r.error}`);
+          } else if (r.changed) {
+            console.log(`• ${r.file} - would sort${fix ? ' (sorted)' : ''}`);
+          } else {
+            console.log(`✓ ${r.file} - already sorted`);
+          }
+        });
+        console.log('------------------------');
+        console.log(`Files changed: ${changed}/${total}`);
+        if (!fix) {
+          console.log('Dry run complete. Thêm --fix để ghi thay đổi.');
+        } else {
+          console.log(backup ? 'Hoàn thành (đã tạo backup).' : 'Hoàn thành.');
+        }
+      }
+      break;
+
+    case 'sort-keys':
+    case 'sk':
+      printHeader('🔠 SORTING TRANSLATION KEYS');
+      {
+        const flags = new Set(options.filter(opt => opt.startsWith('--')));
+        const locales = options.filter(opt => !opt.startsWith('--'));
+        const fix = flags.has('--fix');
+        const backup = flags.has('--backup');
+        const { changed, total, report } = sortLocaleKeys(locales, { fix, backup });
+
+        console.log('I18N Key Sorting Report');
+        console.log('------------------------');
+        report.forEach(r => {
+          if (r.error) {
+            console.log(`✗ ${r.file} - ERROR: ${r.error}`);
+          } else if (r.changed) {
+            console.log(`• ${r.file} - would sort${fix ? ' (sorted)' : ''}`);
+          } else {
+            console.log(`✓ ${r.file} - already sorted`);
+          }
+        });
+        console.log('------------------------');
+        console.log(`Files changed: ${changed}/${total}`);
+        if (!fix) {
+          console.log('Dry run complete. Thêm --fix để ghi thay đổi.');
+        } else {
+          console.log(backup ? 'Hoàn thành (đã tạo backup).' : 'Hoàn thành.');
+        }
+      }
       break;
 
     case 'details':
@@ -731,7 +870,9 @@ ${colors.yellow}KEY MANAGEMENT / QUẢN LÝ KHÓA:${colors.reset}
   fix, f               Auto-fix missing keys / Tự động sửa khóa thiếu
   details, d <locale>  Show detailed missing keys / Hiện khóa thiếu chi tiết
   addkey, ak <key> <value>  Add new key to all locales / Thêm khóa mới
-  sort, s [locale]     Sort keys A-Z (folders first) / Sắp xếp khóa A-Z (mục cha trước)
+  sort, s [locale] [--fix] [--backup]
+                       Sort keys A-Z (dry-run by default; --fix writes; --backup saves *.bak)
+  sort-keys, sk        Alias for sort with same options
 
 ${colors.yellow}TRANSLATION WORKFLOW / QUY TRÌNH DỊCH THUẬT:${colors.reset}
   export, e            Export untranslated keys / Xuất khóa chưa dịch

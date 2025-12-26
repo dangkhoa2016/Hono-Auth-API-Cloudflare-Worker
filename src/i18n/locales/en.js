@@ -173,6 +173,25 @@ export default {
     'updatedAt': 'Updated at {{date, datetime}}',
     'userJoined': 'Joined on {{date, date}}'
   },
+  'emails': {
+    'registration': {
+      'activateButton': 'Activate My Account',
+      'activateLinkText': 'Or copy and paste this link into your browser:',
+      'details': 'Account Details',
+      'disclaimer': 'If you did not create this account, you can safely ignore this email. No action is required.',
+      'email': 'Email: {{email}}',
+      'expiryWarning': 'This activation link will expire in {{hours}} hours.',
+      'footer': 'This is an automated message from {{appName}}. Please do not reply to this email.',
+      'greeting': 'Hello {{userName}},',
+      'instructions': 'To complete your registration and start using your account, please click the button below:',
+      'intro': 'Welcome to {{appName}}! Your account has been created successfully.',
+      'ip': 'IP Address: {{ip}}',
+      'securityNote': 'For your security, never share this link with anyone.',
+      'subject': '{{appName}} - Activate your account',
+      'thanks': 'Best regards,\nThe {{appName}} Team',
+      'time': 'Registered on: {{date}} at {{time}}'
+    }
+  },
   'endpoints': {
     'admin': {
       'changeRole': 'Change user role (Super Admin access required)',
@@ -345,7 +364,7 @@ export default {
         'failed': 'Failed to retrieve behavior analytics - {{actor}} unable to complete {{operation}} for {{timeframe}} targeting {{targetRole}}: {{reason}}'
       },
       'compliance': {
-        'customComplianceFailed': 'Failed to create custom compliance report - {{actor}} unable to complete {{operation}} for "{{reportName}}" ({{reportType}}): {{reason}}',
+        'customComplianceFailed': 'Failed to create custom compliance report - {{actor}} unable to complete {{operation}} for \"{{reportName}}\" ({{reportType}}): {{reason}}',
         'failed': 'Failed to generate compliance report - {{actor}} unable to complete {{operation}} for {{timeframe}} in {{format}} format: {{reason}}',
         'reportFailed': 'Failed to generate compliance report - {{actor}} unable to perform {{operation}} for {{type}} report: {{reason}}'
       },
@@ -379,7 +398,7 @@ export default {
         'retrieveFailed': 'Failed to retrieve audit logs - {{actor}} encountered error while performing {{operation}}: {{reason}}'
       },
       'search': {
-        'searchFailed': 'Failed to search audit logs - {{actor}} unable to complete {{operation}} with query "{{query}}": {{reason}}'
+        'searchFailed': 'Failed to search audit logs - {{actor}} unable to complete {{operation}} with query \"{{query}}\": {{reason}}'
       },
       'stats': {
         'statsFailed': 'Failed to retrieve audit statistics - {{actor}} ({{role}}) unable to perform {{operation}}: {{reason}}'
@@ -428,22 +447,22 @@ export default {
       'businessHoursOnly': 'Operation only allowed during business hours ({{businessHours}})',
       'conflictingOperation': 'Conflicting operation in progress: {{operation}}',
       'deadlineExpired': 'Operation deadline expired on {{deadline, datetime}}',
-      'duplicateEntry': 'Duplicate entry detected: {{entity}} with {{field}} = "{{value}}"',
+      'duplicateEntry': 'Duplicate entry detected: {{entity}} with {{field}} = \"{{value}}\"',
       'insufficientBalance': 'Insufficient balance: {{available, currency}} available, {{required, currency}} required',
-      'operationNotAllowed': 'Operation "{{operation}}" is not allowed: {{reason}}',
+      'operationNotAllowed': 'Operation \"{{operation}}\" is not allowed: {{reason}}',
       'preconditionFailed': 'Precondition failed: {{condition}}',
       'quotaReached': 'Quota limit reached: {{used, number}}/{{limit, number}} {{resource}}',
       'referenceConstraint': 'Cannot delete {{entity}} - referenced by {{referencingCount}} other record',
       'referenceConstraint_other': 'Cannot delete {{entity}} - referenced by {{referencingCount}} other records',
-      'resourceLocked': 'Resource "{{resource}}" is locked by {{lockedBy}} until {{lockedUntil, datetime}}',
+      'resourceLocked': 'Resource \"{{resource}}\" is locked by {{lockedBy}} until {{lockedUntil, datetime}}',
       'workflowViolation': 'Workflow violation: {{step}} cannot be performed in current state {{currentState}}'
     },
     'file': {
-      'accessDenied': 'Access denied to file "{{filename}}": {{reason}}',
+      'accessDenied': 'Access denied to file \"{{filename}}\": {{reason}}',
       'corrupted': 'File appears to be corrupted or incomplete',
       'formatUnsupported': 'File format not supported for operation: {{operation}}',
-      'invalidType': 'File type "{{fileType}}" is not allowed - supported types: {{allowedTypes}}',
-      'notFound': 'File "{{filename}}" not found',
+      'invalidType': 'File type \"{{fileType}}\" is not allowed - supported types: {{allowedTypes}}',
+      'notFound': 'File \"{{filename}}\" not found',
       'processingFailed': 'File processing failed: {{reason}}',
       'quotaExceeded': 'Storage quota exceeded: {{used, number}}MB / {{quota, number}}MB',
       'tooLarge': 'File size {{actualSize, number}}MB exceeds {{maxSize, number}}MB limit',
@@ -453,15 +472,15 @@ export default {
     },
     'i18n': {
       'context_demo_failed': 'Failed to run contextual translation demonstration: {{reason}}',
-      'context_test_failed': 'Failed to test contextual translations for key "{{key}}": {{reason}}',
+      'context_test_failed': 'Failed to test contextual translations for key \"{{key}}\": {{reason}}',
       'enhanced_demo_failed': 'Failed to run enhanced i18n features demonstration: {{reason}}',
       'error_demo_failed': 'Failed to run error messages demonstration: {{reason}}',
       'formatting_demo_failed': 'Failed to run formatting demonstration: {{reason}}',
-      'formatting_test_failed': 'Failed to test formatting functionality for key "{{key}}": {{reason}}',
-      'languageNotSupported': 'Language "{{language}}" is not supported. Available languages: {{supportedLanguages}}',
+      'formatting_test_failed': 'Failed to test formatting functionality for key \"{{key}}\": {{reason}}',
+      'languageNotSupported': 'Language \"{{language}}\" is not supported. Available languages: {{supportedLanguages}}',
       'plurals_demo_failed': 'Failed to run pluralization demonstration: {{reason}}',
-      'plurals_test_failed': 'Failed to test pluralization functionality for key "{{key}}": {{reason}}',
-      'sectionNotFound': 'Translation section "{{section}}" not found for language "{{language}}"',
+      'plurals_test_failed': 'Failed to test pluralization functionality for key \"{{key}}\": {{reason}}',
+      'sectionNotFound': 'Translation section \"{{section}}\" not found for language \"{{language}}\"',
       'success_demo_failed': 'Failed to run success messages demonstration: {{reason}}',
       'translationsFailed': 'Failed to retrieve translation information: {{reason}}'
     },
@@ -476,7 +495,7 @@ export default {
       'webhookTimeout': 'Webhook timeout from {{serviceName}} after {{timeout, number}}ms'
     },
     'kv': {
-      'accessDenied': 'Access denied for configuration key "{{key}}" - requires {{requiredRole}} role',
+      'accessDenied': 'Access denied for configuration key \"{{key}}\" - requires {{requiredRole}} role',
       'alertThresholdsRetrieveFailed': 'Failed to retrieve alert thresholds: {{reason}}',
       'auditConfigsRetrieveFailed': 'Failed to retrieve audit configurations: {{reason}}',
       'batchUpdateFailed': 'Batch update failed for {{failedCount}} out of {{totalCount}} configuration',
@@ -484,24 +503,24 @@ export default {
       'cacheClearFailed': 'Failed to clear configuration cache: {{reason}}',
       'cacheFailed': 'Failed to update configuration cache: {{reason}}',
       'complianceSettingsRetrieveFailed': 'Failed to retrieve compliance settings: {{reason}}',
-      'configResetFailed': 'Failed to reset configuration "{{key}}": {{reason}}',
-      'configRetrieveFailed': 'Failed to retrieve configuration "{{key}}": {{reason}}',
+      'configResetFailed': 'Failed to reset configuration \"{{key}}\": {{reason}}',
+      'configRetrieveFailed': 'Failed to retrieve configuration \"{{key}}\": {{reason}}',
       'configsCompareFailed': 'Failed to retrieve environment comparison: {{reason}}',
       'configsRetrieveFailed': 'Failed to retrieve configurations: {{reason}}',
-      'configUpdateFailed': 'Failed to update configuration "{{key}}": {{reason}}',
+      'configUpdateFailed': 'Failed to update configuration \"{{key}}\": {{reason}}',
       'exportSettingsRetrieveFailed': 'Failed to retrieve export settings: {{reason}}',
       'featureFlagsRetrieveFailed': 'Failed to retrieve feature flags: {{reason}}',
       'featureNotFound': 'Feature not found or not allowed',
-      'featureToggleFailed': 'Failed to toggle feature "{{feature}}": {{reason}}',
+      'featureToggleFailed': 'Failed to toggle feature \"{{feature}}\": {{reason}}',
       'invalidFeatureValue': 'Invalid feature value - must be boolean',
-      'invalidKey': 'Configuration key "{{key}}" is not allowed - valid keys: {{validKeys}}',
-      'keyNotFound': 'Configuration key "{{key}}" not found',
+      'invalidKey': 'Configuration key \"{{key}}\" is not allowed - valid keys: {{validKeys}}',
+      'keyNotFound': 'Configuration key \"{{key}}\" not found',
       'performanceSettingsRetrieveFailed': 'Failed to retrieve performance settings: {{reason}}',
       'realtimeSettingsRetrieveFailed': 'Failed to retrieve real-time monitoring settings: {{reason}}',
-      'resetFailed': 'Failed to reset configuration "{{key}}" to default value: {{reason}}',
+      'resetFailed': 'Failed to reset configuration \"{{key}}\" to default value: {{reason}}',
       'retentionPoliciesRetrieveFailed': 'Failed to retrieve retention policies: {{reason}}',
-      'updateFailed': 'Failed to update configuration "{{key}}": {{reason}}',
-      'valueInvalid': 'Invalid value for configuration "{{key}}": expected {{expectedType}}, got {{actualType}}'
+      'updateFailed': 'Failed to update configuration \"{{key}}\": {{reason}}',
+      'valueInvalid': 'Invalid value for configuration \"{{key}}\": expected {{expectedType}}, got {{actualType}}'
     },
     'kvAdmin': {
       'alertThresholdsRetrieveFailed': 'Failed to retrieve alert thresholds for {{actor}} (Reason: {{reason}}, Operation: {{operation}})',
@@ -612,7 +631,7 @@ export default {
       'licenseInvalid': 'Invalid system license: {{reason}}',
       'maintenanceMode': 'System is under maintenance until {{endTime, datetime}} - {{message}}',
       'memoryExhausted': 'Server memory usage critical: {{currentUsage, number}}MB / {{maxMemory, number}}MB',
-      'operationFailed': 'System operation "{{operation}}" failed: {{reason}}',
+      'operationFailed': 'System operation \"{{operation}}\" failed: {{reason}}',
       'rateLimited': 'System temporarily rate limited: {{currentRequests}}/{{maxRequests}} requests in {{timeWindow}}',
       'resourceExhausted': 'System resources exhausted: {{resource}} at {{usage, number}}% capacity',
       'serverError': 'Internal server error occurred',
@@ -633,7 +652,7 @@ export default {
       'inactive': 'User account {{userName}} is inactive',
       'insufficientPermissions': 'Insufficient permissions to modify user {{userName}} ({{userRole}})',
       'listFailed': 'Failed to retrieve users list: {{reason}}',
-      'notFound': 'User "{{userName}}" not found or has been deleted',
+      'notFound': 'User \"{{userName}}\" not found or has been deleted',
       'notFoundById': 'User with ID {{userId}} not found',
       'passwordChangeFailed': 'Failed to change password for {{userName}}: {{reason}}',
       'passwordIncorrect': 'Current password is incorrect - please try again',
@@ -643,14 +662,14 @@ export default {
       'roleChangeFailed': 'Failed to change role for {{userName}} from {{oldRole}} to {{newRole}}: {{reason}}',
       'sessionLimitExceeded': 'User {{userName}} has exceeded maximum concurrent sessions ({{currentSessions}}/{{maxSessions}})',
       'updateFailed': 'Failed to update user profile for {{userName}}: {{reason}}',
-      'usernameExists': 'Username "{{username}}" is already taken'
+      'usernameExists': 'Username \"{{username}}\" is already taken'
     },
     'zodDemo': {
       'file': {
-        'uploadFailed': 'File upload failed - {{actor}} could not complete {{operation}} for "{{fileName}}" ({{fileSize}} bytes): {{reason}}'
+        'uploadFailed': 'File upload failed - {{actor}} could not complete {{operation}} for \"{{fileName}}\" ({{fileSize}} bytes): {{reason}}'
       },
       'search': {
-        'failed': 'Search operation failed - {{actor}} could not complete {{operation}} for query "{{query}}" ({{searchType}}): {{reason}}'
+        'failed': 'Search operation failed - {{actor}} could not complete {{operation}} for query \"{{query}}\" ({{searchType}}): {{reason}}'
       },
       'user': {
         'registrationFailed': 'User registration failed - {{actor}} could not complete {{operation}} for {{userName}} ({{email}}): {{reason}}'
@@ -662,7 +681,7 @@ export default {
     'schemaViolation': 'Data schema violation: {{violations}}',
     'validation': 'Validation error - {{details}}',
     'validation_other': '{{count}} validation errors - {{details}}',
-    'validationField': 'Validation failed for field "{{field}}": {{error}}',
+    'validationField': 'Validation failed for field \"{{field}}\": {{error}}',
     'validationGeneric': 'Validation error',
     'validationMultiple': 'Multiple validation errors in {{count}} field',
     'validationMultiple_other': 'Multiple validation errors in {{count}} fields'
@@ -770,7 +789,7 @@ export default {
       'passwordChanged': 'Password changed successfully for {{userName}} at {{changeTime}}',
       'passwordReset': 'Password reset email sent to {{email}} - expires in {{expiryMinutes}} minute',
       'passwordReset_other': 'Password reset email sent to {{email}} - expires in {{expiryMinutes}} minutes',
-      'permissionGranted': 'Permission "{{permission}}" granted to {{userName}}',
+      'permissionGranted': 'Permission \"{{permission}}\" granted to {{userName}}',
       'rateLimitReset': 'Rate limit reset successfully for {{ipAddress}}',
       'roleAssigned': 'Role {{newRole}} assigned successfully to {{userName}} by {{assignedBy}}',
       'sessionCreated': 'New user session created with {{sessionDuration}} minute validity',
@@ -784,33 +803,33 @@ export default {
       'auditPassed_other': 'Business audit passed with score {{auditScore, number}}% - {{criteriaCount}} criteria met',
       'complianceVerified': 'Compliance verification completed - {{standardsCount}} standard verified',
       'complianceVerified_other': 'Compliance verification completed - {{standardsCount}} standards verified',
-      'operationApproved': 'Business operation "{{operation}}" approved by {{approvedBy}}',
+      'operationApproved': 'Business operation \"{{operation}}\" approved by {{approvedBy}}',
       'processAutomated': 'Business process automated successfully - {{automatedTasks}} task automated',
       'processAutomated_other': 'Business process automated successfully - {{automatedTasks}} tasks automated',
-      'ruleApplied': 'Business rule "{{ruleName}}" applied successfully to {{affectedRecords}} record',
-      'ruleApplied_other': 'Business rule "{{ruleName}}" applied successfully to {{affectedRecords}} records',
+      'ruleApplied': 'Business rule \"{{ruleName}}\" applied successfully to {{affectedRecords}} record',
+      'ruleApplied_other': 'Business rule \"{{ruleName}}\" applied successfully to {{affectedRecords}} records',
       'validationPassed': 'Business validation passed for {{entityType}} - all {{checkCount}} check successful',
       'validationPassed_other': 'Business validation passed for {{entityType}} - all {{checkCount}} checks successful',
-      'workflowCompleted': 'Workflow "{{workflowName}}" completed successfully in {{steps}} step',
-      'workflowCompleted_other': 'Workflow "{{workflowName}}" completed successfully in {{steps}} steps'
+      'workflowCompleted': 'Workflow \"{{workflowName}}\" completed successfully in {{steps}} step',
+      'workflowCompleted_other': 'Workflow \"{{workflowName}}\" completed successfully in {{steps}} steps'
     },
     'file': {
-      'backup': 'File backup created successfully for "{{filename}}"',
+      'backup': 'File backup created successfully for \"{{filename}}\"',
       'compressed': 'File compressed successfully - size reduced by {{compressionRatio, number}}%',
       'converted': 'File converted successfully from {{sourceFormat}} to {{targetFormat}}',
       'copied': 'File copied successfully to {{destinationPath}}',
-      'deleted': 'File "{{filename}}" deleted successfully',
-      'downloadCompleted': 'File "{{filename}}" downloaded successfully',
+      'deleted': 'File \"{{filename}}\" deleted successfully',
+      'downloadCompleted': 'File \"{{filename}}\" downloaded successfully',
       'extracted': 'Archive extracted successfully - {{extractedCount}} file extracted',
       'extracted_other': 'Archive extracted successfully - {{extractedCount}} files extracted',
       'moved': 'File moved successfully from {{sourcePath}} to {{destinationPath}}',
-      'processingCompleted': 'File processing completed for "{{filename}}" - {{operationsCount}} operation performed',
-      'processingCompleted_other': 'File processing completed for "{{filename}}" - {{operationsCount}} operations performed',
+      'processingCompleted': 'File processing completed for \"{{filename}}\" - {{operationsCount}} operation performed',
+      'processingCompleted_other': 'File processing completed for \"{{filename}}\" - {{operationsCount}} operations performed',
       'restored': 'File restored successfully from backup created on {{backupDate, date}}',
-      'uploadCompleted': 'File "{{filename}}" uploaded successfully ({{fileSize}})',
+      'uploadCompleted': 'File \"{{filename}}\" uploaded successfully ({{fileSize}})',
       'uploadsBatch': 'Batch upload completed: {{successCount}}/{{totalCount}} file processed',
       'uploadsBatch_other': 'Batch upload completed: {{successCount}}/{{totalCount}} files processed',
-      'validated': 'File validation passed for "{{filename}}" - format: {{fileFormat}}'
+      'validated': 'File validation passed for \"{{filename}}\" - format: {{fileFormat}}'
     },
     'integration': {
       'apiCall': 'API call to {{serviceName}} completed successfully in {{responseTime, number}}ms',
@@ -828,7 +847,7 @@ export default {
     'kv': {
       'configs': {
         'comparisonRetrieved': 'Environment comparison retrieved by {{actor}} - KV: {{kvCount}}, ENV: {{envCount}}, Default: {{defaultCount}}',
-        'configRetrieved': 'Configuration "{{key}}" retrieved by {{actor}}: {{value}} (default: {{isDefault}})',
+        'configRetrieved': 'Configuration \"{{key}}\" retrieved by {{actor}}: {{value}} (default: {{isDefault}})',
         'defaultsRetrieved': 'Default configurations retrieved by {{actor}} ({{keyCount}} keys)',
         'retrieved': 'Successfully retrieved {{configCount}} configurations by {{actor}} ({{allowedKeys}} allowed keys)'
       },
@@ -837,9 +856,9 @@ export default {
         'enabled': 'enabled'
       },
       'adminCacheCleared': 'Configuration cache cleared by {{actor}}',
-      'adminConfigReset': 'Configuration "{{key}}" reset to default by {{actor}} - was: {{oldValue}}, now: {{defaultValue}}',
-      'adminConfigUpdated': 'Configuration "{{key}}" updated by {{actor}} from {{oldValue}} to {{newValue}}',
-      'adminFeatureToggled': 'Feature "{{feature}}" toggled by {{actor}}: {{previousValue}} → {{newValue}}',
+      'adminConfigReset': 'Configuration \"{{key}}\" reset to default by {{actor}} - was: {{oldValue}}, now: {{defaultValue}}',
+      'adminConfigUpdated': 'Configuration \"{{key}}\" updated by {{actor}} from {{oldValue}} to {{newValue}}',
+      'adminFeatureToggled': 'Feature \"{{feature}}\" toggled by {{actor}}: {{previousValue}} → {{newValue}}',
       'auditConfigsRetrieved': 'Audit configurations retrieved by {{actor}} ({{configCount}} configurations)',
       'auditPerformanceRetrieved': 'Audit performance settings retrieved by {{actor}} ({{settingCount}} settings)',
       'auditRetentionRetrieved': 'Audit retention policies retrieved by {{actor}} ({{policyCount}} policies)',
@@ -849,19 +868,19 @@ export default {
       'batchUpdateCompleted': 'Batch configuration update completed: {{successCount}}/{{totalCount}} successful',
       'cacheCleared': 'Configuration cache cleared successfully - {{clearedCount}} entry removed',
       'cacheCleared_other': 'Configuration cache cleared successfully - {{clearedCount}} entries removed',
-      'configReset': 'Configuration "{{key}}" reset to default value: {{defaultValue}}',
-      'configRetrieved': 'Configuration "{{key}}" retrieved successfully: {{value}}',
-      'configUpdated': 'Configuration "{{key}}" updated successfully from {{oldValue}} to {{newValue}}',
+      'configReset': 'Configuration \"{{key}}\" reset to default value: {{defaultValue}}',
+      'configRetrieved': 'Configuration \"{{key}}\" retrieved successfully: {{value}}',
+      'configUpdated': 'Configuration \"{{key}}\" updated successfully from {{oldValue}} to {{newValue}}',
       'defaultsRestored': 'Default configurations restored successfully for {{restoredCount}} key',
       'defaultsRestored_other': 'Default configurations restored successfully for {{restoredCount}} keys',
-      'featureToggled': 'Feature "{{feature}}" {{status}} successfully'
+      'featureToggled': 'Feature \"{{feature}}\" {{status}} successfully'
     },
     'operation': {
       'batchProcessed': 'Batch operation completed: {{successCount}}/{{totalCount}} items processed successfully',
-      'completed': 'Operation "{{operationType}}" completed successfully in {{duration}}ms',
+      'completed': 'Operation \"{{operationType}}\" completed successfully in {{duration}}ms',
       'completed_other': '{{count}} operations completed successfully - average time: {{avgDuration}}ms',
-      'taskFinished': 'Task "{{taskName}}" finished successfully with {{resultCount}} result',
-      'taskFinished_other': 'Task "{{taskName}}" finished successfully with {{resultCount}} results',
+      'taskFinished': 'Task \"{{taskName}}\" finished successfully with {{resultCount}} result',
+      'taskFinished_other': 'Task \"{{taskName}}\" finished successfully with {{resultCount}} results',
       'workflowCompleted': 'Workflow completed successfully - {{stepsCount}} step executed',
       'workflowCompleted_other': 'Workflow completed successfully - {{stepsCount}} steps executed'
     },
@@ -901,16 +920,16 @@ export default {
     },
     'security': {
       'incident': {
-        'created': '{{actor}} created security incident "{{title}}" with {{severity}} severity (ID: {{incidentId}}, Type: {{type}})',
+        'created': '{{actor}} created security incident \"{{title}}\" with {{severity}} severity (ID: {{incidentId}}, Type: {{type}})',
         'responseExecuted': '{{actor}} executed {{actionCount}} response actions for incident {{incidentId}} (Type: {{actionType}}) at {{executedAt}}',
         'retrieved': '{{actor}} retrieved incident {{incidentId}} details (Status: {{status}}, Severity: {{severity}}, Created: {{createdAt}})',
-        'statusUpdated': '{{actor}} updated incident {{incidentId}} status from "{{oldStatus}}" to "{{newStatus}}" at {{timestamp}}'
+        'statusUpdated': '{{actor}} updated incident {{incidentId}} status from \"{{oldStatus}}\" to \"{{newStatus}}\" at {{timestamp}}'
       },
       'incidents': {
-        'created': '{{actor}} created security incident "{{title}}" with {{severity}} severity (ID: {{incidentId}}, Type: {{type}})',
+        'created': '{{actor}} created security incident \"{{title}}\" with {{severity}} severity (ID: {{incidentId}}, Type: {{type}})',
         'responseExecuted': '{{actor}} executed {{actionCount}} response actions for incident {{incidentId}} (Type: {{actionType}}) at {{executedAt}}',
         'retrieved': '{{actor}} successfully retrieved {{incidentCount}} security incidents (page {{page}}, limit {{limit}}, filters: {{filters}})',
-        'statusUpdated': '{{actor}} updated incident {{incidentId}} status from "{{oldStatus}}" to "{{newStatus}}" at {{timestamp}}'
+        'statusUpdated': '{{actor}} updated incident {{incidentId}} status from \"{{oldStatus}}\" to \"{{newStatus}}\" at {{timestamp}}'
       },
       'monitoring': {
         'started': 'Real-time monitoring started successfully'
@@ -933,7 +952,7 @@ export default {
       'databaseConnected': 'Database connection established successfully to {{databaseName}}',
       'healthCheckPassed': 'System health check passed - all {{componentCount}} component healthy',
       'healthCheckPassed_other': 'System health check passed - all {{componentCount}} components healthy',
-      'operationCompleted': 'System operation "{{operation}}" completed successfully in {{duration, number}}ms',
+      'operationCompleted': 'System operation \"{{operation}}\" completed successfully in {{duration, number}}ms',
       'queueProcessed': 'Task queue processed successfully - {{processedCount}} task completed',
       'queueProcessed_other': 'Task queue processed successfully - {{processedCount}} tasks completed',
       'resourceAllocated': 'System resources allocated successfully: {{allocatedMemory, number}}MB memory',
@@ -979,25 +998,6 @@ export default {
       'unsuspended': 'User account suspension lifted for {{userName}} by {{liftedBy}}',
       'updated': 'User profile updated successfully for {{userName}} - fields: {{updatedFields}}',
       'updated_other': '{{count}} user profiles updated successfully'
-    }
-  },
-  'emails': {
-    'registration': {
-      'subject': '{{appName}} - Activate your account',
-      'greeting': 'Hello {{userName}},',
-      'intro': 'Welcome to {{appName}}! Your account has been created successfully.',
-      'instructions': 'To complete your registration and start using your account, please click the button below:',
-      'activateButton': 'Activate My Account',
-      'activateLinkText': 'Or copy and paste this link into your browser:',
-      'details': 'Account Details',
-      'email': 'Email: {{email}}',
-      'time': 'Registered on: {{date}} at {{time}}',
-      'ip': 'IP Address: {{ip}}',
-      'expiryWarning': 'This activation link will expire in {{hours}} hours.',
-      'disclaimer': 'If you did not create this account, you can safely ignore this email. No action is required.',
-      'securityNote': 'For your security, never share this link with anyone.',
-      'thanks': 'Best regards,\nThe {{appName}} Team',
-      'footer': 'This is an automated message from {{appName}}. Please do not reply to this email.'
     }
   },
   'system': {
@@ -1464,7 +1464,7 @@ export default {
     'retentionPolicyUpdate': {
       'atLeastOneFieldRequired': 'At least {{min}} field must be updated',
       'atLeastOneFieldRequired_other': 'At least {{min}} fields must be updated',
-      'immutableField': 'Field "{{field}}" cannot be modified after creation',
+      'immutableField': 'Field \"{{field}}\" cannot be modified after creation',
       'invalid': 'Invalid retention policy update: {{details}}'
     },
     'security': {
@@ -1478,7 +1478,7 @@ export default {
         'invalid': 'Invalid configuration structure'
       },
       'configUpdate': {
-        'invalid': 'Invalid configuration update format. Required field "value" is missing or contains unrecognized fields'
+        'invalid': 'Invalid configuration update format. Required field \"value\" is missing or contains unrecognized fields'
       },
       'incidentCreation': {
         'invalid': 'Invalid incident creation structure'
@@ -1521,19 +1521,19 @@ export default {
       'invalid': 'Username can only contain letters, numbers, underscores, and hyphens',
       'invalidCharacters': 'Username contains invalid characters: {{invalidChars}}',
       'required': 'Username is required',
-      'reserved': 'Username "{{username}}" is reserved and cannot be used',
+      'reserved': 'Username \"{{username}}\" is reserved and cannot be used',
       'tooLong': 'Username cannot exceed {{maxLength}} characters',
       'tooShort': 'Username must be at least {{minLength}} character long',
       'tooShort_other': 'Username must be at least {{minLength}} characters long',
-      'unavailable': 'Username "{{username}}" is not available'
+      'unavailable': 'Username \"{{username}}\" is not available'
     },
     'filterArrayTooLarge': 'Filter array with {{count}} item exceeds maximum of {{max}}',
     'filterArrayTooLarge_other': 'Filter array with {{count}} items exceeds maximum of {{max}}',
     'invalid': 'Invalid value provided',
     'invalid_other': '{{count}} invalid values provided',
-    'invalidArchiveAction': 'Invalid archive action "{{action}}" - must be one of: {{validActions}}',
+    'invalidArchiveAction': 'Invalid archive action \"{{action}}\" - must be one of: {{validActions}}',
     'invalidJson': 'Invalid JSON in request body: {{details}}',
-    'invalidRole': 'Invalid role "{{role}}" specified - must be one of: {{validRoles}}',
+    'invalidRole': 'Invalid role \"{{role}}\" specified - must be one of: {{validRoles}}',
     'limitTooLarge': 'Limit {{limit}} exceeds maximum of {{max}} record',
     'limitTooLarge_other': 'Limit {{limit}} exceeds maximum of {{max}} records',
     'registrationFailed': 'User registration failed: {{reason}}',
@@ -1546,8 +1546,8 @@ export default {
     'tooLong_other': 'Value exceeds {{max}} characters limit',
     'tooShort': 'Value must be at least {{min}} character long',
     'tooShort_other': 'Value must be at least {{min}} characters long',
-    'translationsFailed': 'Failed to fetch translations for language "{{language}}": {{reason}}',
-    'unsupportedFormat': 'Export format "{{format}}" is not supported - available formats: {{supportedFormats}}',
+    'translationsFailed': 'Failed to fetch translations for language \"{{language}}\": {{reason}}',
+    'unsupportedFormat': 'Export format \"{{format}}\" is not supported - available formats: {{supportedFormats}}',
     'updateRequiresField': 'At least {{min}} field is required for update operation',
     'updateRequiresField_other': 'At least {{min}} fields are required for update operation',
     'uploadFailed': 'File upload failed: {{reason}}'
