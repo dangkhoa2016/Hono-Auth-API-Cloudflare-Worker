@@ -364,7 +364,7 @@ export default {
         'failed': 'Verhaltensanalyse konnte nicht abgerufen werden - {{actor}} konnte {{operation}} für {{timeframe}} zielend auf {{targetRole}} nicht abschließen: {{reason}}'
       },
       'compliance': {
-        'customComplianceFailed': 'Benutzerdefinierter Compliance-Bericht konnte nicht generiert werden - {{actor}} konnte {{operation}} für \"{{reportName}}\" ({{reportType}}) nicht abschließen: {{reason}}',
+        'customComplianceFailed': 'Benutzerdefinierter Compliance-Bericht konnte nicht generiert werden - {{actor}} konnte {{operation}} für "{{reportName}}" ({{reportType}}) nicht abschließen: {{reason}}',
         'failed': 'Compliance-Bericht konnte nicht generiert werden - {{actor}} konnte {{operation}} für {{timeframe}} mit Format {{format}} nicht abschließen: {{reason}}',
         'reportFailed': 'Compliance-Bericht konnte nicht generiert werden - {{actor}} konnte {{operation}} für Bericht {{type}} nicht durchführen: {{reason}}'
       },
@@ -398,7 +398,7 @@ export default {
         'retrieveFailed': 'Fehler beim Abrufen der Audit-Protokolle - {{actor}} stieß auf Fehler bei {{operation}}: {{reason}}'
       },
       'search': {
-        'searchFailed': 'Fehler beim Durchsuchen der Audit-Protokolle - {{actor}} konnte {{operation}} mit Abfrage \"{{query}}\" nicht abschließen: {{reason}}'
+        'searchFailed': 'Fehler beim Durchsuchen der Audit-Protokolle - {{actor}} konnte {{operation}} mit Abfrage "{{query}}" nicht abschließen: {{reason}}'
       },
       'stats': {
         'statsFailed': 'Fehler beim Abrufen der Audit-Statistiken - {{actor}} ({{role}}) konnte {{operation}} nicht durchführen: {{reason}}'
@@ -472,15 +472,15 @@ export default {
     },
     'i18n': {
       'context_demo_failed': 'Kontextuelle Übersetzungs-Demonstration konnte nicht ausgeführt werden: {{reason}}',
-      'context_test_failed': 'Kontextuelle Übersetzungen konnten nicht getestet werden für Schlüssel \"{{key}}\": {{reason}}',
+      'context_test_failed': 'Kontextuelle Übersetzungen konnten nicht getestet werden für Schlüssel "{{key}}": {{reason}}',
       'enhanced_demo_failed': 'Erweiterte i18n-Funktions-Demonstration konnte nicht ausgeführt werden: {{reason}}',
       'error_demo_failed': 'Fehlermeldungs-Demonstration konnte nicht ausgeführt werden: {{reason}}',
       'formatting_demo_failed': 'Formatierungs-Demonstration konnte nicht ausgeführt werden: {{reason}}',
-      'formatting_test_failed': 'Formatierungsfunktionalität konnte nicht getestet werden für Schlüssel \"{{key}}\": {{reason}}',
-      'languageNotSupported': 'Sprache \"{{language}}\" wird nicht unterstützt. Verfügbare Sprachen: {{supportedLanguages}}',
+      'formatting_test_failed': 'Formatierungsfunktionalität konnte nicht getestet werden für Schlüssel "{{key}}": {{reason}}',
+      'languageNotSupported': 'Sprache "{{language}}" wird nicht unterstützt. Verfügbare Sprachen: {{supportedLanguages}}',
       'plurals_demo_failed': 'Pluralisierungs-Demonstration konnte nicht ausgeführt werden: {{reason}}',
-      'plurals_test_failed': 'Pluralisierungsfunktionalität konnte nicht getestet werden für Schlüssel \"{{key}}\": {{reason}}',
-      'sectionNotFound': 'Übersetzungsabschnitt \"{{section}}\" nicht gefunden für Sprache \"{{language}}\"',
+      'plurals_test_failed': 'Pluralisierungsfunktionalität konnte nicht getestet werden für Schlüssel "{{key}}": {{reason}}',
+      'sectionNotFound': 'Übersetzungsabschnitt "{{section}}" nicht gefunden für Sprache "{{language}}"',
       'success_demo_failed': 'Erfolgsmeldungs-Demonstration konnte nicht ausgeführt werden: {{reason}}',
       'translationsFailed': 'Übersetzungsinformationen konnten nicht abgerufen werden: {{reason}}'
     },
@@ -503,15 +503,15 @@ export default {
       'cacheClearFailed': 'Konfigurationscache konnte nicht geleert werden: {{reason}}',
       'cacheFailed': 'Fehler beim Aktualisieren des Konfigurationscaches: {{reason}}',
       'complianceSettingsRetrieveFailed': 'Compliance-Einstellungen konnten nicht abgerufen werden: {{reason}}',
-      'configResetFailed': 'Konfiguration \"{{key}}\" konnte nicht zurückgesetzt werden: {{reason}}',
-      'configRetrieveFailed': 'Konfiguration \"{{key}}\" konnte nicht abgerufen werden: {{reason}}',
+      'configResetFailed': 'Konfiguration "{{key}}" konnte nicht zurückgesetzt werden: {{reason}}',
+      'configRetrieveFailed': 'Konfiguration "{{key}}" konnte nicht abgerufen werden: {{reason}}',
       'configsCompareFailed': 'Umgebungsvergleich konnte nicht abgerufen werden: {{reason}}',
       'configsRetrieveFailed': 'Konfigurationen konnten nicht abgerufen werden: {{reason}}',
-      'configUpdateFailed': 'Konfiguration \"{{key}}\" konnte nicht aktualisiert werden: {{reason}}',
+      'configUpdateFailed': 'Konfiguration "{{key}}" konnte nicht aktualisiert werden: {{reason}}',
       'exportSettingsRetrieveFailed': 'Exporteinstellungen konnten nicht abgerufen werden: {{reason}}',
       'featureFlagsRetrieveFailed': 'Feature-Flags konnten nicht abgerufen werden: {{reason}}',
       'featureNotFound': 'Feature nicht gefunden oder nicht erlaubt',
-      'featureToggleFailed': 'Feature \"{{feature}}\" konnte nicht umgeschaltet werden: {{reason}}',
+      'featureToggleFailed': 'Feature "{{feature}}" konnte nicht umgeschaltet werden: {{reason}}',
       'invalidFeatureValue': 'Ungültiger Feature-Wert - muss boolean sein',
       'invalidKey': 'Konfigurationsschlüssel „{{key}}“ ist nicht zulässig – gültige Schlüssel: {{validKeys}}',
       'keyNotFound': 'Konfigurationsschlüssel „{{key}}“ nicht gefunden',
@@ -631,7 +631,7 @@ export default {
       'licenseInvalid': 'Ungültige Systemlizenz: {{reason}}',
       'maintenanceMode': 'System befindet sich bis {{endTime, datetime}} im Wartungsmodus – {{message}}',
       'memoryExhausted': 'Server-Speicherauslastung kritisch: {{currentUsage, number}}MB / {{maxMemory, number}}MB',
-      'operationFailed': 'Systemoperation \"{{operation}}\" fehlgeschlagen: {{reason}}',
+      'operationFailed': 'Systemoperation "{{operation}}" fehlgeschlagen: {{reason}}',
       'rateLimited': 'System vorübergehend rate-begrenzt: {{currentRequests}}/{{maxRequests}} Anfragen in {{timeWindow}}',
       'resourceExhausted': 'Systemressourcen erschöpft: {{resource}} bei {{usage, number}}% Kapazität',
       'serverError': 'Interner Serverfehler aufgetreten',
@@ -666,10 +666,10 @@ export default {
     },
     'zodDemo': {
       'file': {
-        'uploadFailed': 'Datei-Upload fehlgeschlagen - {{actor}} konnte {{operation}} für \"{{fileName}}\" ({{fileSize}} Bytes) nicht abschließen: {{reason}}'
+        'uploadFailed': 'Datei-Upload fehlgeschlagen - {{actor}} konnte {{operation}} für "{{fileName}}" ({{fileSize}} Bytes) nicht abschließen: {{reason}}'
       },
       'search': {
-        'failed': 'Suchoperation fehlgeschlagen - {{actor}} konnte {{operation}} für Abfrage \"{{query}}\" ({{searchType}}) nicht abschließen: {{reason}}'
+        'failed': 'Suchoperation fehlgeschlagen - {{actor}} konnte {{operation}} für Abfrage "{{query}}" ({{searchType}}) nicht abschließen: {{reason}}'
       },
       'user': {
         'registrationFailed': 'Benutzerregistrierung fehlgeschlagen - {{actor}} konnte {{operation}} für {{userName}} ({{email}}) nicht abschließen: {{reason}}'
@@ -847,7 +847,7 @@ export default {
     'kv': {
       'configs': {
         'comparisonRetrieved': 'Umgebungsvergleich von {{actor}} abgerufen - KV: {{kvCount}}, ENV: {{envCount}}, Standard: {{defaultCount}}',
-        'configRetrieved': 'Konfiguration \"{{key}}\" von {{actor}} abgerufen: {{value}} (Standard: {{isDefault}})',
+        'configRetrieved': 'Konfiguration "{{key}}" von {{actor}} abgerufen: {{value}} (Standard: {{isDefault}})',
         'defaultsRetrieved': 'Standardkonfigurationen von {{actor}} abgerufen ({{keyCount}} Schlüssel)',
         'retrieved': '{{configCount}} Konfigurationen erfolgreich von {{actor}} abgerufen ({{allowedKeys}} erlaubte Schlüssel)'
       },
@@ -856,9 +856,9 @@ export default {
         'enabled': 'aktiviert'
       },
       'adminCacheCleared': 'Konfigurationscache von {{actor}} geleert',
-      'adminConfigReset': 'Konfiguration \"{{key}}\" von {{actor}} auf Standard zurückgesetzt - war: {{oldValue}}, jetzt: {{defaultValue}}',
-      'adminConfigUpdated': 'Konfiguration \"{{key}}\" von {{actor}} aktualisiert von {{oldValue}} zu {{newValue}}',
-      'adminFeatureToggled': 'Feature \"{{feature}}\" von {{actor}} umgeschaltet: {{previousValue}} → {{newValue}}',
+      'adminConfigReset': 'Konfiguration "{{key}}" von {{actor}} auf Standard zurückgesetzt - war: {{oldValue}}, jetzt: {{defaultValue}}',
+      'adminConfigUpdated': 'Konfiguration "{{key}}" von {{actor}} aktualisiert von {{oldValue}} zu {{newValue}}',
+      'adminFeatureToggled': 'Feature "{{feature}}" von {{actor}} umgeschaltet: {{previousValue}} → {{newValue}}',
       'auditConfigsRetrieved': 'Audit-Konfigurationen von {{actor}} abgerufen ({{configCount}} Konfigurationen)',
       'auditPerformanceRetrieved': 'Audit-Leistungseinstellungen von {{actor}} abgerufen ({{settingCount}} Einstellungen)',
       'auditRetentionRetrieved': 'Audit-Aufbewahrungsrichtlinien von {{actor}} abgerufen ({{policyCount}} Richtlinien)',
@@ -877,10 +877,10 @@ export default {
     },
     'operation': {
       'batchProcessed': 'Batch-Operation abgeschlossen: {{successCount}}/{{totalCount}} Elemente erfolgreich verarbeitet',
-      'completed': 'Operation \"{{operationType}}\" erfolgreich abgeschlossen in {{duration}}ms',
+      'completed': 'Operation "{{operationType}}" erfolgreich abgeschlossen in {{duration}}ms',
       'completed_other': '{{count}} Operationen erfolgreich abgeschlossen - Durchschnittszeit: {{avgDuration}}ms',
-      'taskFinished': 'Aufgabe \"{{taskName}}\" erfolgreich beendet mit {{resultCount}} Ergebnis',
-      'taskFinished_other': 'Aufgabe \"{{taskName}}\" erfolgreich beendet mit {{resultCount}} Ergebnissen',
+      'taskFinished': 'Aufgabe "{{taskName}}" erfolgreich beendet mit {{resultCount}} Ergebnis',
+      'taskFinished_other': 'Aufgabe "{{taskName}}" erfolgreich beendet mit {{resultCount}} Ergebnissen',
       'workflowCompleted': 'Workflow erfolgreich abgeschlossen - {{stepsCount}} Schritt ausgeführt',
       'workflowCompleted_other': 'Workflow erfolgreich abgeschlossen - {{stepsCount}} Schritte ausgeführt'
     },
@@ -920,16 +920,16 @@ export default {
     },
     'security': {
       'incident': {
-        'created': '{{actor}} hat Sicherheitsvorfall \"{{title}}\" mit Schweregrad {{severity}} erstellt (ID: {{incidentId}}, Typ: {{type}})',
+        'created': '{{actor}} hat Sicherheitsvorfall "{{title}}" mit Schweregrad {{severity}} erstellt (ID: {{incidentId}}, Typ: {{type}})',
         'responseExecuted': '{{actor}} hat {{actionCount}} Antwortaktionen für Vorfall {{incidentId}} ausgeführt (Typ: {{actionType}}) um {{executedAt}}',
         'retrieved': '{{actor}} hat Details zu Vorfall {{incidentId}} abgerufen (Status: {{status}}, Schweregrad: {{severity}}, Erstellt: {{createdAt}})',
-        'statusUpdated': '{{actor}} hat Status des Vorfalls {{incidentId}} von \"{{oldStatus}}\" zu \"{{newStatus}}\" um {{timestamp}} aktualisiert'
+        'statusUpdated': '{{actor}} hat Status des Vorfalls {{incidentId}} von "{{oldStatus}}" zu "{{newStatus}}" um {{timestamp}} aktualisiert'
       },
       'incidents': {
-        'created': '{{actor}} hat Sicherheitsvorfall \"{{title}}\" mit Schweregrad {{severity}} erstellt (ID: {{incidentId}}, Typ: {{type}})',
+        'created': '{{actor}} hat Sicherheitsvorfall "{{title}}" mit Schweregrad {{severity}} erstellt (ID: {{incidentId}}, Typ: {{type}})',
         'responseExecuted': '{{actor}} hat {{actionCount}} Antwortaktionen für Vorfall {{incidentId}} ausgeführt (Typ: {{actionType}}) um {{executedAt}}',
         'retrieved': '{{actor}} hat erfolgreich {{incidentCount}} Sicherheitsvorfälle abgerufen (Seite {{page}}, Limit {{limit}}, Filter: {{filters}})',
-        'statusUpdated': '{{actor}} hat Status des Vorfalls {{incidentId}} von \"{{oldStatus}}\" zu \"{{newStatus}}\" um {{timestamp}} aktualisiert'
+        'statusUpdated': '{{actor}} hat Status des Vorfalls {{incidentId}} von "{{oldStatus}}" zu "{{newStatus}}" um {{timestamp}} aktualisiert'
       },
       'monitoring': {
         'started': 'Echtzeitüberwachung erfolgreich gestartet'
@@ -1478,7 +1478,7 @@ export default {
         'invalid': 'Ungültige Konfigurationsstruktur'
       },
       'configUpdate': {
-        'invalid': 'Ungültiges Konfigurationsaktualisierungsformat. Pflichtfeld \"value\" fehlt oder enthält unerkannte Felder'
+        'invalid': 'Ungültiges Konfigurationsaktualisierungsformat. Pflichtfeld "value" fehlt oder enthält unerkannte Felder'
       },
       'incidentCreation': {
         'invalid': 'Ungültige Incident-Erstellungsstruktur'

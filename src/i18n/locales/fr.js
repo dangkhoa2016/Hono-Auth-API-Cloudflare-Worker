@@ -364,7 +364,7 @@ export default {
         'failed': 'Impossible de récupérer l\'analyse comportementale - {{actor}} n\'a pas pu compléter {{operation}} pour {{timeframe}} ciblant {{targetRole}}: {{reason}}'
       },
       'compliance': {
-        'customComplianceFailed': 'Impossible de générer le rapport de conformité personnalisé - {{actor}} n\'a pas pu compléter {{operation}} pour \"{{reportName}}\" ({{reportType}}): {{reason}}',
+        'customComplianceFailed': 'Impossible de générer le rapport de conformité personnalisé - {{actor}} n\'a pas pu compléter {{operation}} pour "{{reportName}}" ({{reportType}}): {{reason}}',
         'failed': 'Impossible de générer le rapport de conformité - {{actor}} n\'a pas pu compléter {{operation}} pour {{timeframe}} avec le format {{format}}: {{reason}}',
         'reportFailed': 'Impossible de générer le rapport de conformité - {{actor}} n\'a pas pu effectuer {{operation}} pour le rapport {{type}}: {{reason}}'
       },
@@ -398,7 +398,7 @@ export default {
         'retrieveFailed': 'Échec de la récupération des journaux d\'audit - {{actor}} a rencontré une erreur lors de {{operation}} : {{reason}}'
       },
       'search': {
-        'searchFailed': 'Échec de la recherche dans les journaux d\'audit - {{actor}} n\'a pas pu terminer {{operation}} avec la requête \"{{query}}\" : {{reason}}'
+        'searchFailed': 'Échec de la recherche dans les journaux d\'audit - {{actor}} n\'a pas pu terminer {{operation}} avec la requête "{{query}}" : {{reason}}'
       },
       'stats': {
         'statsFailed': 'Échec de la récupération des statistiques d\'audit - {{actor}} ({{role}}) n\'a pas pu effectuer {{operation}} : {{reason}}'
@@ -472,15 +472,15 @@ export default {
     },
     'i18n': {
       'context_demo_failed': 'Impossible d\'exécuter la démonstration de traduction contextuelle : {{reason}}',
-      'context_test_failed': 'Impossible de tester les traductions contextuelles pour la clé \"{{key}}\" : {{reason}}',
+      'context_test_failed': 'Impossible de tester les traductions contextuelles pour la clé "{{key}}" : {{reason}}',
       'enhanced_demo_failed': 'Impossible d\'exécuter la démonstration des fonctionnalités i18n avancées : {{reason}}',
       'error_demo_failed': 'Impossible d\'exécuter la démonstration des messages d\'erreur : {{reason}}',
       'formatting_demo_failed': 'Impossible d\'exécuter la démonstration de formatage : {{reason}}',
-      'formatting_test_failed': 'Impossible de tester la fonctionnalité de formatage pour la clé \"{{key}}\" : {{reason}}',
-      'languageNotSupported': 'La langue \"{{language}}\" n\'est pas prise en charge. Langues disponibles : {{supportedLanguages}}',
+      'formatting_test_failed': 'Impossible de tester la fonctionnalité de formatage pour la clé "{{key}}" : {{reason}}',
+      'languageNotSupported': 'La langue "{{language}}" n\'est pas prise en charge. Langues disponibles : {{supportedLanguages}}',
       'plurals_demo_failed': 'Impossible d\'exécuter la démonstration de pluralisation : {{reason}}',
-      'plurals_test_failed': 'Impossible de tester la fonctionnalité de pluralisation pour la clé \"{{key}}\" : {{reason}}',
-      'sectionNotFound': 'Section de traduction \"{{section}}\" non trouvée pour la langue \"{{language}}\"',
+      'plurals_test_failed': 'Impossible de tester la fonctionnalité de pluralisation pour la clé "{{key}}" : {{reason}}',
+      'sectionNotFound': 'Section de traduction "{{section}}" non trouvée pour la langue "{{language}}"',
       'success_demo_failed': 'Impossible d\'exécuter la démonstration des messages de succès : {{reason}}',
       'translationsFailed': 'Impossible de récupérer les informations de traduction : {{reason}}'
     },
@@ -503,15 +503,15 @@ export default {
       'cacheClearFailed': 'Impossible de vider le cache de configuration : {{reason}}',
       'cacheFailed': 'Échec de la mise à jour du cache de configuration : {{reason}}',
       'complianceSettingsRetrieveFailed': 'Impossible de récupérer les paramètres de conformité : {{reason}}',
-      'configResetFailed': 'Impossible de réinitialiser la configuration \"{{key}}\" : {{reason}}',
-      'configRetrieveFailed': 'Impossible de récupérer la configuration \"{{key}}\" : {{reason}}',
+      'configResetFailed': 'Impossible de réinitialiser la configuration "{{key}}" : {{reason}}',
+      'configRetrieveFailed': 'Impossible de récupérer la configuration "{{key}}" : {{reason}}',
       'configsCompareFailed': 'Impossible de récupérer la comparaison des environnements : {{reason}}',
       'configsRetrieveFailed': 'Impossible de récupérer les configurations : {{reason}}',
-      'configUpdateFailed': 'Impossible de mettre à jour la configuration \"{{key}}\" : {{reason}}',
+      'configUpdateFailed': 'Impossible de mettre à jour la configuration "{{key}}" : {{reason}}',
       'exportSettingsRetrieveFailed': 'Impossible de récupérer les paramètres d\'exportation : {{reason}}',
       'featureFlagsRetrieveFailed': 'Impossible de récupérer les indicateurs de fonctionnalité : {{reason}}',
       'featureNotFound': 'Fonctionnalité introuvable ou non autorisée',
-      'featureToggleFailed': 'Impossible de basculer la fonctionnalité \"{{feature}}\" : {{reason}}',
+      'featureToggleFailed': 'Impossible de basculer la fonctionnalité "{{feature}}" : {{reason}}',
       'invalidFeatureValue': 'Valeur de fonctionnalité invalide - doit être booléenne',
       'invalidKey': 'La clé de configuration « {{key}} » n\'est pas autorisée - clés valides : {{validKeys}}',
       'keyNotFound': 'Clé de configuration « {{key}} » introuvable',
@@ -631,7 +631,7 @@ export default {
       'licenseInvalid': 'Licence système invalide : {{reason}}',
       'maintenanceMode': 'Le système est en maintenance jusqu\'à {{endTime, datetime}} - {{message}}',
       'memoryExhausted': 'Utilisation de la mémoire du serveur critique : {{currentUsage, number}}Mo / {{maxMemory, number}}Mo',
-      'operationFailed': 'Opération système \"{{operation}}\" échouée : {{reason}}',
+      'operationFailed': 'Opération système "{{operation}}" échouée : {{reason}}',
       'rateLimited': 'Système temporairement limité en débit : {{currentRequests}}/{{maxRequests}} requêtes sur {{timeWindow}}',
       'resourceExhausted': 'Ressources système épuisées : {{resource}} à {{usage, number}}% de capacité',
       'serverError': 'Une erreur interne du serveur est survenue',
@@ -666,10 +666,10 @@ export default {
     },
     'zodDemo': {
       'file': {
-        'uploadFailed': 'Téléchargement de fichier échoué - {{actor}} n\'a pas pu compléter {{operation}} pour \"{{fileName}}\" ({{fileSize}} octets) : {{reason}}'
+        'uploadFailed': 'Téléchargement de fichier échoué - {{actor}} n\'a pas pu compléter {{operation}} pour "{{fileName}}" ({{fileSize}} octets) : {{reason}}'
       },
       'search': {
-        'failed': 'Opération de recherche échouée - {{actor}} n\'a pas pu compléter {{operation}} pour la requête \"{{query}}\" ({{searchType}}) : {{reason}}'
+        'failed': 'Opération de recherche échouée - {{actor}} n\'a pas pu compléter {{operation}} pour la requête "{{query}}" ({{searchType}}) : {{reason}}'
       },
       'user': {
         'registrationFailed': 'Inscription de l\'utilisateur échouée - {{actor}} n\'a pas pu compléter {{operation}} pour {{userName}} ({{email}}) : {{reason}}'
@@ -847,7 +847,7 @@ export default {
     'kv': {
       'configs': {
         'comparisonRetrieved': 'Comparaison d\'environnement récupérée par {{actor}} - KV: {{kvCount}}, ENV: {{envCount}}, Défaut: {{defaultCount}}',
-        'configRetrieved': 'Configuration \"{{key}}\" récupérée par {{actor}}: {{value}} (défaut: {{isDefault}})',
+        'configRetrieved': 'Configuration "{{key}}" récupérée par {{actor}}: {{value}} (défaut: {{isDefault}})',
         'defaultsRetrieved': 'Configurations par défaut récupérées par {{actor}} ({{keyCount}} clés)',
         'retrieved': '{{configCount}} configurations récupérées avec succès par {{actor}} ({{allowedKeys}} clés autorisées)'
       },
@@ -856,9 +856,9 @@ export default {
         'enabled': 'activée'
       },
       'adminCacheCleared': 'Cache de configuration vidé par {{actor}}',
-      'adminConfigReset': 'Configuration \"{{key}}\" réinitialisée par défaut par {{actor}} - était: {{oldValue}}, maintenant: {{defaultValue}}',
-      'adminConfigUpdated': 'Configuration \"{{key}}\" mise à jour par {{actor}} de {{oldValue}} à {{newValue}}',
-      'adminFeatureToggled': 'Fonctionnalité \"{{feature}}\" basculée par {{actor}}: {{previousValue}} → {{newValue}}',
+      'adminConfigReset': 'Configuration "{{key}}" réinitialisée par défaut par {{actor}} - était: {{oldValue}}, maintenant: {{defaultValue}}',
+      'adminConfigUpdated': 'Configuration "{{key}}" mise à jour par {{actor}} de {{oldValue}} à {{newValue}}',
+      'adminFeatureToggled': 'Fonctionnalité "{{feature}}" basculée par {{actor}}: {{previousValue}} → {{newValue}}',
       'auditConfigsRetrieved': 'Configurations d\'audit récupérées par {{actor}} ({{configCount}} configurations)',
       'auditPerformanceRetrieved': 'Paramètres de performance d\'audit récupérés par {{actor}} ({{settingCount}} paramètres)',
       'auditRetentionRetrieved': 'Politiques de rétention d\'audit récupérées par {{actor}} ({{policyCount}} politiques)',
@@ -920,16 +920,16 @@ export default {
     },
     'security': {
       'incident': {
-        'created': '{{actor}} a créé l\'incident de sécurité \"{{title}}\" avec une gravité {{severity}} (ID : {{incidentId}}, Type : {{type}})',
+        'created': '{{actor}} a créé l\'incident de sécurité "{{title}}" avec une gravité {{severity}} (ID : {{incidentId}}, Type : {{type}})',
         'responseExecuted': '{{actor}} a exécuté {{actionCount}} actions de réponse pour l\'incident {{incidentId}} (Type : {{actionType}}) à {{executedAt}}',
         'retrieved': '{{actor}} a récupéré les détails de l\'incident {{incidentId}} (Statut : {{status}}, Gravité : {{severity}}, Créé : {{createdAt}})',
-        'statusUpdated': '{{actor}} a mis à jour le statut de l\'incident {{incidentId}} de \"{{oldStatus}}\" à \"{{newStatus}}\" à {{timestamp}}'
+        'statusUpdated': '{{actor}} a mis à jour le statut de l\'incident {{incidentId}} de "{{oldStatus}}" à "{{newStatus}}" à {{timestamp}}'
       },
       'incidents': {
-        'created': '{{actor}} a créé l\'incident de sécurité \"{{title}}\" avec une gravité {{severity}} (ID : {{incidentId}}, Type : {{type}})',
+        'created': '{{actor}} a créé l\'incident de sécurité "{{title}}" avec une gravité {{severity}} (ID : {{incidentId}}, Type : {{type}})',
         'responseExecuted': '{{actor}} a exécuté {{actionCount}} actions de réponse pour l\'incident {{incidentId}} (Type : {{actionType}}) à {{executedAt}}',
         'retrieved': '{{actor}} a récupéré avec succès {{incidentCount}} incidents de sécurité (page {{page}}, limite {{limit}}, filtres : {{filters}})',
-        'statusUpdated': '{{actor}} a mis à jour le statut de l\'incident {{incidentId}} de \"{{oldStatus}}\" à \"{{newStatus}}\" à {{timestamp}}'
+        'statusUpdated': '{{actor}} a mis à jour le statut de l\'incident {{incidentId}} de "{{oldStatus}}" à "{{newStatus}}" à {{timestamp}}'
       },
       'monitoring': {
         'started': 'Surveillance en temps réel démarrée avec succès'
@@ -1478,7 +1478,7 @@ export default {
         'invalid': 'Structure de configuration invalide'
       },
       'configUpdate': {
-        'invalid': 'Format de mise à jour de configuration invalide. Le champ requis \"value\" est manquant ou contient des champs non reconnus'
+        'invalid': 'Format de mise à jour de configuration invalide. Le champ requis "value" est manquant ou contient des champs non reconnus'
       },
       'incidentCreation': {
         'invalid': 'Structure de création d’incident invalide'

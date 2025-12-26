@@ -364,7 +364,7 @@ export default {
         'failed': 'ไม่สามารถดึงการวิเคราะห์พฤติกรรมได้ - {{actor}} ไม่สามารถทำ {{operation}} สำหรับ {{timeframe}} ที่เป้าหมาย {{targetRole}} ให้เสร็จสิ้น: {{reason}}'
       },
       'compliance': {
-        'customComplianceFailed': 'ไม่สามารถสร้างรายงานการปฏิบัติตามกฎระเบียบแบบกำหนดเองได้ - {{actor}} ไม่สามารถทำ {{operation}} สำหรับ \"{{reportName}}\" ({{reportType}}) ให้เสร็จสิ้น: {{reason}}',
+        'customComplianceFailed': 'ไม่สามารถสร้างรายงานการปฏิบัติตามกฎระเบียบแบบกำหนดเองได้ - {{actor}} ไม่สามารถทำ {{operation}} สำหรับ "{{reportName}}" ({{reportType}}) ให้เสร็จสิ้น: {{reason}}',
         'failed': 'ไม่สามารถสร้างรายงานการปฏิบัติตามกฎระเบียบได้ - {{actor}} ไม่สามารถทำ {{operation}} สำหรับ {{timeframe}} ด้วยรูปแบบ {{format}} ให้เสร็จสิ้น: {{reason}}',
         'reportFailed': 'ไม่สามารถสร้างรายงานการปฏิบัติตามกฎระเบียบได้ - {{actor}} ไม่สามารถดำเนินการ {{operation}} สำหรับรายงาน {{type}}: {{reason}}'
       },
@@ -398,7 +398,7 @@ export default {
         'retrieveFailed': 'ไม่สามารถดึงข้อมูลบันทึกการตรวจสอบได้ - {{actor}} พบข้อผิดพลาดขณะทำ {{operation}}: {{reason}}'
       },
       'search': {
-        'searchFailed': 'ไม่สามารถค้นหาในบันทึกการตรวจสอบได้ - {{actor}} ไม่สามารถทำ {{operation}} ให้เสร็จสมบูรณ์ด้วยคำค้นหา \"{{query}}\": {{reason}}'
+        'searchFailed': 'ไม่สามารถค้นหาในบันทึกการตรวจสอบได้ - {{actor}} ไม่สามารถทำ {{operation}} ให้เสร็จสมบูรณ์ด้วยคำค้นหา "{{query}}": {{reason}}'
       },
       'stats': {
         'statsFailed': 'ไม่สามารถดึงสถิติการตรวจสอบได้ - {{actor}} ({{role}}) ไม่สามารถทำ {{operation}}: {{reason}}'
@@ -447,22 +447,22 @@ export default {
       'businessHoursOnly': 'อนุญาตการดำเนินการเฉพาะในเวลาทำการ ({{businessHours}})',
       'conflictingOperation': 'มีการดำเนินการที่ขัดแย้งกัน: {{operation}}',
       'deadlineExpired': 'กำหนดเวลาดำเนินการหมดอายุเมื่อวันที่ {{deadline, datetime}}',
-      'duplicateEntry': 'ตรวจพบรายการที่ซ้ำกัน: {{entity}} ที่มี {{field}} = \"{{value}}\"',
+      'duplicateEntry': 'ตรวจพบรายการที่ซ้ำกัน: {{entity}} ที่มี {{field}} = "{{value}}"',
       'insufficientBalance': 'ยอดเงินไม่เพียงพอ: {{available, currency}} ที่ใช้ได้, ต้องการ {{required, currency}}',
-      'operationNotAllowed': 'ไม่อนุญาตการดำเนินการ \"{{operation}}\": {{reason}}',
+      'operationNotAllowed': 'ไม่อนุญาตการดำเนินการ "{{operation}}": {{reason}}',
       'preconditionFailed': 'เงื่อนไขเบื้องต้นล้มเหลว: {{condition}}',
       'quotaReached': 'ถึงขีดจำกัดโควตา: ใช้ไป {{used, number}}/{{limit, number}} {{resource}}',
       'referenceConstraint': 'ไม่สามารถลบ {{entity}} ได้ - อ้างอิงโดย {{referencingCount}} บันทึกอื่น',
       'referenceConstraint_other': 'ไม่สามารถลบ {{entity}} ได้ - อ้างอิงโดย {{referencingCount}} บันทึกอื่น',
-      'resourceLocked': 'ทรัพยากร \"{{resource}}\" ถูกล็อกโดย {{lockedBy}} จนถึง {{lockedUntil, datetime}}',
+      'resourceLocked': 'ทรัพยากร "{{resource}}" ถูกล็อกโดย {{lockedBy}} จนถึง {{lockedUntil, datetime}}',
       'workflowViolation': 'การละเมิด Workflow: ไม่สามารถดำเนินการ {{step}} ในสถานะปัจจุบัน {{currentState}}'
     },
     'file': {
-      'accessDenied': 'การเข้าถึงไฟล์ \"{{filename}}\" ถูกปฏิเสธ: {{reason}}',
+      'accessDenied': 'การเข้าถึงไฟล์ "{{filename}}" ถูกปฏิเสธ: {{reason}}',
       'corrupted': 'ไฟล์ดูเหมือนจะเสียหายหรือไม่สมบูรณ์',
       'formatUnsupported': 'รูปแบบไฟล์ไม่รองรับสำหรับการดำเนินการ: {{operation}}',
-      'invalidType': 'ประเภทไฟล์ \"{{fileType}}\" ไม่ได้รับอนุญาต - ประเภทที่รองรับ: {{allowedTypes}}',
-      'notFound': 'ไม่พบไฟล์ \"{{filename}}\"',
+      'invalidType': 'ประเภทไฟล์ "{{fileType}}" ไม่ได้รับอนุญาต - ประเภทที่รองรับ: {{allowedTypes}}',
+      'notFound': 'ไม่พบไฟล์ "{{filename}}"',
       'processingFailed': 'การประมวลผลไฟล์ล้มเหลว: {{reason}}',
       'quotaExceeded': 'เกินโควตาที่เก็บข้อมูล: ใช้ไป {{used, number}}MB / โควตา {{quota, number}}MB',
       'tooLarge': 'ขนาดไฟล์ {{actualSize, number}}MB เกินขีดจำกัด {{maxSize, number}}MB',
@@ -472,15 +472,15 @@ export default {
     },
     'i18n': {
       'context_demo_failed': 'ไม่สามารถรันการสาธิตการแปลตามบริบทได้: {{reason}}',
-      'context_test_failed': 'ไม่สามารถทดสอบการแปลตามบริบทได้สำหรับคีย์ \"{{key}}\": {{reason}}',
+      'context_test_failed': 'ไม่สามารถทดสอบการแปลตามบริบทได้สำหรับคีย์ "{{key}}": {{reason}}',
       'enhanced_demo_failed': 'ไม่สามารถรันการสาธิตคุณลักษณะ i18n ขั้นสูงได้: {{reason}}',
       'error_demo_failed': 'ไม่สามารถรันการสาธิตข้อความแสดงข้อผิดพลาดได้: {{reason}}',
       'formatting_demo_failed': 'ไม่สามารถรันการสาธิตการจัดรูปแบบได้: {{reason}}',
-      'formatting_test_failed': 'ไม่สามารถทดสอบฟังก์ชันการจัดรูปแบบได้สำหรับคีย์ \"{{key}}\": {{reason}}',
-      'languageNotSupported': 'ภาษา \"{{language}}\" ไม่ได้รับการสนับสนุน ภาษาที่ใช้ได้: {{supportedLanguages}}',
+      'formatting_test_failed': 'ไม่สามารถทดสอบฟังก์ชันการจัดรูปแบบได้สำหรับคีย์ "{{key}}": {{reason}}',
+      'languageNotSupported': 'ภาษา "{{language}}" ไม่ได้รับการสนับสนุน ภาษาที่ใช้ได้: {{supportedLanguages}}',
       'plurals_demo_failed': 'ไม่สามารถรันการสาธิตพหูพจน์ได้: {{reason}}',
-      'plurals_test_failed': 'ไม่สามารถทดสอบฟังก์ชันพหูพจน์ได้สำหรับคีย์ \"{{key}}\": {{reason}}',
-      'sectionNotFound': 'ไม่พบส่วนการแปล \"{{section}}\" สำหรับภาษา \"{{language}}\"',
+      'plurals_test_failed': 'ไม่สามารถทดสอบฟังก์ชันพหูพจน์ได้สำหรับคีย์ "{{key}}": {{reason}}',
+      'sectionNotFound': 'ไม่พบส่วนการแปล "{{section}}" สำหรับภาษา "{{language}}"',
       'success_demo_failed': 'ไม่สามารถรันการสาธิตข้อความแสดงความสำเร็จได้: {{reason}}',
       'translationsFailed': 'ไม่สามารถดึงข้อมูลการแปลได้: {{reason}}'
     },
@@ -495,7 +495,7 @@ export default {
       'webhookTimeout': 'Webhook หมดเวลาจาก {{serviceName}} หลังจาก {{timeout, number}}ms'
     },
     'kv': {
-      'accessDenied': 'การเข้าถึงถูกปฏิเสธสำหรับคีย์การกำหนดค่า \"{{key}}\" - ต้องการบทบาท {{requiredRole}}',
+      'accessDenied': 'การเข้าถึงถูกปฏิเสธสำหรับคีย์การกำหนดค่า "{{key}}" - ต้องการบทบาท {{requiredRole}}',
       'alertThresholdsRetrieveFailed': 'ไม่สามารถดึงข้อมูลเกณฑ์การแจ้งเตือนได้: {{reason}}',
       'auditConfigsRetrieveFailed': 'ไม่สามารถดึงข้อมูลการกำหนดค่าการตรวจสอบได้: {{reason}}',
       'batchUpdateFailed': 'การอัพเดทแบบกลุ่มล้มเหลวสำหรับ {{failedCount}} จาก {{totalCount}} การกำหนดค่า',
@@ -503,24 +503,24 @@ export default {
       'cacheClearFailed': 'ไม่สามารถล้างแคชการกำหนดค่าได้: {{reason}}',
       'cacheFailed': 'ล้มเหลวในการอัพเดทแคชการกำหนดค่า: {{reason}}',
       'complianceSettingsRetrieveFailed': 'ไม่สามารถดึงข้อมูลการตั้งค่าการปฏิบัติตามกฎระเบียบได้: {{reason}}',
-      'configResetFailed': 'ไม่สามารถรีเซ็ตการกำหนดค่า \"{{key}}\" ได้: {{reason}}',
-      'configRetrieveFailed': 'ไม่สามารถดึงข้อมูลการกำหนดค่า \"{{key}}\" ได้: {{reason}}',
+      'configResetFailed': 'ไม่สามารถรีเซ็ตการกำหนดค่า "{{key}}" ได้: {{reason}}',
+      'configRetrieveFailed': 'ไม่สามารถดึงข้อมูลการกำหนดค่า "{{key}}" ได้: {{reason}}',
       'configsCompareFailed': 'ไม่สามารถดึงข้อมูลการเปรียบเทียบสภาพแวดล้อมได้: {{reason}}',
       'configsRetrieveFailed': 'ไม่สามารถดึงข้อมูลการกำหนดค่าได้: {{reason}}',
-      'configUpdateFailed': 'ไม่สามารถอัปเดตการกำหนดค่า \"{{key}}\" ได้: {{reason}}',
+      'configUpdateFailed': 'ไม่สามารถอัปเดตการกำหนดค่า "{{key}}" ได้: {{reason}}',
       'exportSettingsRetrieveFailed': 'ไม่สามารถดึงข้อมูลการตั้งค่าการส่งออกได้: {{reason}}',
       'featureFlagsRetrieveFailed': 'ไม่สามารถดึงข้อมูลแฟล็กฟีเจอร์ได้: {{reason}}',
       'featureNotFound': 'ไม่พบฟีเจอร์หรือไม่ได้รับอนุญาต',
-      'featureToggleFailed': 'ไม่สามารถเปลี่ยนฟีเจอร์ \"{{feature}}\" ได้: {{reason}}',
+      'featureToggleFailed': 'ไม่สามารถเปลี่ยนฟีเจอร์ "{{feature}}" ได้: {{reason}}',
       'invalidFeatureValue': 'ค่าฟีเจอร์ไม่ถูกต้อง - ต้องเป็นค่าบูลีน',
-      'invalidKey': 'คีย์การกำหนดค่า \"{{key}}\" ไม่ได้รับอนุญาต - คีย์ที่ถูกต้อง: {{validKeys}}',
-      'keyNotFound': 'ไม่พบคีย์การกำหนดค่า \"{{key}}\"',
+      'invalidKey': 'คีย์การกำหนดค่า "{{key}}" ไม่ได้รับอนุญาต - คีย์ที่ถูกต้อง: {{validKeys}}',
+      'keyNotFound': 'ไม่พบคีย์การกำหนดค่า "{{key}}"',
       'performanceSettingsRetrieveFailed': 'ไม่สามารถดึงข้อมูลการตั้งค่าประสิทธิภาพได้: {{reason}}',
       'realtimeSettingsRetrieveFailed': 'ไม่สามารถดึงข้อมูลการตั้งค่าการตรวจสอบแบบเรียลไทม์ได้: {{reason}}',
-      'resetFailed': 'ล้มเหลวในการรีเซ็ตการกำหนดค่า \"{{key}}\" เป็นค่าเริ่มต้น: {{reason}}',
+      'resetFailed': 'ล้มเหลวในการรีเซ็ตการกำหนดค่า "{{key}}" เป็นค่าเริ่มต้น: {{reason}}',
       'retentionPoliciesRetrieveFailed': 'ไม่สามารถดึงข้อมูลนโยบายการเก็บรักษาได้: {{reason}}',
-      'updateFailed': 'ล้มเหลวในการอัพเดทการกำหนดค่า \"{{key}}\": {{reason}}',
-      'valueInvalid': 'ค่าไม่ถูกต้องสำหรับการกำหนดค่า \"{{key}}\": คาดหวัง {{expectedType}}, ได้รับ {{actualType}}'
+      'updateFailed': 'ล้มเหลวในการอัพเดทการกำหนดค่า "{{key}}": {{reason}}',
+      'valueInvalid': 'ค่าไม่ถูกต้องสำหรับการกำหนดค่า "{{key}}": คาดหวัง {{expectedType}}, ได้รับ {{actualType}}'
     },
     'kvAdmin': {
       'alertThresholdsRetrieveFailed': 'ไม่สามารถดึงเกณฑ์การแจ้งเตือนสำหรับ {{actor}} ได้ (เหตุผล: {{reason}}, การดำเนินการ: {{operation}})',
@@ -631,7 +631,7 @@ export default {
       'licenseInvalid': 'ใบอนุญาตระบบไม่ถูกต้อง: {{reason}}',
       'maintenanceMode': 'ระบบอยู่ในระหว่างการบำรุงรักษาจนถึง {{endTime, datetime}} - {{message}}',
       'memoryExhausted': 'การใช้หน่วยความจำเซิร์ฟเวอร์อยู่ในภาวะวิกฤต: {{currentUsage, number}}MB / {{maxMemory, number}}MB',
-      'operationFailed': 'การดำเนินการระบบ \"{{operation}}\" ล้มเหลว: {{reason}}',
+      'operationFailed': 'การดำเนินการระบบ "{{operation}}" ล้มเหลว: {{reason}}',
       'rateLimited': 'ระบบถูกจำกัดอัตราชั่วคราว: {{currentRequests}}/{{maxRequests}} คำขอภายใน {{timeWindow}}',
       'resourceExhausted': 'ทรัพยากรระบบหมด: {{resource}} ที่ {{usage, number}}% ของความสามารถ',
       'serverError': 'เกิดข้อผิดพลาดภายในเซิร์ฟเวอร์',
@@ -652,7 +652,7 @@ export default {
       'inactive': 'บัญชีผู้ใช้ {{userName}} ไม่ได้ใช้งาน',
       'insufficientPermissions': 'สิทธิ์ไม่เพียงพอในการแก้ไขผู้ใช้ {{userName}} ({{userRole}})',
       'listFailed': 'ล้มเหลวในการดึงรายชื่อผู้ใช้: {{reason}}',
-      'notFound': 'ผู้ใช้ \"{{userName}}\" ไม่พบหรือถูกลบแล้ว',
+      'notFound': 'ผู้ใช้ "{{userName}}" ไม่พบหรือถูกลบแล้ว',
       'notFoundById': 'ไม่พบผู้ใช้ที่มี ID {{userId}}',
       'passwordChangeFailed': 'ล้มเหลวในการเปลี่ยนรหัสผ่านสำหรับ {{userName}}: {{reason}}',
       'passwordIncorrect': 'รหัสผ่านปัจจุบันไม่ถูกต้อง - กรุณาลองใหม่',
@@ -662,14 +662,14 @@ export default {
       'roleChangeFailed': 'ล้มเหลวในการเปลี่ยนบทบาทสำหรับ {{userName}} จาก {{oldRole}} เป็น {{newRole}}: {{reason}}',
       'sessionLimitExceeded': 'ผู้ใช้ {{userName}} เกินขีดจำกัดเซสชันที่เกิดขึ้นพร้อมกันสูงสุด ({{currentSessions}}/{{maxSessions}})',
       'updateFailed': 'ล้มเหลวในการอัพเดทโปรไฟล์ผู้ใช้สำหรับ {{userName}}: {{reason}}',
-      'usernameExists': 'ชื่อผู้ใช้ \"{{username}}\" ถูกใช้แล้ว'
+      'usernameExists': 'ชื่อผู้ใช้ "{{username}}" ถูกใช้แล้ว'
     },
     'zodDemo': {
       'file': {
-        'uploadFailed': 'การอัปโหลดไฟล์ล้มเหลว - {{actor}} ไม่สามารถดำเนินการ {{operation}} สำหรับ \"{{fileName}}\" ({{fileSize}} ไบต์) ได้: {{reason}}'
+        'uploadFailed': 'การอัปโหลดไฟล์ล้มเหลว - {{actor}} ไม่สามารถดำเนินการ {{operation}} สำหรับ "{{fileName}}" ({{fileSize}} ไบต์) ได้: {{reason}}'
       },
       'search': {
-        'failed': 'การค้นหาล้มเหลว - {{actor}} ไม่สามารถดำเนินการ {{operation}} สำหรับคำค้น \"{{query}}\" ({{searchType}}) ได้: {{reason}}'
+        'failed': 'การค้นหาล้มเหลว - {{actor}} ไม่สามารถดำเนินการ {{operation}} สำหรับคำค้น "{{query}}" ({{searchType}}) ได้: {{reason}}'
       },
       'user': {
         'registrationFailed': 'การลงทะเบียนผู้ใช้ล้มเหลว - {{actor}} ไม่สามารถดำเนินการ {{operation}} ให้กับ {{userName}} ({{email}}) ได้: {{reason}}'
@@ -681,7 +681,7 @@ export default {
     'schemaViolation': 'การละเมิด Schema ข้อมูล: {{violations}}',
     'validation': 'เกิดข้อผิดพลาดในการตรวจสอบ: {{details}}',
     'validation_other': 'เกิดข้อผิดพลาดในการตรวจสอบ {{count}} ข้อ: {{details}}',
-    'validationField': 'การตรวจสอบล้มเหลวสำหรับฟิลด์ \"{{field}}\": {{error}}',
+    'validationField': 'การตรวจสอบล้มเหลวสำหรับฟิลด์ "{{field}}": {{error}}',
     'validationGeneric': 'ข้อผิดพลาดการตรวจสอบ',
     'validationMultiple': 'ข้อผิดพลาดการตรวจสอบหลายข้อในฟิลด์ {{count}} ฟิลด์',
     'validationMultiple_other': 'ข้อผิดพลาดการตรวจสอบหลายข้อในฟิลด์ {{count}} ฟิลด์'
@@ -789,7 +789,7 @@ export default {
       'passwordChanged': 'เปลี่ยนรหัสผ่านสำเร็จสำหรับ {{userName}} ที่ {{changeTime}}',
       'passwordReset': 'ส่งอีเมลรีเซ็ตรหัสผ่านไปยัง {{email}} - หมดอายุใน {{expiryMinutes}} นาที',
       'passwordReset_other': 'ส่งอีเมลรีเซ็ตรหัสผ่านไปยัง {{email}} - หมดอายุใน {{expiryMinutes}} นาที',
-      'permissionGranted': 'อนุญาตสิทธิ์ \"{{permission}}\" ให้ {{userName}}',
+      'permissionGranted': 'อนุญาตสิทธิ์ "{{permission}}" ให้ {{userName}}',
       'rateLimitReset': 'รีเซ็ตขีดจำกัดอัตราสำเร็จสำหรับ {{ipAddress}}',
       'roleAssigned': 'มอบหมายบทบาท {{newRole}} สำเร็จให้ {{userName}} โดย {{assignedBy}}',
       'sessionCreated': 'สร้างเซสชันผู้ใช้ใหม่ที่มีอายุ {{sessionDuration}} นาที',
@@ -803,33 +803,33 @@ export default {
       'auditPassed_other': 'การตรวจสอบทางธุรกิจผ่านด้วยคะแนน {{auditScore, number}}% - {{criteriaCount}} เกณฑ์ได้รับการปฏิบัติตาม',
       'complianceVerified': 'การตรวจสอบการปฏิบัติตามข้อกำหนดเสร็จสมบูรณ์ - {{standardsCount}} มาตรฐานได้รับการตรวจสอบ',
       'complianceVerified_other': 'การตรวจสอบการปฏิบัติตามข้อกำหนดเสร็จสมบูรณ์ - {{standardsCount}} มาตรฐานได้รับการตรวจสอบ',
-      'operationApproved': 'การดำเนินการทางธุรกิจ \"{{operation}}\" ได้รับอนุมัติโดย {{approvedBy}}',
+      'operationApproved': 'การดำเนินการทางธุรกิจ "{{operation}}" ได้รับอนุมัติโดย {{approvedBy}}',
       'processAutomated': 'กระบวนการทางธุรกิจถูกทำให้เป็นอัตโนมัติสำเร็จ - {{automatedTasks}} งานถูกทำให้เป็นอัตโนมัติ',
       'processAutomated_other': 'กระบวนการทางธุรกิจถูกทำให้เป็นอัตโนมัติสำเร็จ - {{automatedTasks}} งานถูกทำให้เป็นอัตโนมัติ',
-      'ruleApplied': 'กฎทางธุรกิจ \"{{ruleName}}\" ถูกนำไปใช้สำเร็จกับ {{affectedRecords}} รายการ',
-      'ruleApplied_other': 'กฎทางธุรกิจ \"{{ruleName}}\" ถูกนำไปใช้สำเร็จกับ {{affectedRecords}} รายการ',
+      'ruleApplied': 'กฎทางธุรกิจ "{{ruleName}}" ถูกนำไปใช้สำเร็จกับ {{affectedRecords}} รายการ',
+      'ruleApplied_other': 'กฎทางธุรกิจ "{{ruleName}}" ถูกนำไปใช้สำเร็จกับ {{affectedRecords}} รายการ',
       'validationPassed': 'การตรวจสอบทางธุรกิจผ่านสำหรับ {{entityType}} - การตรวจสอบทั้งหมด {{checkCount}} รายการสำเร็จ',
       'validationPassed_other': 'การตรวจสอบทางธุรกิจผ่านสำหรับ {{entityType}} - การตรวจสอบทั้งหมด {{checkCount}} รายการสำเร็จ',
-      'workflowCompleted': 'Workflow \"{{workflowName}}\" เสร็จสมบูรณ์ใน {{steps}} ขั้นตอน',
-      'workflowCompleted_other': 'Workflow \"{{workflowName}}\" เสร็จสมบูรณ์ใน {{steps}} ขั้นตอน'
+      'workflowCompleted': 'Workflow "{{workflowName}}" เสร็จสมบูรณ์ใน {{steps}} ขั้นตอน',
+      'workflowCompleted_other': 'Workflow "{{workflowName}}" เสร็จสมบูรณ์ใน {{steps}} ขั้นตอน'
     },
     'file': {
-      'backup': 'สร้างสำรองข้อมูลไฟล์สำเร็จสำหรับ \"{{filename}}\"',
+      'backup': 'สร้างสำรองข้อมูลไฟล์สำเร็จสำหรับ "{{filename}}"',
       'compressed': 'บีบอัดไฟล์สำเร็จ - ลดขนาดลง {{compressionRatio, number}}%',
       'converted': 'แปลงไฟล์สำเร็จจาก {{sourceFormat}} เป็น {{targetFormat}}',
       'copied': 'คัดลอกไฟล์สำเร็จไปยัง {{destinationPath}}',
-      'deleted': 'ลบไฟล์ \"{{filename}}\" สำเร็จ',
-      'downloadCompleted': 'ดาวน์โหลดไฟล์ \"{{filename}}\" สำเร็จ',
+      'deleted': 'ลบไฟล์ "{{filename}}" สำเร็จ',
+      'downloadCompleted': 'ดาวน์โหลดไฟล์ "{{filename}}" สำเร็จ',
       'extracted': 'แตกไฟล์บีบอัดสำเร็จ - แตกไฟล์ {{extractedCount}} ไฟล์',
       'extracted_other': 'แตกไฟล์บีบอัดสำเร็จ - แตกไฟล์ {{extractedCount}} ไฟล์',
       'moved': 'ย้ายไฟล์สำเร็จจาก {{sourcePath}} ไปยัง {{destinationPath}}',
-      'processingCompleted': 'ประมวลผลไฟล์เสร็จสิ้นสำหรับ \"{{filename}}\" - ดำเนินการ {{operationsCount}} การดำเนินการ',
-      'processingCompleted_other': 'ประมวลผลไฟล์เสร็จสิ้นสำหรับ \"{{filename}}\" - ดำเนินการ {{operationsCount}} การดำเนินการ',
+      'processingCompleted': 'ประมวลผลไฟล์เสร็จสิ้นสำหรับ "{{filename}}" - ดำเนินการ {{operationsCount}} การดำเนินการ',
+      'processingCompleted_other': 'ประมวลผลไฟล์เสร็จสิ้นสำหรับ "{{filename}}" - ดำเนินการ {{operationsCount}} การดำเนินการ',
       'restored': 'กู้คืนไฟล์สำเร็จจากสำรองข้อมูลที่สร้างเมื่อ {{backupDate, date}}',
-      'uploadCompleted': 'อัพโหลดไฟล์ \"{{filename}}\" สำเร็จ ({{fileSize}})',
+      'uploadCompleted': 'อัพโหลดไฟล์ "{{filename}}" สำเร็จ ({{fileSize}})',
       'uploadsBatch': 'อัพโหลดแบบกลุ่มเสร็จสิ้น: {{successCount}}/{{totalCount}} ไฟล์ประมวลผล',
       'uploadsBatch_other': 'อัพโหลดแบบกลุ่มเสร็จสิ้น: {{successCount}}/{{totalCount}} ไฟล์ประมวลผล',
-      'validated': 'การตรวจสอบไฟล์ผ่านสำหรับ \"{{filename}}\" - รูปแบบ: {{fileFormat}}'
+      'validated': 'การตรวจสอบไฟล์ผ่านสำหรับ "{{filename}}" - รูปแบบ: {{fileFormat}}'
     },
     'integration': {
       'apiCall': 'การเรียก API ไปยัง {{serviceName}} เสร็จสมบูรณ์ใน {{responseTime, number}}ms',
@@ -847,7 +847,7 @@ export default {
     'kv': {
       'configs': {
         'comparisonRetrieved': 'ดึงข้อมูลการเปรียบเทียบสภาพแวดล้อมโดย {{actor}} - KV: {{kvCount}}, ENV: {{envCount}}, เริ่มต้น: {{defaultCount}}',
-        'configRetrieved': 'ดึงข้อมูลการกำหนดค่า \"{{key}}\" โดย {{actor}}: {{value}} (เริ่มต้น: {{isDefault}})',
+        'configRetrieved': 'ดึงข้อมูลการกำหนดค่า "{{key}}" โดย {{actor}}: {{value}} (เริ่มต้น: {{isDefault}})',
         'defaultsRetrieved': 'ดึงข้อมูลการกำหนดค่าเริ่มต้นโดย {{actor}} ({{keyCount}} คีย์)',
         'retrieved': 'ดึงข้อมูลการกำหนดค่า {{configCount}} รายการสำเร็จโดย {{actor}} ({{allowedKeys}} คีย์ที่อนุญาต)'
       },
@@ -856,9 +856,9 @@ export default {
         'enabled': 'เปิดใช้งาน'
       },
       'adminCacheCleared': 'ล้างแคชการกำหนดค่าโดย {{actor}}',
-      'adminConfigReset': 'รีเซ็ตการกำหนดค่า \"{{key}}\" เป็นค่าเริ่มต้นโดย {{actor}} - เดิม: {{oldValue}}, ตอนนี้: {{defaultValue}}',
-      'adminConfigUpdated': 'อัปเดตการกำหนดค่า \"{{key}}\" โดย {{actor}} จาก {{oldValue}} เป็น {{newValue}}',
-      'adminFeatureToggled': 'เปลี่ยนฟีเจอร์ \"{{feature}}\" โดย {{actor}}: {{previousValue}} → {{newValue}}',
+      'adminConfigReset': 'รีเซ็ตการกำหนดค่า "{{key}}" เป็นค่าเริ่มต้นโดย {{actor}} - เดิม: {{oldValue}}, ตอนนี้: {{defaultValue}}',
+      'adminConfigUpdated': 'อัปเดตการกำหนดค่า "{{key}}" โดย {{actor}} จาก {{oldValue}} เป็น {{newValue}}',
+      'adminFeatureToggled': 'เปลี่ยนฟีเจอร์ "{{feature}}" โดย {{actor}}: {{previousValue}} → {{newValue}}',
       'auditConfigsRetrieved': 'ดึงข้อมูลการกำหนดค่าการตรวจสอบโดย {{actor}} ({{configCount}} การกำหนดค่า)',
       'auditPerformanceRetrieved': 'ดึงข้อมูลการตั้งค่าประสิทธิภาพการตรวจสอบโดย {{actor}} ({{settingCount}} การตั้งค่า)',
       'auditRetentionRetrieved': 'ดึงข้อมูลนโยบายการเก็บรักษาการตรวจสอบโดย {{actor}} ({{policyCount}} นโยบาย)',
@@ -868,19 +868,19 @@ export default {
       'batchUpdateCompleted': 'การอัพเดทการกำหนดค่าแบบกลุ่มเสร็จสิ้น: {{successCount}}/{{totalCount}} สำเร็จ',
       'cacheCleared': 'ล้างแคชการกำหนดค่าสำเร็จ - ลบ {{clearedCount}} รายการ',
       'cacheCleared_other': 'ล้างแคชการกำหนดค่าสำเร็จ - ลบ {{clearedCount}} รายการ',
-      'configReset': 'รีเซ็ตการกำหนดค่า \"{{key}}\" เป็นค่าเริ่มต้น: {{defaultValue}}',
-      'configRetrieved': 'ดึงการกำหนดค่า \"{{key}}\" สำเร็จ: {{value}}',
-      'configUpdated': 'อัพเดทการกำหนดค่า \"{{key}}\" สำเร็จจาก {{oldValue}} เป็น {{newValue}}',
+      'configReset': 'รีเซ็ตการกำหนดค่า "{{key}}" เป็นค่าเริ่มต้น: {{defaultValue}}',
+      'configRetrieved': 'ดึงการกำหนดค่า "{{key}}" สำเร็จ: {{value}}',
+      'configUpdated': 'อัพเดทการกำหนดค่า "{{key}}" สำเร็จจาก {{oldValue}} เป็น {{newValue}}',
       'defaultsRestored': 'คืนค่าการกำหนดค่าเริ่มต้นสำเร็จสำหรับ {{restoredCount}} คีย์',
       'defaultsRestored_other': 'คืนค่าการกำหนดค่าเริ่มต้นสำเร็จสำหรับ {{restoredCount}} คีย์',
-      'featureToggled': 'คุณสมบัติ \"{{feature}}\" {{status}} สำเร็จ'
+      'featureToggled': 'คุณสมบัติ "{{feature}}" {{status}} สำเร็จ'
     },
     'operation': {
       'batchProcessed': 'การดำเนินการแบบกลุ่มเสร็จสิ้น: ประมวลผล {{successCount}}/{{totalCount}} รายการสำเร็จ',
-      'completed': 'การดำเนินการ \"{{operationType}}\" เสร็จสิ้นสำเร็จใน {{duration}}ms',
+      'completed': 'การดำเนินการ "{{operationType}}" เสร็จสิ้นสำเร็จใน {{duration}}ms',
       'completed_other': 'การดำเนินการ {{count}} รายการเสร็จสิ้นสำเร็จ - เวลาเฉลี่ย: {{avgDuration}}ms',
-      'taskFinished': 'งาน \"{{taskName}}\" เสร็จสิ้นสำเร็จด้วย {{resultCount}} ผลลัพธ์',
-      'taskFinished_other': 'งาน \"{{taskName}}\" เสร็จสิ้นสำเร็จด้วย {{resultCount}} ผลลัพธ์',
+      'taskFinished': 'งาน "{{taskName}}" เสร็จสิ้นสำเร็จด้วย {{resultCount}} ผลลัพธ์',
+      'taskFinished_other': 'งาน "{{taskName}}" เสร็จสิ้นสำเร็จด้วย {{resultCount}} ผลลัพธ์',
       'workflowCompleted': 'เวิร์กโฟลว์เสร็จสิ้นสำเร็จ - ดำเนินการ {{stepsCount}} ขั้นตอน',
       'workflowCompleted_other': 'เวิร์กโฟลว์เสร็จสิ้นสำเร็จ - ดำเนินการ {{stepsCount}} ขั้นตอน'
     },
@@ -920,16 +920,16 @@ export default {
     },
     'security': {
       'incident': {
-        'created': '{{actor}} สร้างเหตุการณ์ความปลอดภัย \"{{title}}\" ระดับความรุนแรง {{severity}} (ID: {{incidentId}}, ประเภท: {{type}})',
+        'created': '{{actor}} สร้างเหตุการณ์ความปลอดภัย "{{title}}" ระดับความรุนแรง {{severity}} (ID: {{incidentId}}, ประเภท: {{type}})',
         'responseExecuted': '{{actor}} ดำเนินการตอบสนอง {{actionCount}} รายการสำหรับเหตุการณ์ {{incidentId}} (ประเภท: {{actionType}}) เมื่อ {{executedAt}}',
         'retrieved': '{{actor}} ดึงข้อมูลรายละเอียดเหตุการณ์ {{incidentId}} (สถานะ: {{status}}, ความรุนแรง: {{severity}}, สร้างเมื่อ: {{createdAt}})',
-        'statusUpdated': '{{actor}} อัปเดตสถานะเหตุการณ์ {{incidentId}} จาก \"{{oldStatus}}\" เป็น \"{{newStatus}}\" เมื่อ {{timestamp}}'
+        'statusUpdated': '{{actor}} อัปเดตสถานะเหตุการณ์ {{incidentId}} จาก "{{oldStatus}}" เป็น "{{newStatus}}" เมื่อ {{timestamp}}'
       },
       'incidents': {
-        'created': '{{actor}} สร้างเหตุการณ์ความปลอดภัย \"{{title}}\" ระดับความรุนแรง {{severity}} (ID: {{incidentId}}, ประเภท: {{type}})',
+        'created': '{{actor}} สร้างเหตุการณ์ความปลอดภัย "{{title}}" ระดับความรุนแรง {{severity}} (ID: {{incidentId}}, ประเภท: {{type}})',
         'responseExecuted': '{{actor}} ดำเนินการตอบสนอง {{actionCount}} รายการสำหรับเหตุการณ์ {{incidentId}} (ประเภท: {{actionType}}) เมื่อ {{executedAt}}',
         'retrieved': '{{actor}} ดึงข้อมูลเหตุการณ์ความปลอดภัย {{incidentCount}} รายการสำเร็จ (หน้า {{page}}, จำกัด {{limit}}, ตัวกรอง: {{filters}})',
-        'statusUpdated': '{{actor}} อัปเดตสถานะเหตุการณ์ {{incidentId}} จาก \"{{oldStatus}}\" เป็น \"{{newStatus}}\" เมื่อ {{timestamp}}'
+        'statusUpdated': '{{actor}} อัปเดตสถานะเหตุการณ์ {{incidentId}} จาก "{{oldStatus}}" เป็น "{{newStatus}}" เมื่อ {{timestamp}}'
       },
       'monitoring': {
         'started': 'เริ่มการตรวจสอบแบบเรียลไทม์สำเร็จ'
@@ -952,7 +952,7 @@ export default {
       'databaseConnected': 'เชื่อมต่อฐานข้อมูลสำเร็จไปยัง {{databaseName}}',
       'healthCheckPassed': 'ตรวจสอบสุขภาพระบบผ่าน - คอมโพเนนต์ {{componentCount}} คอมโพเนนต์สุขภาพดี',
       'healthCheckPassed_other': 'ตรวจสอบสุขภาพระบบผ่าน - คอมโพเนนต์ {{componentCount}} คอมโพเนนต์สุขภาพดี',
-      'operationCompleted': 'การดำเนินการระบบ \"{{operation}}\" เสร็จสิ้นใน {{duration, number}}ms',
+      'operationCompleted': 'การดำเนินการระบบ "{{operation}}" เสร็จสิ้นใน {{duration, number}}ms',
       'queueProcessed': 'ประมวลผลคิวงานสำเร็จ - งาน {{processedCount}} งานเสร็จสิ้น',
       'queueProcessed_other': 'ประมวลผลคิวงานสำเร็จ - งาน {{processedCount}} งานเสร็จสิ้น',
       'resourceAllocated': 'จัดสรรทรัพยากรระบบสำเร็จ: หน่วยความจำ {{allocatedMemory, number}}MB',
@@ -1464,7 +1464,7 @@ export default {
     'retentionPolicyUpdate': {
       'atLeastOneFieldRequired': 'ต้องอัปเดตอย่างน้อยหนึ่งฟิลด์',
       'atLeastOneFieldRequired_other': 'ต้องอัปเดตอย่างน้อย {{min}} ฟิลด์',
-      'immutableField': 'ฟิลด์ \"{{field}}\" ไม่สามารถแก้ไขได้หลังจากสร้าง',
+      'immutableField': 'ฟิลด์ "{{field}}" ไม่สามารถแก้ไขได้หลังจากสร้าง',
       'invalid': 'การอัปเดตนโยบายการเก็บรักษาไม่ถูกต้อง'
     },
     'security': {
@@ -1478,7 +1478,7 @@ export default {
         'invalid': 'โครงสร้างการกำหนดค่าไม่ถูกต้อง'
       },
       'configUpdate': {
-        'invalid': 'รูปแบบการอัปเดตการกำหนดค่าไม่ถูกต้อง ขาดฟิลด์ที่จำเป็น \"value\" หรือมีฟิลด์ที่ไม่รู้จัก'
+        'invalid': 'รูปแบบการอัปเดตการกำหนดค่าไม่ถูกต้อง ขาดฟิลด์ที่จำเป็น "value" หรือมีฟิลด์ที่ไม่รู้จัก'
       },
       'incidentCreation': {
         'invalid': 'โครงสร้างการสร้างเหตุการณ์ไม่ถูกต้อง'
@@ -1521,11 +1521,11 @@ export default {
       'invalid': 'ชื่อผู้ใช้สามารถมีได้เฉพาะตัวอักษร, ตัวเลข และขีดล่างเท่านั้น',
       'invalidCharacters': 'ชื่อผู้ใช้สามารถมีได้เฉพาะตัวอักษร, ตัวเลข และขีดล่างเท่านั้น',
       'required': 'ต้องระบุชื่อผู้ใช้',
-      'reserved': 'ชื่อผู้ใช้ \"{{username}}\" ถูกจองไว้และไม่สามารถใช้ได้',
+      'reserved': 'ชื่อผู้ใช้ "{{username}}" ถูกจองไว้และไม่สามารถใช้ได้',
       'tooLong': 'ชื่อผู้ใช้ต้องไม่เกิน 30 ตัวอักษร',
       'tooShort': 'ชื่อผู้ใช้ต้องมีความยาวอย่างน้อย 3 ตัวอักษร',
       'tooShort_other': 'ชื่อผู้ใช้ต้องมีความยาวอย่างน้อย {{minLength}} ตัวอักษร',
-      'unavailable': 'ชื่อผู้ใช้ \"{{username}}\" ไม่พร้อมใช้งาน'
+      'unavailable': 'ชื่อผู้ใช้ "{{username}}" ไม่พร้อมใช้งาน'
     },
     'filterArrayTooLarge': 'อาร์เรย์ตัวกรองใหญ่เกินไป (สูงสุด 500 รายการ)',
     'filterArrayTooLarge_other': 'อาร์เรย์ตัวกรองที่มี {{count}} รายการเกินค่าสูงสุด {{max}}',

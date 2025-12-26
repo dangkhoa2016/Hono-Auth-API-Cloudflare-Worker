@@ -364,7 +364,7 @@ export default {
         'failed': 'No se pudo recuperar análisis de comportamiento - {{actor}} no pudo completar {{operation}} para {{timeframe}} dirigido a {{targetRole}}: {{reason}}'
       },
       'compliance': {
-        'customComplianceFailed': 'No se pudo generar informe de cumplimiento personalizado - {{actor}} no pudo completar {{operation}} para \"{{reportName}}\" ({{reportType}}): {{reason}}',
+        'customComplianceFailed': 'No se pudo generar informe de cumplimiento personalizado - {{actor}} no pudo completar {{operation}} para "{{reportName}}" ({{reportType}}): {{reason}}',
         'failed': 'No se pudo generar informe de cumplimiento - {{actor}} no pudo completar {{operation}} para {{timeframe}} con formato {{format}}: {{reason}}',
         'reportFailed': 'No se pudo generar informe de cumplimiento - {{actor}} no pudo realizar {{operation}} para informe {{type}}: {{reason}}'
       },
@@ -398,7 +398,7 @@ export default {
         'retrieveFailed': 'Error al recuperar los registros de auditoría - {{actor}} encontró un error al realizar {{operation}}: {{reason}}'
       },
       'search': {
-        'searchFailed': 'Error al buscar en los registros de auditoría - {{actor}} no pudo completar {{operation}} con consulta \"{{query}}\": {{reason}}'
+        'searchFailed': 'Error al buscar en los registros de auditoría - {{actor}} no pudo completar {{operation}} con consulta "{{query}}": {{reason}}'
       },
       'stats': {
         'statsFailed': 'Error al recuperar las estadísticas de auditoría - {{actor}} ({{role}}) no pudo realizar {{operation}}: {{reason}}'
@@ -447,22 +447,22 @@ export default {
       'businessHoursOnly': 'Operación solo permitida durante el horario comercial ({{businessHours}})',
       'conflictingOperation': 'Operación conflictiva en progreso: {{operation}}',
       'deadlineExpired': 'La fecha límite de la operación expiró el {{deadline, datetime}}',
-      'duplicateEntry': 'Entrada duplicada detectada: {{entity}} con {{field}} = \"{{value}}\"',
+      'duplicateEntry': 'Entrada duplicada detectada: {{entity}} con {{field}} = "{{value}}"',
       'insufficientBalance': 'Saldo insuficiente: {{available, currency}} disponible, {{required, currency}} requerido',
-      'operationNotAllowed': 'La operación \"{{operation}}\" no está permitida: {{reason}}',
+      'operationNotAllowed': 'La operación "{{operation}}" no está permitida: {{reason}}',
       'preconditionFailed': 'La condición previa falló: {{condition}}',
       'quotaReached': 'Límite de cuota alcanzado: {{used, number}}/{{limit, number}} {{resource}}',
       'referenceConstraint': 'No se puede eliminar {{entity}} - referenciado por {{referencingCount}} otro registro',
       'referenceConstraint_other': 'No se puede eliminar {{entity}} - referenciado por {{referencingCount}} otros registros',
-      'resourceLocked': 'El recurso \"{{resource}}\" está bloqueado por {{lockedBy}} hasta {{lockedUntil, datetime}}',
+      'resourceLocked': 'El recurso "{{resource}}" está bloqueado por {{lockedBy}} hasta {{lockedUntil, datetime}}',
       'workflowViolation': 'Violación de flujo de trabajo: {{step}} no se puede realizar en el estado actual {{currentState}}'
     },
     'file': {
-      'accessDenied': 'Acceso denegado al archivo \"{{filename}}\": {{reason}}',
+      'accessDenied': 'Acceso denegado al archivo "{{filename}}": {{reason}}',
       'corrupted': 'El archivo parece estar corrupto o incompleto',
       'formatUnsupported': 'Formato de archivo no admitido para la operación: {{operation}}',
-      'invalidType': 'El tipo de archivo \"{{fileType}}\" no está permitido - tipos admitidos: {{allowedTypes}}',
-      'notFound': 'Archivo \"{{filename}}\" no encontrado',
+      'invalidType': 'El tipo de archivo "{{fileType}}" no está permitido - tipos admitidos: {{allowedTypes}}',
+      'notFound': 'Archivo "{{filename}}" no encontrado',
       'processingFailed': 'Error al procesar el archivo: {{reason}}',
       'quotaExceeded': 'Cuota de almacenamiento excedida: {{used, number}}MB / {{quota, number}}MB',
       'tooLarge': 'El tamaño del archivo {{actualSize, number}}MB excede el límite de {{maxSize, number}}MB',
@@ -472,15 +472,15 @@ export default {
     },
     'i18n': {
       'context_demo_failed': 'No se pudo ejecutar la demostración de traducción contextual: {{reason}}',
-      'context_test_failed': 'No se pudo probar las traducciones contextuales para la clave \"{{key}}\": {{reason}}',
+      'context_test_failed': 'No se pudo probar las traducciones contextuales para la clave "{{key}}": {{reason}}',
       'enhanced_demo_failed': 'No se pudo ejecutar la demostración de funciones i18n avanzadas: {{reason}}',
       'error_demo_failed': 'No se pudo ejecutar la demostración de mensajes de error: {{reason}}',
       'formatting_demo_failed': 'No se pudo ejecutar la demostración de formato: {{reason}}',
-      'formatting_test_failed': 'No se pudo probar la funcionalidad de formato para la clave \"{{key}}\": {{reason}}',
-      'languageNotSupported': 'El idioma \"{{language}}\" no es compatible. Idiomas disponibles: {{supportedLanguages}}',
+      'formatting_test_failed': 'No se pudo probar la funcionalidad de formato para la clave "{{key}}": {{reason}}',
+      'languageNotSupported': 'El idioma "{{language}}" no es compatible. Idiomas disponibles: {{supportedLanguages}}',
       'plurals_demo_failed': 'No se pudo ejecutar la demostración de pluralización: {{reason}}',
-      'plurals_test_failed': 'No se pudo probar la funcionalidad de pluralización para la clave \"{{key}}\": {{reason}}',
-      'sectionNotFound': 'Sección de traducción \"{{section}}\" no encontrada para el idioma \"{{language}}\"',
+      'plurals_test_failed': 'No se pudo probar la funcionalidad de pluralización para la clave "{{key}}": {{reason}}',
+      'sectionNotFound': 'Sección de traducción "{{section}}" no encontrada para el idioma "{{language}}"',
       'success_demo_failed': 'No se pudo ejecutar la demostración de mensajes de éxito: {{reason}}',
       'translationsFailed': 'No se pudo recuperar la información de traducciones: {{reason}}'
     },
@@ -495,7 +495,7 @@ export default {
       'webhookTimeout': 'Tiempo de espera del webhook de {{serviceName}} después de {{timeout, number}}ms'
     },
     'kv': {
-      'accessDenied': 'Acceso denegado para la clave de configuración \"{{key}}\" - requiere el rol {{requiredRole}}',
+      'accessDenied': 'Acceso denegado para la clave de configuración "{{key}}" - requiere el rol {{requiredRole}}',
       'alertThresholdsRetrieveFailed': 'Error al recuperar umbrales de alerta: {{reason}}',
       'auditConfigsRetrieveFailed': 'Error al recuperar configuraciones de auditoría: {{reason}}',
       'batchUpdateFailed': 'La actualización por lotes falló para {{failedCount}} de {{totalCount}} configuración',
@@ -503,24 +503,24 @@ export default {
       'cacheClearFailed': 'Error al limpiar caché de configuración: {{reason}}',
       'cacheFailed': 'Error al actualizar la caché de configuración: {{reason}}',
       'complianceSettingsRetrieveFailed': 'Error al recuperar configuraciones de cumplimiento: {{reason}}',
-      'configResetFailed': 'Error al restablecer configuración \"{{key}}\": {{reason}}',
-      'configRetrieveFailed': 'Error al recuperar configuración \"{{key}}\": {{reason}}',
+      'configResetFailed': 'Error al restablecer configuración "{{key}}": {{reason}}',
+      'configRetrieveFailed': 'Error al recuperar configuración "{{key}}": {{reason}}',
       'configsCompareFailed': 'Error al recuperar comparación de entornos: {{reason}}',
       'configsRetrieveFailed': 'Error al recuperar configuraciones: {{reason}}',
-      'configUpdateFailed': 'Error al actualizar configuración \"{{key}}\": {{reason}}',
+      'configUpdateFailed': 'Error al actualizar configuración "{{key}}": {{reason}}',
       'exportSettingsRetrieveFailed': 'Error al recuperar configuraciones de exportación: {{reason}}',
       'featureFlagsRetrieveFailed': 'Error al recuperar indicadores de características: {{reason}}',
       'featureNotFound': 'Característica no encontrada o no permitida',
-      'featureToggleFailed': 'Error al alternar característica \"{{feature}}\": {{reason}}',
+      'featureToggleFailed': 'Error al alternar característica "{{feature}}": {{reason}}',
       'invalidFeatureValue': 'Valor de característica inválido - debe ser booleano',
-      'invalidKey': 'La clave de configuración \"{{key}}\" no está permitida - claves válidas: {{validKeys}}',
-      'keyNotFound': 'Clave de configuración \"{{key}}\" no encontrada',
+      'invalidKey': 'La clave de configuración "{{key}}" no está permitida - claves válidas: {{validKeys}}',
+      'keyNotFound': 'Clave de configuración "{{key}}" no encontrada',
       'performanceSettingsRetrieveFailed': 'Error al recuperar configuraciones de rendimiento: {{reason}}',
       'realtimeSettingsRetrieveFailed': 'Error al recuperar configuraciones de monitoreo en tiempo real: {{reason}}',
-      'resetFailed': 'Error al restablecer la configuración \"{{key}}\" al valor predeterminado: {{reason}}',
+      'resetFailed': 'Error al restablecer la configuración "{{key}}" al valor predeterminado: {{reason}}',
       'retentionPoliciesRetrieveFailed': 'Error al recuperar políticas de retención: {{reason}}',
-      'updateFailed': 'Error al actualizar la configuración \"{{key}}\": {{reason}}',
-      'valueInvalid': 'Valor no válido para la configuración \"{{key}}\": se esperaba {{expectedType}}, se obtuvo {{actualType}}'
+      'updateFailed': 'Error al actualizar la configuración "{{key}}": {{reason}}',
+      'valueInvalid': 'Valor no válido para la configuración "{{key}}": se esperaba {{expectedType}}, se obtuvo {{actualType}}'
     },
     'kvAdmin': {
       'alertThresholdsRetrieveFailed': 'Error al recuperar los umbrales de alerta para {{actor}} (Motivo: {{reason}}, Operación: {{operation}})',
@@ -631,7 +631,7 @@ export default {
       'licenseInvalid': 'Licencia del sistema no válida: {{reason}}',
       'maintenanceMode': 'El sistema está en mantenimiento hasta {{endTime, datetime}} - {{message}}',
       'memoryExhausted': 'Uso de memoria del servidor crítico: {{currentUsage, number}}MB / {{maxMemory, number}}MB',
-      'operationFailed': 'Operación del sistema \"{{operation}}\" fallida: {{reason}}',
+      'operationFailed': 'Operación del sistema "{{operation}}" fallida: {{reason}}',
       'rateLimited': 'Sistema temporalmente limitado: {{currentRequests}}/{{maxRequests}} solicitudes en {{timeWindow}}',
       'resourceExhausted': 'Recursos del sistema agotados: {{resource}} al {{usage, number}}% de capacidad',
       'serverError': 'Ocurrió un error interno del servidor',
@@ -652,7 +652,7 @@ export default {
       'inactive': 'La cuenta de usuario {{userName}} está inactiva',
       'insufficientPermissions': 'Permisos insuficientes para modificar el usuario {{userName}} ({{userRole}})',
       'listFailed': 'Error al recuperar la lista de usuarios: {{reason}}',
-      'notFound': 'Usuario \"{{userName}}\" no encontrado o ha sido eliminado',
+      'notFound': 'Usuario "{{userName}}" no encontrado o ha sido eliminado',
       'notFoundById': 'Usuario con ID {{userId}} no encontrado',
       'passwordChangeFailed': 'Error al cambiar la contraseña para {{userName}}: {{reason}}',
       'passwordIncorrect': 'La contraseña actual es incorrecta - por favor, inténtelo de nuevo',
@@ -662,14 +662,14 @@ export default {
       'roleChangeFailed': 'Error al cambiar el rol para {{userName}} de {{oldRole}} a {{newRole}}: {{reason}}',
       'sessionLimitExceeded': 'El usuario {{userName}} ha excedido el máximo de sesiones concurrentes ({{currentSessions}}/{{maxSessions}})',
       'updateFailed': 'Error al actualizar el perfil de usuario para {{userName}}: {{reason}}',
-      'usernameExists': 'El nombre de usuario \"{{username}}\" ya está en uso'
+      'usernameExists': 'El nombre de usuario "{{username}}" ya está en uso'
     },
     'zodDemo': {
       'file': {
-        'uploadFailed': 'Carga de archivo falló - {{actor}} no pudo completar {{operation}} para \"{{fileName}}\" ({{fileSize}} bytes): {{reason}}'
+        'uploadFailed': 'Carga de archivo falló - {{actor}} no pudo completar {{operation}} para "{{fileName}}" ({{fileSize}} bytes): {{reason}}'
       },
       'search': {
-        'failed': 'Operación de búsqueda falló - {{actor}} no pudo completar {{operation}} para consulta \"{{query}}\" ({{searchType}}): {{reason}}'
+        'failed': 'Operación de búsqueda falló - {{actor}} no pudo completar {{operation}} para consulta "{{query}}" ({{searchType}}): {{reason}}'
       },
       'user': {
         'registrationFailed': 'Registro de usuario falló - {{actor}} no pudo completar {{operation}} para {{userName}} ({{email}}): {{reason}}'
@@ -681,7 +681,7 @@ export default {
     'schemaViolation': 'Violación del esquema de datos: {{violations}}',
     'validation': 'Error de validación: {{details}}',
     'validation_other': '{{count}} errores de validación: {{details}}',
-    'validationField': 'La validación falló para el campo \"{{field}}\": {{error}}',
+    'validationField': 'La validación falló para el campo "{{field}}": {{error}}',
     'validationGeneric': 'Error de validación',
     'validationMultiple': 'Múltiples errores de validación en {{count}} campo',
     'validationMultiple_other': 'Múltiples errores de validación en {{count}} campos'
@@ -789,7 +789,7 @@ export default {
       'passwordChanged': 'Contraseña cambiada exitosamente para {{userName}} el {{changeTime}}',
       'passwordReset': 'Correo electrónico de restablecimiento de contraseña enviado a {{email}} - expira en {{expiryMinutes}} minuto',
       'passwordReset_other': 'Correo electrónico de restablecimiento de contraseña enviado a {{email}} - expira en {{expiryMinutes}} minutos',
-      'permissionGranted': 'Permiso \"{{permission}}\" otorgado a {{userName}}',
+      'permissionGranted': 'Permiso "{{permission}}" otorgado a {{userName}}',
       'rateLimitReset': 'Límite de tasa restablecido exitosamente para {{ipAddress}}',
       'roleAssigned': 'Rol {{newRole}} asignado exitosamente a {{userName}} por {{assignedBy}}',
       'sessionCreated': 'Nueva sesión de usuario creada con {{sessionDuration}} minuto de validez',
@@ -803,33 +803,33 @@ export default {
       'auditPassed_other': 'Auditoría comercial superada con una puntuación de {{auditScore, number}}% - {{criteriaCount}} criterios cumplidos',
       'complianceVerified': 'Verificación de cumplimiento completada - {{standardsCount}} estándar verificado',
       'complianceVerified_other': 'Verificación de cumplimiento completada - {{standardsCount}} estándares verificados',
-      'operationApproved': 'Operación comercial \"{{operation}}\" aprobada por {{approvedBy}}',
+      'operationApproved': 'Operación comercial "{{operation}}" aprobada por {{approvedBy}}',
       'processAutomated': 'Proceso comercial automatizado exitosamente - {{automatedTasks}} tarea automatizada',
       'processAutomated_other': 'Proceso comercial automatizado exitosamente - {{automatedTasks}} tareas automatizadas',
-      'ruleApplied': 'Regla comercial \"{{ruleName}}\" aplicada exitosamente a {{affectedRecords}} registro',
-      'ruleApplied_other': 'Regla comercial \"{{ruleName}}\" aplicada exitosamente a {{affectedRecords}} registros',
+      'ruleApplied': 'Regla comercial "{{ruleName}}" aplicada exitosamente a {{affectedRecords}} registro',
+      'ruleApplied_other': 'Regla comercial "{{ruleName}}" aplicada exitosamente a {{affectedRecords}} registros',
       'validationPassed': 'Validación comercial superada para {{entityType}} - todas las {{checkCount}} verificaciones exitosas',
       'validationPassed_other': 'Validación comercial superada para {{entityType}} - todas las {{checkCount}} verificaciones exitosas',
-      'workflowCompleted': 'Flujo de trabajo \"{{workflowName}}\" completado exitosamente en {{steps}} paso',
-      'workflowCompleted_other': 'Flujo de trabajo \"{{workflowName}}\" completado exitosamente en {{steps}} pasos'
+      'workflowCompleted': 'Flujo de trabajo "{{workflowName}}" completado exitosamente en {{steps}} paso',
+      'workflowCompleted_other': 'Flujo de trabajo "{{workflowName}}" completado exitosamente en {{steps}} pasos'
     },
     'file': {
-      'backup': 'Copia de seguridad del archivo creada exitosamente para \"{{filename}}\"',
+      'backup': 'Copia de seguridad del archivo creada exitosamente para "{{filename}}"',
       'compressed': 'Archivo comprimido exitosamente - tamaño reducido en {{compressionRatio, number}}%',
       'converted': 'Archivo convertido exitosamente de {{sourceFormat}} a {{targetFormat}}',
       'copied': 'Archivo copiado exitosamente a {{destinationPath}}',
-      'deleted': 'Archivo \"{{filename}}\" eliminado exitosamente',
-      'downloadCompleted': 'Archivo \"{{filename}}\" descargado exitosamente',
+      'deleted': 'Archivo "{{filename}}" eliminado exitosamente',
+      'downloadCompleted': 'Archivo "{{filename}}" descargado exitosamente',
       'extracted': 'Archivo extraído exitosamente - {{extractedCount}} archivo extraído',
       'extracted_other': 'Archivo extraído exitosamente - {{extractedCount}} archivos extraídos',
       'moved': 'Archivo movido exitosamente de {{sourcePath}} a {{destinationPath}}',
-      'processingCompleted': 'Procesamiento de archivo completado para \"{{filename}}\" - {{operationsCount}} operación realizada',
-      'processingCompleted_other': 'Procesamiento de archivo completado para \"{{filename}}\" - {{operationsCount}} operaciones realizadas',
+      'processingCompleted': 'Procesamiento de archivo completado para "{{filename}}" - {{operationsCount}} operación realizada',
+      'processingCompleted_other': 'Procesamiento de archivo completado para "{{filename}}" - {{operationsCount}} operaciones realizadas',
       'restored': 'Archivo restaurado exitosamente desde la copia de seguridad creada el {{backupDate, date}}',
-      'uploadCompleted': 'Archivo \"{{filename}}\" cargado exitosamente ({{fileSize}})',
+      'uploadCompleted': 'Archivo "{{filename}}" cargado exitosamente ({{fileSize}})',
       'uploadsBatch': 'Carga por lotes completada: {{successCount}}/{{totalCount}} archivo procesado',
       'uploadsBatch_other': 'Carga por lotes completada: {{successCount}}/{{totalCount}} archivos procesados',
-      'validated': 'Validación de archivo superada para \"{{filename}}\" - formato: {{fileFormat}}'
+      'validated': 'Validación de archivo superada para "{{filename}}" - formato: {{fileFormat}}'
     },
     'integration': {
       'apiCall': 'Llamada a la API a {{serviceName}} completada exitosamente en {{responseTime, number}}ms',
@@ -847,7 +847,7 @@ export default {
     'kv': {
       'configs': {
         'comparisonRetrieved': 'Comparación de entorno recuperada por {{actor}} - KV: {{kvCount}}, ENV: {{envCount}}, Predeterminado: {{defaultCount}}',
-        'configRetrieved': 'Configuración \"{{key}}\" recuperada por {{actor}}: {{value}} (predeterminado: {{isDefault}})',
+        'configRetrieved': 'Configuración "{{key}}" recuperada por {{actor}}: {{value}} (predeterminado: {{isDefault}})',
         'defaultsRetrieved': 'Configuraciones predeterminadas recuperadas por {{actor}} ({{keyCount}} claves)',
         'retrieved': '{{configCount}} configuraciones recuperadas exitosamente por {{actor}} ({{allowedKeys}} claves permitidas)'
       },
@@ -856,9 +856,9 @@ export default {
         'enabled': 'habilitada'
       },
       'adminCacheCleared': 'Caché de configuración limpiado por {{actor}}',
-      'adminConfigReset': 'Configuración \"{{key}}\" restablecida por defecto por {{actor}} - era: {{oldValue}}, ahora: {{defaultValue}}',
-      'adminConfigUpdated': 'Configuración \"{{key}}\" actualizada por {{actor}} de {{oldValue}} a {{newValue}}',
-      'adminFeatureToggled': 'Característica \"{{feature}}\" alternada por {{actor}}: {{previousValue}} → {{newValue}}',
+      'adminConfigReset': 'Configuración "{{key}}" restablecida por defecto por {{actor}} - era: {{oldValue}}, ahora: {{defaultValue}}',
+      'adminConfigUpdated': 'Configuración "{{key}}" actualizada por {{actor}} de {{oldValue}} a {{newValue}}',
+      'adminFeatureToggled': 'Característica "{{feature}}" alternada por {{actor}}: {{previousValue}} → {{newValue}}',
       'auditConfigsRetrieved': 'Configuraciones de auditoría recuperadas por {{actor}} ({{configCount}} configuraciones)',
       'auditPerformanceRetrieved': 'Configuraciones de rendimiento de auditoría recuperadas por {{actor}} ({{settingCount}} configuraciones)',
       'auditRetentionRetrieved': 'Políticas de retención de auditoría recuperadas por {{actor}} ({{policyCount}} políticas)',
@@ -868,19 +868,19 @@ export default {
       'batchUpdateCompleted': 'Actualización de configuración por lotes completada: {{successCount}}/{{totalCount}} exitosas',
       'cacheCleared': 'Caché de configuración borrada exitosamente - {{clearedCount}} entrada eliminada',
       'cacheCleared_other': 'Caché de configuración borrada exitosamente - {{clearedCount}} entradas eliminadas',
-      'configReset': 'Configuración \"{{key}}\" restablecida al valor predeterminado: {{defaultValue}}',
-      'configRetrieved': 'Configuración \"{{key}}\" recuperada exitosamente: {{value}}',
-      'configUpdated': 'Configuración \"{{key}}\" actualizada exitosamente de {{oldValue}} a {{newValue}}',
+      'configReset': 'Configuración "{{key}}" restablecida al valor predeterminado: {{defaultValue}}',
+      'configRetrieved': 'Configuración "{{key}}" recuperada exitosamente: {{value}}',
+      'configUpdated': 'Configuración "{{key}}" actualizada exitosamente de {{oldValue}} a {{newValue}}',
       'defaultsRestored': 'Configuraciones predeterminadas restauradas exitosamente para {{restoredCount}} clave',
       'defaultsRestored_other': 'Configuraciones predeterminadas restauradas exitosamente para {{restoredCount}} claves',
-      'featureToggled': 'Función \"{{feature}}\" {{status}} exitosamente'
+      'featureToggled': 'Función "{{feature}}" {{status}} exitosamente'
     },
     'operation': {
       'batchProcessed': 'Operación por lotes completada: {{successCount}}/{{totalCount}} elementos procesados exitosamente',
-      'completed': 'Operación \"{{operationType}}\" completada exitosamente en {{duration}}ms',
+      'completed': 'Operación "{{operationType}}" completada exitosamente en {{duration}}ms',
       'completed_other': '{{count}} operaciones completadas exitosamente - tiempo promedio: {{avgDuration}}ms',
-      'taskFinished': 'Tarea \"{{taskName}}\" terminada exitosamente con {{resultCount}} resultado',
-      'taskFinished_other': 'Tarea \"{{taskName}}\" terminada exitosamente con {{resultCount}} resultados',
+      'taskFinished': 'Tarea "{{taskName}}" terminada exitosamente con {{resultCount}} resultado',
+      'taskFinished_other': 'Tarea "{{taskName}}" terminada exitosamente con {{resultCount}} resultados',
       'workflowCompleted': 'Flujo de trabajo completado exitosamente - {{stepsCount}} paso ejecutado',
       'workflowCompleted_other': 'Flujo de trabajo completado exitosamente - {{stepsCount}} pasos ejecutados'
     },
@@ -920,16 +920,16 @@ export default {
     },
     'security': {
       'incident': {
-        'created': '{{actor}} creó incidente de seguridad \"{{title}}\" con gravedad {{severity}} (ID: {{incidentId}}, Tipo: {{type}})',
+        'created': '{{actor}} creó incidente de seguridad "{{title}}" con gravedad {{severity}} (ID: {{incidentId}}, Tipo: {{type}})',
         'responseExecuted': '{{actor}} ejecutó {{actionCount}} acciones de respuesta para el incidente {{incidentId}} (Tipo: {{actionType}}) en {{executedAt}}',
         'retrieved': '{{actor}} recuperó detalles del incidente {{incidentId}} (Estado: {{status}}, Gravedad: {{severity}}, Creado: {{createdAt}})',
-        'statusUpdated': '{{actor}} actualizó el estado del incidente {{incidentId}} de \"{{oldStatus}}\" a \"{{newStatus}}\" en {{timestamp}}'
+        'statusUpdated': '{{actor}} actualizó el estado del incidente {{incidentId}} de "{{oldStatus}}" a "{{newStatus}}" en {{timestamp}}'
       },
       'incidents': {
-        'created': '{{actor}} creó incidente de seguridad \"{{title}}\" con gravedad {{severity}} (ID: {{incidentId}}, Tipo: {{type}})',
+        'created': '{{actor}} creó incidente de seguridad "{{title}}" con gravedad {{severity}} (ID: {{incidentId}}, Tipo: {{type}})',
         'responseExecuted': '{{actor}} ejecutó {{actionCount}} acciones de respuesta para el incidente {{incidentId}} (Tipo: {{actionType}}) en {{executedAt}}',
         'retrieved': '{{actor}} recuperó exitosamente {{incidentCount}} incidentes de seguridad (página {{page}}, límite {{limit}}, filtros: {{filters}})',
-        'statusUpdated': '{{actor}} actualizó el estado del incidente {{incidentId}} de \"{{oldStatus}}\" a \"{{newStatus}}\" en {{timestamp}}'
+        'statusUpdated': '{{actor}} actualizó el estado del incidente {{incidentId}} de "{{oldStatus}}" a "{{newStatus}}" en {{timestamp}}'
       },
       'monitoring': {
         'started': 'Monitoreo en tiempo real iniciado correctamente'
@@ -952,7 +952,7 @@ export default {
       'databaseConnected': 'Conexión a la base de datos establecida exitosamente con {{databaseName}}',
       'healthCheckPassed': 'Verificación de salud del sistema superada - todos los {{componentCount}} componentes saludables',
       'healthCheckPassed_other': 'Verificación de salud del sistema superada - todos los {{componentCount}} componentes saludables',
-      'operationCompleted': 'Operación del sistema \"{{operation}}\" completada exitosamente en {{duration, number}}ms',
+      'operationCompleted': 'Operación del sistema "{{operation}}" completada exitosamente en {{duration, number}}ms',
       'queueProcessed': 'Cola de tareas procesada exitosamente - {{processedCount}} tarea completada',
       'queueProcessed_other': 'Cola de tareas procesada exitosamente - {{processedCount}} tareas completadas',
       'resourceAllocated': 'Recursos del sistema asignados exitosamente: {{allocatedMemory, number}}MB de memoria',
@@ -1464,7 +1464,7 @@ export default {
     'retentionPolicyUpdate': {
       'atLeastOneFieldRequired': 'Se debe actualizar al menos un campo',
       'atLeastOneFieldRequired_other': 'Se deben actualizar al menos {{min}} campos',
-      'immutableField': 'El campo \"{{field}}\" no puede modificarse después de la creación',
+      'immutableField': 'El campo "{{field}}" no puede modificarse después de la creación',
       'invalid': 'Actualización de política de retención inválida'
     },
     'security': {
@@ -1478,7 +1478,7 @@ export default {
         'invalid': 'Estructura de configuración no válida'
       },
       'configUpdate': {
-        'invalid': 'Formato de actualización de configuración no válido. El campo requerido \"value\" falta o contiene campos no reconocidos'
+        'invalid': 'Formato de actualización de configuración no válido. El campo requerido "value" falta o contiene campos no reconocidos'
       },
       'incidentCreation': {
         'invalid': 'Estructura de creación de incidente no válida'
@@ -1521,11 +1521,11 @@ export default {
       'invalid': 'El nombre de usuario solo puede contener letras, números y guiones bajos',
       'invalidCharacters': 'El nombre de usuario solo puede contener letras, números y guiones bajos',
       'required': 'El nombre de usuario es obligatorio',
-      'reserved': 'El nombre de usuario \"{{username}}\" está reservado y no puede usarse',
+      'reserved': 'El nombre de usuario "{{username}}" está reservado y no puede usarse',
       'tooLong': 'El nombre de usuario no puede exceder 30 caracteres',
       'tooShort': 'El nombre de usuario debe tener al menos 3 caracteres',
       'tooShort_other': 'El nombre de usuario debe tener al menos {{minLength}} caracteres',
-      'unavailable': 'El nombre de usuario \"{{username}}\" no está disponible'
+      'unavailable': 'El nombre de usuario "{{username}}" no está disponible'
     },
     'filterArrayTooLarge': 'Array de filtros demasiado grande (máx 500 elementos)',
     'filterArrayTooLarge_other': 'La matriz de filtros con {{count}} elementos excede el máximo de {{max}}',

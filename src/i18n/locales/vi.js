@@ -364,7 +364,7 @@ export default {
         'failed': 'Không thể truy xuất phân tích hành vi - {{actor}} không thể hoàn thành {{operation}} cho {{timeframe}} nhắm mục tiêu {{targetRole}}: {{reason}}'
       },
       'compliance': {
-        'customComplianceFailed': 'Không thể tạo báo cáo tuân thủ tùy chỉnh - {{actor}} không thể hoàn thành {{operation}} cho \"{{reportName}}\" ({{reportType}}): {{reason}}',
+        'customComplianceFailed': 'Không thể tạo báo cáo tuân thủ tùy chỉnh - {{actor}} không thể hoàn thành {{operation}} cho "{{reportName}}" ({{reportType}}): {{reason}}',
         'failed': 'Không thể tạo báo cáo tuân thủ - {{actor}} không thể hoàn thành {{operation}} cho {{timeframe}} với định dạng {{format}}: {{reason}}',
         'reportFailed': 'Không thể tạo báo cáo tuân thủ - {{actor}} không thể thực hiện {{operation}} cho báo cáo {{type}}: {{reason}}'
       },
@@ -398,7 +398,7 @@ export default {
         'retrieveFailed': 'Không thể truy xuất audit logs - {{actor}} gặp lỗi khi thực hiện {{operation}}: {{reason}}'
       },
       'search': {
-        'searchFailed': 'Không thể tìm kiếm audit logs - {{actor}} không thể hoàn thành {{operation}} với truy vấn \"{{query}}\": {{reason}}'
+        'searchFailed': 'Không thể tìm kiếm audit logs - {{actor}} không thể hoàn thành {{operation}} với truy vấn "{{query}}": {{reason}}'
       },
       'stats': {
         'statsFailed': 'Không thể truy xuất thống kê audit - {{actor}} ({{role}}) không thể thực hiện {{operation}}: {{reason}}'
@@ -447,22 +447,22 @@ export default {
       'businessHoursOnly': 'Thao tác chỉ được phép trong giờ làm việc ({{businessHours}})',
       'conflictingOperation': 'Thao tác xung đột đang tiến hành: {{operation}}',
       'deadlineExpired': 'Hạn chót thao tác đã hết vào {{deadline, datetime}}',
-      'duplicateEntry': 'Phát hiện mục trùng lặp: {{entity}} với {{field}} = \"{{value}}\"',
+      'duplicateEntry': 'Phát hiện mục trùng lặp: {{entity}} với {{field}} = "{{value}}"',
       'insufficientBalance': 'Số dư không đủ: có {{available, currency}}, yêu cầu {{required, currency}}',
-      'operationNotAllowed': 'Thao tác \"{{operation}}\" không được phép: {{reason}}',
+      'operationNotAllowed': 'Thao tác "{{operation}}" không được phép: {{reason}}',
       'preconditionFailed': 'Điều kiện tiên quyết thất bại: {{condition}}',
       'quotaReached': 'Đã đạt giới hạn hạn ngạch: {{used, number}}/{{limit, number}} {{resource}}',
       'referenceConstraint': 'Không thể xóa {{entity}} - được tham chiếu bởi {{referencingCount}} bản ghi khác',
       'referenceConstraint_other': 'Không thể xóa {{entity}} - được tham chiếu bởi {{referencingCount}} bản ghi khác',
-      'resourceLocked': 'Tài nguyên \"{{resource}}\" bị khóa bởi {{lockedBy}} đến {{lockedUntil, datetime}}',
+      'resourceLocked': 'Tài nguyên "{{resource}}" bị khóa bởi {{lockedBy}} đến {{lockedUntil, datetime}}',
       'workflowViolation': 'Vi phạm luồng công việc: {{step}} không thể thực hiện ở trạng thái hiện tại {{currentState}}'
     },
     'file': {
-      'accessDenied': 'Truy cập bị từ chối đến tệp \"{{filename}}\": {{reason}}',
+      'accessDenied': 'Truy cập bị từ chối đến tệp "{{filename}}": {{reason}}',
       'corrupted': 'Tệp có vẻ bị hỏng hoặc không hoàn chỉnh',
       'formatUnsupported': 'Định dạng tệp không được hỗ trợ cho thao tác: {{operation}}',
-      'invalidType': 'Loại tệp \"{{fileType}}\" không được phép - các loại được hỗ trợ: {{allowedTypes}}',
-      'notFound': 'Không tìm thấy tệp \"{{filename}}\"',
+      'invalidType': 'Loại tệp "{{fileType}}" không được phép - các loại được hỗ trợ: {{allowedTypes}}',
+      'notFound': 'Không tìm thấy tệp "{{filename}}"',
       'processingFailed': 'Xử lý tệp thất bại: {{reason}}',
       'quotaExceeded': 'Vượt quá hạn ngạch lưu trữ: {{used, number}}MB / {{quota, number}}MB',
       'tooLarge': 'Kích thước tệp {{actualSize, number}}MB vượt quá giới hạn {{maxSize, number}}MB',
@@ -472,15 +472,15 @@ export default {
     },
     'i18n': {
       'context_demo_failed': 'Không thể chạy demo dịch thuật theo ngữ cảnh: {{reason}}',
-      'context_test_failed': 'Không thể kiểm tra dịch thuật theo ngữ cảnh cho khóa \"{{key}}\": {{reason}}',
+      'context_test_failed': 'Không thể kiểm tra dịch thuật theo ngữ cảnh cho khóa "{{key}}": {{reason}}',
       'enhanced_demo_failed': 'Không thể chạy demo tính năng i18n nâng cao: {{reason}}',
       'error_demo_failed': 'Không thể chạy demo thông báo lỗi: {{reason}}',
       'formatting_demo_failed': 'Không thể chạy demo formatting: {{reason}}',
-      'formatting_test_failed': 'Không thể kiểm tra tính năng formatting cho khóa \"{{key}}\": {{reason}}',
-      'languageNotSupported': 'Ngôn ngữ \"{{language}}\" không được hỗ trợ. Ngôn ngữ có sẵn: {{supportedLanguages}}',
+      'formatting_test_failed': 'Không thể kiểm tra tính năng formatting cho khóa "{{key}}": {{reason}}',
+      'languageNotSupported': 'Ngôn ngữ "{{language}}" không được hỗ trợ. Ngôn ngữ có sẵn: {{supportedLanguages}}',
       'plurals_demo_failed': 'Không thể chạy demo pluralization: {{reason}}',
-      'plurals_test_failed': 'Không thể kiểm tra tính năng pluralization cho khóa \"{{key}}\": {{reason}}',
-      'sectionNotFound': 'Không tìm thấy phần dịch thuật \"{{section}}\" cho ngôn ngữ \"{{language}}\"',
+      'plurals_test_failed': 'Không thể kiểm tra tính năng pluralization cho khóa "{{key}}": {{reason}}',
+      'sectionNotFound': 'Không tìm thấy phần dịch thuật "{{section}}" cho ngôn ngữ "{{language}}"',
       'success_demo_failed': 'Không thể chạy demo thông báo thành công: {{reason}}',
       'translationsFailed': 'Không thể truy xuất thông tin dịch thuật: {{reason}}'
     },
@@ -495,7 +495,7 @@ export default {
       'webhookTimeout': 'Hết thời gian chờ webhook từ {{serviceName}} sau {{timeout, number}}ms'
     },
     'kv': {
-      'accessDenied': 'Truy cập bị từ chối cho khóa cấu hình \"{{key}}\" - yêu cầu vai trò {{requiredRole}}',
+      'accessDenied': 'Truy cập bị từ chối cho khóa cấu hình "{{key}}" - yêu cầu vai trò {{requiredRole}}',
       'alertThresholdsRetrieveFailed': 'Không thể truy xuất ngưỡng cảnh báo: {{reason}}',
       'auditConfigsRetrieveFailed': 'Không thể truy xuất cấu hình audit: {{reason}}',
       'batchUpdateFailed': 'Cập nhật hàng loạt thất bại cho {{failedCount}} trong số {{totalCount}} cấu hình',
@@ -503,24 +503,24 @@ export default {
       'cacheClearFailed': 'Không thể xóa cache cấu hình: {{reason}}',
       'cacheFailed': 'Không thể cập nhật cache cấu hình: {{reason}}',
       'complianceSettingsRetrieveFailed': 'Không thể truy xuất cài đặt tuân thủ: {{reason}}',
-      'configResetFailed': 'Không thể đặt lại cấu hình \"{{key}}\": {{reason}}',
-      'configRetrieveFailed': 'Không thể truy xuất cấu hình \"{{key}}\": {{reason}}',
+      'configResetFailed': 'Không thể đặt lại cấu hình "{{key}}": {{reason}}',
+      'configRetrieveFailed': 'Không thể truy xuất cấu hình "{{key}}": {{reason}}',
       'configsCompareFailed': 'Không thể truy xuất so sánh môi trường: {{reason}}',
       'configsRetrieveFailed': 'Không thể truy xuất cấu hình: {{reason}}',
-      'configUpdateFailed': 'Không thể cập nhật cấu hình \"{{key}}\": {{reason}}',
+      'configUpdateFailed': 'Không thể cập nhật cấu hình "{{key}}": {{reason}}',
       'exportSettingsRetrieveFailed': 'Không thể truy xuất cài đặt xuất dữ liệu: {{reason}}',
       'featureFlagsRetrieveFailed': 'Không thể truy xuất cờ tính năng: {{reason}}',
       'featureNotFound': 'Không tìm thấy tính năng hoặc không được phép',
-      'featureToggleFailed': 'Không thể chuyển đổi tính năng \"{{feature}}\": {{reason}}',
+      'featureToggleFailed': 'Không thể chuyển đổi tính năng "{{feature}}": {{reason}}',
       'invalidFeatureValue': 'Giá trị tính năng không hợp lệ - phải là boolean',
-      'invalidKey': 'Khóa cấu hình \"{{key}}\" không được phép',
-      'keyNotFound': 'Không tìm thấy khóa cấu hình \"{{key}}\"',
+      'invalidKey': 'Khóa cấu hình "{{key}}" không được phép',
+      'keyNotFound': 'Không tìm thấy khóa cấu hình "{{key}}"',
       'performanceSettingsRetrieveFailed': 'Không thể truy xuất cài đặt hiệu suất: {{reason}}',
       'realtimeSettingsRetrieveFailed': 'Không thể truy xuất cài đặt giám sát thời gian thực: {{reason}}',
-      'resetFailed': 'Reset cấu hình \"{{key}}\" thất bại',
+      'resetFailed': 'Reset cấu hình "{{key}}" thất bại',
       'retentionPoliciesRetrieveFailed': 'Không thể truy xuất chính sách lưu trữ: {{reason}}',
-      'updateFailed': 'Cập nhật cấu hình \"{{key}}\" thất bại',
-      'valueInvalid': 'Giá trị không hợp lệ cho cấu hình \"{{key}}\": mong đợi {{expectedType}}, nhận được {{actualType}}'
+      'updateFailed': 'Cập nhật cấu hình "{{key}}" thất bại',
+      'valueInvalid': 'Giá trị không hợp lệ cho cấu hình "{{key}}": mong đợi {{expectedType}}, nhận được {{actualType}}'
     },
     'kvAdmin': {
       'alertThresholdsRetrieveFailed': 'Không thể truy xuất ngưỡng cảnh báo cho {{actor}} (Lý do: {{reason}}, Thao tác: {{operation}})',
@@ -631,7 +631,7 @@ export default {
       'licenseInvalid': 'Giấy phép hệ thống không hợp lệ: {{reason}}',
       'maintenanceMode': 'Hệ thống đang bảo trì đến {{endTime, datetime}} - {{message}}',
       'memoryExhausted': 'Sử dụng bộ nhớ máy chủ nghiêm trọng: {{currentUsage, number}}MB / {{maxMemory, number}}MB',
-      'operationFailed': 'Thao tác hệ thống \"{{operation}}\" thất bại: {{reason}}',
+      'operationFailed': 'Thao tác hệ thống "{{operation}}" thất bại: {{reason}}',
       'rateLimited': 'Hệ thống tạm thời bị giới hạn tần suất: {{currentRequests}}/{{maxRequests}} yêu cầu trong {{timeWindow}}',
       'resourceExhausted': 'Tài nguyên hệ thống cạn kiệt: {{resource}} ở {{usage, number}}% công suất',
       'serverError': 'Đã xảy ra lỗi máy chủ nội bộ',
@@ -662,14 +662,14 @@ export default {
       'roleChangeFailed': 'Không thể thay đổi vai trò cho {{userName}} từ {{oldRole}} thành {{newRole}}: {{reason}}',
       'sessionLimitExceeded': 'Người dùng {{userName}} đã vượt quá số phiên đồng thời tối đa ({{currentSessions}}/{{maxSessions}})',
       'updateFailed': 'Cập nhật thông tin cá nhân thất bại cho {{userName}}. {{reason}}',
-      'usernameExists': 'Tên người dùng \"{{username}}\" đã được sử dụng'
+      'usernameExists': 'Tên người dùng "{{username}}" đã được sử dụng'
     },
     'zodDemo': {
       'file': {
-        'uploadFailed': 'Tải file thất bại - {{actor}} không thể hoàn thành {{operation}} cho \"{{fileName}}\" ({{fileSize}} bytes): {{reason}}'
+        'uploadFailed': 'Tải file thất bại - {{actor}} không thể hoàn thành {{operation}} cho "{{fileName}}" ({{fileSize}} bytes): {{reason}}'
       },
       'search': {
-        'failed': 'Thao tác tìm kiếm thất bại - {{actor}} không thể hoàn thành {{operation}} cho truy vấn \"{{query}}\" ({{searchType}}): {{reason}}'
+        'failed': 'Thao tác tìm kiếm thất bại - {{actor}} không thể hoàn thành {{operation}} cho truy vấn "{{query}}" ({{searchType}}): {{reason}}'
       },
       'user': {
         'registrationFailed': 'Đăng ký người dùng thất bại - {{actor}} không thể hoàn thành {{operation}} cho {{userName}} ({{email}}): {{reason}}'
@@ -681,7 +681,7 @@ export default {
     'schemaViolation': 'Vi phạm schema dữ liệu: {{violations}}',
     'validation': 'Lỗi xác thực - {{details}}',
     'validation_other': '{{count}} lỗi xác thực - {{details}}',
-    'validationField': 'Xác thực thất bại cho trường \"{{field}}\": {{error}}',
+    'validationField': 'Xác thực thất bại cho trường "{{field}}": {{error}}',
     'validationGeneric': 'Lỗi xác thực',
     'validationMultiple': 'Nhiều lỗi xác thực trong {{count}} trường',
     'validationMultiple_other': 'Nhiều lỗi xác thực trong {{count}} trường'
@@ -789,7 +789,7 @@ export default {
       'passwordChanged': 'Mật khẩu đã được thay đổi thành công cho {{userName}}',
       'passwordReset': 'Email đặt lại mật khẩu đã được gửi đến {{email}} - hết hạn sau {{expiryMinutes}} phút',
       'passwordReset_other': 'Email đặt lại mật khẩu đã được gửi đến {{email}} - hết hạn sau {{expiryMinutes}} phút',
-      'permissionGranted': 'Quyền \"{{permission}}\" đã được cấp cho {{userName}}',
+      'permissionGranted': 'Quyền "{{permission}}" đã được cấp cho {{userName}}',
       'rateLimitReset': 'Giới hạn tần suất đã được đặt lại thành công cho {{ipAddress}}',
       'roleAssigned': 'Vai trò {{newRole}} đã được gán thành công cho {{userName}} bởi {{assignedBy}}',
       'sessionCreated': 'Phiên người dùng mới đã được tạo với thời hạn {{sessionDuration}} phút',
@@ -803,33 +803,33 @@ export default {
       'auditPassed_other': 'Kiểm toán kinh doanh đã vượt qua với điểm {{auditScore, number}}% - {{criteriaCount}} tiêu chí đã đạt',
       'complianceVerified': 'Xác minh tuân thủ đã hoàn thành - {{standardsCount}} tiêu chuẩn đã được xác minh',
       'complianceVerified_other': 'Xác minh tuân thủ đã hoàn thành - {{standardsCount}} tiêu chuẩn đã được xác minh',
-      'operationApproved': 'Thao tác kinh doanh \"{{operation}}\" đã được phê duyệt bởi {{approvedBy}}',
+      'operationApproved': 'Thao tác kinh doanh "{{operation}}" đã được phê duyệt bởi {{approvedBy}}',
       'processAutomated': 'Quy trình kinh doanh đã được tự động hóa thành công - {{automatedTasks}} tác vụ đã tự động hóa',
       'processAutomated_other': 'Quy trình kinh doanh đã được tự động hóa thành công - {{automatedTasks}} tác vụ đã tự động hóa',
-      'ruleApplied': 'Quy tắc kinh doanh \"{{ruleName}}\" đã được áp dụng thành công cho {{affectedRecords}} bản ghi',
-      'ruleApplied_other': 'Quy tắc kinh doanh \"{{ruleName}}\" đã được áp dụng thành công cho {{affectedRecords}} bản ghi',
+      'ruleApplied': 'Quy tắc kinh doanh "{{ruleName}}" đã được áp dụng thành công cho {{affectedRecords}} bản ghi',
+      'ruleApplied_other': 'Quy tắc kinh doanh "{{ruleName}}" đã được áp dụng thành công cho {{affectedRecords}} bản ghi',
       'validationPassed': 'Xác thực kinh doanh đã vượt qua cho {{entityType}} - tất cả {{checkCount}} kiểm tra đều thành công',
       'validationPassed_other': 'Xác thực kinh doanh đã vượt qua cho {{entityType}} - tất cả {{checkCount}} kiểm tra đều thành công',
-      'workflowCompleted': 'Luồng công việc \"{{workflowName}}\" đã hoàn thành thành công trong {{steps}} bước',
-      'workflowCompleted_other': 'Luồng công việc \"{{workflowName}}\" đã hoàn thành thành công trong {{steps}} bước'
+      'workflowCompleted': 'Luồng công việc "{{workflowName}}" đã hoàn thành thành công trong {{steps}} bước',
+      'workflowCompleted_other': 'Luồng công việc "{{workflowName}}" đã hoàn thành thành công trong {{steps}} bước'
     },
     'file': {
-      'backup': 'Sao lưu tệp đã được tạo thành công cho \"{{filename}}\"',
+      'backup': 'Sao lưu tệp đã được tạo thành công cho "{{filename}}"',
       'compressed': 'Tệp đã được nén thành công - kích thước giảm {{compressionRatio, number}}%',
       'converted': 'Tệp đã được chuyển đổi thành công từ {{sourceFormat}} thành {{targetFormat}}',
       'copied': 'Tệp đã được sao chép thành công đến {{destinationPath}}',
-      'deleted': 'Tệp \"{{filename}}\" đã được xóa thành công',
-      'downloadCompleted': 'Tệp \"{{filename}}\" đã được tải xuống thành công',
+      'deleted': 'Tệp "{{filename}}" đã được xóa thành công',
+      'downloadCompleted': 'Tệp "{{filename}}" đã được tải xuống thành công',
       'extracted': 'Kho lưu trữ đã được giải nén thành công - {{extractedCount}} tệp đã giải nén',
       'extracted_other': 'Kho lưu trữ đã được giải nén thành công - {{extractedCount}} tệp đã giải nén',
       'moved': 'Tệp đã được di chuyển thành công từ {{sourcePath}} đến {{destinationPath}}',
-      'processingCompleted': 'Xử lý tệp đã hoàn thành cho \"{{filename}}\" - {{operationsCount}} thao tác đã thực hiện',
-      'processingCompleted_other': 'Xử lý tệp đã hoàn thành cho \"{{filename}}\" - {{operationsCount}} thao tác đã thực hiện',
+      'processingCompleted': 'Xử lý tệp đã hoàn thành cho "{{filename}}" - {{operationsCount}} thao tác đã thực hiện',
+      'processingCompleted_other': 'Xử lý tệp đã hoàn thành cho "{{filename}}" - {{operationsCount}} thao tác đã thực hiện',
       'restored': 'Tệp đã được khôi phục thành công từ bản sao lưu được tạo vào {{backupDate, date}}',
-      'uploadCompleted': 'Tệp \"{{filename}}\" đã được tải lên thành công ({{fileSize}})',
+      'uploadCompleted': 'Tệp "{{filename}}" đã được tải lên thành công ({{fileSize}})',
       'uploadsBatch': 'Tải lên hàng loạt đã hoàn thành: {{successCount}}/{{totalCount}} tệp đã xử lý',
       'uploadsBatch_other': 'Tải lên hàng loạt đã hoàn thành: {{successCount}}/{{totalCount}} tệp đã xử lý',
-      'validated': 'Xác thực tệp đã vượt qua cho \"{{filename}}\" - định dạng: {{fileFormat}}'
+      'validated': 'Xác thực tệp đã vượt qua cho "{{filename}}" - định dạng: {{fileFormat}}'
     },
     'integration': {
       'apiCall': 'Cuộc gọi API đến {{serviceName}} đã hoàn thành thành công trong {{responseTime, number}}ms',
@@ -847,7 +847,7 @@ export default {
     'kv': {
       'configs': {
         'comparisonRetrieved': 'So sánh môi trường đã được truy xuất bởi {{actor}} - KV: {{kvCount}}, ENV: {{envCount}}, Mặc định: {{defaultCount}}',
-        'configRetrieved': 'Cấu hình \"{{key}}\" đã được truy xuất bởi {{actor}}: {{value}} (mặc định: {{isDefault}})',
+        'configRetrieved': 'Cấu hình "{{key}}" đã được truy xuất bởi {{actor}}: {{value}} (mặc định: {{isDefault}})',
         'defaultsRetrieved': 'Cấu hình mặc định đã được truy xuất bởi {{actor}} ({{keyCount}} khóa)',
         'retrieved': 'Đã truy xuất thành công {{configCount}} cấu hình bởi {{actor}} ({{allowedKeys}} khóa được phép)'
       },
@@ -856,9 +856,9 @@ export default {
         'enabled': 'được bật'
       },
       'adminCacheCleared': 'Cache cấu hình đã được xóa bởi {{actor}}',
-      'adminConfigReset': 'Cấu hình \"{{key}}\" đã được đặt lại về mặc định bởi {{actor}} - trước: {{oldValue}}, giờ: {{defaultValue}}',
-      'adminConfigUpdated': 'Cấu hình \"{{key}}\" đã được cập nhật bởi {{actor}} từ {{oldValue}} thành {{newValue}}',
-      'adminFeatureToggled': 'Tính năng \"{{feature}}\" đã được chuyển đổi bởi {{actor}}: {{previousValue}} → {{newValue}}',
+      'adminConfigReset': 'Cấu hình "{{key}}" đã được đặt lại về mặc định bởi {{actor}} - trước: {{oldValue}}, giờ: {{defaultValue}}',
+      'adminConfigUpdated': 'Cấu hình "{{key}}" đã được cập nhật bởi {{actor}} từ {{oldValue}} thành {{newValue}}',
+      'adminFeatureToggled': 'Tính năng "{{feature}}" đã được chuyển đổi bởi {{actor}}: {{previousValue}} → {{newValue}}',
       'auditConfigsRetrieved': 'Cấu hình audit đã được truy xuất bởi {{actor}} ({{configCount}} cấu hình)',
       'auditPerformanceRetrieved': 'Cài đặt hiệu suất audit đã được truy xuất bởi {{actor}} ({{settingCount}} cài đặt)',
       'auditRetentionRetrieved': 'Chính sách lưu trữ audit đã được truy xuất bởi {{actor}} ({{policyCount}} chính sách)',
@@ -868,19 +868,19 @@ export default {
       'batchUpdateCompleted': 'Cập nhật cấu hình hàng loạt đã hoàn thành: {{successCount}}/{{totalCount}} thành công',
       'cacheCleared': 'Cache cấu hình đã được xóa thành công - {{clearedCount}} mục đã xóa',
       'cacheCleared_other': 'Cache cấu hình đã được xóa thành công - {{clearedCount}} mục đã xóa',
-      'configReset': 'Cấu hình \"{{key}}\" đã được đặt lại về giá trị mặc định: {{defaultValue}}',
-      'configRetrieved': 'Cấu hình \"{{key}}\" đã được truy xuất thành công: {{value}}',
-      'configUpdated': 'Cấu hình \"{{key}}\" đã được cập nhật thành công từ {{oldValue}} thành {{newValue}}',
+      'configReset': 'Cấu hình "{{key}}" đã được đặt lại về giá trị mặc định: {{defaultValue}}',
+      'configRetrieved': 'Cấu hình "{{key}}" đã được truy xuất thành công: {{value}}',
+      'configUpdated': 'Cấu hình "{{key}}" đã được cập nhật thành công từ {{oldValue}} thành {{newValue}}',
       'defaultsRestored': 'Cấu hình mặc định đã được khôi phục thành công cho {{restoredCount}} khóa',
       'defaultsRestored_other': 'Cấu hình mặc định đã được khôi phục thành công cho {{restoredCount}} khóa',
-      'featureToggled': 'Tính năng \"{{feature}}\" {{status}} thành công'
+      'featureToggled': 'Tính năng "{{feature}}" {{status}} thành công'
     },
     'operation': {
       'batchProcessed': 'Thao tác hàng loạt đã hoàn thành: {{successCount}}/{{totalCount}} mục đã xử lý thành công',
-      'completed': 'Thao tác \"{{operationType}}\" đã hoàn thành thành công trong {{duration}}ms',
+      'completed': 'Thao tác "{{operationType}}" đã hoàn thành thành công trong {{duration}}ms',
       'completed_other': '{{count}} thao tác đã hoàn thành thành công - thời gian trung bình: {{avgDuration}}ms',
-      'taskFinished': 'Nhiệm vụ \"{{taskName}}\" đã hoàn thành thành công với {{resultCount}} kết quả',
-      'taskFinished_other': 'Nhiệm vụ \"{{taskName}}\" đã hoàn thành thành công với {{resultCount}} kết quả',
+      'taskFinished': 'Nhiệm vụ "{{taskName}}" đã hoàn thành thành công với {{resultCount}} kết quả',
+      'taskFinished_other': 'Nhiệm vụ "{{taskName}}" đã hoàn thành thành công với {{resultCount}} kết quả',
       'workflowCompleted': 'Quy trình làm việc đã hoàn thành thành công - {{stepsCount}} bước đã thực hiện',
       'workflowCompleted_other': 'Quy trình làm việc đã hoàn thành thành công - {{stepsCount}} bước đã thực hiện'
     },
@@ -920,16 +920,16 @@ export default {
     },
     'security': {
       'incident': {
-        'created': '{{actor}} đã tạo sự cố bảo mật \"{{title}}\" với mức độ {{severity}} (ID: {{incidentId}}, Loại: {{type}})',
+        'created': '{{actor}} đã tạo sự cố bảo mật "{{title}}" với mức độ {{severity}} (ID: {{incidentId}}, Loại: {{type}})',
         'responseExecuted': '{{actor}} đã thực hiện {{actionCount}} hành động phản hồi cho sự cố {{incidentId}} (Loại: {{actionType}}) lúc {{executedAt}}',
         'retrieved': '{{actor}} đã lấy chi tiết sự cố {{incidentId}} (Trạng thái: {{status}}, Mức độ: {{severity}}, Tạo lúc: {{createdAt}})',
-        'statusUpdated': '{{actor}} đã cập nhật trạng thái sự cố {{incidentId}} từ \"{{oldStatus}}\" thành \"{{newStatus}}\" lúc {{timestamp}}'
+        'statusUpdated': '{{actor}} đã cập nhật trạng thái sự cố {{incidentId}} từ "{{oldStatus}}" thành "{{newStatus}}" lúc {{timestamp}}'
       },
       'incidents': {
-        'created': '{{actor}} đã tạo sự cố bảo mật \"{{title}}\" với mức độ {{severity}} (ID: {{incidentId}}, Loại: {{type}})',
+        'created': '{{actor}} đã tạo sự cố bảo mật "{{title}}" với mức độ {{severity}} (ID: {{incidentId}}, Loại: {{type}})',
         'responseExecuted': '{{actor}} đã thực hiện {{actionCount}} hành động phản hồi cho sự cố {{incidentId}} (Loại: {{actionType}}) lúc {{executedAt}}',
         'retrieved': '{{actor}} đã lấy thành công {{incidentCount}} sự cố bảo mật (trang {{page}}, giới hạn {{limit}}, bộ lọc: {{filters}})',
-        'statusUpdated': '{{actor}} đã cập nhật trạng thái sự cố {{incidentId}} từ \"{{oldStatus}}\" thành \"{{newStatus}}\" lúc {{timestamp}}'
+        'statusUpdated': '{{actor}} đã cập nhật trạng thái sự cố {{incidentId}} từ "{{oldStatus}}" thành "{{newStatus}}" lúc {{timestamp}}'
       },
       'monitoring': {
         'started': 'Bắt đầu giám sát thời gian thực thành công'
@@ -952,7 +952,7 @@ export default {
       'databaseConnected': 'Kết nối cơ sở dữ liệu đã được thiết lập thành công đến {{databaseName}}',
       'healthCheckPassed': 'Kiểm tra sức khỏe hệ thống đã vượt qua - tất cả {{componentCount}} thành phần đều khỏe mạnh',
       'healthCheckPassed_other': 'Kiểm tra sức khỏe hệ thống đã vượt qua - tất cả {{componentCount}} thành phần đều khỏe mạnh',
-      'operationCompleted': 'Thao tác hệ thống \"{{operation}}\" đã hoàn thành thành công trong {{duration, number}}ms',
+      'operationCompleted': 'Thao tác hệ thống "{{operation}}" đã hoàn thành thành công trong {{duration, number}}ms',
       'queueProcessed': 'Hàng đợi tác vụ đã được xử lý thành công - {{processedCount}} tác vụ đã hoàn thành',
       'queueProcessed_other': 'Hàng đợi tác vụ đã được xử lý thành công - {{processedCount}} tác vụ đã hoàn thành',
       'resourceAllocated': 'Tài nguyên hệ thống đã được phân bổ thành công: {{allocatedMemory, number}}MB bộ nhớ',
@@ -1464,7 +1464,7 @@ export default {
     'retentionPolicyUpdate': {
       'atLeastOneFieldRequired': 'Phải cập nhật ít nhất một trường',
       'atLeastOneFieldRequired_other': 'Phải cập nhật ít nhất {{min}} trường',
-      'immutableField': 'Trường \"{{field}}\" không thể sửa đổi sau khi tạo',
+      'immutableField': 'Trường "{{field}}" không thể sửa đổi sau khi tạo',
       'invalid': 'Cập nhật chính sách lưu giữ không hợp lệ'
     },
     'security': {
@@ -1478,7 +1478,7 @@ export default {
         'invalid': 'Cấu trúc cấu hình không hợp lệ'
       },
       'configUpdate': {
-        'invalid': 'Định dạng cập nhật cấu hình không hợp lệ. Thiếu trường bắt buộc \"value\" hoặc chứa trường không được phép'
+        'invalid': 'Định dạng cập nhật cấu hình không hợp lệ. Thiếu trường bắt buộc "value" hoặc chứa trường không được phép'
       },
       'incidentCreation': {
         'invalid': 'Cấu trúc tạo sự cố không hợp lệ'
@@ -1521,11 +1521,11 @@ export default {
       'invalid': 'Tên đăng nhập chỉ có thể chứa chữ cái, số và gạch dưới',
       'invalidCharacters': 'Tên đăng nhập chỉ có thể chứa chữ cái, số và gạch dưới',
       'required': 'Tên người dùng là bắt buộc',
-      'reserved': 'Tên người dùng \"{{username}}\" đã được bảo lưu và không thể sử dụng',
+      'reserved': 'Tên người dùng "{{username}}" đã được bảo lưu và không thể sử dụng',
       'tooLong': 'Tên đăng nhập không thể vượt quá 30 ký tự',
       'tooShort': 'Tên đăng nhập phải có ít nhất 3 ký tự',
       'tooShort_other': 'Tên người dùng phải có ít nhất {{minLength}} ký tự',
-      'unavailable': 'Tên người dùng \"{{username}}\" không khả dụng'
+      'unavailable': 'Tên người dùng "{{username}}" không khả dụng'
     },
     'filterArrayTooLarge': 'Mảng filter quá lớn (tối đa 500 items)',
     'filterArrayTooLarge_other': 'Mảng bộ lọc với {{count}} mục vượt quá tối đa {{max}}',
