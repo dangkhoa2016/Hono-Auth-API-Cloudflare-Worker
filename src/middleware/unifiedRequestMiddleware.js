@@ -98,6 +98,8 @@ export function createUnifiedRequestMiddleware(
     const path = url.pathname;
     const method = c.req.method;
     const query = c.req.query();
+    const queryString = Object.keys(query).length ? `?${new URLSearchParams(query).toString()}` : '';
+    const pathWithQuery = `${path}${queryString}`;
     const userAgent = c.req.header('user-agent') || 'Unknown';
     const ip = c.req.header('x-forwarded-for') ||
                c.req.header('x-real-ip') ||
@@ -308,6 +310,7 @@ export function createUnifiedRequestMiddleware(
           requestId,
           method,
           path,
+          pathWithQuery,
           query,
           ip,
           userAgent,
@@ -367,7 +370,7 @@ function sanitizeRequestBody(body, sensitiveFields = []) {
 */
 function createAuditEntry(c, requestData) {
   const user = c.get('user') || null;
-  const { method, path, ip, userAgent, statusCode, processingTime, routeName, routeType } = requestData;
+  const { method, path, pathWithQuery, query, ip, userAgent, statusCode, processingTime, routeName, routeType } = requestData;
 
   // Determine action and entity
   const action = determineAction(method, path);
@@ -401,7 +404,7 @@ function createAuditEntry(c, requestData) {
     actor_email: user?.email || null,
     target_type: entityType,
     target_id: entityId,
-    target_identifier: entityId || path,
+    target_identifier: entityId || pathWithQuery || path,
     ip_address: ip,
     user_agent: userAgent,
     status,
@@ -409,6 +412,8 @@ function createAuditEntry(c, requestData) {
     details: {
       method,
       path,
+      fullPath: pathWithQuery,
+      query,
       statusCode,
       duration: processingTime,
       routeName,
