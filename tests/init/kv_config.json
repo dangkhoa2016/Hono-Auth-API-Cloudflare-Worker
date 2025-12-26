@@ -10,8 +10,88 @@
     "expiration_ttl": 2147483647
   },
   {
+    "key": "APP_URL",
+    "value": "https://your-app.com",
+    "expiration_ttl": 2147483647
+  },
+  {
     "key": "DEBUG",
     "value": "hono-auth-api:*",
+    "expiration_ttl": 2147483647
+  },
+  {
+    "key": "JWT_ISSUER",
+    "value": "hono-auth-worker",
+    "expiration_ttl": 2147483647
+  },
+  {
+    "key": "JWT_AUDIENCE",
+    "value": "hono-auth-client",
+    "expiration_ttl": 2147483647
+  },
+  {
+    "key": "JWT_ENFORCE_ISSUER",
+    "value": "true",
+    "expiration_ttl": 2147483647
+  },
+  {
+    "key": "JWT_ENFORCE_AUDIENCE",
+    "value": "true",
+    "expiration_ttl": 2147483647
+  },
+  {
+    "key": "JWT_ALLOWED_CLOCK_SKEW",
+    "value": "10",
+    "expiration_ttl": 2147483647
+  },
+  {
+    "key": "JWT_MAX_ACCESS_TOKEN_LIFETIME",
+    "value": "7200",
+    "expiration_ttl": 2147483647
+  },
+  {
+    "key": "JWT_DEFAULT_SCOPE",
+    "value": "user:basic",
+    "expiration_ttl": 2147483647
+  },
+  {
+    "key": "JWT_SCOPE_SEPARATOR",
+    "value": " ",
+    "expiration_ttl": 2147483647
+  },
+  {
+    "key": "JWT_SUBJECT_PREFIX",
+    "value": "user",
+    "expiration_ttl": 2147483647
+  },
+  {
+    "key": "MAX_REFRESH_TOKENS_PER_USER",
+    "value": "5",
+    "expiration_ttl": 2147483647
+  },
+  {
+    "key": "REFRESH_TOKEN_REUSE_GRACE_SECONDS",
+    "value": "30",
+    "expiration_ttl": 2147483647
+  },
+  {
+    "key": "ENFORCE_ACCESS_TOKEN_IP_BINDING",
+    "value": "false",
+    "expiration_ttl": 2147483647
+  },
+  {
+    "key": "ENFORCE_ACCESS_TOKEN_UA_BINDING",
+    "value": "false",
+    "expiration_ttl": 2147483647
+  },
+  {
+    "key": "ENFORCE_REFRESH_TOKEN_IP_BINDING",
+    "value": "false",
+    "expiration_ttl": 2147483647
+  },
+  {
+    "key": "ENFORCE_REFRESH_TOKEN_UA_BINDING",
+    "value": "false",
     "expiration_ttl": 2147483647
   },
   {
@@ -70,6 +150,31 @@
     "expiration_ttl": 2147483647
   },
   {
+    "key": "SECURITY_COOP",
+    "value": "same-origin",
+    "expiration_ttl": 2147483647
+  },
+  {
+    "key": "SECURITY_COEP",
+    "value": "require-corp",
+    "expiration_ttl": 2147483647
+  },
+  {
+    "key": "SECURITY_CORP",
+    "value": "same-origin",
+    "expiration_ttl": 2147483647
+  },
+  {
+    "key": "SECURITY_X_DOWNLOAD_OPTIONS",
+    "value": "noopen",
+    "expiration_ttl": 2147483647
+  },
+  {
+    "key": "SECURITY_X_PERMITTED_CDP",
+    "value": "none",
+    "expiration_ttl": 2147483647
+  },
+  {
     "key": "SECURITY_HSTS",
     "value": "max-age=31536000; includeSubDomains; preload",
     "expiration_ttl": 2147483647
@@ -107,6 +212,51 @@
   {
     "key": "CORS_ORIGIN",
     "value": "*",
+    "expiration_ttl": 2147483647
+  },
+  {
+    "key": "EMAIL_ENABLED",
+    "value": "false",
+    "expiration_ttl": 2147483647
+  },
+  {
+    "key": "EMAIL_CONFIRMATION_ENABLED",
+    "value": "false",
+    "expiration_ttl": 2147483647
+  },
+  {
+    "key": "EMAIL_FROM_ADDRESS",
+    "value": "no-reply@hono-auth.local",
+    "expiration_ttl": 2147483647
+  },
+  {
+    "key": "EMAIL_FROM_NAME",
+    "value": "Hono Auth API",
+    "expiration_ttl": 2147483647
+  },
+  {
+    "key": "EMAIL_REPLY_TO",
+    "value": "",
+    "expiration_ttl": 2147483647
+  },
+  {
+    "key": "EMAIL_PROVIDER",
+    "value": "brevo",
+    "expiration_ttl": 2147483647
+  },
+  {
+    "key": "EMAIL_PROVIDER_ENDPOINT",
+    "value": "https://api.brevo.com/v3/smtp/email",
+    "expiration_ttl": 2147483647
+  },
+  {
+    "key": "EMAIL_PROVIDER_API_KEY",
+    "value": "",
+    "expiration_ttl": 2147483647
+  },
+  {
+    "key": "EMAIL_PROVIDER_AUTH_HEADER",
+    "value": "api-key",
     "expiration_ttl": 2147483647
   },
   {

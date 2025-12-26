@@ -495,7 +495,7 @@ export async function getAppSettings(env) {
   return {
     name: await getStringConfig(env, 'APP_NAME', 'Hono Auth API'),
     version: await getStringConfig(env, 'APP_VERSION', '1.0.0'),
-    url: await getStringConfig(env, 'APP_URL', 'https://your-app.com')
+    url: await getStringConfig(env, 'APP_URL', DEFAULT_CONFIGS.APP_URL)
   };
 }
 
@@ -523,7 +523,7 @@ export async function getEmailSettings(env) {
     providerEndpoint: await getStringConfig(env, 'EMAIL_PROVIDER_ENDPOINT', 'https://api.mailchannels.net/tx/v1/send'),
     providerApiKey: await getStringConfig(env, 'EMAIL_PROVIDER_API_KEY', ''),
     providerAuthHeader: await getStringConfig(env, 'EMAIL_PROVIDER_AUTH_HEADER', 'Authorization'),
-    appUrl: await getStringConfig(env, 'APP_URL', 'https://your-app.com')
+    appUrl: await getStringConfig(env, 'APP_URL', DEFAULT_CONFIGS.APP_URL)
   };
 }
 
