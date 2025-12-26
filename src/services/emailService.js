@@ -2,6 +2,8 @@ import { BaseService } from './baseService.js';
 import { emailService_log, error_log } from '../utils/debug.js';
 import { getAppSettings } from '../utils/dynamicConfig.js';
 import { tl, getDefaultLanguage, isLanguageSupported } from '../i18n/index.js';
+import { isValidEmail } from '../utils/helpers.js';
+import { DEFAULT_CONFIGS } from '../constants/kvKeys.js';
 
 
 /**
@@ -67,7 +69,7 @@ export function generateActivationToken() {
  * @param {string} params.baseUrl - Base URL for activation link
  * @returns {Promise<{subject: string, plainText: string, htmlBody: string, lang: string, activationUrl: string}>}
  */
-export async function buildRegistrationEmailContent({ user, context = {}, appName = 'Hono Auth API', baseUrl = 'https://your-app.com' }) {
+export async function buildRegistrationEmailContent({ user, context = {}, appName = 'Hono Auth API', baseUrl = DEFAULT_CONFIGS.APP_URL }) {
   const desiredLang = context.locale;
   const lang = (desiredLang && isLanguageSupported(desiredLang)) ? desiredLang : await getDefaultLanguage();
 
@@ -250,7 +252,7 @@ export class EmailService extends BaseService {
     const emailConfig = await this.getEmailConfig();
     const appSettings = await getAppSettings(this.env);
 
-    const baseUrl = context.baseUrl || emailConfig.appUrl || appSettings.url || 'https://your-app.com';
+    const baseUrl = context.baseUrl || emailConfig.appUrl || appSettings.url || DEFAULT_CONFIGS.APP_URL;
 
     return buildRegistrationEmailContent({
       user,
@@ -267,37 +269,35 @@ export class EmailService extends BaseService {
    * @returns {Promise<{success: boolean, skipped?: boolean, error?: string, status?: number, provider?: string, reason?: string}>}
    */
   async sendRegistrationConfirmation(user, context = {}) {
+    const { debug: debugFlag, ...safeContext } = context || {};
+    const debugMode = Boolean(debugFlag);
     const emailConfig = await this.getEmailConfig();
     const provider = (emailConfig.provider || 'mailchannels').toLowerCase();
-    const debugMode = Boolean(context.debug);
-    delete context.debug;
 
     if (debugMode) {
-      emailService_log(`context: ${JSON.stringify(context)}`);
+      emailService_log(`context: ${JSON.stringify(safeContext)}`);
     }
+    const toggleResult = this.checkConfigToggles(emailConfig);
+    if (toggleResult) {return toggleResult;}
 
-    if (!emailConfig.enabled || !emailConfig.confirmationEnabled) {
-      emailService_log('Registration confirmation email skipped: email disabled via config');
-      return { success: true, skipped: true, reason: 'EMAIL_DISABLED' };
-    }
+    const recipientResult = this.validateRecipientAndSender(user, emailConfig);
+    if (recipientResult.error) {return recipientResult.error;}
 
-    if (!user?.email) {
-      error_log('Registration confirmation email failed: missing recipient email');
-      return { success: false, error: 'MISSING_RECIPIENT', message: 'Recipient email address is required' };
-    }
+    const tokenResult = this.ensureActivationToken(user);
+    if (tokenResult.error) {return tokenResult.error;}
 
-    if (!emailConfig.fromAddress) {
-      error_log('Registration confirmation email failed: missing sender address (EMAIL_FROM_ADDRESS not configured)');
-      return { success: false, error: 'MISSING_SENDER', message: 'Sender address (EMAIL_FROM_ADDRESS) is not configured in KV or environment' };
-    }
+    const appSettings = await getAppSettings(this.env);
+    const { recipientEmail, recipientName } = recipientResult;
 
     // Build email content using shared function
-    const { subject, plainText, htmlBody, lang, activationUrl } = await this.buildEmailContent(user, context);
-    const appSettings = await getAppSettings(this.env);
-    const recipientName = user.full_name || user.email;
+    const { subject, plainText, htmlBody, lang, activationUrl } = await this.buildEmailContent({
+      ...user,
+      email: recipientEmail,
+      activation_token: tokenResult.activationToken
+    }, safeContext);
 
     // Allow preview mode (skip sending) for testing/local validation
-    if (context.preview) {
+    if (safeContext.preview) {
       emailService_log('Preview mode enabled - skipping email send');
       return {
         success: true,
@@ -313,62 +313,21 @@ export class EmailService extends BaseService {
       };
     }
 
-    const payload = provider === 'brevo'
-      ? {
-        sender: {
-          email: emailConfig.fromAddress,
-          name: emailConfig.fromName || appSettings.name
-        },
-        to: [{ email: user.email, name: recipientName }],
-        subject,
-        htmlContent: htmlBody,
-        textContent: plainText,
-        ...(emailConfig.replyTo
-          ? { replyTo: { email: emailConfig.replyTo, name: emailConfig.fromName || appSettings.name } }
-          : {}),
-        ...(context.userAgent ? { headers: { 'User-Agent': context.userAgent } } : {})
-      }
-      : {
-        personalizations: [
-          {
-            to: [{ email: user.email, name: recipientName }],
-            ...(context.userAgent ? { headers: { 'User-Agent': context.userAgent } } : {})
-          }
-        ],
-        from: {
-          email: emailConfig.fromAddress,
-          name: emailConfig.fromName || appSettings.name
-        },
-        subject,
-        content: [
-          { type: 'text/plain', value: plainText },
-          { type: 'text/html', value: htmlBody }
-        ],
-        ...(emailConfig.replyTo
-          ? {
-            reply_to: {
-              email: emailConfig.replyTo,
-              name: emailConfig.fromName || appSettings.name
-            }
-          }
-          : {})
-      };
+    const payload = this.buildEmailPayload({
+      provider,
+      emailConfig,
+      appSettings,
+      recipientEmail,
+      recipientName,
+      subject,
+      plainText,
+      htmlBody,
+      userAgent: safeContext.userAgent
+    });
 
-    const headers = {
-      'content-type': 'application/json'
-    };
-
-    const authHeader = emailConfig.providerAuthHeader || (provider === 'brevo' ? 'api-key' : 'Authorization');
-
-    if (emailConfig.providerApiKey) {
-      headers[authHeader] = emailConfig.providerApiKey;
-    } else if (provider === 'brevo') {
-      return {
-        success: false,
-        error: 'MISSING_API_KEY',
-        message: 'Brevo provider requires EMAIL_PROVIDER_API_KEY'
-      };
-    }
+    const headerResult = this.buildEmailHeaders(emailConfig, provider);
+    if (headerResult.error) {return headerResult.error;}
+    const { headers, authHeader } = headerResult;
 
     const endpoint = emailConfig.providerEndpoint || (provider === 'brevo'
       ? 'https://api.brevo.com/v3/smtp/email'
@@ -423,5 +382,109 @@ export class EmailService extends BaseService {
         } : {})
       };
     }
+  }
+
+  checkConfigToggles(emailConfig) {
+    if (!emailConfig.enabled || !emailConfig.confirmationEnabled) {
+      emailService_log('Registration confirmation email skipped: email disabled via config');
+      return { success: true, skipped: true, reason: 'EMAIL_DISABLED' };
+    }
+    return null;
+  }
+
+  validateRecipientAndSender(user, emailConfig) {
+    const recipientEmail = user?.email?.trim?.();
+    if (!recipientEmail) {
+      error_log('Registration confirmation email failed: missing recipient email');
+      return { error: { success: false, error: 'MISSING_RECIPIENT', message: 'Recipient email address is required' } };
+    }
+
+    if (!isValidEmail(recipientEmail)) {
+      error_log(`Registration confirmation email failed: invalid recipient email ${recipientEmail}`);
+      return { error: { success: false, error: 'INVALID_RECIPIENT', message: 'Recipient email address is invalid' } };
+    }
+
+    if (!emailConfig.fromAddress) {
+      error_log('Registration confirmation email failed: missing sender address (EMAIL_FROM_ADDRESS not configured)');
+      return { error: { success: false, error: 'MISSING_SENDER', message: 'Sender address (EMAIL_FROM_ADDRESS) is not configured in KV or environment' } };
+    }
+
+    return {
+      recipientEmail,
+      recipientName: user.full_name || recipientEmail
+    };
+  }
+
+  ensureActivationToken(user) {
+    const activationToken = user?.activation_token;
+    if (!activationToken) {
+      error_log('Registration confirmation email failed: missing activation token');
+      return { error: { success: false, error: 'MISSING_ACTIVATION_TOKEN', message: 'Activation token is required to send confirmation email' } };
+    }
+
+    return { activationToken };
+  }
+
+  buildEmailPayload({ provider, emailConfig, appSettings, recipientEmail, recipientName, subject, plainText, htmlBody, userAgent }) {
+    const baseSender = {
+      email: emailConfig.fromAddress,
+      name: emailConfig.fromName || appSettings.name
+    };
+
+    if (provider === 'brevo') {
+      return {
+        sender: baseSender,
+        to: [{ email: recipientEmail, name: recipientName }],
+        subject,
+        htmlContent: htmlBody,
+        textContent: plainText,
+        ...(emailConfig.replyTo
+          ? { replyTo: { email: emailConfig.replyTo, name: baseSender.name } }
+          : {}),
+        ...(userAgent ? { headers: { 'User-Agent': userAgent } } : {})
+      };
+    }
+
+    return {
+      personalizations: [
+        {
+          to: [{ email: recipientEmail, name: recipientName }],
+          ...(userAgent ? { headers: { 'User-Agent': userAgent } } : {})
+        }
+      ],
+      from: baseSender,
+      subject,
+      content: [
+        { type: 'text/plain', value: plainText },
+        { type: 'text/html', value: htmlBody }
+      ],
+      ...(emailConfig.replyTo
+        ? {
+          reply_to: {
+            email: emailConfig.replyTo,
+            name: baseSender.name
+          }
+        }
+        : {})
+    };
+  }
+
+  buildEmailHeaders(emailConfig, provider) {
+    const headers = {
+      'content-type': 'application/json'
+    };
+
+    const authHeader = emailConfig.providerAuthHeader || (provider === 'brevo' ? 'api-key' : 'Authorization');
+
+    if (emailConfig.providerApiKey) {
+      headers[authHeader] = emailConfig.providerApiKey;
+      return { headers, authHeader };
+    }
+
+    if (provider === 'brevo') {
+      return { error: { success: false, error: 'MISSING_API_KEY', message: 'Brevo provider requires EMAIL_PROVIDER_API_KEY' } };
+    }
+
+    return { headers, authHeader };
   }
 }

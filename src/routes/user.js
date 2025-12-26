@@ -11,7 +11,7 @@ import { i18nValidatorsMiddleware } from '../middleware/i18nValidator.js';
 import { getFeatureFlags } from '../utils/dynamicConfig.js';
 import { unifiedMiddlewares } from '../middleware/unifiedRequestMiddleware.js';
 import { handleStandardError } from '../utils/errorHandler.js';
-import { ROLES } from '../constants/roles.js';
+import { ROLES, USER_STATUSES } from '../constants/roles.js';
 
 const user = new Hono();
 
@@ -109,36 +109,52 @@ user.post('/register', i18nValidatorsMiddleware.register(), async (c) => {
 
     // Send confirmation email (best-effort; does not block registration success)
     const emailStatus = { sent: false, skipped: false, provider: null };
-    try {
-      const sendResult = await emailService.sendRegistrationConfirmation({
-        id: result.data.id,
-        full_name,
-        email,
-        status: result.data.status
-      }, {
-        locale: c.get('language'),
-        ipAddress: getClientIP(c),
-        userAgent: c.req.header('user-agent') || 'Unknown'
-      });
+    const shouldSendActivation = result.data.status !== USER_STATUSES.ACTIVE;
+    const activationToken = result.data.activation_token;
 
-      emailStatus.sent = sendResult?.success && !sendResult?.skipped;
-      emailStatus.skipped = Boolean(sendResult?.skipped);
-      emailStatus.provider = sendResult?.provider || null;
-      emailStatus.reason = sendResult?.reason || sendResult?.error || null;
+    if (shouldSendActivation && activationToken) {
+      try {
+        const sendResult = await emailService.sendRegistrationConfirmation({
+          id: result.data.id,
+          full_name,
+          email,
+          status: result.data.status,
+          activation_token: activationToken
+        }, {
+          locale: c.get('language'),
+          ipAddress: getClientIP(c),
+          userAgent: c.req.header('user-agent') || 'Unknown'
+        });
 
-      if (!sendResult?.success) {
-        userRoutes_log(`Registration email send did not complete successfully: ${emailStatus.reason || 'unknown reason'}`);
+        emailStatus.sent = sendResult?.success && !sendResult?.skipped;
+        emailStatus.skipped = Boolean(sendResult?.skipped);
+        emailStatus.provider = sendResult?.provider || null;
+        emailStatus.reason = sendResult?.reason || sendResult?.error || null;
+
+        if (!sendResult?.success) {
+          userRoutes_log(`Registration email send did not complete successfully: ${emailStatus.reason || 'unknown reason'}`);
+        }
+      } catch (emailError) {
+        emailStatus.sent = false;
+        emailStatus.reason = emailError.message;
+        userRoutes_log(`Registration email send error: ${emailError.message}`);
       }
-    } catch (emailError) {
-      emailStatus.sent = false;
-      emailStatus.reason = emailError.message;
-      userRoutes_log(`Registration email send error: ${emailError.message}`);
+    } else {
+      emailStatus.skipped = true;
+      emailStatus.reason = shouldSendActivation ? 'MISSING_ACTIVATION_TOKEN' : 'AUTO_ACTIVATED';
+      if (shouldSendActivation) {
+        userRoutes_log('Registration email skipped: activation token missing');
+      }
     }
 
     const successKey = result.data.status === 'active' ? 'user.registered' : 'user.registeredPendingActivation';
 
+    const safeUserData = { ...result.data };
+    delete safeUserData.activation_token;
+    delete safeUserData.activation_token_expires_at;
+
     return c.json(createSuccessResponse({
-      ...result.data,
+      ...safeUserData,
       email_notification: emailStatus
     }, tSuccess(c, successKey, {
       userName: full_name,
