@@ -301,41 +301,43 @@ export function createUnifiedRequestMiddleware(
 
     handleMiddleware_log(`🏁 REQUEST COMPLETE [${requestId}] - Total time: ${processingTime}ms\n`);
 
-    // Always enable audit logging for all routes
-    try {
-      const auditEntry = createAuditEntry(c, {
-        requestId,
-        method,
-        path,
-        query,
-        ip,
-        userAgent,
-        requestBody: requestBodyForAudit,
-        responseData,
-        statusCode,
-        processingTime,
-        error,
-        routeName: finalRouteName,
-        routeType
-      });
+    // Audit logging (can be disabled via config.enableAudit for per-route control)
+    if (config.enableAudit) {
+      try {
+        const auditEntry = createAuditEntry(c, {
+          requestId,
+          method,
+          path,
+          query,
+          ip,
+          userAgent,
+          requestBody: requestBodyForAudit,
+          responseData,
+          statusCode,
+          processingTime,
+          error,
+          routeName: finalRouteName,
+          routeType
+        });
 
-      const auditLogService = new AuditLogService(c.env);
+        const auditLogService = new AuditLogService(c.env);
 
-      // Use waitUntil to prevent blocking the response
-      if (c.executionCtx && typeof c.executionCtx.waitUntil === 'function') {
-        c.executionCtx.waitUntil(
-          auditLogService.log(auditEntry)
-            .then(() => handleMiddleware_log(`📋 Audit logged (async): ${auditEntry.action} by ${auditEntry.actor_role}`))
-            .catch(err => auditMiddleware_log('❌ Failed to log audit entry (async):', err))
-        );
-      } else {
-        // Fallback for environments without executionCtx (e.g. some tests)
-        await auditLogService.log(auditEntry);
-        handleMiddleware_log(`📋 Audit logged (sync): ${auditEntry.action} by ${auditEntry.actor_role}`);
+        // Use waitUntil to prevent blocking the response
+        if (c.executionCtx && typeof c.executionCtx.waitUntil === 'function') {
+          c.executionCtx.waitUntil(
+            auditLogService.log(auditEntry)
+              .then(() => handleMiddleware_log(`📋 Audit logged (async): ${auditEntry.action} by ${auditEntry.actor_role}`))
+              .catch(err => auditMiddleware_log('❌ Failed to log audit entry (async):', err))
+          );
+        } else {
+          // Fallback for environments without executionCtx (e.g. some tests)
+          await auditLogService.log(auditEntry);
+          handleMiddleware_log(`📋 Audit logged (sync): ${auditEntry.action} by ${auditEntry.actor_role}`);
+        }
+
+      } catch (auditError) {
+        auditMiddleware_log(`❌ Failed to log audit entry for ${routeType} route:`, auditError);
       }
-
-    } catch (auditError) {
-      auditMiddleware_log(`❌ Failed to log audit entry for ${routeType} route:`, auditError);
     }
   };
 }
