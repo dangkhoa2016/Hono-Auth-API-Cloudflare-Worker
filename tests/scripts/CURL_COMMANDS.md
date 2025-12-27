@@ -1009,7 +1009,7 @@ curl -s -X GET http://localhost:8788/api \
   -H "Authorization: Bearer YOUR_TOKEN" | jq .
 
 # System routes discovery (Admin only)
-curl -s -X GET http://localhost:8788/routes \
+curl -s -X GET http://localhost:8788/route-metadata \
   -H "Authorization: Bearer YOUR_ADMIN_TOKEN" | jq .
 ```
 

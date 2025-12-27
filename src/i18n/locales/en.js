@@ -228,6 +228,7 @@ export default {
     'auth': {
       'login': 'Login with email and password',
       'logout': 'Logout and invalidate tokens',
+      'logoutAll': 'Logout from all devices (revoke all tokens)',
       'refresh': 'Refresh access token'
     },
     'demo': {

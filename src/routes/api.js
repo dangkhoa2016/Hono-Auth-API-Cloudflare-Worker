@@ -93,7 +93,10 @@ api.get('/api', authMiddleware, async (c) => {
         role: userRole,
         can_access_admin: ROLE_COMBINATIONS.ADMIN_ONLY.includes(userRole),
         can_access_kv_admin: userRole === ROLES.SUPER_ADMIN,
-        can_access_audit: ROLE_COMBINATIONS.ADMIN_ONLY.includes(userRole)
+        can_access_audit: ROLE_COMBINATIONS.ADMIN_ONLY.includes(userRole),
+        can_access_advanced_audit: ROLE_COMBINATIONS.ADMIN_ONLY.includes(userRole),
+        can_access_realtime_monitoring: ROLE_COMBINATIONS.ADMIN_ONLY.includes(userRole),
+        can_access_security_incident: ROLE_COMBINATIONS.ADMIN_ONLY.includes(userRole)
       }
     }
   });
@@ -149,7 +152,7 @@ api.get('/language', (c) => {
 });
 
 // System route discovery endpoint (admin only) - comprehensive route listing
-api.get('/routes', authMiddleware, (c) => {
+api.get('/route-metadata', authMiddleware, (c) => {
   const currentUser = c.get('user');
   const lang = c.get('language');
 
@@ -164,17 +167,23 @@ api.get('/routes', authMiddleware, (c) => {
 
   // Get routes directly from registry
   const routeRegistry = getAllRoutes();
+  const userRole = currentUser.role;
 
-  // Enhanced route information with permissions
+  // Enhanced route information with permissions (filtered by role)
   const enhancedRoutes = {};
 
   Object.keys(routeRegistry).forEach(category => {
-    enhancedRoutes[category] = {};
+    const categoryRoutes = routeRegistry[category];
+    const filteredCategoryRoutes = {};
 
-    Object.keys(routeRegistry[category]).forEach(routeKey => {
-      const routeData = routeRegistry[category][routeKey];
+    Object.keys(categoryRoutes).forEach(routeKey => {
+      const routeData = categoryRoutes[routeKey];
+      const permissions = routeData.permissions;
+      const canAccess = permissions?.public || (permissions?.roles && permissions.roles.includes(userRole));
 
-      enhancedRoutes[category][routeKey] = {
+      if (!canAccess) return;
+
+      filteredCategoryRoutes[routeKey] = {
         description: t(c, routeData.i18nKey),
         method: routeData.method,
         path: routeData.path,
@@ -182,12 +191,16 @@ api.get('/routes', authMiddleware, (c) => {
         category: routeData.category
       };
     });
+
+    if (Object.keys(filteredCategoryRoutes).length > 0) {
+      enhancedRoutes[category] = filteredCategoryRoutes;
+    }
   });
 
   i18n_log(`System routes requested by user: ${currentUser.user_id} (${currentUser.role})`);
 
-  const totalRoutes = Object.values(routeRegistry).reduce((sum, cat) => sum + Object.keys(cat).length, 0);
-  const categories = Object.keys(routeRegistry);
+  const totalRoutes = Object.values(enhancedRoutes).reduce((sum, cat) => sum + Object.keys(cat).length, 0);
+  const categories = Object.keys(enhancedRoutes);
 
   return c.json(createSuccessResponse({
     language: lang,
@@ -197,7 +210,7 @@ api.get('/routes', authMiddleware, (c) => {
       total_categories: categories.length,
       categories: categories,
       routes_by_category: Object.fromEntries(
-        categories.map(cat => [cat, Object.keys(routeRegistry[cat]).length])
+        categories.map(cat => [cat, Object.keys(enhancedRoutes[cat]).length])
       ),
       scan_method: 'registry'
     },

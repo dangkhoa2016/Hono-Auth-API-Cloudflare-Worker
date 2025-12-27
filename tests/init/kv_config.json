@@ -16,7 +16,7 @@
   },
   {
     "key": "DEBUG",
-    "value": "hono-auth-api:*",
+    "value": "",
     "expiration_ttl": 2147483647
   },
   {
@@ -201,12 +201,12 @@
   },
   {
     "key": "ENABLE_RESPONSE_BODY_CAPTURE",
-    "value": "true", 
+    "value": "false", 
     "expiration_ttl": 2147483647
   },
   {
     "key": "LOG_SQL_QUERIES",
-    "value": "true",
+    "value": "false",
     "expiration_ttl": 2147483647
   },
   {

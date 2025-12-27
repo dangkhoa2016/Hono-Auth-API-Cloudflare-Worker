@@ -1,0 +1,1171 @@
+{
+  "success": true,
+  "data": {
+    "language": "en",
+    "routes": {
+      "system": {
+        "GET /": {
+          "description": "API root endpoint - welcome message",
+          "method": "GET",
+          "path": "/",
+          "permissions": {
+            "public": true,
+            "roles": []
+          },
+          "category": "system"
+        },
+        "GET /health": {
+          "description": "Health check endpoint",
+          "method": "GET",
+          "path": "/health",
+          "permissions": {
+            "public": true,
+            "roles": []
+          },
+          "category": "system"
+        },
+        "GET /version": {
+          "description": "API version information",
+          "method": "GET",
+          "path": "/version",
+          "permissions": {
+            "public": true,
+            "roles": []
+          },
+          "category": "system"
+        },
+        "GET /language": {
+          "description": "Language switcher endpoint",
+          "method": "GET",
+          "path": "/language",
+          "permissions": {
+            "public": true,
+            "roles": []
+          },
+          "category": "system"
+        },
+        "GET /api": {
+          "description": "Comprehensive API information and endpoints",
+          "method": "GET",
+          "path": "/api",
+          "permissions": {
+            "public": false,
+            "roles": [
+              "user",
+              "admin",
+              "super_admin"
+            ]
+          },
+          "category": "system"
+        },
+        "GET /route-metadata": {
+          "description": "System route discovery (admin only)",
+          "method": "GET",
+          "path": "/route-metadata",
+          "permissions": {
+            "public": false,
+            "roles": [
+              "admin",
+              "super_admin"
+            ]
+          },
+          "category": "system"
+        }
+      },
+      "assets": {
+        "GET /favicon": {
+          "description": "Favicon and icon resources",
+          "method": "GET",
+          "path": "/favicon",
+          "permissions": {
+            "public": true,
+            "roles": []
+          },
+          "category": "assets"
+        },
+        "GET /favicon.ico": {
+          "description": "Favicon and icon resources",
+          "method": "GET",
+          "path": "/favicon.ico",
+          "permissions": {
+            "public": true,
+            "roles": []
+          },
+          "category": "assets"
+        },
+        "GET /favicon.png": {
+          "description": "Favicon and icon resources",
+          "method": "GET",
+          "path": "/favicon.png",
+          "permissions": {
+            "public": true,
+            "roles": []
+          },
+          "category": "assets"
+        },
+        "GET /apple-touch-icon.png": {
+          "description": "Favicon and icon resources",
+          "method": "GET",
+          "path": "/apple-touch-icon.png",
+          "permissions": {
+            "public": true,
+            "roles": []
+          },
+          "category": "assets"
+        },
+        "GET /icon-192.png": {
+          "description": "Favicon and icon resources",
+          "method": "GET",
+          "path": "/icon-192.png",
+          "permissions": {
+            "public": true,
+            "roles": []
+          },
+          "category": "assets"
+        }
+      },
+      "auth": {
+        "POST /api/auth/login": {
+          "description": "Login with email and password",
+          "method": "POST",
+          "path": "/api/auth/login",
+          "permissions": {
+            "public": true,
+            "roles": []
+          },
+          "category": "auth"
+        },
+        "POST /api/auth/refresh_token": {
+          "description": "Refresh access token",
+          "method": "POST",
+          "path": "/api/auth/refresh_token",
+          "permissions": {
+            "public": true,
+            "roles": []
+          },
+          "category": "auth"
+        },
+        "POST /api/auth/logout": {
+          "description": "Logout and invalidate tokens",
+          "method": "POST",
+          "path": "/api/auth/logout",
+          "permissions": {
+            "public": false,
+            "roles": [
+              "user",
+              "admin",
+              "super_admin"
+            ]
+          },
+          "category": "auth"
+        },
+        "POST /api/auth/logout-all": {
+          "description": "Logout from all devices (revoke all tokens)",
+          "method": "POST",
+          "path": "/api/auth/logout-all",
+          "permissions": {
+            "public": false,
+            "roles": [
+              "user",
+              "admin",
+              "super_admin"
+            ]
+          },
+          "category": "auth"
+        }
+      },
+      "user": {
+        "POST /api/user/register": {
+          "description": "Register new user",
+          "method": "POST",
+          "path": "/api/user/register",
+          "permissions": {
+            "public": true,
+            "roles": []
+          },
+          "category": "user"
+        },
+        "GET /api/user/profile": {
+          "description": "Get user profile (requires authentication)",
+          "method": "GET",
+          "path": "/api/user/profile",
+          "permissions": {
+            "public": false,
+            "roles": [
+              "user",
+              "admin",
+              "super_admin"
+            ]
+          },
+          "category": "user"
+        },
+        "PUT /api/user/profile": {
+          "description": "Update user profile (requires authentication)",
+          "method": "PUT",
+          "path": "/api/user/profile",
+          "permissions": {
+            "public": false,
+            "roles": [
+              "user",
+              "admin",
+              "super_admin"
+            ]
+          },
+          "category": "user"
+        },
+        "GET /api/user/me": {
+          "description": "Get current user info (requires authentication)",
+          "method": "GET",
+          "path": "/api/user/me",
+          "permissions": {
+            "public": false,
+            "roles": [
+              "user",
+              "admin",
+              "super_admin"
+            ]
+          },
+          "category": "user"
+        },
+        "POST /api/user/change-password": {
+          "description": "Change password (requires authentication)",
+          "method": "POST",
+          "path": "/api/user/change-password",
+          "permissions": {
+            "public": false,
+            "roles": [
+              "user",
+              "admin",
+              "super_admin"
+            ]
+          },
+          "category": "user"
+        }
+      },
+      "admin": {
+        "GET /api/admin/users": {
+          "description": "List all users (admin access required)",
+          "method": "GET",
+          "path": "/api/admin/users",
+          "permissions": {
+            "public": false,
+            "roles": [
+              "admin",
+              "super_admin"
+            ]
+          },
+          "category": "admin"
+        },
+        "POST /api/admin/users": {
+          "description": "Create new user (admin access required)",
+          "method": "POST",
+          "path": "/api/admin/users",
+          "permissions": {
+            "public": false,
+            "roles": [
+              "admin",
+              "super_admin"
+            ]
+          },
+          "category": "admin"
+        },
+        "GET /api/admin/users/:id": {
+          "description": "Get user details (admin access required)",
+          "method": "GET",
+          "path": "/api/admin/users/:id",
+          "permissions": {
+            "public": false,
+            "roles": [
+              "admin",
+              "super_admin"
+            ]
+          },
+          "category": "admin"
+        },
+        "PUT /api/admin/users/:id": {
+          "description": "Update user information (admin access required)",
+          "method": "PUT",
+          "path": "/api/admin/users/:id",
+          "permissions": {
+            "public": false,
+            "roles": [
+              "admin",
+              "super_admin"
+            ]
+          },
+          "category": "admin"
+        },
+        "DELETE /api/admin/users/:id": {
+          "description": "Delete user (Super Admin access required)",
+          "method": "DELETE",
+          "path": "/api/admin/users/:id",
+          "permissions": {
+            "public": false,
+            "roles": [
+              "admin",
+              "super_admin"
+            ]
+          },
+          "category": "admin"
+        },
+        "PUT /api/admin/users/:id/role": {
+          "description": "Change user role (Super Admin access required)",
+          "method": "PUT",
+          "path": "/api/admin/users/:id/role",
+          "permissions": {
+            "public": false,
+            "roles": [
+              "admin",
+              "super_admin"
+            ]
+          },
+          "category": "admin"
+        },
+        "GET /api/admin/dashboard": {
+          "description": "Get comprehensive dashboard data (admin access required)",
+          "method": "GET",
+          "path": "/api/admin/dashboard",
+          "permissions": {
+            "public": false,
+            "roles": [
+              "admin",
+              "super_admin"
+            ]
+          },
+          "category": "admin"
+        },
+        "GET /api/admin/stats": {
+          "description": "Get system statistics (admin access required)",
+          "method": "GET",
+          "path": "/api/admin/stats",
+          "permissions": {
+            "public": false,
+            "roles": [
+              "admin",
+              "super_admin"
+            ]
+          },
+          "category": "admin"
+        },
+        "GET /api/admin/system-health": {
+          "description": "Get comprehensive system health status (admin access required)",
+          "method": "GET",
+          "path": "/api/admin/system-health",
+          "permissions": {
+            "public": false,
+            "roles": [
+              "admin",
+              "super_admin"
+            ]
+          },
+          "category": "admin"
+        }
+      },
+      "audit": {
+        "GET /api/audit/logs": {
+          "description": "View audit logs (admin access required)",
+          "method": "GET",
+          "path": "/api/audit/logs",
+          "permissions": {
+            "public": false,
+            "roles": [
+              "admin",
+              "super_admin"
+            ]
+          },
+          "category": "audit"
+        },
+        "GET /api/audit/search": {
+          "description": "Search audit logs (admin access required)",
+          "method": "GET",
+          "path": "/api/audit/search",
+          "permissions": {
+            "public": false,
+            "roles": [
+              "admin",
+              "super_admin"
+            ]
+          },
+          "category": "audit"
+        },
+        "GET /api/audit/stats": {
+          "description": "Get audit statistics (admin access required)",
+          "method": "GET",
+          "path": "/api/audit/stats",
+          "permissions": {
+            "public": false,
+            "roles": [
+              "admin",
+              "super_admin"
+            ]
+          },
+          "category": "audit"
+        },
+        "GET /api/audit/export": {
+          "description": "Export audit logs (admin access required)",
+          "method": "GET",
+          "path": "/api/audit/export",
+          "permissions": {
+            "public": false,
+            "roles": [
+              "admin",
+              "super_admin"
+            ]
+          },
+          "category": "audit"
+        },
+        "DELETE /api/audit/logs/:id": {
+          "description": "View audit logs (admin access required)",
+          "method": "DELETE",
+          "path": "/api/audit/logs/:id",
+          "permissions": {
+            "public": false,
+            "roles": [
+              "admin",
+              "super_admin"
+            ]
+          },
+          "category": "audit"
+        }
+      },
+      "advanced_audit": {
+        "GET /api/advanced-audit/analytics": {
+          "description": "Advanced audit analytics (admin access required)",
+          "method": "GET",
+          "path": "/api/advanced-audit/analytics",
+          "permissions": {
+            "public": false,
+            "roles": [
+              "admin",
+              "super_admin"
+            ]
+          },
+          "category": "advanced_audit"
+        },
+        "GET /api/advanced-audit/analytics/security": {
+          "description": "Security analytics (admin access required)",
+          "method": "GET",
+          "path": "/api/advanced-audit/analytics/security",
+          "permissions": {
+            "public": false,
+            "roles": [
+              "admin",
+              "super_admin"
+            ]
+          },
+          "category": "advanced_audit"
+        },
+        "GET /api/advanced-audit/analytics/behavior": {
+          "description": "Behavior analytics (admin access required)",
+          "method": "GET",
+          "path": "/api/advanced-audit/analytics/behavior",
+          "permissions": {
+            "public": false,
+            "roles": [
+              "admin",
+              "super_admin"
+            ]
+          },
+          "category": "advanced_audit"
+        },
+        "GET /api/advanced-audit/analytics/performance": {
+          "description": "Performance analytics (admin access required)",
+          "method": "GET",
+          "path": "/api/advanced-audit/analytics/performance",
+          "permissions": {
+            "public": false,
+            "roles": [
+              "admin",
+              "super_admin"
+            ]
+          },
+          "category": "advanced_audit"
+        },
+        "GET /api/advanced-audit/compliance": {
+          "description": "Compliance reporting (admin access required)",
+          "method": "GET",
+          "path": "/api/advanced-audit/compliance",
+          "permissions": {
+            "public": false,
+            "roles": [
+              "admin",
+              "super_admin"
+            ]
+          },
+          "category": "advanced_audit"
+        },
+        "GET /api/advanced-audit/compliance/report": {
+          "description": "Generate compliance report (admin access required)",
+          "method": "GET",
+          "path": "/api/advanced-audit/compliance/report",
+          "permissions": {
+            "public": false,
+            "roles": [
+              "admin",
+              "super_admin"
+            ]
+          },
+          "category": "advanced_audit"
+        },
+        "GET /api/advanced-audit/archival": {
+          "description": "Audit log archival (admin access required)",
+          "method": "GET",
+          "path": "/api/advanced-audit/archival",
+          "permissions": {
+            "public": false,
+            "roles": [
+              "admin",
+              "super_admin"
+            ]
+          },
+          "category": "advanced_audit"
+        },
+        "GET /api/advanced-audit/archival/stats": {
+          "description": "Archival statistics (admin access required)",
+          "method": "GET",
+          "path": "/api/advanced-audit/archival/stats",
+          "permissions": {
+            "public": false,
+            "roles": [
+              "admin",
+              "super_admin"
+            ]
+          },
+          "category": "advanced_audit"
+        },
+        "POST /api/advanced-audit/archival/run": {
+          "description": "Run archival process (admin access required)",
+          "method": "POST",
+          "path": "/api/advanced-audit/archival/run",
+          "permissions": {
+            "public": false,
+            "roles": [
+              "admin",
+              "super_admin"
+            ]
+          },
+          "category": "advanced_audit"
+        },
+        "POST /api/advanced-audit/archival/restore": {
+          "description": "Restore archived logs (admin access required)",
+          "method": "POST",
+          "path": "/api/advanced-audit/archival/restore",
+          "permissions": {
+            "public": false,
+            "roles": [
+              "admin",
+              "super_admin"
+            ]
+          },
+          "category": "advanced_audit"
+        },
+        "GET /api/advanced-audit/middleware/stats": {
+          "description": "Middleware statistics (admin access required)",
+          "method": "GET",
+          "path": "/api/advanced-audit/middleware/stats",
+          "permissions": {
+            "public": false,
+            "roles": [
+              "admin",
+              "super_admin"
+            ]
+          },
+          "category": "advanced_audit"
+        }
+      },
+      "realtime_monitoring": {
+        "GET /api/realtime-monitoring/events/recent": {
+          "description": "Get recent monitoring events (admin access required)",
+          "method": "GET",
+          "path": "/api/realtime-monitoring/events/recent",
+          "permissions": {
+            "public": false,
+            "roles": [
+              "admin",
+              "super_admin"
+            ]
+          },
+          "category": "realtime_monitoring"
+        },
+        "GET /api/realtime-monitoring/monitoring/status": {
+          "description": "Get monitoring status (admin access required)",
+          "method": "GET",
+          "path": "/api/realtime-monitoring/monitoring/status",
+          "permissions": {
+            "public": false,
+            "roles": [
+              "admin",
+              "super_admin"
+            ]
+          },
+          "category": "realtime_monitoring"
+        },
+        "POST /api/realtime-monitoring/monitoring/start": {
+          "description": "Start real-time monitoring (admin access required)",
+          "method": "POST",
+          "path": "/api/realtime-monitoring/monitoring/start",
+          "permissions": {
+            "public": false,
+            "roles": [
+              "admin",
+              "super_admin"
+            ]
+          },
+          "category": "realtime_monitoring"
+        },
+        "POST /api/realtime-monitoring/monitoring/stop": {
+          "description": "Stop real-time monitoring (admin access required)",
+          "method": "POST",
+          "path": "/api/realtime-monitoring/monitoring/stop",
+          "permissions": {
+            "public": false,
+            "roles": [
+              "admin",
+              "super_admin"
+            ]
+          },
+          "category": "realtime_monitoring"
+        },
+        "GET /api/realtime-monitoring/monitoring/threats": {
+          "description": "Get threat information (admin access required)",
+          "method": "GET",
+          "path": "/api/realtime-monitoring/monitoring/threats",
+          "permissions": {
+            "public": false,
+            "roles": [
+              "admin",
+              "super_admin"
+            ]
+          },
+          "category": "realtime_monitoring"
+        },
+        "POST /api/realtime-monitoring/monitoring/threats/:threatId/resolve": {
+          "description": "Resolve detected threat (admin access required)",
+          "method": "POST",
+          "path": "/api/realtime-monitoring/monitoring/threats/:threatId/resolve",
+          "permissions": {
+            "public": false,
+            "roles": [
+              "admin",
+              "super_admin"
+            ]
+          },
+          "category": "realtime_monitoring"
+        },
+        "POST /api/realtime-monitoring/monitoring/analyze": {
+          "description": "Analyze monitoring data (admin access required)",
+          "method": "POST",
+          "path": "/api/realtime-monitoring/monitoring/analyze",
+          "permissions": {
+            "public": false,
+            "roles": [
+              "admin",
+              "super_admin"
+            ]
+          },
+          "category": "realtime_monitoring"
+        },
+        "POST /api/realtime-monitoring/monitoring/simulate": {
+          "description": "Simulate monitoring scenarios (admin access required)",
+          "method": "POST",
+          "path": "/api/realtime-monitoring/monitoring/simulate",
+          "permissions": {
+            "public": false,
+            "roles": [
+              "admin",
+              "super_admin"
+            ]
+          },
+          "category": "realtime_monitoring"
+        },
+        "GET /api/realtime-monitoring/alerts/status": {
+          "description": "Get alerts status (admin access required)",
+          "method": "GET",
+          "path": "/api/realtime-monitoring/alerts/status",
+          "permissions": {
+            "public": false,
+            "roles": [
+              "admin",
+              "super_admin"
+            ]
+          },
+          "category": "realtime_monitoring"
+        },
+        "GET /api/realtime-monitoring/alerts/history": {
+          "description": "Get alerts history (admin access required)",
+          "method": "GET",
+          "path": "/api/realtime-monitoring/alerts/history",
+          "permissions": {
+            "public": false,
+            "roles": [
+              "admin",
+              "super_admin"
+            ]
+          },
+          "category": "realtime_monitoring"
+        },
+        "POST /api/realtime-monitoring/alerts/send": {
+          "description": "Send system alert (admin access required)",
+          "method": "POST",
+          "path": "/api/realtime-monitoring/alerts/send",
+          "permissions": {
+            "public": false,
+            "roles": [
+              "admin",
+              "super_admin"
+            ]
+          },
+          "category": "realtime_monitoring"
+        },
+        "GET /api/realtime-monitoring/alerts/rules": {
+          "description": "Manage alert rules (admin access required)",
+          "method": "GET",
+          "path": "/api/realtime-monitoring/alerts/rules",
+          "permissions": {
+            "public": false,
+            "roles": [
+              "admin",
+              "super_admin"
+            ]
+          },
+          "category": "realtime_monitoring"
+        },
+        "POST /api/realtime-monitoring/alerts/rules": {
+          "description": "Create alert rule (admin access required)",
+          "method": "POST",
+          "path": "/api/realtime-monitoring/alerts/rules",
+          "permissions": {
+            "public": false,
+            "roles": [
+              "admin",
+              "super_admin"
+            ]
+          },
+          "category": "realtime_monitoring"
+        },
+        "PUT /api/realtime-monitoring/alerts/rules/:ruleId/toggle": {
+          "description": "Enable/disable alert rule (admin access required)",
+          "method": "PUT",
+          "path": "/api/realtime-monitoring/alerts/rules/:ruleId/toggle",
+          "permissions": {
+            "public": false,
+            "roles": [
+              "admin",
+              "super_admin"
+            ]
+          },
+          "category": "realtime_monitoring"
+        },
+        "GET /api/realtime-monitoring/alerts/channels": {
+          "description": "Manage alert channels (admin access required)",
+          "method": "GET",
+          "path": "/api/realtime-monitoring/alerts/channels",
+          "permissions": {
+            "public": false,
+            "roles": [
+              "admin",
+              "super_admin"
+            ]
+          },
+          "category": "realtime_monitoring"
+        },
+        "POST /api/realtime-monitoring/alerts/channels": {
+          "description": "Create alert channel (admin access required)",
+          "method": "POST",
+          "path": "/api/realtime-monitoring/alerts/channels",
+          "permissions": {
+            "public": false,
+            "roles": [
+              "admin",
+              "super_admin"
+            ]
+          },
+          "category": "realtime_monitoring"
+        },
+        "POST /api/realtime-monitoring/alerts/test": {
+          "description": "Test alert system (admin access required)",
+          "method": "POST",
+          "path": "/api/realtime-monitoring/alerts/test",
+          "permissions": {
+            "public": false,
+            "roles": [
+              "admin",
+              "super_admin"
+            ]
+          },
+          "category": "realtime_monitoring"
+        },
+        "POST /api/realtime-monitoring/alerts/configure": {
+          "description": "Configure system alerts (admin access required)",
+          "method": "POST",
+          "path": "/api/realtime-monitoring/alerts/configure",
+          "permissions": {
+            "public": false,
+            "roles": [
+              "admin",
+              "super_admin"
+            ]
+          },
+          "category": "realtime_monitoring"
+        },
+        "GET /api/realtime-monitoring/dashboard/overview": {
+          "description": "Dashboard overview (admin access required)",
+          "method": "GET",
+          "path": "/api/realtime-monitoring/dashboard/overview",
+          "permissions": {
+            "public": false,
+            "roles": [
+              "admin",
+              "super_admin"
+            ]
+          },
+          "category": "realtime_monitoring"
+        },
+        "GET /api/realtime-monitoring/dashboard/realtime": {
+          "description": "Live dashboard data (admin access required)",
+          "method": "GET",
+          "path": "/api/realtime-monitoring/dashboard/realtime",
+          "permissions": {
+            "public": false,
+            "roles": [
+              "admin",
+              "super_admin"
+            ]
+          },
+          "category": "realtime_monitoring"
+        },
+        "GET /api/realtime-monitoring/dashboard/live": {
+          "description": "Live dashboard snapshot (admin access required)",
+          "method": "GET",
+          "path": "/api/realtime-monitoring/dashboard/live",
+          "permissions": {
+            "public": false,
+            "roles": [
+              "admin",
+              "super_admin"
+            ]
+          },
+          "category": "realtime_monitoring"
+        },
+        "GET /api/realtime-monitoring/dashboard/timeline": {
+          "description": "Dashboard timeline (admin access required)",
+          "method": "GET",
+          "path": "/api/realtime-monitoring/dashboard/timeline",
+          "permissions": {
+            "public": false,
+            "roles": [
+              "admin",
+              "super_admin"
+            ]
+          },
+          "category": "realtime_monitoring"
+        },
+        "GET /api/realtime-monitoring/dashboard/security": {
+          "description": "Security dashboard (admin access required)",
+          "method": "GET",
+          "path": "/api/realtime-monitoring/dashboard/security",
+          "permissions": {
+            "public": false,
+            "roles": [
+              "admin",
+              "super_admin"
+            ]
+          },
+          "category": "realtime_monitoring"
+        },
+        "GET /api/realtime-monitoring/dashboard/performance": {
+          "description": "Performance dashboard (admin access required)",
+          "method": "GET",
+          "path": "/api/realtime-monitoring/dashboard/performance",
+          "permissions": {
+            "public": false,
+            "roles": [
+              "admin",
+              "super_admin"
+            ]
+          },
+          "category": "realtime_monitoring"
+        },
+        "POST /api/realtime-monitoring/dashboard/export": {
+          "description": "Export dashboard data (admin access required)",
+          "method": "POST",
+          "path": "/api/realtime-monitoring/dashboard/export",
+          "permissions": {
+            "public": false,
+            "roles": [
+              "admin",
+              "super_admin"
+            ]
+          },
+          "category": "realtime_monitoring"
+        },
+        "DELETE /api/realtime-monitoring/dashboard/cache": {
+          "description": "Clear dashboard cache (admin access required)",
+          "method": "DELETE",
+          "path": "/api/realtime-monitoring/dashboard/cache",
+          "permissions": {
+            "public": false,
+            "roles": [
+              "admin",
+              "super_admin"
+            ]
+          },
+          "category": "realtime_monitoring"
+        },
+        "GET /api/realtime-monitoring/dashboard/health": {
+          "description": "Dashboard health check (admin access required)",
+          "method": "GET",
+          "path": "/api/realtime-monitoring/dashboard/health",
+          "permissions": {
+            "public": false,
+            "roles": [
+              "admin",
+              "super_admin"
+            ]
+          },
+          "category": "realtime_monitoring"
+        },
+        "POST /api/realtime-monitoring/incidents/create": {
+          "description": "Create realtime monitoring incident (admin access required)",
+          "method": "POST",
+          "path": "/api/realtime-monitoring/incidents/create",
+          "permissions": {
+            "public": false,
+            "roles": [
+              "admin",
+              "super_admin"
+            ]
+          },
+          "category": "realtime_monitoring"
+        }
+      },
+      "security_incident": {
+        "GET /api/security-incident/incidents": {
+          "description": "List security incidents (admin access required)",
+          "method": "GET",
+          "path": "/api/security-incident/incidents",
+          "permissions": {
+            "public": false,
+            "roles": [
+              "admin",
+              "super_admin"
+            ]
+          },
+          "category": "security"
+        },
+        "POST /api/security-incident/incidents": {
+          "description": "Create security incident (admin access required)",
+          "method": "POST",
+          "path": "/api/security-incident/incidents",
+          "permissions": {
+            "public": false,
+            "roles": [
+              "admin",
+              "super_admin"
+            ]
+          },
+          "category": "security"
+        },
+        "GET /api/security-incident/incidents/:id": {
+          "description": "Get incident details (admin access required)",
+          "method": "GET",
+          "path": "/api/security-incident/incidents/:id",
+          "permissions": {
+            "public": false,
+            "roles": [
+              "admin",
+              "super_admin"
+            ]
+          },
+          "category": "security"
+        },
+        "PUT /api/security-incident/incidents/:id/status": {
+          "description": "Update incident status (admin access required)",
+          "method": "PUT",
+          "path": "/api/security-incident/incidents/:id/status",
+          "permissions": {
+            "public": false,
+            "roles": [
+              "admin",
+              "super_admin"
+            ]
+          },
+          "category": "security"
+        },
+        "POST /api/security-incident/incidents/:id/response": {
+          "description": "Execute incident response (admin access required)",
+          "method": "POST",
+          "path": "/api/security-incident/incidents/:id/response",
+          "permissions": {
+            "public": false,
+            "roles": [
+              "admin",
+              "super_admin"
+            ]
+          },
+          "category": "security"
+        },
+        "GET /api/security-incident/statistics": {
+          "description": "Get incident statistics (admin access required)",
+          "method": "GET",
+          "path": "/api/security-incident/statistics",
+          "permissions": {
+            "public": false,
+            "roles": [
+              "admin",
+              "super_admin"
+            ]
+          },
+          "category": "security"
+        },
+        "GET /api/security-incident/status": {
+          "description": "Get service status (admin access required)",
+          "method": "GET",
+          "path": "/api/security-incident/status",
+          "permissions": {
+            "public": false,
+            "roles": [
+              "admin",
+              "super_admin"
+            ]
+          },
+          "category": "security"
+        },
+        "POST /api/security-incident/simulate": {
+          "description": "Simulate security incident (admin access required)",
+          "method": "POST",
+          "path": "/api/security-incident/simulate",
+          "permissions": {
+            "public": false,
+            "roles": [
+              "admin",
+              "super_admin"
+            ]
+          },
+          "category": "security"
+        }
+      },
+      "translations": {
+        "GET /api/translations": {
+          "description": "List all available languages and their validation status",
+          "method": "GET",
+          "path": "/api/translations",
+          "permissions": {
+            "public": true,
+            "roles": []
+          },
+          "category": "i18n"
+        },
+        "GET /api/translations/:language": {
+          "description": "Get all translations for a specific language",
+          "method": "GET",
+          "path": "/api/translations/:language",
+          "permissions": {
+            "public": true,
+            "roles": []
+          },
+          "category": "i18n"
+        },
+        "GET /api/translations/:language/validate": {
+          "description": "Validate translation completeness",
+          "method": "GET",
+          "path": "/api/translations/:language/validate",
+          "permissions": {
+            "public": true,
+            "roles": []
+          },
+          "category": "i18n"
+        },
+        "GET /api/translations/:language/section/:section": {
+          "description": "Get specific section translations",
+          "method": "GET",
+          "path": "/api/translations/:language/section/:section",
+          "permissions": {
+            "public": true,
+            "roles": []
+          },
+          "category": "i18n"
+        }
+      },
+      "zod_demo": {
+        "GET /api/zod_demo": {
+          "description": "Zod validation demo information",
+          "method": "GET",
+          "path": "/api/zod_demo",
+          "permissions": {
+            "public": true,
+            "roles": []
+          },
+          "category": "demo"
+        },
+        "POST /api/zod_demo/register": {
+          "description": "User registration demo with comprehensive validation",
+          "method": "POST",
+          "path": "/api/zod_demo/register",
+          "permissions": {
+            "public": true,
+            "roles": []
+          },
+          "category": "demo"
+        },
+        "GET /api/zod_demo/search": {
+          "description": "Search demo with query parameter validation",
+          "method": "GET",
+          "path": "/api/zod_demo/search",
+          "permissions": {
+            "public": true,
+            "roles": []
+          },
+          "category": "demo"
+        },
+        "POST /api/zod_demo/upload": {
+          "description": "File upload demo with metadata validation",
+          "method": "POST",
+          "path": "/api/zod_demo/upload",
+          "permissions": {
+            "public": true,
+            "roles": []
+          },
+          "category": "demo"
+        }
+      }
+    },
+    "summary": {
+      "total_routes": 89,
+      "total_categories": 11,
+      "categories": [
+        "system",
+        "assets",
+        "auth",
+        "user",
+        "admin",
+        "audit",
+        "advanced_audit",
+        "realtime_monitoring",
+        "security_incident",
+        "translations",
+        "zod_demo"
+      ],
+      "routes_by_category": {
+        "system": 6,
+        "assets": 5,
+        "auth": 4,
+        "user": 5,
+        "admin": 9,
+        "audit": 5,
+        "advanced_audit": 11,
+        "realtime_monitoring": 28,
+        "security_incident": 8,
+        "translations": 4,
+        "zod_demo": 4
+      },
+      "scan_method": "registry"
+    },
+    "user_context": {
+      "role": "admin",
+      "user_id": 3,
+      "can_access_all": false
+    }
+  },
+  "message": "System routes retrieved successfully"
+}

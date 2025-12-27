@@ -71,6 +71,6 @@ curl -X GET http://localhost:8788/api \
   -H "Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyX2lkIjoyLCJmdWxsX25hbWUiOiJUZXN0IFJlZ3VsYXIgVXNlciIsImVtYWlsIjoidGVzdC11c2VyQGV4YW1wbGUuY29tIiwicm9sZSI6InVzZXIiLCJpYXQiOjE3NTMwNTkyNDQsImV4cCI6MTc1MzA2Mjg0NH0.dLu17vURfzH7iDnJ31BUXUyZMhhciG_hvEHQRPyotn4" \
   -H "Accept-Language: vi-VN"
 
-curl -X GET http://localhost:8788/routes \
+curl -X GET http://localhost:8788/route-metadata \
   -H "Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyX2lkIjoyLCJmdWxsX25hbWUiOiJUZXN0IFJlZ3VsYXIgVXNlciIsImVtYWlsIjoidGVzdC11c2VyQGV4YW1wbGUuY29tIiwicm9sZSI6InVzZXIiLCJpYXQiOjE3NTMwNTkyNDQsImV4cCI6MTc1MzA2Mjg0NH0.dLu17vURfzH7iDnJ31BUXUyZMhhciG_hvEHQRPyotn4" \
   -H "Accept-Language: vi-VN"

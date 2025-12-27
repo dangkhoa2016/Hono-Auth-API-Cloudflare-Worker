@@ -62,7 +62,7 @@ const SYSTEM_ROUTES = [
   },
   {
     method: 'GET',
-    path: '/routes',
+    path: '/route-metadata',
     metadata: {
       category: 'system',
       i18nKey: 'endpoints.system.routes',
