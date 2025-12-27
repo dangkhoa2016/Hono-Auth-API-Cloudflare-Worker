@@ -1,17 +1,19 @@
 
 import { getPlatformProxy } from 'wrangler';
+import { KVConfigService } from '../src/services/kvConfigService.js';
 
 async function resetRateLimits() {
   const { env } = await getPlatformProxy({ configPath: 'wrangler.toml', environment: 'test' });
+  const kvService = new KVConfigService(env);
 
   let kvReset = false;
-  if (env.CONFIG_KV) {
+  if (kvService.kv) {
     console.log('Resetting rate limits in KV...');
-    const list = await env.CONFIG_KV.list({ prefix: 'ratelimit:' });
+    const list = await kvService.listRaw({ prefix: 'ratelimit:' });
     console.log(`Found ${list.keys.length} rate limit keys`);
 
     for (const key of list.keys) {
-      await env.CONFIG_KV.delete(key.name);
+      await kvService.deleteRaw(key.name);
     }
 
     kvReset = true;

@@ -23,12 +23,16 @@ class TestClient {
    */
   async request(method, path, data = null, headers = {}) {
     try {
+      const controller = new AbortController();
+      const timeoutId = setTimeout(() => controller.abort(), 10000); // 10s timeout
+
       const options = {
         method,
         headers: {
           ...this.defaultHeaders,
           ...headers
-        }
+        },
+        signal: controller.signal
       };
 
       // console.log(`Making ${method.toUpperCase()} request to ${this.baseUrl}${path}`, options.headers);
@@ -39,6 +43,8 @@ class TestClient {
       const url = `${this.baseUrl}${path}`;
 
       const response = await fetch(url, options);
+      clearTimeout(timeoutId);
+
       let responseData;
 
       const contentType = response.headers.get('content-type');

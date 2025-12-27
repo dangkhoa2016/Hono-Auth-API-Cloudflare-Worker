@@ -1,5 +1,5 @@
 import { authMiddleware_log, authError_log } from '../utils/debug.js';
-import { createAuthService, createUserService } from '../utils/serviceFactory.js';
+import { createAuthService, createUserService, createKvConfigService } from '../utils/serviceFactory.js';
 import { handleStandardError } from '../utils/errorHandler.js';
 import { getClientIP } from '../utils/auditHelpers.js';
 
@@ -50,9 +50,10 @@ export const authMiddleware = async (c, next) => {
     const cacheKey = `user:cache:${payload.user_id}`;
 
     // Try to get from cache first
-    if (c.env.CONFIG_KV) {
+    const kvConfigService = createKvConfigService(c.env);
+    if (kvConfigService.kv) {
       try {
-        userDetails = await c.env.CONFIG_KV.get(cacheKey, 'json');
+        userDetails = await kvConfigService.getRaw(cacheKey, 'json');
         if (userDetails) {
           authMiddleware_log(`User details loaded from cache: ${payload.user_id}`);
         }
@@ -72,8 +73,8 @@ export const authMiddleware = async (c, next) => {
       }
 
       // Cache user details for 5 minutes (300 seconds)
-      if (c.env.CONFIG_KV) {
-        c.env.CONFIG_KV.put(cacheKey, JSON.stringify(userDetails), { expirationTtl: 300 })
+      if (kvConfigService.kv) {
+        kvConfigService.putRaw(cacheKey, JSON.stringify(userDetails), { expirationTtl: 300 })
           .catch(e => authError_log(`Error caching user: ${e.message}`));
       }
     }

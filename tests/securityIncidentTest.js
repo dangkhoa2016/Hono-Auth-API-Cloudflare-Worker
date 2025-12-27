@@ -545,13 +545,19 @@ class SecurityIncidentResponseTests {
         action: 'escalate',
         note: 'Escalating due to privilege escalation attempt',
         actionTaken: 'Escalated to security team',
-        nextSteps: 'Security team to investigate further'
+        nextSteps: 'Security team to investigate further',
+        params: { level: 'L2' }
       };
 
       const responseResult = await this.client.post(
         `${API_ENDPOINTS.securityIncidentResponse.replace(':id', this.testIncidentId)}`,
         responseActions
       );
+
+      if (!responseResult.success || !responseResult.data) {
+        this.logger.error(`Comprehensive response failed. Status: ${responseResult.status}`);
+        this.logger.error(`Response data: ${JSON.stringify(responseResult.data)}`);
+      }
 
       this.assert.assertSuccess(responseResult.data, 'Failed to execute comprehensive response');
       this.assert.assertHasField(responseResult.data.data, 'manual', 'Should indicate manual execution');

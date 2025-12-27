@@ -1,6 +1,7 @@
 import { execSync } from 'child_process';
 import { getPlatformProxy } from 'wrangler';
 import crypto from 'crypto';
+import { KVConfigService } from '../../src/services/kvConfigService.js';
 
 // sql query for inspect
 const inspectQuery = `
@@ -16,8 +17,8 @@ function durableObjectNamespaceIdFromName(name) {
   return Buffer.concat([nameHmac, hmac]).toString('hex');
 }
 
-async function inspectkeys(kv) {
-  const results = await kv.list();
+async function inspectkeys(kvService) {
+  const results = await kvService.listRaw();
   console.log('KV Namespace keys:', results.keys);
   if (!results || Object.keys(results).length === 0) {
     console.log('No keys found in the KV Namespace.');
@@ -27,11 +28,11 @@ async function inspectkeys(kv) {
   console.log('Inspecting KV Namespace:', results);
   for (const item of results.keys) {
     console.log(`Getting value for key: ${item.name}`);
-    const value = await kv.get(item.name);
+    const value = await kvService.getRaw(item.name);
     console.log(`Value: ${value}`);
 
     console.log(`Inspecting key: ${item.name}`);
-    const json = await kv.getWithMetadata(item.name);
+    const json = await kvService.getWithMetadataRaw(item.name);
     console.log('Metadata:', json);
   }
 }
@@ -80,7 +81,8 @@ function inspectDatabase(file_name) {
   }
   */
 
-  await inspectkeys(env.CONFIG_KV);
+  const kvService = new KVConfigService(env);
+  await inspectkeys(kvService);
   console.log('----------------------');
 
   const database_file_name = durableObjectNamespaceIdFromName('config-kv-test');
