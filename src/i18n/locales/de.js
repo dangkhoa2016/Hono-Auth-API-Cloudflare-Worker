@@ -852,6 +852,15 @@ export default {
         'defaultsRetrieved': 'Standardkonfigurationen von {{actor}} abgerufen ({{keyCount}} Schlüssel)',
         'retrieved': '{{configCount}} Konfigurationen erfolgreich von {{actor}} abgerufen ({{allowedKeys}} erlaubte Schlüssel)'
       },
+      'rateLimit': {
+        'batchDeleteDryRun': 'Testlauf für Batch-Löschung der Ratenbegrenzung: {{count}} Schlüssel werden gelöscht ({{failed}} fehlgeschlagen)',
+        'batchDeleted': 'Batch-Löschung der Ratenbegrenzung: {{count}} Schlüssel gelöscht ({{failed}} fehlgeschlagen)',
+        'cleanDryRun': 'Testlauf für Bereinigung der Ratenbegrenzung: {{count}} Schlüssel werden gelöscht (Präfix: {{prefix}})',
+        'cleaned': 'Bereinigung der Ratenbegrenzung: {{count}} Schlüssel gelöscht (Präfix: {{prefix}})',
+        'pruneDryRun': 'Testlauf für Beschneidung der Ratenbegrenzung: {{count}} Schlüssel werden gelöscht (Präfix: {{prefix}})',
+        'pruned': 'Beschneidung der Ratenbegrenzung: {{count}} Schlüssel gelöscht (Präfix: {{prefix}})',
+        'seeded': 'Ratenbegrenzung gesät: {{count}} Schlüssel erstellt (Präfix: {{prefix}})'
+      },
       'status': {
         'disabled': 'deaktiviert',
         'enabled': 'aktiviert'

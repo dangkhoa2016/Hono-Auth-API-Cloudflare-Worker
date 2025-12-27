@@ -643,4 +643,242 @@ kvAdmin.post('/audit/configs/feature/:feature/toggle',
   }
 );
 
+// ==========================================================================
+// RATE LIMIT MANAGEMENT ENDPOINTS
+// ==========================================================================
+
+/**
+ * POST /api/kv-admin/rate-limits/clean - Clean rate limit keys
+ */
+kvAdmin.post('/rate-limits/clean', async (c) => {
+  try {
+    const { prefix, dryRun = false } = await c.req.json();
+
+    if (!prefix) {
+      return c.json({ success: false, error: 'Prefix is required' }, 400);
+    }
+
+    const kvService = c.kvConfig;
+    let cursor = null;
+    let deletedCount = 0;
+    const affectedKeys = [];
+
+    do {
+      const list = await kvService.listRaw({ prefix, cursor });
+      cursor = list.cursor;
+
+      for (const key of list.keys) {
+        if (dryRun) {
+          affectedKeys.push(key.name);
+        } else {
+          await kvService.deleteRaw(key.name);
+          affectedKeys.push(key.name);
+        }
+        deletedCount++;
+      }
+    } while (cursor);
+
+    kvAdminRoutes_log(`Clean rate limits (dryRun=${dryRun}): ${deletedCount} keys with prefix ${prefix}`);
+
+    return c.json({
+      success: true,
+      data: {
+        prefix,
+        dryRun,
+        deletedCount,
+        affectedKeys: affectedKeys.length > 100 ? affectedKeys.slice(0, 100).concat(['...more']) : affectedKeys
+      },
+      message: tSuccess(c, dryRun ? 'kv.rateLimit.cleanDryRun' : 'kv.rateLimit.cleaned', {
+        count: deletedCount,
+        prefix
+      })
+    });
+  } catch (error) {
+    return await handleStandardError(c, error, 'Failed to clean rate limits', kvAdminRoutes_log, 'kvAdmin.rateLimitCleanFailed');
+  }
+});
+
+/**
+ * POST /api/kv-admin/rate-limits/seed - Seed rate limit keys
+ */
+kvAdmin.post('/rate-limits/seed', async (c) => {
+  try {
+    const { prefix, count = 10, attempts = 1 } = await c.req.json();
+
+    if (!prefix) {
+      return c.json({ success: false, error: 'Prefix is required' }, 400);
+    }
+
+    const kvService = c.kvConfig;
+    const createdKeys = [];
+
+    for (let i = 0; i < count; i++) {
+      const timestamp = Date.now();
+      const key = `${prefix}seed:${i}:${timestamp}`;
+      const value = {
+        attempts: attempts,
+        firstAttempt: timestamp,
+        lastAttempt: timestamp,
+        metadata: { reason: "seed_api", index: i }
+      };
+
+      await kvService.putRaw(key, JSON.stringify(value), { expirationTtl: 86400 });
+      createdKeys.push(key);
+    }
+
+    kvAdminRoutes_log(`Seeded rate limits: ${count} keys with prefix ${prefix}`);
+
+    return c.json({
+      success: true,
+      data: {
+        prefix,
+        count,
+        createdKeys: createdKeys.length > 100 ? createdKeys.slice(0, 100).concat(['...more']) : createdKeys
+      },
+      message: tSuccess(c, 'kv.rateLimit.seeded', {
+        count,
+        prefix
+      })
+    });
+  } catch (error) {
+    return await handleStandardError(c, error, 'Failed to seed rate limits', kvAdminRoutes_log, 'kvAdmin.rateLimitSeedFailed');
+  }
+});
+
+/**
+ * POST /api/kv-admin/rate-limits/prune-time - Prune rate limits by time
+ */
+kvAdmin.post('/rate-limits/prune-time', async (c) => {
+  try {
+    const { prefix, start, end, dryRun = false } = await c.req.json();
+
+    if (!prefix || !start || !end) {
+      return c.json({ success: false, error: 'Prefix, start, and end are required' }, 400);
+    }
+
+    // Helper to parse timestamp
+    const parseTimestamp = (input) => {
+      if (typeof input === 'number') return input;
+      if (/^\d+$/.test(input)) return parseInt(input, 10);
+      const date = new Date(input);
+      if (!isNaN(date.getTime())) return date.getTime();
+      throw new Error(`Invalid date format: "${input}"`);
+    };
+
+    let startTime, endTime;
+    try {
+      startTime = parseTimestamp(start);
+      endTime = parseTimestamp(end);
+    } catch (e) {
+      return c.json({ success: false, error: e.message }, 400);
+    }
+
+    const kvService = c.kvConfig;
+    let cursor = null;
+    let deletedCount = 0;
+    let checkedCount = 0;
+    const affectedKeys = [];
+
+    do {
+      const list = await kvService.listRaw({ prefix, cursor });
+      cursor = list.cursor;
+
+      for (const key of list.keys) {
+        checkedCount++;
+        try {
+          const value = await kvService.getRaw(key.name, 'json');
+          
+          if (value && (value.firstAttempt || value.lastAttempt)) {
+            const timestamp = value.firstAttempt || value.lastAttempt;
+            
+            if (timestamp >= startTime && timestamp <= endTime) {
+              if (dryRun) {
+                affectedKeys.push({ key: key.name, timestamp });
+              } else {
+                await kvService.deleteRaw(key.name);
+                affectedKeys.push({ key: key.name, timestamp });
+              }
+              deletedCount++;
+            }
+          }
+        } catch (e) {
+          kvAdminRoutes_log(`Failed to process key ${key.name}: ${e.message}`);
+        }
+      }
+    } while (cursor);
+
+    kvAdminRoutes_log(`Prune rate limits (dryRun=${dryRun}): ${deletedCount} keys pruned`);
+
+    return c.json({
+      success: true,
+      data: {
+        prefix,
+        range: { start: new Date(startTime).toISOString(), end: new Date(endTime).toISOString() },
+        dryRun,
+        checkedCount,
+        deletedCount,
+        affectedKeys: affectedKeys.length > 100 ? affectedKeys.slice(0, 100).concat(['...more']) : affectedKeys
+      },
+      message: tSuccess(c, dryRun ? 'kv.rateLimit.pruneDryRun' : 'kv.rateLimit.pruned', {
+        count: deletedCount,
+        prefix
+      })
+    });
+  } catch (error) {
+    return await handleStandardError(c, error, 'Failed to prune rate limits', kvAdminRoutes_log, 'kvAdmin.rateLimitPruneFailed');
+  }
+});
+
+/**
+ * POST /api/kv-admin/rate-limits/batch-delete - Batch delete rate limit keys
+ */
+kvAdmin.post('/rate-limits/batch-delete', async (c) => {
+  try {
+    const { keys, dryRun = false } = await c.req.json();
+
+    if (!Array.isArray(keys) || keys.length === 0) {
+      return c.json({ success: false, error: 'Keys array is required and cannot be empty' }, 400);
+    }
+
+    const kvService = c.kvConfig;
+    const results = [];
+    let deletedCount = 0;
+    let failedCount = 0;
+
+    for (const key of keys) {
+      try {
+        if (dryRun) {
+          results.push({ key, status: 'dry-run' });
+          deletedCount++;
+        } else {
+          await kvService.deleteRaw(key);
+          results.push({ key, status: 'deleted' });
+          deletedCount++;
+        }
+      } catch (error) {
+        results.push({ key, status: 'failed', error: error.message });
+        failedCount++;
+      }
+    }
+
+    kvAdminRoutes_log(`Batch delete rate limits (dryRun=${dryRun}): ${deletedCount} keys processed`);
+
+    return c.json({
+      success: true,
+      data: {
+        dryRun,
+        deletedCount,
+        failedCount,
+        results: results.length > 100 ? results.slice(0, 100).concat(['...more']) : results
+      },
+      message: tSuccess(c, dryRun ? 'kv.rateLimit.batchDeleteDryRun' : 'kv.rateLimit.batchDeleted', {
+        count: deletedCount,
+        failed: failedCount
+      })
+    });
+  } catch (error) {
+    return await handleStandardError(c, error, 'Failed to batch delete rate limits', kvAdminRoutes_log, 'kvAdmin.rateLimitBatchDeleteFailed');
+  }
+});
+
 export default kvAdmin;
