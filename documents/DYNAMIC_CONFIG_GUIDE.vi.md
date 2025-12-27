@@ -115,7 +115,7 @@ const featureFlags = await getFeatureFlags(env);
 // Trả về: {
 //   disableRateLimiting: false,
 //   enableDetailedErrors: false,
-//   autoActivateUserOnRegister: false,
+//   autoActivateUserOnRegister: false, // Nếu true: bỏ qua email kích hoạt và tự động kích hoạt user
 //   logSqlQueries: false,
 //   enableAuditLogCompression: true,
 //   enableRealtimeNotifications: false,

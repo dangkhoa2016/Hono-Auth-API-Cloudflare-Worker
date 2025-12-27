@@ -115,7 +115,7 @@ const featureFlags = await getFeatureFlags(env);
 // Returns: {
 //   disableRateLimiting: false,
 //   enableDetailedErrors: false,
-//   autoActivateUserOnRegister: false,
+//   autoActivateUserOnRegister: false, // If true: skips activation email and auto-activates user
 //   logSqlQueries: false,
 //   enableAuditLogCompression: true,
 //   enableRealtimeNotifications: false,
