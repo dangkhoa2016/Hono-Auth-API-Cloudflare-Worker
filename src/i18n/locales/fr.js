@@ -852,6 +852,15 @@ export default {
         'defaultsRetrieved': 'Configurations par défaut récupérées par {{actor}} ({{keyCount}} clés)',
         'retrieved': '{{configCount}} configurations récupérées avec succès par {{actor}} ({{allowedKeys}} clés autorisées)'
       },
+      'rateLimit': {
+        'batchDeleteDryRun': 'Simulation de suppression par lot de limite de débit : {{count}} clés seront supprimées ({{failed}} échecs)',
+        'batchDeleted': 'Suppression par lot de limite de débit : {{count}} clés supprimées ({{failed}} échecs)',
+        'cleanDryRun': 'Simulation de nettoyage de limite de débit : {{count}} clés seront supprimées (préfixe : {{prefix}})',
+        'cleaned': 'Nettoyage de limite de débit : {{count}} clés supprimées (préfixe : {{prefix}})',
+        'pruneDryRun': 'Simulation d\'élagage de limite de débit : {{count}} clés seront supprimées (préfixe : {{prefix}})',
+        'pruned': 'Élagage de limite de débit : {{count}} clés supprimées (préfixe : {{prefix}})',
+        'seeded': 'Initialisation de limite de débit : {{count}} clés créées (préfixe : {{prefix}})'
+      },
       'status': {
         'disabled': 'désactivée',
         'enabled': 'activée'

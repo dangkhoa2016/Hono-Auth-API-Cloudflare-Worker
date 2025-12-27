@@ -852,6 +852,15 @@ export default {
         'defaultsRetrieved': 'Configuraciones predeterminadas recuperadas por {{actor}} ({{keyCount}} claves)',
         'retrieved': '{{configCount}} configuraciones recuperadas exitosamente por {{actor}} ({{allowedKeys}} claves permitidas)'
       },
+      'rateLimit': {
+        'batchDeleteDryRun': 'Simulacro de eliminación por lotes de límite de tasa: {{count}} claves serán eliminadas ({{failed}} fallidas)',
+        'batchDeleted': 'Eliminación por lotes de límite de tasa: {{count}} claves eliminadas ({{failed}} fallidas)',
+        'cleanDryRun': 'Simulacro de limpieza de límite de tasa: {{count}} claves serán eliminadas (prefijo: {{prefix}})',
+        'cleaned': 'Limpieza de límite de tasa: {{count}} claves eliminadas (prefijo: {{prefix}})',
+        'pruneDryRun': 'Simulacro de poda de límite de tasa: {{count}} claves serán eliminadas (prefijo: {{prefix}})',
+        'pruned': 'Poda de límite de tasa: {{count}} claves eliminadas (prefijo: {{prefix}})',
+        'seeded': 'Siembra de límite de tasa: {{count}} claves creadas (prefijo: {{prefix}})'
+      },
       'status': {
         'disabled': 'deshabilitada',
         'enabled': 'habilitada'
