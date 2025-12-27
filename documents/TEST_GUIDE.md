@@ -86,7 +86,12 @@ npm run test:admin:i18n
 # 📊 Enterprise audit system testing
 npm run test:audit:system
 
-# 📊 Complete test suite with audit system
+# � Email & Account activation testing
+npm run test:activation        # Account activation flow tests
+npm run test:email:content     # Email content localization tests
+npm run test:email:provider    # Email provider header tests
+
+# �📊 Complete test suite with audit system
 bash tests/scripts/run-all-tests.sh
 
 # 🚀 Comprehensive audit endpoint testing
@@ -200,6 +205,10 @@ tests/
 │   ├── zodValidationTest.js         # Zod schema validation
 │   ├── quickTest.js                 # Quick smoke tests
 │   ├── roleTest.js                  # Role-based access control
+│   ├── 📧 EMAIL & ACTIVATION TESTS - Complete Coverage (3 files)
+│   │   ├── activationTest.js            # Account activation flow with token validation (12+ tests)
+│   │   ├── emailContentTest.js          # Email content localization testing (7 languages)
+│   │   └── emailProviderHeaderTest.js   # Email provider integration (Brevo API)
 │   └── 📊 ENTERPRISE AUDIT SYSTEM TESTS - Complete Coverage (15+ files)
 │       ├── auditSystemTest.js           # Complete audit system test (4-phase comprehensive testing)
 │       ├── advancedAuditComprehensiveTest.js # Advanced analytics (/api/advanced-audit/* - 14+ endpoints)
@@ -283,8 +292,11 @@ tests/
 ├── 🛡️ securityTest.js          # Security & rate limiting tests with audit security
 ├── 🔒 xssSecurityTest.js        # XSS security testing
 ├── 🌍 comprehensiveI18nTest.js # Comprehensive i18n & translation tests
-├── � adminMessageTranslationTest.js # Admin routes i18n message translation testing
-├── �🌐 multiLanguageValidationErrorTest.js # Multi-language Zod validation error testing
+├── 📬 adminMessageTranslationTest.js # Admin routes i18n message translation testing
+├── 🌐 multiLanguageValidationErrorTest.js # Multi-language Zod validation error testing
+├── 📧 activationTest.js        # Account activation flow tests (12+ tests)
+├── 📧 emailContentTest.js      # Email content localization tests
+├── 📧 emailProviderHeaderTest.js # Email provider integration tests
 ├── ⚡ performanceTest.js       # Performance & load tests
 ├── 🔗 integrationTest.js       # End-to-end integration tests
 ├── ✅ validationTest.js        # General validation tests
@@ -467,6 +479,9 @@ npm run test:admin_user        # Admin User Role tests
 npm run test:super_admin_user  # Super Admin User Role tests
 npm run test:security          # Security tests
 npm run test:i18n             # i18n tests
+npm run test:activation        # Account activation flow tests
+npm run test:email:content     # Email content localization tests
+npm run test:email:provider    # Email provider header tests
 npm run test:admin:i18n        # Admin routes i18n message translation tests
 npm run test:admin:messages:script # Automated admin message test runner
 npm run test:multilang_validation # Multi-language Zod validation error tests

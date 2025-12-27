@@ -284,20 +284,35 @@ System performance analytics.
 
 **Access**: Admin, Super Admin
 
+### **� GET /api/advanced-audit/middleware/stats**
+Get middleware usage statistics.
+
+**Access**: Super Admin only
+
+### **📋 GET /api/advanced-audit/compliance/report**
+Generate general compliance report.
+
+**Access**: Super Admin only
+
 ### **📋 GET /api/advanced-audit/compliance**
-Generate compliance reports (GDPR, SOX, etc.).
+Generate specific compliance reports (GDPR, SOX, etc.).
 
 **Access**: Super Admin only
 
 **Query Parameters**:
 ```typescript
 {
-  reportType: 'gdpr' | 'sox' | 'hipaa'; // Compliance standard
-  startDate: string;                    // Required
-  endDate: string;                      // Required
-  format?: 'json' | 'pdf';             // Output format
+  type: 'gdpr' | 'sox' | 'iso27001'; // Compliance standard
+  start_date?: string;
+  end_date?: string;
+  detailed?: boolean;
 }
 ```
+
+### **📋 POST /api/advanced-audit/compliance**
+Update compliance settings.
+
+**Access**: Super Admin only
 
 ### **🗄️ GET /api/advanced-audit/archival/stats**
 Get archival statistics and policies.
@@ -321,6 +336,26 @@ Execute data archival process.
 
 ### **🗄️ POST /api/advanced-audit/archival/restore**
 Restore archived data.
+
+**Access**: Super Admin only
+
+### **🗄️ GET /api/advanced-audit/archive**
+List available archives.
+
+**Access**: Super Admin only
+
+### **🗄️ POST /api/advanced-audit/archive**
+Create manual archive.
+
+**Access**: Super Admin only
+
+### **⚙️ POST /api/advanced-audit/retention**
+Configure data retention policies.
+
+**Access**: Super Admin only
+
+### **📤 POST /api/advanced-audit/export-advanced**
+Advanced data export with more options.
 
 **Access**: Super Admin only
 
@@ -392,13 +427,108 @@ Simulate events for testing purposes.
 
 **Access**: Super Admin only
 
-### **📊 GET /monitoring/dashboard/realtime**
+### **� GET /events/recent**
+Get recent monitoring events.
+
+**Access**: Super Admin only
+
+### **🔔 GET /alerts/status**
+Get alert system status.
+
+**Access**: Super Admin only
+
+### **⚙️ POST /alerts/configure**
+Configure alert system settings.
+
+**Access**: Super Admin only
+
+### **📜 GET /alerts/history**
+Get alert history.
+
+**Access**: Super Admin only
+
+### **📨 POST /alerts/send**
+Send a manual alert.
+
+**Access**: Super Admin only
+
+### **📏 GET /alerts/rules**
+Get alert rules.
+
+**Access**: Super Admin only
+
+### **➕ POST /alerts/rules**
+Create a new alert rule.
+
+**Access**: Super Admin only
+
+### **🔄 PUT /alerts/rules/:ruleId/toggle**
+Toggle an alert rule on/off.
+
+**Access**: Super Admin only
+
+### **📢 GET /alerts/channels**
+Get notification channels.
+
+**Access**: Super Admin only
+
+### **🔧 POST /alerts/channels**
+Configure notification channels.
+
+**Access**: Super Admin only
+
+### **🧪 POST /alerts/test**
+Test alert system.
+
+**Access**: Super Admin only
+
+### **📊 GET /dashboard/overview**
+Get dashboard overview.
+
+**Access**: Super Admin only
+
+### **📈 GET /dashboard/realtime**
 Get live dashboard data.
 
 **Access**: Super Admin only
 
-### **📊 GET /monitoring/dashboard/overview**
-Get dashboard overview.
+### **🔴 GET /dashboard/live**
+Get live monitoring view.
+
+**Access**: Super Admin only
+
+### **⏱️ GET /dashboard/timeline**
+Get historical timeline data.
+
+**Access**: Super Admin only
+
+### **🛡️ GET /dashboard/security**
+Get security metrics dashboard.
+
+**Access**: Super Admin only
+
+### **🚀 GET /dashboard/performance**
+Get performance metrics dashboard.
+
+**Access**: Super Admin only
+
+### **🏥 GET /dashboard/health**
+Get dashboard system health.
+
+**Access**: Super Admin only
+
+### **📤 POST /dashboard/export**
+Export dashboard data.
+
+**Access**: Super Admin only
+
+### **🧹 DELETE /dashboard/cache**
+Clear dashboard cache.
+
+**Access**: Super Admin only
+
+### **📝 POST /incidents/create**
+Create incident from monitoring event.
 
 **Access**: Super Admin only
 

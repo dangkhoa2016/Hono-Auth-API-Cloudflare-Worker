@@ -284,20 +284,35 @@ Phân tích hiệu suất hệ thống.
 
 **Quyền truy cập**: Admin, Super Admin
 
+### **� GET /api/advanced-audit/middleware/stats**
+Lấy thống kê sử dụng middleware.
+
+**Quyền truy cập**: Chỉ Super Admin
+
+### **📋 GET /api/advanced-audit/compliance/report**
+Tạo báo cáo tuân thủ chung.
+
+**Quyền truy cập**: Chỉ Super Admin
+
 ### **📋 GET /api/advanced-audit/compliance**
-Tạo báo cáo tuân thủ (GDPR, SOX, v.v.).
+Tạo báo cáo tuân thủ cụ thể (GDPR, SOX, v.v.).
 
 **Quyền truy cập**: Chỉ Super Admin
 
 **Query Parameters**:
 ```typescript
 {
-  reportType: 'gdpr' | 'sox' | 'hipaa'; // Tiêu chuẩn tuân thủ
-  startDate: string;                    // Bắt buộc
-  endDate: string;                      // Bắt buộc
-  format?: 'json' | 'pdf';             // Định dạng đầu ra
+  type: 'gdpr' | 'sox' | 'iso27001'; // Tiêu chuẩn tuân thủ
+  start_date?: string;
+  end_date?: string;
+  detailed?: boolean;
 }
 ```
+
+### **📋 POST /api/advanced-audit/compliance**
+Cập nhật cài đặt tuân thủ.
+
+**Quyền truy cập**: Chỉ Super Admin
 
 ### **🗄️ GET /api/advanced-audit/archival/stats**
 Lấy thống kê lưu trữ và chính sách.
@@ -321,6 +336,26 @@ Thực thi quá trình lưu trữ dữ liệu.
 
 ### **🗄️ POST /api/advanced-audit/archival/restore**
 Khôi phục dữ liệu đã lưu trữ.
+
+**Quyền truy cập**: Chỉ Super Admin
+
+### **🗄️ GET /api/advanced-audit/archive**
+Danh sách các bản lưu trữ có sẵn.
+
+**Quyền truy cập**: Chỉ Super Admin
+
+### **🗄️ POST /api/advanced-audit/archive**
+Tạo bản lưu trữ thủ công.
+
+**Quyền truy cập**: Chỉ Super Admin
+
+### **⚙️ POST /api/advanced-audit/retention**
+Cấu hình chính sách giữ lại dữ liệu.
+
+**Quyền truy cập**: Chỉ Super Admin
+
+### **📤 POST /api/advanced-audit/export-advanced**
+Xuất dữ liệu nâng cao với nhiều tùy chọn hơn.
 
 **Quyền truy cập**: Chỉ Super Admin
 
@@ -392,13 +427,108 @@ Mô phỏng sự kiện để kiểm thử.
 
 **Quyền truy cập**: Chỉ Super Admin
 
-### **📊 GET /monitoring/dashboard/realtime**
+### **� GET /events/recent**
+Lấy các sự kiện giám sát gần đây.
+
+**Quyền truy cập**: Chỉ Super Admin
+
+### **🔔 GET /alerts/status**
+Lấy trạng thái hệ thống cảnh báo.
+
+**Quyền truy cập**: Chỉ Super Admin
+
+### **⚙️ POST /alerts/configure**
+Cấu hình cài đặt hệ thống cảnh báo.
+
+**Quyền truy cập**: Chỉ Super Admin
+
+### **📜 GET /alerts/history**
+Lấy lịch sử cảnh báo.
+
+**Quyền truy cập**: Chỉ Super Admin
+
+### **📨 POST /alerts/send**
+Gửi cảnh báo thủ công.
+
+**Quyền truy cập**: Chỉ Super Admin
+
+### **📏 GET /alerts/rules**
+Lấy danh sách quy tắc cảnh báo.
+
+**Quyền truy cập**: Chỉ Super Admin
+
+### **➕ POST /alerts/rules**
+Tạo quy tắc cảnh báo mới.
+
+**Quyền truy cập**: Chỉ Super Admin
+
+### **🔄 PUT /alerts/rules/:ruleId/toggle**
+Bật/tắt quy tắc cảnh báo.
+
+**Quyền truy cập**: Chỉ Super Admin
+
+### **📢 GET /alerts/channels**
+Lấy danh sách kênh thông báo.
+
+**Quyền truy cập**: Chỉ Super Admin
+
+### **🔧 POST /alerts/channels**
+Cấu hình kênh thông báo.
+
+**Quyền truy cập**: Chỉ Super Admin
+
+### **🧪 POST /alerts/test**
+Kiểm tra hệ thống cảnh báo.
+
+**Quyền truy cập**: Chỉ Super Admin
+
+### **📊 GET /dashboard/overview**
+Lấy tổng quan dashboard.
+
+**Quyền truy cập**: Chỉ Super Admin
+
+### **📈 GET /dashboard/realtime**
 Lấy dữ liệu dashboard trực tiếp.
 
 **Quyền truy cập**: Chỉ Super Admin
 
-### **📊 GET /monitoring/dashboard/overview**
-Lấy tổng quan dashboard.
+### **🔴 GET /dashboard/live**
+Lấy chế độ xem giám sát trực tiếp.
+
+**Quyền truy cập**: Chỉ Super Admin
+
+### **⏱️ GET /dashboard/timeline**
+Lấy dữ liệu dòng thời gian lịch sử.
+
+**Quyền truy cập**: Chỉ Super Admin
+
+### **🛡️ GET /dashboard/security**
+Lấy dashboard metrics bảo mật.
+
+**Quyền truy cập**: Chỉ Super Admin
+
+### **🚀 GET /dashboard/performance**
+Lấy dashboard metrics hiệu năng.
+
+**Quyền truy cập**: Chỉ Super Admin
+
+### **🏥 GET /dashboard/health**
+Lấy sức khỏe hệ thống dashboard.
+
+**Quyền truy cập**: Chỉ Super Admin
+
+### **📤 POST /dashboard/export**
+Xuất dữ liệu dashboard.
+
+**Quyền truy cập**: Chỉ Super Admin
+
+### **🧹 DELETE /dashboard/cache**
+Xóa cache dashboard.
+
+**Quyền truy cập**: Chỉ Super Admin
+
+### **📝 POST /incidents/create**
+Tạo sự cố từ sự kiện giám sát.
 
 **Quyền truy cập**: Chỉ Super Admin
 
