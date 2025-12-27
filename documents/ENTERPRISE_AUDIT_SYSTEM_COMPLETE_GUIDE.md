@@ -31,25 +31,25 @@ The **Hono Auth Worker** project now features a complete **ENTERPRISE-GRADE AUDI
 ### **📊 System Statistics**
 - **15+ Service Files**: Core services + advanced enterprise features with BaseService optimization
 - **6000+ Lines of Code**: High-quality, production-ready code with comprehensive error handling
-- **40+ API Endpoints**: Complete REST API coverage across 4 route groups
+- **50+ API Endpoints**: Complete REST API coverage across 4 route groups
 - **5 Database Migrations**: Progressive schema evolution with audit trails and archival
 - **Multi-Phase Implementation**: 4 core phases + enterprise features + real-time capabilities
 - **100% Test Coverage**: Comprehensive test suite with automation and role-based testing
 
 ### **🔧 Core Architecture Overview**
 ```
-Enterprise Audit System (40+ Endpoints)
+Enterprise Audit System (50+ Endpoints)
 ├── 📋 Phase 1: Core Audit (/api/audit/*) - 5 endpoints
 │   ├── Database Schema (5 migrations)
 │   ├── AuditLogService with BaseService inheritance
 │   ├── Role-based filtering and pagination
 │   └── Health monitoring and statistics
-├── 🚀 Phase 2: Advanced Analytics (/api/advanced-audit/*) - 14 endpoints  
+├── 🚀 Phase 2: Advanced Analytics (/api/advanced-audit/*) - 15 endpoints  
 │   ├── Security, behavior, performance analytics
 │   ├── GDPR, SOX, ISO27001 compliance reporting
 │   ├── Data archival with automated retention
 │   └── CSV export and middleware statistics
-├── 🔴 Phase 3: Real-time Monitoring (/api/realtime-monitoring/*) - 22 endpoints
+├── 🔴 Phase 3: Real-time Monitoring (/api/realtime-monitoring/*) - 28 endpoints
 │   ├── Live threat detection with automated resolution
 │   ├── Multi-channel alert system with rule engine
 │   ├── Real-time dashboards (overview, security, performance)
@@ -390,26 +390,54 @@ Before diving into test cases details, let's understand the structure of **40+ A
   - `GET /analytics/security` - Security-focused insights
   - `GET /analytics/behavior` - User behavior patterns
   - `GET /analytics/performance` - System performance metrics
-- 🗂️ **Archival Group**:
+  - `GET /middleware/stats` - Middleware usage statistics
+- 🗂️ **Archival & Retention**:
   - `GET /archival/stats` - Archive statistics
   - `POST /archival/run` - Execute archival process
   - `POST /archival/restore` - Restore archived data
-- 📋 **Compliance Group**:
+  - `GET /archive` - List archives
+  - `POST /archive` - Create manual archive
+  - `POST /retention` - Configure retention policies
+- 📋 **Compliance & Export**:
   - `GET /compliance/report` - Generate compliance reports
+  - `GET /compliance` - Compliance status
+  - `POST /compliance` - Update compliance settings
+  - `POST /export-advanced` - Advanced data export
 
 #### **📡 3. Real-time Monitoring Routes** (`/api/realtime-monitoring/*`)
 - 🎛️ **Monitoring Control**:
-  - `GET /status` - Current monitoring status
-  - `POST /start` - Start monitoring session
-  - `POST /stop` - Stop monitoring session
+  - `GET /monitoring/status` - Current monitoring status
+  - `POST /monitoring/start` - Start monitoring session
+  - `POST /monitoring/stop` - Stop monitoring session
+  - `GET /events/recent` - Recent monitoring events
 - 🚨 **Threat Detection**:
-  - `GET /threats` - Active and resolved threats
-  - `POST /threats/:id/resolve` - Resolve detected threats
-  - `POST /analyze` - Manual threat analysis
+  - `GET /monitoring/threats` - Active and resolved threats
+  - `POST /monitoring/threats/:id/resolve` - Resolve detected threats
+  - `POST /monitoring/analyze` - Manual threat analysis
+  - `POST /monitoring/simulate` - Simulate threat events
+- 🔔 **Alert System**:
+  - `GET /alerts/status` - Alert system status
+  - `POST /alerts/configure` - Configure alert settings
+  - `GET /alerts/history` - Alert history
+  - `POST /alerts/send` - Send manual alert
+  - `GET /alerts/rules` - Get alert rules
+  - `POST /alerts/rules` - Create alert rule
+  - `PUT /alerts/rules/:ruleId/toggle` - Toggle alert rule
+  - `GET /alerts/channels` - Get notification channels
+  - `POST /alerts/channels` - Configure notification channels
+  - `POST /alerts/test` - Test alert system
 - 📊 **Dashboard APIs**:
+  - `GET /dashboard/overview` - Dashboard overview
   - `GET /dashboard/realtime` - Live dashboard data
+  - `GET /dashboard/live` - Live monitoring view
   - `GET /dashboard/timeline` - Historical timeline data
+  - `GET /dashboard/security` - Security metrics dashboard
+  - `GET /dashboard/performance` - Performance metrics dashboard
+  - `GET /dashboard/health` - Dashboard system health
   - `POST /dashboard/export` - Export dashboard data
+  - `DELETE /dashboard/cache` - Clear dashboard cache
+- 📝 **Incident Creation**:
+  - `POST /incidents/create` - Create incident from monitoring
 
 #### **🚨 4. Security Incident Routes** (`/api/security-incident/*`)
 - 📋 **Incident Management**:

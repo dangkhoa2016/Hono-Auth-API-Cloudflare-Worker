@@ -31,25 +31,25 @@ Dự án **Hono Auth Worker** giờ đây đã có một **HỆ THỐNG AUDIT C�
 ### **📊 Thống Kê Hệ Thống**
 - **15+ Files Dịch Vụ**: Các dịch vụ cốt lõi + tính năng doanh nghiệp nâng cao với tối ưu hóa BaseService
 - **6000+ Dòng Code**: Code chất lượng cao, sẵn sàng cho production với xử lý lỗi toàn diện
-- **40+ API Endpoints**: Độ bao phủ REST API hoàn chỉnh trên 4 nhóm route
+- **50+ API Endpoints**: Độ bao phủ REST API hoàn chỉnh trên 4 nhóm route
 - **5 Database Migrations**: Phát triển lược đồ theo từng giai đoạn với audit trails và lưu trữ
 - **Triển Khai Đa Giai Đoạn**: 4 giai đoạn cốt lõi + tính năng doanh nghiệp + khả năng thời gian thực
 - **100% Độ Bao Phủ Test**: Bộ kiểm thử toàn diện với tự động hóa và kiểm thử dựa trên vai trò
 
 ### **🔧 Tổng Quan Kiến Trúc Cốt Lõi**
 ```
-Hệ Thống Audit Doanh Nghiệp (40+ Endpoints)
+Hệ Thống Audit Doanh Nghiệp (50+ Endpoints)
 ├── 📋 Giai đoạn 1: Core Audit (/api/audit/*) - 5 endpoints
 │   ├── Lược đồ cơ sở dữ liệu (5 migrations)
 │   ├── AuditLogService với kế thừa BaseService
 │   ├── Lọc dựa trên vai trò và phân trang
 │   └── Giám sát sức khỏe và thống kê
-├── 🚀 Giai đoạn 2: Advanced Analytics (/api/advanced-audit/*) - 14 endpoints  
+├── 🚀 Giai đoạn 2: Advanced Analytics (/api/advanced-audit/*) - 15 endpoints  
 │   ├── Phân tích bảo mật, hành vi, hiệu năng
 │   ├── Báo cáo tuân thủ GDPR, SOX, ISO27001
 │   ├── Lưu trữ dữ liệu với chính sách giữ lại tự động
 │   └── Xuất CSV và thống kê middleware
-├── 🔴 Giai đoạn 3: Real-time Monitoring (/api/realtime-monitoring/*) - 22 endpoints
+├── 🔴 Giai đoạn 3: Real-time Monitoring (/api/realtime-monitoring/*) - 28 endpoints
 │   ├── Phát hiện mối đe dọa trực tiếp với giải quyết tự động
 │   ├── Hệ thống cảnh báo đa kênh với rule engine
 │   ├── Dashboard thời gian thực (tổng quan, bảo mật, hiệu năng)
@@ -390,26 +390,54 @@ Trước khi đi sâu vào chi tiết các trường hợp kiểm thử, hãy hi
   - `GET /analytics/security` - Thông tin chi tiết tập trung vào bảo mật
   - `GET /analytics/behavior` - Các mẫu hành vi người dùng
   - `GET /analytics/performance` - Các chỉ số hiệu suất hệ thống
-- 🗂️ **Nhóm Lưu Trữ**:
+  - `GET /middleware/stats` - Thống kê sử dụng middleware
+- 🗂️ **Lưu Trữ & Giữ Lại**:
   - `GET /archival/stats` - Thống kê lưu trữ
   - `POST /archival/run` - Thực thi quy trình lưu trữ
   - `POST /archival/restore` - Khôi phục dữ liệu đã lưu trữ
-- 📋 **Nhóm Tuân Thủ**:
+  - `GET /archive` - Danh sách lưu trữ
+  - `POST /archive` - Tạo lưu trữ thủ công
+  - `POST /retention` - Cấu hình chính sách giữ lại
+- 📋 **Tuân Thủ & Xuất Dữ Liệu**:
   - `GET /compliance/report` - Tạo báo cáo tuân thủ
+  - `GET /compliance` - Trạng thái tuân thủ
+  - `POST /compliance` - Cập nhật cài đặt tuân thủ
+  - `POST /export-advanced` - Xuất dữ liệu nâng cao
 
 #### **📡 3. Real-time Monitoring Routes (`/api/realtime-monitoring/*`)**
 - 🎛️ **Kiểm Soát Giám Sát**:
-  - `GET /status` - Trạng thái giám sát hiện tại
-  - `POST /start` - Bắt đầu phiên giám sát
-  - `POST /stop` - Dừng phiên giám sát
+  - `GET /monitoring/status` - Trạng thái giám sát hiện tại
+  - `POST /monitoring/start` - Bắt đầu phiên giám sát
+  - `POST /monitoring/stop` - Dừng phiên giám sát
+  - `GET /events/recent` - Các sự kiện giám sát gần đây
 - 🚨 **Phát Hiện Mối Đe Dọa**:
-  - `GET /threats` - Các mối đe dọa đang hoạt động và đã giải quyết
-  - `POST /threats/:id/resolve` - Giải quyết các mối đe dọa đã phát hiện
-  - `POST /analyze` - Phân tích mối đe dọa thủ công
+  - `GET /monitoring/threats` - Các mối đe dọa đang hoạt động và đã giải quyết
+  - `POST /monitoring/threats/:id/resolve` - Giải quyết các mối đe dọa đã phát hiện
+  - `POST /monitoring/analyze` - Phân tích mối đe dọa thủ công
+  - `POST /monitoring/simulate` - Mô phỏng sự kiện mối đe dọa
+- 🔔 **Hệ Thống Cảnh Báo**:
+  - `GET /alerts/status` - Trạng thái hệ thống cảnh báo
+  - `POST /alerts/configure` - Cấu hình cài đặt cảnh báo
+  - `GET /alerts/history` - Lịch sử cảnh báo
+  - `POST /alerts/send` - Gửi cảnh báo thủ công
+  - `GET /alerts/rules` - Lấy danh sách quy tắc cảnh báo
+  - `POST /alerts/rules` - Tạo quy tắc cảnh báo
+  - `PUT /alerts/rules/:ruleId/toggle` - Bật/tắt quy tắc cảnh báo
+  - `GET /alerts/channels` - Lấy danh sách kênh thông báo
+  - `POST /alerts/channels` - Cấu hình kênh thông báo
+  - `POST /alerts/test` - Kiểm tra hệ thống cảnh báo
 - 📊 **API Bảng Điều Khiển**:
+  - `GET /dashboard/overview` - Tổng quan dashboard
   - `GET /dashboard/realtime` - Dữ liệu bảng điều khiển trực tiếp
+  - `GET /dashboard/live` - Chế độ xem giám sát trực tiếp
   - `GET /dashboard/timeline` - Dữ liệu dòng thời gian lịch sử
+  - `GET /dashboard/security` - Dashboard metrics bảo mật
+  - `GET /dashboard/performance` - Dashboard metrics hiệu năng
+  - `GET /dashboard/health` - Sức khỏe hệ thống dashboard
   - `POST /dashboard/export` - Xuất dữ liệu bảng điều khiển
+  - `DELETE /dashboard/cache` - Xóa cache dashboard
+- 📝 **Tạo Sự Cố**:
+  - `POST /incidents/create` - Tạo sự cố từ giám sát
 
 #### **🚨 4. Security Incident Routes (`/api/security-incident/*`)**
 - 📋 **Quản Lý Sự Cố**:

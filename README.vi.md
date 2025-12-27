@@ -13,6 +13,8 @@ Một dự án Cloudflare Workers toàn diện sử dụng Hono.js framework (Ja
 - 🛡️ **Giới hạn truy cập (Rate Limiting)** cho các lần đăng nhập với theo dõi dựa trên IP
 - 🔒 **Mã hóa mật khẩu bcrypt** với salt rounds
 - 🛡️ **Tăng cường bảo mật token** với blacklist access token, rotation/ghi log refresh token và cơ chế logout-all
+- 📧 **Tích hợp dịch vụ Email** - Kích hoạt người dùng qua email với hỗ trợ nhà cung cấp Brevo
+- 🔐 **Hệ thống kích hoạt tài khoản** - Token bảo mật 64 ký tự với thời gian hết hạn 2 ngày cho xác nhận email
 - 🌐 **Các điểm cuối API RESTful** với định dạng phản hồi nhất quán
 - 🌍 **Hệ thống i18n động** - Tự động phát hiện ngôn ngữ và hỗ trợ không giới hạn ngôn ngữ
 - 🎯 **Xác thực Zod** với xác thực schema toàn diện và thông báo lỗi hỗ trợ i18n
@@ -24,7 +26,7 @@ Một dự án Cloudflare Workers toàn diện sử dụng Hono.js framework (Ja
 - 🔧 **Tích hợp ESLint** với các quy tắc chất lượng mã toàn diện
 - ⚙️ **Quản lý cấu hình KV** - Cấu hình thời gian chạy động với quyền kiểm soát của super admin
 - 🚀 **Sẵn sàng cho sản xuất** triển khai với Cloudflare Workers
-- 📊 **Hệ thống kiểm toán doanh nghiệp** - Ghi log kiểm toán hoàn chỉnh với 4 nhóm định tuyến chính (hơn 40 điểm cuối)
+- 📊 **Hệ thống kiểm toán doanh nghiệp** - Ghi log kiểm toán hoàn chỉnh với 4 nhóm định tuyến chính (hơn 50 điểm cuối)
   - 📋 **Các định tuyến kiểm toán cốt lõi** (`/api/audit/*`) - Truy cập log kiểm toán cơ bản, tìm kiếm và xuất
   - 🚀 **Các định tuyến kiểm toán nâng cao** (`/api/advanced-audit/*`) - Phân tích, lưu trữ và tuân thủ
   - 🔴 **Các định tuyến giám sát thời gian thực** (`/api/realtime-monitoring/*`) - Giám sát trực tiếp và phát hiện mối đe dọa
@@ -32,9 +34,9 @@ Một dự án Cloudflare Workers toàn diện sử dụng Hono.js framework (Ja
 - 🌍 **Hệ thống xác thực i18n** - Xác thực đa ngôn ngữ với thông báo lỗi được bản địa hóa cho tất cả các điểm cuối API
 - 🔧 **Hệ thống cấu hình động** - Quản lý cấu hình thời gian chạy với lưu trữ KV và điều khiển admin
 
-## � **Khởi động nhanh**
+## 🚀 Khởi động nhanh
 
-### 📋 **Thiết lập dự án**
+### 📋 Thiết lập dự án
 ```bash
 # 1. Cài đặt dependencies
 npm install
@@ -51,10 +53,11 @@ npm run dev          # Port 8787
 # hoặc npm run dev:debug  # Với debug mode
 ```
 
-### 🧪 **Chạy kiểm thử**
+### 🧪 Chạy kiểm thử
 ```bash
 # Menu kiểm thử tương tác (khuyến nghị)
 npm run test
+
 
 # Kiểm thử nhanh
 npm run test:quick
@@ -69,7 +72,7 @@ npm run test:admin_user       # Admin
 npm run test:super_admin_user # Super Admin
 ```
 
-### 🌍 **Kiểm thử đa ngôn ngữ**
+### 🌍 Kiểm thử đa ngôn ngữ
 ```bash
 # Test API với ngôn ngữ khác nhau
 curl "http://localhost:8787/api/auth/login?lang=vi" -X POST \
@@ -79,208 +82,45 @@ curl "http://localhost:8787/api/auth/login?lang=vi" -X POST \
 # Hỗ trợ: en, vi, fr, es, de, ja, th
 ```
 
-### 📚 **Tài liệu quan trọng**
-- **[SETUP_GUIDE_vi.md](./documents/SETUP_GUIDE_vi.md)** - Hướng dẫn cài đặt chi tiết
-- **[TEST_GUIDE_vi.md](./documents/TEST_GUIDE_vi.md)** - Framework kiểm thử toàn diện
-- **[ROLE_COMPLETE_GUIDE_vi.md](./documents/ROLE_COMPLETE_GUIDE_vi.md)** - Hệ thống vai trò & admin
+### 📚 Tài liệu quan trọng
+- [documents/SETUP_GUIDE_vi.md](documents/SETUP_GUIDE_vi.md) - Hướng dẫn cài đặt chi tiết
+- [documents/TEST_GUIDE_vi.md](documents/TEST_GUIDE_vi.md) - Framework kiểm thử toàn diện
+- [documents/ROLE_COMPLETE_GUIDE_vi.md](documents/ROLE_COMPLETE_GUIDE_vi.md) - Hệ thống vai trò & admin
 
-## �📚 Tổ chức tài liệu
+## 📚 Tổ chức tài liệu
 
-Dự án này có tài liệu được tổ chức trong thư mục `documents/` để dễ dàng quản lý và điều hướng:
+Tất cả tài liệu nằm trong thư mục [documents](documents) với cặp EN/VI (34 tệp: 18 EN, 16 VI; tài liệu bảo mật token có file EN riêng và file VI riêng không hậu tố `_vi`).
 
-### 🎯 **Tài liệu cốt lõi** (`documents/`)
-- **[SETUP_GUIDE_vi.md](./documents/SETUP_GUIDE_vi.md)** - 🛠️ Hướng dẫn cài đặt hoàn chỉnh & cấu hình môi trường
-- **[ROLE_COMPLETE_GUIDE_vi.md](./documents/ROLE_COMPLETE_GUIDE_vi.md)** - 👑 Hệ thống quản lý admin & vai trò hoàn chỉnh
-- **[DEBUG_DEVELOPMENT_GUIDE_vi.md](./documents/DEBUG_DEVELOPMENT_GUIDE_vi.md)** - 🐛 Quy trình gỡ lỗi & phát triển với điều khiển chi tiết
-- **[I18N_MASTER_GUIDE_vi.md](./documents/I18N_MASTER_GUIDE_vi.md)** - 🌍 Hệ thống i18n động hoàn chỉnh với xác thực đa ngôn ngữ
-- **[ZOD_GUIDE_vi.md](./documents/ZOD_GUIDE_vi.md)** - ✅ Hướng dẫn xác thực Zod & mẫu thiết kế schema
-- **[SCHEMAS_GUIDE_vi.md](./documents/SCHEMAS_GUIDE_vi.md)** - 📋 Xác thực schema toàn diện với hỗ trợ i18n
-- **[ESLINT_GUIDE_vi.md](./documents/ESLINT_GUIDE_vi.md)** - 🔧 Tiêu chuẩn chất lượng mã & linting
-- **[WRANGLER_CONFIG_GUIDE_vi.md](./documents/WRANGLER_CONFIG_GUIDE_vi.md)** - ⚙️ Quản lý cấu hình Cloudflare Workers
-- **[DATABASE_SERVICE_vi.md](./documents/DATABASE_SERVICE_vi.md)** - 🗄️ Kiến trúc & vận hành dịch vụ cơ sở dữ liệu
-- **[DYNAMIC_CONFIG_GUIDE_vi.md](./documents/DYNAMIC_CONFIG_GUIDE_vi.md)** - � Hệ thống quản lý cấu hình động cấp doanh nghiệp
+- **Tài liệu cốt lõi**: [SETUP_GUIDE_vi.md](documents/SETUP_GUIDE_vi.md), [ROLE_COMPLETE_GUIDE_vi.md](documents/ROLE_COMPLETE_GUIDE_vi.md), [DEBUG_DEVELOPMENT_GUIDE_vi.md](documents/DEBUG_DEVELOPMENT_GUIDE_vi.md), [I18N_MASTER_GUIDE_vi.md](documents/I18N_MASTER_GUIDE_vi.md), [ZOD_GUIDE_vi.md](documents/ZOD_GUIDE_vi.md), [SCHEMAS_GUIDE_vi.md](documents/SCHEMAS_GUIDE_vi.md), [ESLINT_GUIDE_vi.md](documents/ESLINT_GUIDE_vi.md), [WRANGLER_CONFIG_GUIDE_vi.md](documents/WRANGLER_CONFIG_GUIDE_vi.md), [DATABASE_SERVICE_vi.md](documents/DATABASE_SERVICE_vi.md), [DYNAMIC_CONFIG_GUIDE_vi.md](documents/DYNAMIC_CONFIG_GUIDE_vi.md), [MANUAL_SEND_EMAIL_GUIDE_vi.md](documents/MANUAL_SEND_EMAIL_GUIDE_vi.md)
+- **Kiểm thử**: [TEST_GUIDE_vi.md](documents/TEST_GUIDE_vi.md), [TEST_SCRIPTS_vi.md](documents/TEST_SCRIPTS_vi.md)
+- **Tính năng doanh nghiệp**: [ENTERPRISE_AUDIT_SYSTEM_COMPLETE_GUIDE_vi.md](documents/ENTERPRISE_AUDIT_SYSTEM_COMPLETE_GUIDE_vi.md), [AUDIT_API_REFERENCE_vi.md](documents/AUDIT_API_REFERENCE_vi.md), [AUDIT_KV_CONFIGURATION_GUIDE_vi.md](documents/AUDIT_KV_CONFIGURATION_GUIDE_vi.md)
+- **Bảo mật token**: [TOKEN_SECURITY_COMPREHENSIVE_GUIDE.md](documents/TOKEN_SECURITY_COMPREHENSIVE_GUIDE.md) (VI) và [TOKEN_SECURITY_COMPREHENSIVE_GUIDE_EN.md](documents/TOKEN_SECURITY_COMPREHENSIVE_GUIDE_EN.md) (EN)
+- **Đa ngôn ngữ**: hầu hết tài liệu có bản `_vi`; các bản EN/VI tham chiếu lẫn nhau để dễ tra cứu
 
-### 🧪 **Kiểm thử & Tự động hóa**
-- **[TEST_GUIDE_vi.md](./documents/TEST_GUIDE_vi.md)** - 🧪 Framework kiểm thử toàn diện với 40+ bộ kiểm thử
-- **[TEST_SCRIPTS_vi.md](./documents/TEST_SCRIPTS_vi.md)** - 📜 Tự động hóa kiểm thử & script shell với kiểm thử RBAC
-
-### 🏢 **Tính năng doanh nghiệp**
-- **[ENTERPRISE_AUDIT_SYSTEM_COMPLETE_GUIDE_vi.md](./documents/ENTERPRISE_AUDIT_SYSTEM_COMPLETE_GUIDE_vi.md)** - 🏛️ Hệ thống audit cấp doanh nghiệp hoàn chỉnh
-- **[AUDIT_API_REFERENCE_vi.md](./documents/AUDIT_API_REFERENCE_vi.md)** - 📚 Tham chiếu API audit chi tiết với 50+ endpoint
-- **[AUDIT_KV_CONFIGURATION_GUIDE_vi.md](./documents/AUDIT_KV_CONFIGURATION_GUIDE_vi.md)** - ⚙️ Cấu hình KV Store cho audit & quản lý cấu hình
-- **[TOKEN_SECURITY_COMPREHENSIVE_GUIDE.md](./TOKEN_SECURITY_COMPREHENSIVE_GUIDE.md)** - 🔐 Tóm tắt tăng cường bảo mật token (blacklist, audit, logout-all)
-
-### 🌏 **Tài liệu đa ngôn ngữ**
-Tất cả tài liệu có sẵn bằng **Tiếng Anh** và **Tiếng Việt** (30 tệp tổng cộng):
-- **Tiếng Anh**: `*_en.md` hoặc `*.md` (15 tệp)
-- **Tiếng Việt**: `*_vi.md` (15 tệp)
-
-### 🏢 **Tính năng doanh nghiệp**
-- **[ENTERPRISE_AUDIT_SYSTEM_COMPLETE_GUIDE_vi.md](./documents/ENTERPRISE_AUDIT_SYSTEM_COMPLETE_GUIDE_vi.md)** - 📋 Hệ thống kiểm toán doanh nghiệp hoàn chỉnh với giám sát thời gian thực, phân tích và tuân thủ
-- **[AUDIT_API_REFERENCE_vi.md](./documents/AUDIT_API_REFERENCE_vi.md)** - 🔍 Tham chiếu API hoàn chỉnh cho 4 nhóm định tuyến kiểm toán chính (hơn 40 điểm cuối)
-- **[AUDIT_KV_CONFIGURATION_GUIDE_vi.md](./documents/AUDIT_KV_CONFIGURATION_GUIDE_vi.md)** - ⚙️ Quản lý cấu hình KV nâng cao cho hệ thống kiểm toán
-- **[SCHEMAS_GUIDE_vi.md](./documents/SCHEMAS_GUIDE_vi.md)** - 📋 Xác thực schema toàn diện với hỗ trợ i18n
-
-### 🎯 **Bắt đầu nhanh**
-1. **Cài đặt**: [documents/SETUP_GUIDE_vi.md](./documents/SETUP_GUIDE_vi.md) - Cài đặt môi trường hoàn chỉnh
-2. **Phát triển**: [documents/DEBUG_DEVELOPMENT_GUIDE_vi.md](./documents/DEBUG_DEVELOPMENT_GUIDE_vi.md) - Quy trình phát triển
-3. **Kiểm thử**: [documents/TEST_GUIDE_vi.md](./documents/TEST_GUIDE_vi.md) - Sử dụng bộ kiểm thử
-4. **Triển khai**: [documents/WRANGLER_CONFIG_GUIDE_vi.md](./documents/WRANGLER_CONFIG_GUIDE_vi.md) - Triển khai sản xuất
+### 🎯 Bắt đầu nhanh
+1. **Cài đặt**: [documents/SETUP_GUIDE_vi.md](documents/SETUP_GUIDE_vi.md) - Cài đặt môi trường đa môi trường
+2. **Phát triển**: [documents/DEBUG_DEVELOPMENT_GUIDE_vi.md](documents/DEBUG_DEVELOPMENT_GUIDE_vi.md) - Quy trình wrangler/dev và kiểm soát debug
+3. **Kiểm thử**: [documents/TEST_GUIDE_vi.md](documents/TEST_GUIDE_vi.md) - Menu hợp nhất và bộ kiểm thử audit/i18n
+4. **Triển khai**: [documents/WRANGLER_CONFIG_GUIDE_vi.md](documents/WRANGLER_CONFIG_GUIDE_vi.md) - Quy trình staging/production an toàn
 
 ## Cấu trúc dự án
 
-```
-hono-auth-api-worker/
-├── src/                      # 🔧 Mã nguồn - Logic ứng dụng
-│   ├── index.js             # Điểm vào chính của ứng dụng
-│   ├── constants/           # 🎯 Hằng số tập trung & Quản lý vai trò
-│   │   ├── app.js          # Hằng số toàn ứng dụng
-│   │   ├── kvKeys.js       # Khóa cấu hình KV & giá trị mặc định
-│   │   └── roles.js        # Định nghĩa vai trò, quyền hạn, phân cấp
-│   ├── i18n/               # 🌍 Hệ thống i18n động - Hoàn toàn tự động
-│   │   ├── index.js        # Export chính cho i18n
-│   │   ├── config.js       # Cấu hình i18next động
-│   │   ├── loader.js       # Trình tải bản dịch động
-│   │   ├── languages.js    # Tiện ích quản lý ngôn ngữ
-│   │   ├── service.js      # Dịch vụ phát hiện ngôn ngữ & dịch thuật
-│   │   └── locales/        # Tệp bản dịch (tự động phát hiện)
-│   │       ├── en.js       # Bản dịch tiếng Anh (mặc định)
-│   │       ├── vi.js       # Bản dịch tiếng Việt
-│   │       ├── fr.js       # Bản dịch tiếng Pháp
-│   │       ├── es.js       # Bản dịch tiếng Tây Ban Nha
-│   │       ├── de.js       # Bản dịch tiếng Đức
-│   │       ├── ja.js       # Bản dịch tiếng Nhật
-│   │       └── th.js       # Bản dịch tiếng Thái
-│   ├── middleware/          # Các hàm middleware
-│   │   ├── auth.js         # Middleware xác thực JWT
-│   │   ├── authorization.js # Middleware kiểm soát truy cập dựa trên vai trò
-│   │   ├── cors.js         # Cấu hình CORS
-│   │   ├── env.js          # Xác thực môi trường
-│   │   ├── error.js        # Middleware xử lý lỗi
-│   │   ├── i18n.js         # Middleware i18n để phát hiện ngôn ngữ
-│   │   ├── handleLog.js    # Middleware ghi log
-│   │   ├── kvConfig.js     # Middleware chèn dịch vụ cấu hình KV
-│   │   ├── i18nValidator.js # Xác thực Zod nhận biết i18n với thông báo lỗi đa ngôn ngữ
-│   │   └── unifiedRequestMiddleware.js # Ghi log request/response thống nhất và kiểm toán
-│   ├── routes/              # Định nghĩa các định tuyến API
-│   │   ├── api.js          # Router API chính
-│   │   ├── auth.js         # Các định tuyến xác thực (/auth/*)
-│   │   ├── user.js         # Các định tuyến người dùng (/user/*)
-│   │   ├── admin.js        # 👑 Các định tuyến admin (/admin/*) - Hệ thống admin hoàn chỉnh
-│   │   ├── kvAdmin.js      # ⚙️ Các định tuyến quản lý cấu hình KV (/kv-admin/*) - Chỉ super admin
-│   │   ├── 📊 **HỆ THỐNG KIỂM TOÁN DOANH NGHIỆP** - 4 Nhóm định tuyến chính (hơn 40 điểm cuối)
-│   │   ├── audit.js        # 📋 Các định tuyến kiểm toán cốt lõi (/api/audit/*) - Log cơ bản, tìm kiếm, thống kê, xuất
-│   │   ├── advancedAudit.js # 🚀 Các định tuyến kiểm toán nâng cao (/api/advanced-audit/*) - Phân tích, lưu trữ, tuân thủ
-│   │   ├── realtimeMonitoring.js # 🔴 Giám sát thời gian thực (/api/realtime-monitoring/*) - Giám sát trực tiếp, phát hiện mối đe dọa
-│   │   ├── securityIncident.js # 🛡️ Sự cố bảo mật (/api/security-incident/*) - Quản lý và ứng phó sự cố
-│   │   ├── favicon.js      # Cung cấp favicon
-│   │   ├── translations.js # Các định tuyến demo i18n
-│   │   └── zodDemo.js     # Demo xác thực Zod
-│   ├── schemas/            # 🎯 Các schema xác thực
-│   │   ├── auth.js         # Xác thực xác thực
-│   │   ├── user.js         # Xác thực người dùng với vai trò động
-│   │   ├── kv.js           # Xác thực cấu hình KV
-│   │   ├── audit.js        # Các schema xác thực hệ thống kiểm toán
-│   │   └── i18n.js         # Các schema xác thực i18n với hỗ trợ đa ngôn ngữ
-│   ├── services/            # Các dịch vụ logic nghiệp vụ
-│   │   ├── authService.js      # Các hoạt động xác thực
-│   │   ├── databaseService.js  # Các hoạt động cơ sở dữ liệu & kiểm tra sức khỏe
-│   │   ├── kvConfigService.js  # Dịch vụ quản lý cấu hình KV
-│   │   ├── auditLogService.js  # Dịch vụ ghi log kiểm toán doanh nghiệp
-│   │   ├── securityIncidentService.js # Quản lý sự cố bảo mật
-│   │   ├── realtimeMonitoringService.js # Dịch vụ giám sát thời gian thực
-│   │   ├── rateLimitService.js # Logic giới hạn truy cập
-│   │   └── userService.js      # Các hoạt động liên quan đến người dùng
-│   ├── assets/             # Các tài sản tĩnh
-│   │   ├── favicon.ico     # Tệp Favicon
-│   │   ├── favicon.png     
-│   │   └── icon-192.png    
-│   └── utils/               # Các hàm tiện ích
-│       ├── debug.js        # 🐛 Cấu hình ghi log gỡ lỗi
-│       ├── env.js          # Tiện ích môi trường
-│       ├── helpers.js       # Các hàm trợ giúp chung
-│       └── jwt.js          # Tiện ích token JWT
-├── tests/                   # 🧪 Bộ kiểm thử toàn diện
-│   ├── mainMenu.js         # 📋 Menu kiểm thử tương tác (điểm vào chính)
-│   ├── unifiedTestSuite.js # 🎯 Bộ kiểm thử hợp nhất toàn diện
-│   ├── systemTest.js       # 🔧 Kiểm thử chức năng hệ thống cốt lõi
-│   ├── authTest.js         # 🔐 Kiểm thử xác thực & JWT
-│   ├── regularUserTest.js  # 👤 Kiểm thử chức năng người dùng thông thường
-│   ├── adminUserTest.js    # 👨‍💼 Kiểm thử chức năng người dùng admin
-│   ├── superAdminUserTest.js   # 👑 Kiểm thử chức năng người dùng Super Admin
-│   ├── kvAdminTest.js         # ⚙️ Kiểm thử quản lý cấu hình KV (chỉ super_admin)
-│   ├── securityTest.js     # 🛡️ Kiểm thử bảo mật & giới hạn truy cập
-│   ├── comprehensiveI18nTest.js  # 🌍 Kiểm thử i18n & dịch thuật toàn diện
-│   ├── performanceTest.js  # ⚡ Kiểm thử hiệu năng & tải
-│   ├── integrationTest.js  # 🔗 Kiểm thử tích hợp end-to-end
-│   ├── validationTest.js   # ✅ Kiểm thử xác thực Zod
-│   ├── quickTest.js        # ⚡ Kiểm thử nhanh (smoke tests)
-│   ├── roleTest.js         # 🎭 Kiểm thử kiểm soát truy cập dựa trên vai trò
-│   ├── **🔍 BỘ KIỂM THỬ HỆ THỐNG KIỂM TOÁN DOANH NGHIỆP** - Kiểm thử hệ thống kiểm toán hoàn chỉnh
-│   ├── auditSystemTest.js  # 📋 Chức năng hệ thống kiểm toán cốt lõi
-│   ├── advancedAuditComprehensiveTest.js # 🚀 Tính năng kiểm toán nâng cao
-│   ├── realtimeMonitoringTest.js # 🔴 Hệ thống giám sát thời gian thực
-│   ├── securityIncidentTest.js # 🛡️ Quản lý sự cố bảo mật
-│   ├── auditPerformanceTest.js # ⚡ Kiểm thử hiệu năng hệ thống kiểm toán
-│   ├── archivalServiceTest.js # 📦 Chức năng lưu trữ dữ liệu
-│   ├── kvAuditConfigTest.js # ⚙️ Kiểm thử cấu hình KV kiểm toán
-│   ├── **🌍 BỘ KIỂM THỬ XÁC THỰC i18n** - Kiểm thử xác thực đa ngôn ngữ
-│   ├── i18nValidatorExtensionTest.js # 🌐 Kiểm thử hệ thống xác thực i18n
-│   ├── multiLanguageValidationErrorTest.js # 🗣️ Kiểm thử thông báo lỗi đa ngôn ngữ
-│   ├── xssSecurityTest.js  # 🛡️ Kiểm thử bảo vệ XSS và bảo mật
-│   ├── errorHandlingTest.js # ⚠️ Kiểm thử xử lý lỗi toàn diện
-│   ├── scripts/            # 📜 Script tự động hóa kiểm thử & shell
-│   ├── utils/              # 🛠️ Tiện ích & trợ giúp kiểm thử dùng chung
-│   └── config/             # ⚙️ Cấu hình kiểm thử
-│   # Xem documents/TEST_GUIDE_vi.md để có tài liệu kiểm thử hoàn chỉnh
-│   │   └── zodValidation.js # 🎯 Kiểm thử xác thực schema Zod
-│   ├── init           # Tệp khởi tạo
-│   │   └── reset.sql # 🗄️ Khởi tạo cơ sở dữ liệu để kiểm thử
-│   │   └── kv_config.json # 🗄️ Khởi tạo cấu hình Cloudflare KV để kiểm thử
-├── scripts/                 # 🚀 Script cài đặt & phát triển
-│   ├── setup-dev.sh        # Cài đặt môi trường phát triển
-│   ├── setup-test.sh       # Cài đặt môi trường kiểm thử
-│   ├── setup-staging.sh    # Cài đặt môi trường staging
-│   ├── dev-debug.sh        # Chế độ gỡ lỗi phát triển
-│   └── staging-debug.sh    # Chế độ gỡ lỗi staging
-├── migrations/              # 🗄️ Di chuyển cơ sở dữ liệu
-│   ├── 0001_initial.sql    # Schema cơ sở dữ liệu ban đầu
-│   ├── 0002_add_role_column.sql # Thêm cột vai trò vào bảng người dùng
-│   ├── 0003_add_audit_logs.sql # Thêm bảng ghi log kiểm toán
-│   ├── 0004_add_audit_archive.sql # Thêm hệ thống lưu trữ kiểm toán
-│   └── 0005_security_incident_management.sql # Thêm quản lý sự cố bảo mật
-├── tools/                   # 🔧 Công cụ phát triển
-│   ├── i18n/               # Công cụ quản lý i18n
-│   ├── d1/                 # Công cụ quản lý cơ sở dữ liệu
-│   ├── debug_log/          # Công cụ kiểm thử hệ thống gỡ lỗi
-│   └── generate-password-hashes.js # Tiện ích mật khẩu
-├── .dev.vars.development               # 🔒 Biến môi trường phát triển (không có trong git)
-├── .dev.vars.test              # 🔒 Biến môi trường kiểm thử (không có trong git)
-├── .dev.vars.staging           # 🔒 Biến môi trường staging (không có trong git)
-├── .dev.vars.*.example         # 📋 Mẫu biến môi trường (có trong git)
-├── wrangler.toml.example       # ⚙️ Mẫu cấu hình Cloudflare Workers (có trong git)
-├── wrangler.toml               # ⚙️ Cấu hình thực tế với ID cơ sở dữ liệu (không có trong git)
-├── package.json            # 📦 Phụ thuộc & script
-├── README_vi.md              # 📖 Tài liệu dự án (tệp này)
-├── documents/             # 📚 Bộ sưu tập tài liệu hoàn chỉnh
-│   ├── SETUP_GUIDE_vi.md          # 🛠️ Hướng dẫn cài đặt & môi trường
-│   ├── ROLE_COMPLETE_GUIDE_vi.md # 👑 Hướng dẫn quản lý admin & vai trò hoàn chỉnh
-│   ├── DEBUG_DEVELOPMENT_GUIDE_vi.md # 🐛 Hướng dẫn quy trình gỡ lỗi & phát triển
-│   ├── I18N_MASTER_GUIDE_vi.md # 🌍 Hướng dẫn hệ thống i18n động hoàn chỉnh
-│   ├── ZOD_GUIDE_vi.md      # ✅ Hướng dẫn xác thực Zod toàn diện
-│   ├── SCHEMAS_GUIDE_vi.md  # 📋 Xác thực schema với hỗ trợ i18n
-│   ├── ESLINT_GUIDE_vi.md   # 🔧 Hướng dẫn chất lượng mã & linting
-│   ├── WRANGLER_CONFIG_GUIDE_vi.md # ⚙️ Hướng dẫn cấu hình Cloudflare Workers
-│   ├── TEST_GUIDE_vi.md     # 🧪 Hướng dẫn bộ kiểm thử toàn diện
-│   ├── TEST_SCRIPTS_vi.md   # 📜 Hướng dẫn script tự động hóa kiểm thử & shell
-│   ├── DATABASE_SERVICE_vi.md # 🗄️ Hướng dẫn dịch vụ & hoạt động cơ sở dữ liệu
-│   ├── DYNAMIC_CONFIG_GUIDE_vi.md # 🔧 Hướng dẫn hệ thống quản lý cấu hình động
-│   ├── ENTERPRISE_AUDIT_SYSTEM_COMPLETE_GUIDE_vi.md # 📋 Hướng dẫn hệ thống kiểm toán doanh nghiệp
-│   ├── AUDIT_API_REFERENCE_vi.md # 🔍 Tham chiếu API kiểm toán hoàn chỉnh
-│   └── AUDIT_KV_CONFIGURATION_GUIDE_vi.md # ⚙️ Hướng dẫn cấu hình KV kiểm toán
-└── wrangler.toml.example # ⚙️ Mẫu cấu hình Cloudflare Workers
-```
-
+- **src/**: mã nguồn ứng dụng
+  - `index.js` khởi tạo app Hono
+  - **constants/**: hằng số ứng dụng, hằng số route (`authRoutes.js`, `adminRoutes.js`, `userRoutes.js`, `kvAdminRoutes.js`, `auditRoutes.js`, `realtimeMonitoringRoutes.js`, `securityIncidentRoutes.js`, `translationRoutes.js`, `systemRoutes.js`), định nghĩa vai trò, cấu hình bảo mật, registry/mapping route, khóa KV
+  - **i18n/**: cấu hình i18next động (`config.js`, `loader.js`, `service.js`, `index.js`) và các locale (`en`, `vi`, `fr`, `es`, `de`, `ja`, `th`)
+  - **middleware/**: `auth.js`, `authorization.js`, `cors.js`, `debug.js`, `env.js`, `error.js`, `i18n.js`, `i18nValidator.js`, `kvConfig.js`, `rateLimit.js`, `routeDetector.js`, `security.js`, `securityConfigGuard.js`, `unifiedRequestMiddleware.js`
+  - **routes/**: `api.js` và các router tính năng (`auth.js`, `user.js`, `admin.js`, `kvAdmin.js`, `audit.js`, `advancedAudit.js`, `realtimeMonitoring.js`, `securityIncident.js`, `translations.js`, `zodDemo.js`, `routeGroups.js`, `favicon.js`)
+  - **schemas/**: base/registry/definitions/validatorGenerator và schema cho auth, user, kv, audit, advancedAudit, auditRetention, realtimeMonitoring, securityIncident, i18n, zod demo
+  - **services/**: `baseService.js`, `authService.js`, `userService.js`, `databaseService.js`, `kvConfigService.js`, `rateLimitService.js`, nhóm dịch vụ audit (log, analytics, archival, dashboard, export, monitoring, retention), `alertSystemService.js`, `securityIncidentResponseService.js`, nhóm token (`tokenService.js`, `tokenBlacklistService.js`, `tokenAuditService.js`), `emailService.js`, `emailSendTester.js`
+  - **utils/**: dynamic config, debug, helper, audit helper, jwt helper, route scanner, service config/context/factory, i18n demo
+  - **assets/**: favicon và biểu tượng ứng dụng
+- **tests/**: menu tương tác (`mainMenu.js`), bộ hợp nhất, bộ RBAC, bộ audit, bộ i18n/validation/security/performance, `tokenSecurityTest.js`, kiểm thử email, định dạng thông báo đăng nhập, phát hiện route, thư mục `init/`, `scripts/`, `utils/`, `config/`
+- **tools/**: script vận hành (`generate-password-hashes.js`, `clear-cache.js`, `reset-rate-limits.js`, `test-curl.sh`, `change-commit-author.sh`, `schema-registry-demo.js`) và các thư mục con D1, KV, i18n, debug log, database usage, metadata vai trò, tiện ích email
+- **migrations/**: `0001_initial.sql` đến `0009_user_activation_token.sql`, bao gồm bảng audit, archive, security incident, token security
+- **scripts/**: script thiết lập môi trường (dev/test/staging) và debug
+- **documents/**: 34 tài liệu Markdown (EN/VI) liệt kê ở phần trên
+- **cấu hình mẫu**: `.dev.vars.*.example`, `wrangler.toml.example`; các file `.dev.vars.*` và `wrangler.toml` thật không commit
 ## 🧪 **Framework kiểm thử toàn diện (40+ Bộ kiểm thử)**
 
 ### 🎯 **Bộ kiểm thử chuyên biệt**
@@ -361,6 +201,11 @@ npm run test:audit:performance    # Hiệu suất audit
 npm run test:i18n                # Hệ thống i18n
 npm run test:i18n:validator       # Xác thực i18n
 npm run test:validation:multilang # Lỗi xác thực đa ngôn ngữ
+
+# Kiểm thử Email & Kích hoạt tài khoản
+npm run test:activation          # Kiểm thử luồng kích hoạt tài khoản
+npm run test:email:content       # Kiểm thử bản địa hóa nội dung email
+npm run test:email:provider      # Kiểm thử header nhà cung cấp email
 
 # Kiểm thử quản lý Schema Registry
 npm run test:schema:registry      # Kiểm thử tích hợp schema registry
