@@ -1,0 +1,151 @@
+{
+  "message": "API information",
+  "version": "1.0.0",
+  "status": "running",
+  "language": "en",
+  "environment": "test",
+  "user": {
+    "id": 3,
+    "role": "admin",
+    "access_level": "admin"
+  },
+  "endpoints": {
+    "system": {
+      "GET /": "API root endpoint - welcome message",
+      "GET /health": "Health check endpoint",
+      "GET /version": "API version information",
+      "GET /language": "Language switcher endpoint",
+      "GET /api": "Comprehensive API information and endpoints",
+      "GET /route-metadata": "System route discovery (admin only)"
+    },
+    "assets": {
+      "GET /favicon": "Favicon and icon resources",
+      "GET /favicon.ico": "Favicon and icon resources",
+      "GET /favicon.png": "Favicon and icon resources",
+      "GET /apple-touch-icon.png": "Favicon and icon resources",
+      "GET /icon-192.png": "Favicon and icon resources"
+    },
+    "auth": {
+      "POST /api/auth/login": "Login with email and password",
+      "POST /api/auth/refresh_token": "Refresh access token",
+      "POST /api/auth/logout": "Logout and invalidate tokens",
+      "POST /api/auth/logout-all": "Logout from all devices (revoke all tokens)"
+    },
+    "user": {
+      "POST /api/user/register": "Register new user",
+      "GET /api/user/profile": "Get user profile (requires authentication)",
+      "PUT /api/user/profile": "Update user profile (requires authentication)",
+      "GET /api/user/me": "Get current user info (requires authentication)",
+      "POST /api/user/change-password": "Change password (requires authentication)"
+    },
+    "admin": {
+      "GET /api/admin/users": "List all users (admin access required)",
+      "POST /api/admin/users": "Create new user (admin access required)",
+      "GET /api/admin/users/:id": "Get user details (admin access required)",
+      "PUT /api/admin/users/:id": "Update user information (admin access required)",
+      "DELETE /api/admin/users/:id": "Delete user (Super Admin access required)",
+      "PUT /api/admin/users/:id/role": "Change user role (Super Admin access required)",
+      "GET /api/admin/dashboard": "Get comprehensive dashboard data (admin access required)",
+      "GET /api/admin/stats": "Get system statistics (admin access required)",
+      "GET /api/admin/system-health": "Get comprehensive system health status (admin access required)"
+    },
+    "audit": {
+      "GET /api/audit/logs": "View audit logs (admin access required)",
+      "GET /api/audit/search": "Search audit logs (admin access required)",
+      "GET /api/audit/stats": "Get audit statistics (admin access required)",
+      "GET /api/audit/export": "Export audit logs (admin access required)",
+      "DELETE /api/audit/logs/:id": "View audit logs (admin access required)"
+    },
+    "advanced_audit": {
+      "GET /api/advanced-audit/analytics": "Advanced audit analytics (admin access required)",
+      "GET /api/advanced-audit/analytics/security": "Security analytics (admin access required)",
+      "GET /api/advanced-audit/analytics/behavior": "Behavior analytics (admin access required)",
+      "GET /api/advanced-audit/analytics/performance": "Performance analytics (admin access required)",
+      "GET /api/advanced-audit/compliance": "Compliance reporting (admin access required)",
+      "GET /api/advanced-audit/compliance/report": "Generate compliance report (admin access required)",
+      "GET /api/advanced-audit/archival": "Audit log archival (admin access required)",
+      "GET /api/advanced-audit/archival/stats": "Archival statistics (admin access required)",
+      "POST /api/advanced-audit/archival/run": "Run archival process (admin access required)",
+      "POST /api/advanced-audit/archival/restore": "Restore archived logs (admin access required)",
+      "GET /api/advanced-audit/middleware/stats": "Middleware statistics (admin access required)"
+    },
+    "realtime_monitoring": {
+      "GET /api/realtime-monitoring/events/recent": "Get recent monitoring events (admin access required)",
+      "GET /api/realtime-monitoring/monitoring/status": "Get monitoring status (admin access required)",
+      "POST /api/realtime-monitoring/monitoring/start": "Start real-time monitoring (admin access required)",
+      "POST /api/realtime-monitoring/monitoring/stop": "Stop real-time monitoring (admin access required)",
+      "GET /api/realtime-monitoring/monitoring/threats": "Get threat information (admin access required)",
+      "POST /api/realtime-monitoring/monitoring/threats/:threatId/resolve": "Resolve detected threat (admin access required)",
+      "POST /api/realtime-monitoring/monitoring/analyze": "Analyze monitoring data (admin access required)",
+      "POST /api/realtime-monitoring/monitoring/simulate": "Simulate monitoring scenarios (admin access required)",
+      "GET /api/realtime-monitoring/alerts/status": "Get alerts status (admin access required)",
+      "GET /api/realtime-monitoring/alerts/history": "Get alerts history (admin access required)",
+      "POST /api/realtime-monitoring/alerts/send": "Send system alert (admin access required)",
+      "GET /api/realtime-monitoring/alerts/rules": "Manage alert rules (admin access required)",
+      "POST /api/realtime-monitoring/alerts/rules": "Create alert rule (admin access required)",
+      "PUT /api/realtime-monitoring/alerts/rules/:ruleId/toggle": "Enable/disable alert rule (admin access required)",
+      "GET /api/realtime-monitoring/alerts/channels": "Manage alert channels (admin access required)",
+      "POST /api/realtime-monitoring/alerts/channels": "Create alert channel (admin access required)",
+      "POST /api/realtime-monitoring/alerts/test": "Test alert system (admin access required)",
+      "POST /api/realtime-monitoring/alerts/configure": "Configure system alerts (admin access required)",
+      "GET /api/realtime-monitoring/dashboard/overview": "Dashboard overview (admin access required)",
+      "GET /api/realtime-monitoring/dashboard/realtime": "Live dashboard data (admin access required)",
+      "GET /api/realtime-monitoring/dashboard/live": "Live dashboard snapshot (admin access required)",
+      "GET /api/realtime-monitoring/dashboard/timeline": "Dashboard timeline (admin access required)",
+      "GET /api/realtime-monitoring/dashboard/security": "Security dashboard (admin access required)",
+      "GET /api/realtime-monitoring/dashboard/performance": "Performance dashboard (admin access required)",
+      "POST /api/realtime-monitoring/dashboard/export": "Export dashboard data (admin access required)",
+      "DELETE /api/realtime-monitoring/dashboard/cache": "Clear dashboard cache (admin access required)",
+      "GET /api/realtime-monitoring/dashboard/health": "Dashboard health check (admin access required)",
+      "POST /api/realtime-monitoring/incidents/create": "Create realtime monitoring incident (admin access required)"
+    },
+    "security_incident": {
+      "GET /api/security-incident/incidents": "List security incidents (admin access required)",
+      "POST /api/security-incident/incidents": "Create security incident (admin access required)",
+      "GET /api/security-incident/incidents/:id": "Get incident details (admin access required)",
+      "PUT /api/security-incident/incidents/:id/status": "Update incident status (admin access required)",
+      "POST /api/security-incident/incidents/:id/response": "Execute incident response (admin access required)",
+      "GET /api/security-incident/statistics": "Get incident statistics (admin access required)",
+      "GET /api/security-incident/status": "Get service status (admin access required)",
+      "POST /api/security-incident/simulate": "Simulate security incident (admin access required)"
+    },
+    "translations": {
+      "GET /api/translations": "List all available languages and their validation status",
+      "GET /api/translations/:language": "Get all translations for a specific language",
+      "GET /api/translations/:language/validate": "Validate translation completeness",
+      "GET /api/translations/:language/section/:section": "Get specific section translations"
+    },
+    "zod_demo": {
+      "GET /api/zod_demo": "Zod validation demo information",
+      "POST /api/zod_demo/register": "User registration demo with comprehensive validation",
+      "GET /api/zod_demo/search": "Search demo with query parameter validation",
+      "POST /api/zod_demo/upload": "File upload demo with metadata validation"
+    }
+  },
+  "route_summary": {
+    "total_available": 89,
+    "total_system": 106,
+    "categories": [
+      "system",
+      "assets",
+      "auth",
+      "user",
+      "admin",
+      "audit",
+      "advanced_audit",
+      "realtime_monitoring",
+      "security_incident",
+      "translations",
+      "zod_demo"
+    ],
+    "user_permissions": {
+      "role": "admin",
+      "can_access_admin": true,
+      "can_access_kv_admin": false,
+      "can_access_audit": true,
+      "can_access_advanced_audit": true,
+      "can_access_realtime_monitoring": true,
+      "can_access_security_incident": true
+    }
+  }
+}

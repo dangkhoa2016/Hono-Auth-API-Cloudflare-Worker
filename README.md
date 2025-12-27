@@ -475,6 +475,11 @@ GET /api/admin/system-health      → System health check with performance metri
 ### 📖 **Complete Documentation:**
 See the complete system details in [documents/ROLE_COMPLETE_GUIDE.md](./documents/ROLE_COMPLETE_GUIDE.md)
 
+### 🔍 **System Route Discovery (admin only):**
+- `GET /route-metadata` → Returns the full route registry with method, path, permissions, category, and i18n description
+- Access: `admin` and `super_admin`
+- Source of truth: registry-driven (no runtime scanning), useful for tooling, QA, and permission reviews
+
 ## ⚙️ KV Configuration Management System
 
 The project includes a powerful **KV Configuration Management System** for dynamic runtime configuration control:
