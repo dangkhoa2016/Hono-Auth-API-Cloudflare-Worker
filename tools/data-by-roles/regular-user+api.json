@@ -1,0 +1,74 @@
+{
+  "message": "API information",
+  "version": "1.0.0",
+  "status": "running",
+  "language": "en",
+  "environment": "test",
+  "user": {
+    "id": 2,
+    "role": "user",
+    "access_level": "user"
+  },
+  "endpoints": {
+    "system": {
+      "GET /": "API root endpoint - welcome message",
+      "GET /health": "Health check endpoint",
+      "GET /version": "API version information",
+      "GET /language": "Language switcher endpoint",
+      "GET /api": "Comprehensive API information and endpoints"
+    },
+    "assets": {
+      "GET /favicon": "Favicon and icon resources",
+      "GET /favicon.ico": "Favicon and icon resources",
+      "GET /favicon.png": "Favicon and icon resources",
+      "GET /apple-touch-icon.png": "Favicon and icon resources",
+      "GET /icon-192.png": "Favicon and icon resources"
+    },
+    "auth": {
+      "POST /api/auth/login": "Login with email and password",
+      "POST /api/auth/refresh_token": "Refresh access token",
+      "POST /api/auth/logout": "Logout and invalidate tokens",
+      "POST /api/auth/logout-all": "Logout from all devices (revoke all tokens)"
+    },
+    "user": {
+      "POST /api/user/register": "Register new user",
+      "GET /api/user/profile": "Get user profile (requires authentication)",
+      "PUT /api/user/profile": "Update user profile (requires authentication)",
+      "GET /api/user/me": "Get current user info (requires authentication)",
+      "POST /api/user/change-password": "Change password (requires authentication)"
+    },
+    "translations": {
+      "GET /api/translations": "List all available languages and their validation status",
+      "GET /api/translations/:language": "Get all translations for a specific language",
+      "GET /api/translations/:language/validate": "Validate translation completeness",
+      "GET /api/translations/:language/section/:section": "Get specific section translations"
+    },
+    "zod_demo": {
+      "GET /api/zod_demo": "Zod validation demo information",
+      "POST /api/zod_demo/register": "User registration demo with comprehensive validation",
+      "GET /api/zod_demo/search": "Search demo with query parameter validation",
+      "POST /api/zod_demo/upload": "File upload demo with metadata validation"
+    }
+  },
+  "route_summary": {
+    "total_available": 27,
+    "total_system": 106,
+    "categories": [
+      "system",
+      "assets",
+      "auth",
+      "user",
+      "translations",
+      "zod_demo"
+    ],
+    "user_permissions": {
+      "role": "user",
+      "can_access_admin": false,
+      "can_access_kv_admin": false,
+      "can_access_audit": false,
+      "can_access_advanced_audit": false,
+      "can_access_realtime_monitoring": false,
+      "can_access_security_incident": false
+    }
+  }
+}

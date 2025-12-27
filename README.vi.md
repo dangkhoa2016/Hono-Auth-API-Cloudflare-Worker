@@ -490,6 +490,11 @@ GET /api/admin/system-health      → Kiểm tra sức khỏe hệ thống với
 ### 📖 **Tài liệu hoàn chỉnh:**
 Xem chi tiết hệ thống hoàn chỉnh trong [documents/ROLE_COMPLETE_GUIDE_vi.md](./documents/ROLE_COMPLETE_GUIDE_vi.md)
 
+### 🔍 **Khám phá route hệ thống (chỉ admin):**
+- `GET /route-metadata` → Trả về toàn bộ registry route với method, path, permissions, category và mô tả i18n
+- Quyền truy cập: `admin` và `super_admin`
+- Nguồn dữ liệu: dựa trên registry (không quét runtime), hữu ích cho tooling, QA và rà soát quyền
+
 ## ⚙️ Hệ thống quản lý cấu hình KV
 
 Dự án bao gồm một **Hệ thống quản lý cấu hình KV** mạnh mẽ để kiểm soát cấu hình thời gian chạy động:

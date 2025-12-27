@@ -228,6 +228,7 @@ export default {
     'auth': {
       'login': 'Đăng nhập bằng email và mật khẩu',
       'logout': 'Đăng xuất và vô hiệu hóa tokens',
+      'logoutAll': 'Đăng xuất khỏi tất cả thiết bị (thu hồi toàn bộ token)',
       'refresh': 'Làm mới access token'
     },
     'demo': {

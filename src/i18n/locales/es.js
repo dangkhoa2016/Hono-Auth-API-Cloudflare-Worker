@@ -228,6 +228,7 @@ export default {
     'auth': {
       'login': 'Iniciar sesión con email y contraseña',
       'logout': 'Cerrar sesión e invalidar tokens',
+      'logoutAll': 'Cerrar sesión en todos los dispositivos (revocar todos los tokens)',
       'refresh': 'Actualizar token de acceso'
     },
     'demo': {

@@ -228,6 +228,7 @@ export default {
     'auth': {
       'login': 'Mit E-Mail und Passwort anmelden',
       'logout': 'Abmelden und Token ungültig machen',
+      'logoutAll': 'Von allen Geräten abmelden (alle Tokens widerrufen)',
       'refresh': 'Zugriffstoken aktualisieren'
     },
     'demo': {

@@ -228,6 +228,7 @@ export default {
     'auth': {
       'login': 'Se connecter avec email et mot de passe',
       'logout': 'Se déconnecter et invalider les tokens',
+      'logoutAll': 'Se déconnecter de tous les appareils (révoquer tous les tokens)',
       'refresh': 'Actualiser le token d\'accès'
     },
     'demo': {

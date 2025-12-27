@@ -43,7 +43,7 @@
     "lint:check": "eslint src/ tests/ --ext .js --max-warnings 0",
     "kill": "pkill -f 'wrangler dev' || true",
     "test:kv:setup": "node tests/init/reset_kv.js",
-    "test:initdb": "yarn test:kv:setup && wrangler d1 execute hono-auth-api-db-test --local --env test --file tests/init/reset.sql",
+    "test:initdb": "yarn db:migrate:test && yarn test:kv:setup && wrangler d1 execute hono-auth-api-db-test --local --env test --file tests/init/reset.sql",
     "test:unified": "yarn test:initdb && node tests/unifiedTestSuite.js all",
     "test:unified:all": "yarn test:initdb && node tests/unifiedTestSuite.js all",
     "test:unified:quick": "node tests/unifiedTestSuite.js quick",
