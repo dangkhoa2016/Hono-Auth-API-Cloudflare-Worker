@@ -1,40 +1,103 @@
-# 🔐 Token Security Guide (EN) - Hono Auth Worker
 
-> 🌐 Language / Ngôn ngữ: **English** | [Tiếng Việt](TOKEN_SECURITY_COMPREHENSIVE_GUIDE.vi.md)
+# 🔐 TOKEN SECURITY COMPREHENSIVE GUIDE
+
+> 🌐 Language / Ngôn ngữ: **English** | [Tiếng Việt](TOKEN_SECURITY_COMPREHENSIVE_GUIDE_vi.vi.md)
 
 ## Scope
+Summarizes token security hardening: access/refresh lifecycle, blacklist, audit logging, and ops guidance.
 
-This guide captures the current token hardening work (as of 2025-12-16) for the Hono Auth Worker: access/refresh lifecycle, blacklist-based revocation, audit logging, and operational steps.
-
-## What is implemented
-- **Access/Refresh tokens**: Access 1h, refresh 3d with JTI per token, scope, issuer/audience/subject hardening, optional IP/UA binding hashes.
-- **Persistent refresh tokens**: `refresh_tokens` table (migration 0006) stores SHA-256 hashes, device metadata, revocation status, and reuse detection fields.
-- **Blacklist for access tokens**: `token_blacklist` table (migration 0008) blocks any access token JTI that has been revoked (logout or logout-all) until its expiry.
-- **Token audit log**: `token_audit_logs` (migration 0008) records login, refresh, logout, logout-all, and suspicious activity with IP/UA metadata.
-- **Services**: `tokenService.js` issues/validates/rotates refresh tokens; `tokenBlacklistService.js` adds/queries/cleans blacklisted JTIs; `tokenAuditService.js` writes audit entries and prunes old logs. `authService.js` orchestrates these in login/refresh/logout/logout-all flows and enforces blacklist checks during auth middleware.
-- **Cleanup**: Opportunistic cleanup for expired blacklist rows and stale audit logs runs inside auth flows (no dedicated scheduler yet).
-- **Tests**: `tests/tokenSecurityTest.js` plus `yarn test:token_security` cover login → refresh → logout → logout-all, blacklist enforcement, and mismatch handling.
+## Implemented
+- **Access/Refresh tokens**: Access 1h, refresh 3d, each with JTI, scope, standard iss/aud/sub; optional IP/UA hashing when enabled.
+- **Refresh storage**: `refresh_tokens` table (migration 0006) stores SHA-256 hash, device metadata, revoke flag, reuse detection chain.
+- **Access blacklist**: `token_blacklist` (migration 0008) blocks revoked access JTIs until expiry.
+- **Token audit logs**: `token_audit_logs` (migration 0008) capture login, refresh, logout, logout-all, suspicious actions with IP/UA and metadata.
+- **Services**: `tokenService.js` (issue/validate/rotate refresh), `tokenBlacklistService.js` (add/query/cleanup blacklist), `tokenAuditService.js` (log + cleanup); `authService.js` orchestrates login/refresh/logout/logout-all and middleware checks blacklist.
+- **Cleanup**: Opportunistic cleanup of expired blacklist entries and old audits occurs in auth flows (no dedicated scheduler yet).
+- **Tests**: `tests/tokenSecurityTest.js` + `yarn test:token_security` cover login → refresh → logout → logout-all, blacklist enforcement, mismatch cases.
 
 ## Data model
-- **refresh_tokens** (0006): hashed token (`token_hash`), `jti`, `user_id`, issued/expiry, revoked flags, replacement chain, IP/UA, reuse detection fields, indexes on `(user_id, revoked)`, `jti`, `replaced_by`.
-- **token_blacklist** (0008): `jti`, `user_id`, `expires_at`, `reason`, timestamps, indexes on `jti`, `expires_at`, `user_id`.
-- **token_audit_logs** (0008): `user_id`, `action`, `token_jti`, `refresh_jti`, IP/UA, success flag, message, metadata JSON, indexes on `(user_id, action)` and `created_at`.
+- **refresh_tokens** (0006): `token_hash`, `jti`, `user_id`, issued/expiry, `revoked`, `replaced_by`, IP/UA, reuse detection; indexes on `(user_id, revoked)`, `jti`, `replaced_by`.
+- **token_blacklist** (0008): `jti`, `user_id`, `expires_at`, `reason`, timestamps; indexes on `jti`, `expires_at`, `user_id`.
+- **token_audit_logs** (0008): `user_id`, `action`, `token_jti`, `refresh_jti`, IP/UA, `success`, `message`, `metadata` JSON; indexes on `(user_id, action)` and `created_at`.
+
+### Table structure details
+- **refresh_tokens**
+	- Identity: `id` (PK), `jti` (unique), `user_id` (FK users).
+	- Token state: `token_hash` (SHA-256 of refresh), `issued_at`, `expires_at`, `revoked` flag, `revoked_at`, `revocation_reason`, `replaced_by` chain.
+	- Reuse detection: `reuse_detected_at`, `reuse_ip`, `reuse_user_agent`.
+	- Context: `ip_address`, `user_agent` (binding optional via config).
+	- Indices: `jti` lookup; `(user_id, revoked)` for active selection; `replaced_by` for rotation chain.
+- **token_blacklist**
+	- Identity: `id` (PK), `jti` (unique), `user_id` (FK users).
+	- Revocation: `blacklisted_at`, `expires_at`, `reason`; timestamps for auditing.
+	- Indices: `jti` fast check; `expires_at` for cleanup; `user_id` for user-wide revocation.
+- **token_audit_logs**
+	- Identity: `id` (PK), `user_id` (FK users).
+	- Event: `action` (`login`, `refresh`, `logout`, `logout_all`, suspicious), `token_jti`, `refresh_jti`.
+	- Context: `ip_address`, `user_agent`, `success`, `error_message`, `metadata` JSON.
+	- Indices: `(user_id, action)` for filtering; `created_at` for retention cleanup.
 
 ## Runtime behavior
-- **Auth middleware** rejects access tokens whose `jti` appears in `token_blacklist` before granting route access.
-- **Login**: issues access/refresh with JTIs, stores hashed refresh token row, logs `login` audit with IP/UA.
-- **Refresh**: verifies JWT + DB hash, checks reuse/revocation, rotates token, logs `refresh`; reuses trigger revoke-all and audit.
-- **Logout**: requires valid access + refresh; revokes the refresh row, blacklists access JTI until `exp`, logs `logout` (or `logout_mismatch` when IDs differ).
-- **Logout-all**: revokes all active refresh tokens for the user, optionally blacklists the presented access JTI, logs `logout_all` / `logout_all_mismatch`.
-- **Cleanup**: periodic calls inside auth flows prune expired blacklist entries and old audit rows (defaults in services); a dedicated cron/queue worker is still pending.
+- **Auth middleware**: denies access tokens whose JTI is in `token_blacklist` before route authorization.
+- **Login**: issues access/refresh with JTI, stores hashed refresh, logs `login` with IP/UA.
+- **Refresh**: validates JWT + DB hash, checks reuse/revoke, rotates tokens, logs `refresh`; on reuse, revoke-all and log warning.
+- **Logout**: requires valid access + refresh; revokes refresh row, blacklists access JTI until `exp`, logs `logout` (or `logout_mismatch` on JTI mismatch).
+- **Logout-all**: revokes all active refresh tokens for the user, optionally blacklists current access, logs `logout_all` / `logout_all_mismatch`.
+- **Cleanup**: opportunistic removal of expired blacklist entries and stale audits (no dedicated worker yet).
 
 ## Operations
 - **Run migrations**: `yarn db:migrate` (dev) or `yarn db:migrate:test` (test) to apply 0006/0008.
-- **Run token security tests**: `yarn test:initdb && yarn test:token_security` (or `npm` equivalents).
-- **Config knobs** (dynamic config via `dynamicConfig.js`): issuer, audience, clock skew, default scope, IP/UA binding toggles, rate limit controls; JWT secret in Wrangler secrets.
-- **Logging**: debug namespaces `hono-auth-api:services:token*` and `hono-auth-api:routes:*` help trace token flows.
+- **Run token security tests**: `yarn test:initdb && yarn test:token_security` (or npm equivalents).
+- **Configuration** (via `dynamicConfig.js`): issuer, audience, clock skew, default scope, IP/UA binding toggle, rate-limit control; JWT secret stored in Wrangler secrets.
+- **Logging**: debug namespaces `hono-auth-api:services:token*` and `hono-auth-api:routes:*` to trace token flows.
+
+## Key flows (code samples)
+```javascript
+// Issue access/refresh, persist hashed refresh, and enforce quota
+const { accessToken, refreshToken } = await tokenService.issueTokenPair(user, {
+	ipAddress: c.req.header('cf-connecting-ip'),
+	userAgent: c.req.header('user-agent')
+});
+
+// Check blacklist before authorizing access token
+const isBlocked = await tokenBlacklistService.isBlacklisted(accessPayload.jti);
+if (isBlocked) return c.json({ success: false, error: 'ACCESS_TOKEN_BLACKLISTED' }, 401);
+
+// Logout: revoke refresh + blacklist access, then audit
+await tokenService.revokeRefreshToken(refreshPayload.jti, 'USER_LOGOUT');
+await tokenBlacklistService.addToBlacklist({
+	jti: accessPayload.jti,
+	userId: accessPayload.user_id,
+	expiresAt: new Date(accessPayload.exp * 1000),
+	reason: 'USER_LOGOUT'
+});
+await tokenAuditService.logTokenAction('logout', accessPayload.user_id, {
+	tokenJti: accessPayload.jti,
+	refreshJti: refreshPayload.jti,
+	ipAddress: c.req.header('cf-connecting-ip'),
+	userAgent: c.req.header('user-agent')
+});
+
+// Refresh rotation with reuse detection
+const validation = await tokenService.validateRefreshToken(refreshToken, {
+	ipAddress: c.req.header('cf-connecting-ip'),
+	userAgent: c.req.header('user-agent')
+});
+if (!validation.success) return c.json({ success: false, error: validation.error }, validation.statusCode);
+const rotated = await tokenService.rotateRefreshToken({
+	record: validation.record,
+	user,
+	metadata: { ipAddress: c.req.header('cf-connecting-ip'), userAgent: c.req.header('user-agent') }
+});
+await tokenAuditService.logTokenAction('refresh', user.id, {
+	tokenJti: rotated.accessTokenPayload.jti,
+	refreshJti: rotated.refreshTokenPayload.jti,
+	ipAddress: c.req.header('cf-connecting-ip'),
+	userAgent: c.req.header('user-agent')
+});
+```
 
 ## Remaining gaps
-- Scheduled cleanup worker for blacklist/audit tables (current cleanup is opportunistic only).
-- Admin-facing session/device management endpoints and UI.
-- Key rotation with KMS-backed secrets.
+- No dedicated worker/scheduler yet for blacklist/audit cleanup (opportunistic only).
+- No admin/device session management endpoints/UI.
+- No KMS-backed key rotation process yet.

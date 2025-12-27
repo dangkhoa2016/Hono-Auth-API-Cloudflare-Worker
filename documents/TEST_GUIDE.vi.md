@@ -91,7 +91,12 @@ npm run test:role
 # 🌍 Kiểm thử i18n message translation (Mới)
 npm run test:admin:i18n
 
-# 📊 Bộ kiểm thử hoàn chỉnh (bao gồm hệ thống kiểm toán)
+# � Kiểm thử Email & Kích hoạt tài khoản
+npm run test:activation        # Kiểm thử luồng kích hoạt tài khoản
+npm run test:email:content     # Kiểm thử bản địa hóa nội dung email
+npm run test:email:provider    # Kiểm thử tích hợp nhà cung cấp email
+
+# �📊 Bộ kiểm thử hoàn chỉnh (bao gồm hệ thống kiểm toán)
 npm run test:unified
 ```
 
@@ -280,8 +285,11 @@ tests/
 ├── 🛡️ securityTest.js          # Kiểm thử Bảo mật & rate limiting
 ├── 🔒 xssSecurityTest.js        # Kiểm thử bảo mật XSS
 ├── 🌍 comprehensiveI18nTest.js # Kiểm thử i18n & translation toàn diện
-├── � adminMessageTranslationTest.js # Kiểm thử i18n message translation cho admin routes
-├── �🌐 multiLanguageValidationErrorTest.js # Kiểm thử lỗi validation Zod đa ngôn ngữ
+├── 📬 adminMessageTranslationTest.js # Kiểm thử i18n message translation cho admin routes
+├── 🌐 multiLanguageValidationErrorTest.js # Kiểm thử lỗi validation Zod đa ngôn ngữ
+├── 📧 activationTest.js        # Kiểm thử luồng kích hoạt tài khoản (12+ test)
+├── 📧 emailContentTest.js      # Kiểm thử bản địa hóa nội dung email
+├── 📧 emailProviderHeaderTest.js # Kiểm thử tích hợp nhà cung cấp email
 ├── ⚡ performanceTest.js       # Kiểm thử Hiệu năng & tải
 ├── 🔗 integrationTest.js       # Kiểm thử Tích hợp từ đầu đến cuối
 ├── ✅ validationTest.js        # Kiểm thử Xác thực chung
@@ -512,6 +520,9 @@ npm run test:super_admin_user  # Kiểm thử Vai trò Super Admin
 npm run test:security          # Kiểm thử bảo mật
 npm run test:i18n              # Kiểm thử i18n
 npm run test:multilang_validation # Kiểm thử lỗi xác thực đa ngôn ngữ Zod
+npm run test:activation        # Kiểm thử luồng kích hoạt tài khoản
+npm run test:email:content     # Kiểm thử bản địa hóa nội dung email
+npm run test:email:provider    # Kiểm thử tích hợp nhà cung cấp email
 npm run test:kv_admin          # Kiểm thử quản lý cấu hình KV
 npm run test:role              # Kiểm thử kiểm soát truy cập dựa trên vai trò
 npm run test:performance       # Kiểm thử hiệu năng

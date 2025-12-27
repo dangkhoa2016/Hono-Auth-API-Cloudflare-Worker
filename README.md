@@ -13,6 +13,8 @@ A comprehensive Cloudflare Workers project using the Hono.js framework (JavaScri
 - 🛡️ **Rate Limiting** for login attempts with IP-based tracking
 - 🔒 **bcrypt Password Hashing** with salt rounds
 - 🛡️ **Token Security Hardening** with access-token blacklist, refresh token rotation/audit, and logout-all enforcement
+- 📧 **Email Service Integration** - User activation via email with Brevo provider support
+- 🔐 **Account Activation System** - Secure 64-char token with 2-day expiry for email confirmation
 - 🌐 **RESTful API Endpoints** with consistent response format
 - 🌍 **Dynamic i18n System** - Fully automatic language detection and unlimited language support
 - 🎯 **Zod Validation** with comprehensive schema validation and i18n-aware error messages
@@ -24,7 +26,7 @@ A comprehensive Cloudflare Workers project using the Hono.js framework (JavaScri
 - 🔧 **ESLint Integration** with comprehensive code quality rules
 - ⚙️ **KV Configuration Management** - Dynamic runtime configuration with super admin controls
 - 🚀 **Production Ready** deployment with Cloudflare Workers
-- 📊 **Enterprise Audit System** - Complete audit logging with 4 main route groups (40+ endpoints)
+- 📊 **Enterprise Audit System** - Complete audit logging with 4 main route groups (50+ endpoints)
   - 📋 **Core Audit Routes** (`/api/audit/*`) - Basic audit log access, search, and export
   - 🚀 **Advanced Audit Routes** (`/api/advanced-audit/*`) - Analytics, archival, and compliance
   - 🔴 **Real-time Monitoring Routes** (`/api/realtime-monitoring/*`) - Live monitoring and threat detection
@@ -34,204 +36,38 @@ A comprehensive Cloudflare Workers project using the Hono.js framework (JavaScri
 
 ## 📚 Documentation Organization
 
-This project has documentation organized in the `documents/` folder for easy management and navigation:
+All guides live in [documents](./documents) with English and Vietnamese pairs unless noted otherwise (34 files total: 18 EN, 16 VI).
 
-### 🎯 **Core Documentation** (`documents/`)
-- **[SETUP_GUIDE.md](./documents/SETUP_GUIDE.md)** - 🛠️ Complete setup guide & environment configuration
-- **[ROLE_COMPLETE_GUIDE.md](./documents/ROLE_COMPLETE_GUIDE.md)** - 👑 Admin & role management system complete guide
-- **[DEBUG_DEVELOPMENT_GUIDE.md](./documents/DEBUG_DEVELOPMENT_GUIDE.md)** - 🐛 Debug & development workflow with granular controls
-- **[I18N_MASTER_GUIDE.md](./documents/I18N_MASTER_GUIDE.md)** - 🌍 Complete dynamic i18n system with multilingual validation
-- **[ZOD_GUIDE.md](./documents/ZOD_GUIDE.md)** - ✅ Zod validation guide & schema design patterns
-- **[SCHEMAS_GUIDE.md](./documents/SCHEMAS_GUIDE.md)** - 📋 Comprehensive schema validation with i18n support
-- **[ESLINT_GUIDE.md](./documents/ESLINT_GUIDE.md)** - 🔧 Code quality & linting standards
-- **[WRANGLER_CONFIG_GUIDE.md](./documents/WRANGLER_CONFIG_GUIDE.md)** - ⚙️ Cloudflare Workers configuration management
-- **[DATABASE_SERVICE.md](./documents/DATABASE_SERVICE.md)** - 🗄️ Database service architecture & operations
-- **[DYNAMIC_CONFIG_GUIDE.md](./documents/DYNAMIC_CONFIG_GUIDE.md)** - 🔧 Enterprise dynamic configuration management system
+- **Core guides**: [SETUP_GUIDE.md](documents/SETUP_GUIDE.md), [ROLE_COMPLETE_GUIDE.md](documents/ROLE_COMPLETE_GUIDE.md), [DEBUG_DEVELOPMENT_GUIDE.md](documents/DEBUG_DEVELOPMENT_GUIDE.md), [I18N_MASTER_GUIDE.md](documents/I18N_MASTER_GUIDE.md), [ZOD_GUIDE.md](documents/ZOD_GUIDE.md), [SCHEMAS_GUIDE.md](documents/SCHEMAS_GUIDE.md), [ESLINT_GUIDE.md](documents/ESLINT_GUIDE.md), [WRANGLER_CONFIG_GUIDE.md](documents/WRANGLER_CONFIG_GUIDE.md), [DATABASE_SERVICE.md](documents/DATABASE_SERVICE.md), [DYNAMIC_CONFIG_GUIDE.md](documents/DYNAMIC_CONFIG_GUIDE.md), [MANUAL_SEND_EMAIL_GUIDE.md](documents/MANUAL_SEND_EMAIL_GUIDE.md)
+- **Testing**: [TEST_GUIDE.md](documents/TEST_GUIDE.md) and [TEST_SCRIPTS.md](documents/TEST_SCRIPTS.md)
+- **Enterprise audit**: [ENTERPRISE_AUDIT_SYSTEM_COMPLETE_GUIDE.md](documents/ENTERPRISE_AUDIT_SYSTEM_COMPLETE_GUIDE.md), [AUDIT_API_REFERENCE.md](documents/AUDIT_API_REFERENCE.md), [AUDIT_KV_CONFIGURATION_GUIDE.md](documents/AUDIT_KV_CONFIGURATION_GUIDE.md)
+- **Token security**: [TOKEN_SECURITY_COMPREHENSIVE_GUIDE.md](documents/TOKEN_SECURITY_COMPREHENSIVE_GUIDE.md) (VI) and [TOKEN_SECURITY_COMPREHENSIVE_GUIDE_EN.md](documents/TOKEN_SECURITY_COMPREHENSIVE_GUIDE_EN.md) (EN)
+- **Multi-language**: every guide above has a `_vi` twin where available; token security is provided as separate EN and VI files
 
-### 🧪 **Testing & Automation**
-- **[TEST_GUIDE.md](./documents/TEST_GUIDE.md)** - 🧪 Comprehensive testing framework with 40+ test suites
-- **[TEST_SCRIPTS.md](./documents/TEST_SCRIPTS.md)** - 📜 Test automation & shell scripts with RBAC testing
-
-### 🏢 **Enterprise Features**
-- **[ENTERPRISE_AUDIT_SYSTEM_COMPLETE_GUIDE.md](./documents/ENTERPRISE_AUDIT_SYSTEM_COMPLETE_GUIDE.md)** - 📋 Complete enterprise audit system with real-time monitoring, analytics, and compliance
-- **[AUDIT_API_REFERENCE.md](./documents/AUDIT_API_REFERENCE.md)** - 🔍 Complete API reference for 4 main audit route groups (40+ endpoints)
-- **[AUDIT_KV_CONFIGURATION_GUIDE.md](./documents/AUDIT_KV_CONFIGURATION_GUIDE.md)** - ⚙️ Advanced KV configuration management for audit system
-- **[TOKEN_SECURITY_COMPREHENSIVE_GUIDE_EN.md](./TOKEN_SECURITY_COMPREHENSIVE_GUIDE_EN.md)** - 🔐 Token security hardening (blacklist, audits, logout-all) summary
-
-### 🌍 **Multi-language Documentation**
-All documentation is available in both English and Vietnamese:
-- **English versions**: All guides above in English
-- **Vietnamese versions**: Corresponding `*_vi.md` files for all guides
-- **Complete Coverage**: 30 documentation files (15 English + 15 Vietnamese) covering all aspects of the system
-
-
-### 🎯 **Quick Start**
-1. **Setup**: [documents/SETUP_GUIDE.md](./documents/SETUP_GUIDE.md) - Complete environment setup with multi-environment support
-2. **Development**: [documents/DEBUG_DEVELOPMENT_GUIDE.md](./documents/DEBUG_DEVELOPMENT_GUIDE.md) - Development workflow with granular debug controls
-3. **Testing**: [documents/TEST_GUIDE.md](./documents/TEST_GUIDE.md) - Comprehensive testing framework with 40+ test suites
-4. **Deployment**: [documents/WRANGLER_CONFIG_GUIDE.md](./documents/WRANGLER_CONFIG_GUIDE.md) - Production deployment with security best practices
-
-### 📖 **Complete Documentation Library**
-Our documentation is organized for maximum clarity and accessibility:
-- **🎯 Core System Guides**: 10 comprehensive guides covering all system aspects
-- **🧪 Testing & Automation**: Complete testing documentation with automation scripts
-- **🏢 Enterprise Features**: Advanced audit system, KV configuration, and enterprise-grade features
-- **🌍 Multilingual Support**: All 15 guides available in both English and Vietnamese (30 total files)
-- **📋 Reference Materials**: API references, schema guides, and configuration management
+### 🎯 Quick Start
+1. **Setup**: [documents/SETUP_GUIDE.md](documents/SETUP_GUIDE.md) for multi-environment initialization
+2. **Develop**: [documents/DEBUG_DEVELOPMENT_GUIDE.md](documents/DEBUG_DEVELOPMENT_GUIDE.md) for wrangler/dev workflows and debug flags
+3. **Test**: [documents/TEST_GUIDE.md](documents/TEST_GUIDE.md) for the unified menu and audit/i18n suites
+4. **Deploy**: [documents/WRANGLER_CONFIG_GUIDE.md](documents/WRANGLER_CONFIG_GUIDE.md) for staging/production rollouts
 
 ## Project Structure
 
-```
-hono-auth-api-worker/
-├── src/                      # 🔧 Source code - Application logic
-│   ├── index.js             # Main application entry point
-│   ├── constants/           # 🎯 Centralized constants & Role management
-│   │   ├── app.js          # App-wide constants
-│   │   ├── kvKeys.js       # KV configuration keys & defaults
-│   │   └── roles.js        # Role definitions, permissions, hierarchy
-│   ├── i18n/               # 🌍 Dynamic i18n system - Fully automatic
-│   │   ├── index.js        # Main exports for i18n
-│   │   ├── config.js       # Dynamic i18next configuration  
-│   │   ├── loader.js       # Dynamic translation loader
-│   │   ├── languages.js    # Language management utilities
-│   │   ├── service.js      # Language detection & translation service
-│   │   └── locales/        # Translation files (auto-detected)
-│   │       ├── en.js       # English translations (default)
-│   │       ├── vi.js       # Vietnamese translations
-│   │       ├── fr.js       # French translations
-│   │       ├── es.js       # Spanish translations
-│   │       ├── de.js       # German translations
-│   │       ├── ja.js       # Japanese translations
-│   │       └── th.js       # Thai translations
-│   ├── middleware/          # Middleware functions
-│   │   ├── auth.js         # JWT authentication middleware
-│   │   ├── authorization.js # Role-based access control middleware
-│   │   ├── cors.js         # CORS configuration
-│   │   ├── env.js          # Environment validation
-│   │   ├── error.js        # Error handling middleware
-│   │   ├── i18n.js         # i18n middleware for language detection
-│   │   ├── handleLog.js    # Logging middleware
-│   │   ├── kvConfig.js     # KV configuration service injection
-│   │   ├── i18nValidator.js # i18n-aware Zod validation with multilingual error messages
-│   │   └── unifiedRequestMiddleware.js # Unified request/response logging and audit
-│   ├── routes/              # API route definitions
-│   │   ├── api.js          # Main API router
-│   │   ├── auth.js         # Authentication routes (/auth/*)
-│   │   ├── user.js         # User routes (/user/*)
-│   │   ├── admin.js        # 👑 Admin routes (/admin/*) - Complete admin system
-│   │   ├── kvAdmin.js      # ⚙️ KV configuration management routes (/kv-admin/*) - Super admin only
-│   │   ├── 📊 **ENTERPRISE AUDIT SYSTEM** - 4 Main Route Groups (40+ endpoints)
-│   │   ├── audit.js        # 📋 Core audit routes (/api/audit/*) - Basic logs, search, stats, export
-│   │   ├── advancedAudit.js # 🚀 Advanced audit routes (/api/advanced-audit/*) - Analytics, archival, compliance
-│   │   ├── realtimeMonitoring.js # 🔴 Real-time monitoring (/api/realtime-monitoring/*) - Live monitoring, threat detection
-│   │   ├── securityIncident.js # 🛡️ Security incidents (/api/security-incident/*) - Incident management, response
-│   │   ├── favicon.js      # Favicon serving
-│   │   ├── translations.js # i18n demo routes
-│   │   └── zodDemo.js     # Zod validation demo
-│   ├── schemas/            # 🎯 Validation schemas
-│   │   ├── auth.js         # Authentication validation
-│   │   ├── user.js         # User validation with dynamic roles
-│   │   ├── kv.js           # KV configuration validation
-│   │   ├── audit.js        # Audit system validation schemas
-│   │   └── i18n.js         # i18n validation schemas with multilingual support
-│   ├── services/            # Business logic services
-│   │   ├── authService.js      # Authentication operations
-│   │   ├── databaseService.js  # Database operations & health checks
-│   │   ├── kvConfigService.js  # KV configuration management service
-│   │   ├── auditLogService.js  # Enterprise audit logging service
-│   │   ├── securityIncidentService.js # Security incident management
-│   │   ├── realtimeMonitoringService.js # Real-time monitoring service
-│   │   ├── rateLimitService.js # Rate limiting logic
-│   │   └── userService.js      # User-related operations
-│   ├── assets/             # Static assets
-│   │   ├── favicon.ico     # Favicon files
-│   │   ├── favicon.png     
-│   │   └── icon-192.png    
-│   └── utils/               # Utility functions
-│       ├── debug.js        # 🐛 Debug logging configuration
-│       ├── env.js          # Environment utilities
-│       ├── helpers.js       # General helper functions
-│       └── jwt.js          # JWT token utilities
-├── tests/                   # 🧪 Comprehensive Testing Framework
-│   ├── mainMenu.js         # 📋 Interactive test menu (main entry point)
-│   ├── unifiedTestSuite.js # 🎯 Comprehensive unified test suite
-│   ├── systemTest.js       # 🔧 Core system functionality tests
-│   ├── authTest.js         # 🔐 Authentication & JWT tests
-│   ├── regularUserTest.js  # 👤 Regular user functionality tests
-│   ├── adminUserTest.js    # 👨‍💼 Admin user functionality tests
-│   ├── superAdminUserTest.js   # 👑 Super Admin user functionality tests
-│   ├── kvAdminTest.js         # ⚙️ KV configuration management tests (super_admin only)
-│   ├── securityTest.js     # 🛡️ Security & rate limiting tests
-│   ├── comprehensiveI18nTest.js  # 🌍 Comprehensive i18n & translation tests
-│   ├── performanceTest.js  # ⚡ Performance & load tests
-│   ├── integrationTest.js  # 🔗 End-to-end integration tests
-│   ├── validationTest.js   # ✅ Zod validation tests
-│   ├── quickTest.js        # ⚡ Quick smoke tests
-│   ├── roleTest.js         # 🎭 Role-based access control tests
-│   ├── **🔍 ENTERPRISE AUDIT TESTING SUITE** - Complete audit system testing
-│   ├── auditSystemTest.js  # 📋 Core audit system functionality
-│   ├── advancedAuditComprehensiveTest.js # 🚀 Advanced audit features
-│   ├── realtimeMonitoringTest.js # 🔴 Real-time monitoring system
-│   ├── securityIncidentTest.js # 🛡️ Security incident management
-│   ├── auditPerformanceTest.js # ⚡ Audit system performance tests
-│   ├── archivalServiceTest.js # 📦 Data archival functionality
-│   ├── kvAuditConfigTest.js # ⚙️ KV audit configuration tests
-│   ├── **🌍 i18n VALIDATION TESTING SUITE** - Multilingual validation testing
-│   ├── i18nValidatorExtensionTest.js # 🌐 i18n validator system tests
-│   ├── multiLanguageValidationErrorTest.js # 🗣️ Multilingual error message tests
-│   ├── xssSecurityTest.js  # 🛡️ XSS protection and security tests
-│   ├── errorHandlingTest.js # ⚠️ Comprehensive error handling tests
-│   ├── scripts/            # 📜 Test automation & shell scripts
-│   ├── utils/              # 🛠️ Shared test utilities & helpers
-│   └── config/             # ⚙️ Test configuration
-│   # See documents/TEST_GUIDE.md for complete testing documentation
-│   │   └── zodValidation.js # 🎯 Zod schema validation tests
-│   ├── init           # Initialization files
-│   │   └── reset.sql # 🗄️ Database initialization for testing
-│   │   └── kv_config.json # 🗄️ Cloudflare KV configuration initialization for testing
-├── scripts/                 # 🚀 Setup & development scripts
-│   ├── setup-dev.sh        # Development environment setup
-│   ├── setup-test.sh       # Test environment setup
-│   ├── setup-staging.sh    # Staging environment setup
-│   ├── dev-debug.sh        # Development debug mode
-│   └── staging-debug.sh    # Staging debug mode
-├── migrations/              # 🗄️ Database migrations
-│   ├── 0001_initial.sql    # Initial database schema
-│   ├── 0002_add_role_column.sql # Add role column to users
-│   ├── 0003_add_audit_logs.sql # Add audit logging tables
-│   ├── 0004_add_audit_archive.sql # Add audit archival system
-│   └── 0005_security_incident_management.sql # Add security incident management
-├── tools/                   # 🔧 Development tools
-│   ├── i18n/               # i18n management tools
-│   ├── d1/                 # Database management tools
-│   ├── debug_log/          # Debug system testing tools
-│   └── generate-password-hashes.js # Password utilities
-├── .dev.vars.development               # 🔒 Development environment variables (not in git)
-├── .dev.vars.test              # 🔒 Test environment variables (not in git)
-├── .dev.vars.staging           # 🔒 Staging environment variables (not in git)
-├── .dev.vars.*.example         # 📋 Environment variable templates (in git)
-├── wrangler.toml.example       # ⚙️ Cloudflare Workers configuration template (in git)
-├── wrangler.toml               # ⚙️ Actual configuration with database IDs (not in git)
-├── package.json            # 📦 Dependencies & scripts
-├── README.md              # 📖 Project documentation (this file)
-├── documents/             # 📚 Complete documentation collection
-│   ├── SETUP_GUIDE.md          # 🛠️ Setup guide & environment
-│   ├── ROLE_COMPLETE_GUIDE.md # 👑 Complete admin & role management guide
-│   ├── DEBUG_DEVELOPMENT_GUIDE.md # 🐛 Debug & development workflow guide
-│   ├── I18N_MASTER_GUIDE.md # 🌍 Complete dynamic i18n system guide
-│   ├── ZOD_GUIDE.md      # ✅ Comprehensive Zod validation guide
-│   ├── SCHEMAS_GUIDE.md  # 📋 Schema validation with i18n support
-│   ├── ESLINT_GUIDE.md   # 🔧 Code quality & linting guide
-│   ├── WRANGLER_CONFIG_GUIDE.md # ⚙️ Cloudflare Workers configuration guide
-│   ├── TEST_GUIDE.md     # 🧪 Comprehensive testing framework guide
-│   ├── TEST_SCRIPTS.md   # 📜 Test automation & shell scripts guide
-│   ├── DATABASE_SERVICE.md # 🗄️ Database service & operations guide
-│   ├── DYNAMIC_CONFIG_GUIDE.md # 🔧 Dynamic configuration management guide
-│   ├── ENTERPRISE_AUDIT_SYSTEM_COMPLETE_GUIDE.md # 📋 Enterprise audit system guide
-│   ├── AUDIT_API_REFERENCE.md # 🔍 Complete audit API reference
-│   └── AUDIT_KV_CONFIGURATION_GUIDE.md # ⚙️ Audit KV configuration guide
-└── wrangler.toml.example # ⚙️ Cloudflare Workers configuration template
-```
+- **src/**: application code
+  - `index.js` bootstraps the Hono app
+  - **constants/**: app constants, route constants (`authRoutes.js`, `adminRoutes.js`, `userRoutes.js`, `kvAdminRoutes.js`, `auditRoutes.js`, `realtimeMonitoringRoutes.js`, `securityIncidentRoutes.js`, `translationRoutes.js`, `systemRoutes.js`), role definitions, security settings, route registry and category mappings, KV keys
+  - **i18n/**: dynamic i18next config (`config.js`, `loader.js`, `service.js`, `index.js`) and locales (`en`, `vi`, `fr`, `es`, `de`, `ja`, `th`)
+  - **middleware/**: `auth.js`, `authorization.js`, `cors.js`, `debug.js`, `env.js`, `error.js`, `i18n.js`, `i18nValidator.js`, `kvConfig.js`, `rateLimit.js`, `routeDetector.js`, `security.js`, `securityConfigGuard.js`, `unifiedRequestMiddleware.js`
+  - **routes/**: `api.js` plus feature routers (`auth.js`, `user.js`, `admin.js`, `kvAdmin.js`, `audit.js`, `advancedAudit.js`, `realtimeMonitoring.js`, `securityIncident.js`, `translations.js`, `zodDemo.js`, `routeGroups.js`, `favicon.js`)
+  - **schemas/**: base/registry/definitions/validatorGenerator plus module schemas for auth, user, kv, audit, advancedAudit, auditRetention, realtimeMonitoring, securityIncident, i18n, zod demos
+  - **services/**: `baseService.js`, `authService.js`, `userService.js`, `databaseService.js`, `kvConfigService.js`, `rateLimitService.js`, audit services (log, analytics, archival, dashboard, export, monitoring, retention), `alertSystemService.js`, `securityIncidentResponseService.js`, token services (`tokenService.js`, `tokenBlacklistService.js`, `tokenAuditService.js`), email services (`emailService.js`, `emailSendTester.js` with multilingual email templates and Brevo integration)
+  - **utils/**: dynamic config helpers, debug utilities, audit helpers, jwt helpers, route scanner, service config/context/factory utilities, i18n demo helpers
+  - **assets/**: favicon and app icons
+- **tests/**: interactive menu (`mainMenu.js`), unified suite, RBAC suites, audit suites, i18n/validation/security/performance suites, token security tests, **account activation test suite (`activationTest.js`)**, email content/provider header tests (`emailContentTest.js`, `emailProviderHeaderTest.js`), login message format, route detection, plus `init/` data, `scripts/`, `utils/`, `config/`
+- **tools/**: operational scripts (`generate-password-hashes.js`, `clear-cache.js`, `reset-rate-limits.js`, `test-curl.sh`, `change-commit-author.sh`, `schema-registry-demo.js`) and subfolders for D1 management (`tools/d1`), KV config (`tools/kv`), i18n tooling, debug log harness, database usage examples, role metadata, and email utilities
+- **migrations/**: `0001_initial.sql` through `0009_user_activation_token.sql`, including audit/archive, security incident, token security tables
+- **scripts/**: environment setup scripts (dev/test/staging) and debug helpers
+- **documents/**: 34 Markdown guides (EN/VI) referenced above
+- **config templates**: `.dev.vars.*.example`, `wrangler.toml.example`; local `.dev.vars.*` and `wrangler.toml` stay untracked
 
 ## 🧪 Testing Framework
 
@@ -270,6 +106,11 @@ npm run test:i18n              # i18n system tests
 npm run test:multilang_validation # Multilingual validation error tests
 npm run test:i18n:validator     # i18n validator extension tests
 npm run test:comprehensive:i18n  # Comprehensive i18n functionality tests
+
+# Email & Account Activation Tests
+npm run test:activation        # Account activation flow tests
+npm run test:email:content     # Email content localization tests
+npm run test:email:provider    # Email provider header tests
 
 # Security & Performance Tests
 npm run test:security           # Security and rate limiting tests
@@ -347,6 +188,12 @@ Our testing framework provides extensive coverage across all system components:
 - **Multilingual Validation**: Error messages in 7 languages (EN, VI, FR, ES, DE, JA, TH)
 - **Zod Schema Validation**: Comprehensive input validation, type safety, error handling
 - **XSS Security Testing**: Cross-site scripting protection, input sanitization
+
+**📧 Email & Account Activation Testing** (4+ test suites):
+- **Account Activation Tests**: Complete activation flow with token validation and expiry
+- **Email Content Localization**: Multilingual email templates (7 languages)
+- **Email Provider Integration**: Brevo API integration and configuration testing
+- **Activation Security**: Token generation, expiry handling, admin disable checks
 
 **⚡ Performance & Security Testing** (6+ test suites):
 - **Load Testing**: Concurrent requests, response time validation, system limits
