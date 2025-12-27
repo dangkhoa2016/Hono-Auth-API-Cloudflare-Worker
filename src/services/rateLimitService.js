@@ -1,5 +1,6 @@
 import { rateLimitService_log, rateLimit_log, dbError_log } from '../utils/debug.js';
 import { BaseService } from './baseService.js';
+import { createKvConfigService } from '../utils/serviceFactory.js';
 
 const DEFAULT_CONTEXT = 'auth:ip';
 
@@ -24,6 +25,7 @@ function normalizeIdentifier(identifier) {
 export class RateLimitService extends BaseService {
   constructor(env) {
     super(env, 'RateLimitService');
+    this.kvService = createKvConfigService(env);
     rateLimitService_log('RateLimitService initialized with optimized config management');
   }
 
@@ -59,7 +61,7 @@ export class RateLimitService extends BaseService {
     }
 
     // Use KV if available (Performance Optimization)
-    if (this.env.CONFIG_KV) {
+    if (this.kvService.kv) {
       return this.checkRateLimitKV(normalized, resolved);
     }
 
@@ -150,7 +152,7 @@ export class RateLimitService extends BaseService {
   async checkRateLimitKV(normalized, resolved) {
     const key = `ratelimit:${resolved.context}:${normalized}`;
     try {
-      const record = await this.env.CONFIG_KV.get(key, 'json');
+      const record = await this.kvService.getRaw(key, 'json');
 
       if (!record) {
         return { allowed: true, attempts: 0, limit: resolved.limit, context: resolved.context };
@@ -204,7 +206,7 @@ export class RateLimitService extends BaseService {
     rateLimit_log(`Recording failed attempt for ${normalized} in context ${resolved.context}`);
 
     // Use KV if available
-    if (this.env.CONFIG_KV) {
+    if (this.kvService.kv) {
       return this.recordFailedAttemptKV(normalized, resolved);
     }
 
@@ -273,7 +275,7 @@ export class RateLimitService extends BaseService {
     const now = Date.now();
 
     try {
-      let record = await this.env.CONFIG_KV.get(key, 'json');
+      let record = await this.kvService.getRaw(key, 'json');
 
       if (!record) {
         record = { attempts: 1, firstAttempt: now, lastAttempt: now, metadata: resolved.metadata };
@@ -289,7 +291,7 @@ export class RateLimitService extends BaseService {
 
       // Calculate TTL: Max of window or block duration
       const ttl = Math.max(resolved.windowSeconds, resolved.blockDurationSeconds, 60); // Min 60s
-      await this.env.CONFIG_KV.put(key, JSON.stringify(record), { expirationTtl: ttl });
+      await this.kvService.putRaw(key, JSON.stringify(record), { expirationTtl: ttl });
       return true;
     } catch (e) {
       dbError_log(`Failed to record rate limit attempt (KV): ${e.message}`);
@@ -312,7 +314,7 @@ export class RateLimitService extends BaseService {
     }
 
     // Use KV if available
-    if (this.env.CONFIG_KV) {
+    if (this.kvService.kv) {
       return this.resetFailedAttemptsKV(normalized, resolved);
     }
 
@@ -336,7 +338,7 @@ export class RateLimitService extends BaseService {
   async resetFailedAttemptsKV(normalized, resolved) {
     const key = `ratelimit:${resolved.context}:${normalized}`;
     try {
-      await this.env.CONFIG_KV.delete(key);
+      await this.kvService.deleteRaw(key);
       return true;
     } catch (e) {
       dbError_log(`Failed to reset rate limit counter (KV): ${e.message}`);
@@ -359,7 +361,7 @@ export class RateLimitService extends BaseService {
     }
 
     // Use KV if available
-    if (this.env.CONFIG_KV) {
+    if (this.kvService.kv) {
       return this.getAttemptCountKV(normalized, resolved);
     }
 
@@ -387,7 +389,7 @@ export class RateLimitService extends BaseService {
   async getAttemptCountKV(normalized, resolved) {
     const key = `ratelimit:${resolved.context}:${normalized}`;
     try {
-      const record = await this.env.CONFIG_KV.get(key, 'json');
+      const record = await this.kvService.getRaw(key, 'json');
       return record ? record.attempts : 0;
     } catch (e) {
       dbError_log(`Error getting rate limit count (KV): ${e.message}`);

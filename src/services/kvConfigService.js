@@ -283,6 +283,54 @@ export class KVConfigService {
   }
 
   // ==========================================================================
+  // RAW KV ACCESS METHODS (For non-config use cases like Rate Limiting)
+  // ==========================================================================
+
+  /**
+   * Get raw value from KV without prefixing or internal caching
+   * @param {string} key - The exact key to get
+   * @param {string} type - 'text', 'json', 'arrayBuffer', 'stream'
+   */
+  async getRaw(key, type = 'text') {
+    return this.kv.get(key, type);
+  }
+
+  /**
+   * Get raw value with metadata from KV
+   * @param {string} key - The exact key to get
+   * @param {string} type - 'text', 'json', 'arrayBuffer', 'stream'
+   */
+  async getWithMetadataRaw(key, type = 'text') {
+    return this.kv.getWithMetadata(key, type);
+  }
+
+  /**
+   * Put raw value into KV without prefixing
+   * @param {string} key - The exact key to set
+   * @param {string|ReadableStream|ArrayBuffer} value - The value to store
+   * @param {Object} options - KV options (expiration, expirationTtl, metadata)
+   */
+  async putRaw(key, value, options = {}) {
+    return this.kv.put(key, value, options);
+  }
+
+  /**
+   * Delete raw key from KV without prefixing
+   * @param {string} key - The exact key to delete
+   */
+  async deleteRaw(key) {
+    return this.kv.delete(key);
+  }
+
+  /**
+   * List keys from KV without forced prefix
+   * @param {Object} options - List options (prefix, limit, cursor)
+   */
+  async listRaw(options = {}) {
+    return this.kv.list(options);
+  }
+
+  // ==========================================================================
   // AUDIT CONFIGURATION METHODS
   // ==========================================================================
 

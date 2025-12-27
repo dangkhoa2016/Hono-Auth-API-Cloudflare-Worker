@@ -8,6 +8,7 @@ import {
   canManageUser
 } from '../constants/roles.js';
 import { BaseService } from './baseService.js';
+import { createKvConfigService } from '../utils/serviceFactory.js';
 
 /**
  * Service for managing operations with users table
@@ -16,6 +17,7 @@ import { BaseService } from './baseService.js';
 export class UserService extends BaseService {
   constructor(env) {
     super(env, 'UserService');
+    this.kvService = createKvConfigService(env);
     userService_log('UserService initialized with optimized config management');
   }
 
@@ -961,9 +963,9 @@ export class UserService extends BaseService {
    * @param {number} userId - User ID
    */
   async invalidateUserCache(userId) {
-    if (this.env.CONFIG_KV) {
+    if (this.kvService.kv) {
       try {
-        await this.env.CONFIG_KV.delete(`user:cache:${userId}`);
+        await this.kvService.deleteRaw(`user:cache:${userId}`);
         userService_log(`User cache invalidated for ID: ${userId}`);
       } catch (error) {
         userService_log(`Failed to invalidate user cache: ${error.message}`);
