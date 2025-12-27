@@ -852,6 +852,15 @@ export default {
         'defaultsRetrieved': 'Default configurations retrieved by {{actor}} ({{keyCount}} keys)',
         'retrieved': 'Successfully retrieved {{configCount}} configurations by {{actor}} ({{allowedKeys}} allowed keys)'
       },
+      'rateLimit': {
+        'batchDeleteDryRun': 'Rate limit batch delete dry run: {{count}} keys would be deleted ({{failed}} failed)',
+        'batchDeleted': 'Rate limit batch delete: {{count}} keys deleted ({{failed}} failed)',
+        'cleanDryRun': 'Rate limit clean dry run: {{count}} keys would be deleted (prefix: {{prefix}})',
+        'cleaned': 'Rate limit cleaned: {{count}} keys deleted (prefix: {{prefix}})',
+        'pruneDryRun': 'Rate limit prune dry run: {{count}} keys would be deleted (prefix: {{prefix}})',
+        'pruned': 'Rate limit pruned: {{count}} keys deleted (prefix: {{prefix}})',
+        'seeded': 'Rate limit seeded: {{count}} keys created (prefix: {{prefix}})'
+      },
       'status': {
         'disabled': 'disabled',
         'enabled': 'enabled'

@@ -852,6 +852,15 @@ export default {
         'defaultsRetrieved': '{{actor}}によってデフォルト設定が取得されました（{{keyCount}}個のキー）',
         'retrieved': '{{actor}}によって{{configCount}}個の設定が正常に取得されました（{{allowedKeys}}個の許可されたキー）'
       },
+      'rateLimit': {
+        'batchDeleteDryRun': 'レート制限の一括削除ドライラン: {{count}} 個のキーが削除されます ({{failed}} 失敗)',
+        'batchDeleted': 'レート制限の一括削除: {{count}} 個のキーが削除されました ({{failed}} 失敗)',
+        'cleanDryRun': 'レート制限のクリーニングドライラン: {{count}} 個のキーが削除されます (プレフィックス: {{prefix}})',
+        'cleaned': 'レート制限のクリーニング: {{count}} 個のキーが削除されました (プレフィックス: {{prefix}})',
+        'pruneDryRun': 'レート制限のプルーニングドライラン: {{count}} 個のキーが削除されます (プレフィックス: {{prefix}})',
+        'pruned': 'レート制限のプルーニング: {{count}} 個のキーが削除されました (プレフィックス: {{prefix}})',
+        'seeded': 'レート制限のシード: {{count}} 個のキーが作成されました (プレフィックス: {{prefix}})'
+      },
       'status': {
         'disabled': '無効化',
         'enabled': '有効化'

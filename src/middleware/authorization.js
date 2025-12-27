@@ -21,7 +21,7 @@ export const requireAdmin = async (c, next) => {
 
   if (!user) {
     error_log('Authorization: No user found in context');
-    return await handleStandardError(c, new Error('UNAUTHORIZED'), 'Authorization: missing user', error_log, 'auth.unauthorized', {}, 401);
+    return await handleStandardError(c, new Error('UNAUTHORIZED'), 'Authorization: missing user', error_log, 'auth.unauthorized', { resource: '[Admin route]' }, 401);
   }
 
   authMiddleware_log(`Authorization check for user ${user.user_id}, role: ${user.role}`);
@@ -46,7 +46,7 @@ export const requireRole = (requiredRoles) => {
 
     if (!user) {
       error_log('Authorization: No user found in context');
-      return await handleStandardError(c, new Error('UNAUTHORIZED'), 'Role check: missing user', error_log, 'auth.unauthorized', {}, 401);
+      return await handleStandardError(c, new Error('UNAUTHORIZED'), 'Role check: missing user', error_log, 'auth.unauthorized', { resource: '[Protected route]' }, 401);
     }
 
     // Normalize to array for consistent processing
@@ -73,7 +73,7 @@ export const requireSuperAdmin = async (c, next) => {
 
   if (!user) {
     error_log('Authorization: No user found in context');
-    return await handleStandardError(c, new Error('UNAUTHORIZED'), 'Super admin check: missing user', error_log, 'auth.unauthorized', {}, 401);
+    return await handleStandardError(c, new Error('UNAUTHORIZED'), 'Super admin check: missing user', error_log, 'auth.unauthorized', { resource: '[Super Admin route]' }, 401);
   }
 
   authMiddleware_log(`Super Admin check for user ${user.user_id}, role: ${user.role}`);
@@ -98,7 +98,7 @@ export const requireOwnerOrAdmin = (resourceUserIdParam = 'id') => {
 
     if (!currentUser) {
       error_log('Authorization: No user found in context');
-      return await handleStandardError(c, new Error('UNAUTHORIZED'), 'Owner/Admin check: missing user', error_log, 'auth.unauthorized', {}, 401);
+      return await handleStandardError(c, new Error('UNAUTHORIZED'), 'Owner/Admin check: missing user', error_log, 'auth.unauthorized', { resource: '[Owner/Admin resource]' }, 401);
     }
 
     authMiddleware_log(`Resource access check: user ${currentUser.user_id} (${currentUser.role}) accessing resource of user ${resourceUserId}`);
@@ -142,7 +142,7 @@ export const requireDeletePermission = async (c, next) => {
 
   if (!currentUser) {
     error_log('Authorization: No user found in context');
-    return await handleStandardError(c, new Error('UNAUTHORIZED'), 'Delete permission: missing user', error_log, 'auth.unauthorized', {}, 401);
+    return await handleStandardError(c, new Error('UNAUTHORIZED'), 'Delete permission: missing user', error_log, 'auth.unauthorized', { resource: '[Deletion]' }, 401);
   }
 
   authMiddleware_log(`Delete permission check: user ${currentUser.user_id} (${currentUser.role}) trying to delete user ${targetUserId}`);

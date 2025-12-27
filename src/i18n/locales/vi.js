@@ -852,6 +852,15 @@ export default {
         'defaultsRetrieved': 'Cấu hình mặc định đã được truy xuất bởi {{actor}} ({{keyCount}} khóa)',
         'retrieved': 'Đã truy xuất thành công {{configCount}} cấu hình bởi {{actor}} ({{allowedKeys}} khóa được phép)'
       },
+      'rateLimit': {
+        'batchDeleteDryRun': 'Chạy thử xóa hàng loạt giới hạn tần suất: {{count}} khóa sẽ bị xóa ({{failed}} thất bại)',
+        'batchDeleted': 'Xóa hàng loạt giới hạn tần suất: {{count}} khóa đã bị xóa ({{failed}} thất bại)',
+        'cleanDryRun': 'Chạy thử dọn dẹp giới hạn tần suất: {{count}} khóa sẽ bị xóa (tiền tố: {{prefix}})',
+        'cleaned': 'Đã dọn dẹp giới hạn tần suất: {{count}} khóa đã bị xóa (tiền tố: {{prefix}})',
+        'pruneDryRun': 'Chạy thử cắt tỉa giới hạn tần suất: {{count}} khóa sẽ bị xóa (tiền tố: {{prefix}})',
+        'pruned': 'Đã cắt tỉa giới hạn tần suất: {{count}} khóa đã bị xóa (tiền tố: {{prefix}})',
+        'seeded': 'Đã gieo giới hạn tần suất: {{count}} khóa đã được tạo (tiền tố: {{prefix}})'
+      },
       'status': {
         'disabled': 'được tắt',
         'enabled': 'được bật'

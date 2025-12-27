@@ -96,7 +96,11 @@ class KVAdminTests {
       this.testPerformanceScenarios,
       this.testEdgeCases,
       this.testSecurityScenarios,
-      this.testDataConsistency
+      this.testDataConsistency,
+      this.testRateLimitClean,
+      this.testRateLimitSeed,
+      this.testRateLimitPruneTime,
+      this.testRateLimitBatchDelete
     ];
 
     // Process tests using standard pattern
@@ -801,6 +805,131 @@ class KVAdminTests {
       this.logger.success('Data consistency test completed successfully');
     } catch (error) {
       this.logger.error(`[testDataConsistency] Data consistency test failed: ${error.message}`);
+      throw error;
+    }
+  }
+
+  /**
+   * Test Rate Limit Clean
+   */
+  async testRateLimitClean() {
+    this.logger.info('Testing Rate Limit Clean...');
+
+    try {
+      // Test dry run
+      const dryRunResponse = await this.client.post(API_ENDPOINTS.kvAdminRateLimitClean,
+        { prefix: 'test:clean:', dryRun: true },
+        { 'Authorization': `Bearer ${this.superAdminToken}` }
+      );
+
+      this.assert.assertSuccess(dryRunResponse, 'Rate limit clean dry run');
+      this.assert.assertEqual(dryRunResponse.data.data.dryRun, true, 'Should be dry run');
+
+      this.logger.success('Rate Limit Clean test completed successfully');
+    } catch (error) {
+      this.logger.error(`[testRateLimitClean] Rate Limit Clean test failed: ${error.message}`);
+      throw error;
+    }
+  }
+
+  /**
+   * Test Rate Limit Seed
+   */
+  async testRateLimitSeed() {
+    this.logger.info('Testing Rate Limit Seed...');
+
+    try {
+      const prefix = 'test:seed:';
+      const count = 5;
+
+      const response = await this.client.post(API_ENDPOINTS.kvAdminRateLimitSeed,
+        { prefix, count },
+        { 'Authorization': `Bearer ${this.superAdminToken}` }
+      );
+
+      this.assert.assertSuccess(response, 'Rate limit seed');
+      this.assert.assertEqual(response.data.data.count, count, 'Should seed correct count');
+      this.assert.assertTrue(response.data.data.createdKeys.length > 0, 'Should return created keys');
+
+      this.logger.success('Rate Limit Seed test completed successfully');
+    } catch (error) {
+      this.logger.error(`[testRateLimitSeed] Rate Limit Seed test failed: ${error.message}`);
+      throw error;
+    }
+  }
+
+  /**
+   * Test Rate Limit Prune Time
+   */
+  async testRateLimitPruneTime() {
+    this.logger.info('Testing Rate Limit Prune Time...');
+
+    try {
+      // First seed some data
+      const prefix = 'test:prune:';
+      await this.client.post(API_ENDPOINTS.kvAdminRateLimitSeed,
+        { prefix, count: 5 },
+        { 'Authorization': `Bearer ${this.superAdminToken}` }
+      );
+
+      // Then prune
+      const now = Date.now();
+      const start = now - 10000; // 10 seconds ago
+      const end = now + 10000;   // 10 seconds future
+
+      const response = await this.client.post(API_ENDPOINTS.kvAdminRateLimitPruneTime,
+        { prefix, start, end, dryRun: true },
+        { 'Authorization': `Bearer ${this.superAdminToken}` }
+      );
+
+      this.assert.assertSuccess(response, 'Rate limit prune time dry run');
+      this.assert.assertEqual(response.data.data.dryRun, true, 'Should be dry run');
+      
+      this.logger.success('Rate Limit Prune Time test completed successfully');
+    } catch (error) {
+      this.logger.error(`[testRateLimitPruneTime] Rate Limit Prune Time test failed: ${error.message}`);
+      throw error;
+    }
+  }
+
+  /**
+   * Test Rate Limit Batch Delete
+   */
+  async testRateLimitBatchDelete() {
+    this.logger.info('Testing Rate Limit Batch Delete...');
+
+    try {
+      // Seed data
+      const prefix = 'test:batch:';
+      const seedResponse = await this.client.post(API_ENDPOINTS.kvAdminRateLimitSeed,
+        { prefix, count: 3 },
+        { 'Authorization': `Bearer ${this.superAdminToken}` }
+      );
+      
+      const keys = seedResponse.data.data.createdKeys;
+
+      // Batch delete dry run
+      const dryRunResponse = await this.client.post(API_ENDPOINTS.kvAdminRateLimitBatchDelete,
+        { keys, dryRun: true },
+        { 'Authorization': `Bearer ${this.superAdminToken}` }
+      );
+
+      this.assert.assertSuccess(dryRunResponse, 'Batch delete dry run');
+      this.assert.assertEqual(dryRunResponse.data.data.dryRun, true, 'Should be dry run');
+      this.assert.assertEqual(dryRunResponse.data.data.deletedCount, keys.length, 'Should match key count');
+
+      // Batch delete real
+      const deleteResponse = await this.client.post(API_ENDPOINTS.kvAdminRateLimitBatchDelete,
+        { keys },
+        { 'Authorization': `Bearer ${this.superAdminToken}` }
+      );
+
+      this.assert.assertSuccess(deleteResponse, 'Batch delete real');
+      this.assert.assertEqual(deleteResponse.data.data.deletedCount, keys.length, 'Should match key count');
+
+      this.logger.success('Rate Limit Batch Delete test completed successfully');
+    } catch (error) {
+      this.logger.error(`[testRateLimitBatchDelete] Rate Limit Batch Delete test failed: ${error.message}`);
       throw error;
     }
   }
