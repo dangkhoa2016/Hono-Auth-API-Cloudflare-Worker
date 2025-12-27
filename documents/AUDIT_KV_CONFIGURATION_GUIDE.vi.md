@@ -97,7 +97,7 @@ Cho phép super admin tùy chỉnh hành vi hệ thống audit thông qua API m�
 | `MAX_PAGE_SIZE` | Kích thước phân trang tối đa | `100` | number |
 | `SECURITY_HIGH_RISK_THRESHOLD` | Ngưỡng rủi ro bảo mật | `10` | number |
 | `PERFORMANCE_GOOD_THRESHOLD` | Ngưỡng hiệu năng (ms) | `1000` | number |
-| `AUTO_ACTIVATE_USER_ON_REGISTER` | Tự động kích hoạt user | `false` | boolean |
+| `AUTO_ACTIVATE_USER_ON_REGISTER` | Tự động kích hoạt user (bỏ qua email) | `false` | boolean |
 | `CORS_ORIGIN` | Cài đặt CORS origin | `"*"` | string |
 
 ---

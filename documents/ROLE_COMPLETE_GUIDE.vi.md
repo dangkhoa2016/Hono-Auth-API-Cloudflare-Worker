@@ -932,7 +932,7 @@ Super admin có thể quản lý các khóa cấu hình sau:
 - `PERFORMANCE_GOOD_THRESHOLD` - Ngưỡng benchmark hiệu suất
 
 #### **Quản lý User**
-- `AUTO_ACTIVATE_USER_ON_REGISTER` - Tự động kích hoạt user mới
+- `AUTO_ACTIVATE_USER_ON_REGISTER` - Tự động kích hoạt user mới (bỏ qua email)
 
 #### **Debug & Development**
 - `ENABLE_DETAILED_ERRORS` - Hiển thị lỗi chi tiết

@@ -109,7 +109,10 @@ user.post('/register', i18nValidatorsMiddleware.register(), async (c) => {
 
     // Send confirmation email (best-effort; does not block registration success)
     const emailStatus = { sent: false, skipped: false, provider: null };
-    const shouldSendActivation = result.data.status !== USER_STATUSES.ACTIVE;
+    
+    // Determine if we should send activation email
+    // If auto-activate is enabled, we skip email sending
+    const shouldSendActivation = !featureFlags.autoActivateUserOnRegister && result.data.status !== USER_STATUSES.ACTIVE;
     const activationToken = result.data.activation_token;
 
     if (shouldSendActivation && activationToken) {
@@ -141,13 +144,16 @@ user.post('/register', i18nValidatorsMiddleware.register(), async (c) => {
       }
     } else {
       emailStatus.skipped = true;
-      emailStatus.reason = shouldSendActivation ? 'MISSING_ACTIVATION_TOKEN' : 'AUTO_ACTIVATED';
+      emailStatus.reason = featureFlags.autoActivateUserOnRegister ? 'AUTO_ACTIVATED' : (shouldSendActivation ? 'MISSING_ACTIVATION_TOKEN' : 'ALREADY_ACTIVE');
+      
       if (shouldSendActivation) {
         userRoutes_log('Registration email skipped: activation token missing');
+      } else if (featureFlags.autoActivateUserOnRegister) {
+        userRoutes_log('Registration email skipped: user auto-activated by feature flag');
       }
     }
 
-    const successKey = result.data.status === 'active' ? 'user.registered' : 'user.registeredPendingActivation';
+    const successKey = featureFlags.autoActivateUserOnRegister ? 'user.registered' : 'user.registeredPendingActivation';
 
     const safeUserData = { ...result.data };
     delete safeUserData.activation_token;
