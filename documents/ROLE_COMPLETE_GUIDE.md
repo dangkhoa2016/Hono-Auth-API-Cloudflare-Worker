@@ -1050,7 +1050,7 @@ Super admins can manage these configuration keys:
 - `PERFORMANCE_GOOD_THRESHOLD` - Performance benchmark threshold
 
 #### **User Management**
-- `AUTO_ACTIVATE_USER_ON_REGISTER` - Auto-activate new users
+- `AUTO_ACTIVATE_USER_ON_REGISTER` - Auto-activate new users (skips email)
 
 #### **Debug & Development**
 - `ENABLE_DETAILED_ERRORS` - Show detailed error messages

@@ -97,7 +97,7 @@ Enable super admin to customize audit system behavior through API without code d
 | `MAX_PAGE_SIZE` | Maximum pagination size | `100` | number |
 | `SECURITY_HIGH_RISK_THRESHOLD` | Security risk threshold | `10` | number |
 | `PERFORMANCE_GOOD_THRESHOLD` | Performance threshold (ms) | `1000` | number |
-| `AUTO_ACTIVATE_USER_ON_REGISTER` | Auto-activate users | `false` | boolean |
+| `AUTO_ACTIVATE_USER_ON_REGISTER` | Auto-activate users (skips email) | `false` | boolean |
 | `CORS_ORIGIN` | CORS origin setting | `"*"` | string |
 
 ---
