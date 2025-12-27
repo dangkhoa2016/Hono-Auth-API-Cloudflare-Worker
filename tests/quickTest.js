@@ -71,7 +71,22 @@ class QuickTests {
     this.logger.info('Testing basic API health...');
 
     try {
-      const response = await this.client.get(API_ENDPOINTS.health);
+      let response;
+      let attempts = 0;
+      const maxAttempts = 3;
+
+      while (attempts < maxAttempts) {
+        try {
+          response = await this.client.get(API_ENDPOINTS.health);
+          if (response.status === 200) break;
+        } catch (e) {
+          // ignore error and retry
+        }
+        attempts++;
+        if (attempts < maxAttempts) {
+          await new Promise(resolve => setTimeout(resolve, 1000));
+        }
+      }
 
       this.assert.assertEqual(response.status, 200, 'Health check should return 200');
       this.assert.assertEqual(response.data.data.status, 'ok', 'Health check should be successful');

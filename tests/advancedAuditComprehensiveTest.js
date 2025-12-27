@@ -362,6 +362,8 @@ class AdvancedAuditComprehensiveTest {
 
     for (const endpointTest of analyticsEndpoints) {
       await this.runTest(endpointTest.name, async () => this.testAdvancedEndpoint(endpointTest));
+      // Add small delay between analytics tests to prevent server overload
+      await new Promise(resolve => setTimeout(resolve, 500));
     }
 
     // Test with different timeframes
