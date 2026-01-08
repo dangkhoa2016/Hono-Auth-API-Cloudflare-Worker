@@ -231,6 +231,180 @@ export async function buildRegistrationEmailContent({ user, context = {}, appNam
   return { subject, plainText, htmlBody, lang, activationUrl };
 }
 
+/**
+ * Build email change verification content with i18n support
+ *
+ * @param {Object} params - Parameters for building email
+ * @param {Object} params.user - User data { email, full_name, new_email, email_verification_token }
+ * @param {Object} params.context - Context { locale, ipAddress }
+ * @param {string} params.appName - Application name
+ * @param {string} params.baseUrl - Base URL
+ * @returns {Promise<{subject: string, plainText: string, htmlBody: string, lang: string, verificationUrl: string}>}
+ */
+export async function buildEmailChangeVerificationContent({ user, context = {}, appName = 'Hono Auth API', baseUrl = DEFAULT_CONFIGS.APP_URL }) {
+  const desiredLang = context.locale;
+  const lang = (desiredLang && isLanguageSupported(desiredLang)) ? desiredLang : await getDefaultLanguage();
+
+  // Load language if needed
+  try {
+    const { loadLanguage, isLanguageLoaded } = await import('../i18n/config.js');
+    if (!isLanguageLoaded(lang)) {
+      await loadLanguage(lang);
+    }
+  } catch (loadErr) {
+    emailService_log(`Language preload failed for ${lang}: ${loadErr.message}`);
+  }
+
+  const safeTl = (key, options, fallback) => {
+    try {
+      return tl(lang, key, options);
+    } catch (err) {
+      emailService_log(`Translation fallback for ${key}: ${err.message}`);
+      return fallback;
+    }
+  };
+
+  const recipientName = user.full_name || user.email;
+  const now = new Date();
+  const { date, time } = formatDateTime(now, lang);
+
+  // Build verification URL
+  const token = user.email_verification_token || '';
+  const verificationUrl = token ? `${baseUrl}/api/user/verify-email?token=${token}` : '';
+
+  // Translation keys (fallback to English if keys missing)
+  const subject = safeTl('emails.emailChange.subject', { appName }, `${appName} - Verify your new email address`);
+  const greeting = safeTl('emails.emailChange.greeting', { userName: recipientName }, `Hello ${recipientName},`);
+  const intro = safeTl('emails.emailChange.intro', { appName }, `You requested to change your email address for your ${appName} account.`);
+  const instructions = safeTl('emails.emailChange.instructions', {}, 'To confirm this change, please click the button below:');
+  const verifyButton = safeTl('emails.emailChange.verifyButton', {}, 'Verify New Email');
+  const linkText = safeTl('emails.emailChange.linkText', {}, 'Or copy and paste this link into your browser:');
+  const details = safeTl('emails.emailChange.details', {}, 'Request Details');
+  const currentEmailLine = safeTl('emails.emailChange.currentEmail', { email: user.email }, `Current Email: ${user.email}`);
+  const newEmailLine = safeTl('emails.emailChange.newEmail', { email: user.new_email }, `New Email: ${user.new_email}`);
+  const timeLine = safeTl('emails.emailChange.time', { date, time }, `Requested on: ${date} at ${time}`);
+  const ipLine = context.ipAddress ? safeTl('emails.emailChange.ip', { ip: context.ipAddress }, `IP Address: ${context.ipAddress}`) : null;
+  const expiryWarning = safeTl('emails.emailChange.expiryWarning', { hours: 24 }, 'This verification link will expire in 24 hours.');
+  const disclaimer = safeTl('emails.emailChange.disclaimer', {}, 'If you did not request this change, please ignore this email. Your email address will remain unchanged.');
+  const securityNote = safeTl('emails.emailChange.securityNote', {}, 'If you suspect unauthorized access to your account, please contact support immediately.');
+  const thanks = safeTl('emails.emailChange.thanks', { appName }, `Best regards,\nThe ${appName} Team`);
+  const footer = safeTl('emails.emailChange.footer', { appName }, `This is an automated message from ${appName}. Please do not reply to this email.`);
+
+  // Plain text version
+  const plainText = [
+    greeting,
+    '',
+    intro,
+    '',
+    instructions,
+    '',
+    verificationUrl ? `${verifyButton}: ${verificationUrl}` : '',
+    '',
+    '─'.repeat(40),
+    details,
+    `• ${currentEmailLine}`,
+    `• ${newEmailLine}`,
+    `• ${timeLine}`,
+    ipLine ? `• ${ipLine}` : null,
+    '─'.repeat(40),
+    '',
+    verificationUrl ? expiryWarning : '',
+    '',
+    disclaimer,
+    securityNote,
+    '',
+    thanks,
+    '',
+    '─'.repeat(40),
+    footer
+  ].filter(Boolean).join('\n');
+
+  // HTML template (reusing similar style)
+  const htmlBody = `
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+</head>
+<body style="margin: 0; padding: 0; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background-color: #f4f4f4;">
+  <table width="100%" cellpadding="0" cellspacing="0" style="background-color: #f4f4f4; padding: 20px 0;">
+    <tr>
+      <td align="center">
+        <table width="600" cellpadding="0" cellspacing="0" style="background-color: #ffffff; border-radius: 8px; box-shadow: 0 2px 8px rgba(0,0,0,0.1);">
+          <!-- Header -->
+          <tr>
+            <td style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); padding: 30px; text-align: center; border-radius: 8px 8px 0 0;">
+              <h1 style="color: #ffffff; margin: 0; font-size: 24px;">${appName}</h1>
+            </td>
+          </tr>
+          
+          <!-- Content -->
+          <tr>
+            <td style="padding: 40px 30px;">
+              <p style="font-size: 18px; color: #333; margin: 0 0 20px 0;">${greeting}</p>
+              <p style="font-size: 16px; color: #555; line-height: 1.6; margin: 0 0 20px 0;">${intro}</p>
+              <p style="font-size: 16px; color: #555; line-height: 1.6; margin: 0 0 30px 0;">${instructions}</p>
+              
+              ${verificationUrl ? `
+              <!-- CTA Button -->
+              <table width="100%" cellpadding="0" cellspacing="0">
+                <tr>
+                  <td align="center" style="padding: 20px 0;">
+                    <a href="${verificationUrl}" style="display: inline-block; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: #ffffff; text-decoration: none; padding: 15px 40px; border-radius: 50px; font-size: 16px; font-weight: bold; box-shadow: 0 4px 15px rgba(102, 126, 234, 0.4);">
+                      ${verifyButton}
+                    </a>
+                  </td>
+                </tr>
+              </table>
+              
+              <!-- Alternative link -->
+              <p style="font-size: 14px; color: #888; text-align: center; margin: 20px 0 10px 0;">${linkText}</p>
+              <p style="font-size: 12px; color: #667eea; text-align: center; word-break: break-all; background: #f8f9fa; padding: 15px; border-radius: 5px; margin: 0 0 30px 0;">
+                <a href="${verificationUrl}" style="color: #667eea; text-decoration: none;">${verificationUrl}</a>
+              </p>
+              ` : ''}
+              
+              <!-- Details -->
+              <div style="background: #f8f9fa; border-left: 4px solid #667eea; padding: 20px; border-radius: 0 5px 5px 0; margin: 30px 0;">
+                <h3 style="color: #333; margin: 0 0 15px 0; font-size: 16px;">${details}</h3>
+                <p style="font-size: 14px; color: #555; margin: 5px 0;"><strong>📧</strong> ${currentEmailLine}</p>
+                <p style="font-size: 14px; color: #555; margin: 5px 0;"><strong>✨</strong> ${newEmailLine}</p>
+                <p style="font-size: 14px; color: #555; margin: 5px 0;"><strong>📅</strong> ${timeLine}</p>
+                ${ipLine ? `<p style="font-size: 14px; color: #555; margin: 5px 0;"><strong>🌐</strong> ${ipLine}</p>` : ''}
+              </div>
+              
+              ${verificationUrl ? `
+              <!-- Warning -->
+              <p style="font-size: 14px; color: #e67e22; background: #fef9e7; padding: 15px; border-radius: 5px; margin: 20px 0;">
+                ⏰ ${expiryWarning}
+              </p>
+              ` : ''}
+              
+              <!-- Security Note -->
+              <p style="font-size: 13px; color: #888; margin: 20px 0;">${disclaimer}</p>
+              <p style="font-size: 13px; color: #e74c3c; margin: 0 0 20px 0;">🔒 ${securityNote}</p>
+              
+              <!-- Signature -->
+              <p style="font-size: 16px; color: #333; margin: 30px 0 0 0; white-space: pre-line;">${thanks}</p>
+            </td>
+          </tr>
+          
+          <!-- Footer -->
+          <tr>
+            <td style="background: #f8f9fa; padding: 20px 30px; text-align: center; border-radius: 0 0 8px 8px; border-top: 1px solid #eee;">
+              <p style="font-size: 12px; color: #999; margin: 0;">${footer}</p>
+            </td>
+          </tr>
+        </table>
+      </td>
+    </tr>
+  </table>
+</body>
+</html>`;
+
+  return { subject, plainText, htmlBody, lang, verificationUrl };
+}
 
 /**
  * Lightweight email delivery service.
@@ -381,6 +555,92 @@ export class EmailService extends BaseService {
           }
         } : {})
       };
+    }
+  }
+
+  /**
+   * Send email change verification email
+   * @param {Object} user - User payload { email, full_name, new_email, email_verification_token }
+   * @param {Object} context - Optional context { locale, ipAddress, userAgent, baseUrl }
+   * @returns {Promise<{success: boolean, skipped?: boolean, error?: string, status?: number, provider?: string, reason?: string}>}
+   */
+  async sendEmailChangeVerification(user, context = {}) {
+    const emailConfig = await this.getEmailConfig();
+    const provider = (emailConfig.provider || 'mailchannels').toLowerCase();
+
+    const toggleResult = this.checkConfigToggles(emailConfig);
+    if (toggleResult) { return toggleResult; }
+
+    // We send this to the NEW email address, but we might also notify the OLD one.
+    // For now, let's just send verification to the NEW one as per standard flow.
+    // So recipient is new_email.
+
+    // We construct a temporary user object for recipient validation
+    const recipientUser = { ...user, email: user.new_email };
+
+    const recipientResult = this.validateRecipientAndSender(recipientUser, emailConfig);
+    if (recipientResult.error) { return recipientResult.error; }
+
+    if (!user.email_verification_token) {
+      error_log('Email change verification failed: missing verification token');
+      return { error: { success: false, error: 'MISSING_VERIFICATION_TOKEN', message: 'Verification token is required' } };
+    }
+
+    const appSettings = await getAppSettings(this.env);
+    const { recipientEmail, recipientName } = recipientResult;
+
+    // Build email content
+    const { subject, plainText, htmlBody, lang, verificationUrl } = await buildEmailChangeVerificationContent({
+      user,
+      context,
+      appName: appSettings.name,
+      baseUrl: context.baseUrl || emailConfig.appUrl || appSettings.url || DEFAULT_CONFIGS.APP_URL
+    });
+
+    if (context.preview) {
+      emailService_log('Preview mode enabled - skipping email send');
+      return {
+        success: true,
+        skipped: true,
+        provider: emailConfig.provider,
+        preview: { lang, subject, plainText, htmlBody, verificationUrl }
+      };
+    }
+
+    const payload = this.buildEmailPayload({
+      provider,
+      emailConfig,
+      appSettings,
+      recipientEmail,
+      recipientName,
+      subject,
+      plainText,
+      htmlBody,
+      userAgent: context.userAgent
+    });
+
+    const headerResult = this.buildEmailHeaders(emailConfig, provider);
+    if (headerResult.error) { return headerResult.error; }
+    const { headers } = headerResult;
+
+    const endpoint = emailConfig.providerEndpoint || (provider === 'brevo'
+      ? 'https://api.brevo.com/v3/smtp/email'
+      : 'https://api.mailchannels.net/tx/v1/send');
+
+    try {
+      const response = await fetch(endpoint, { method: 'POST', headers, body: JSON.stringify(payload) });
+
+      if (!response.ok) {
+        const bodyText = await response.text().catch(() => '');
+        error_log(`Email verification send failed: ${response.status} ${bodyText}`);
+        return { success: false, error: 'EMAIL_SEND_FAILED', status: response.status, provider: emailConfig.provider };
+      }
+
+      emailService_log(`Email change verification sent to ${recipientEmail}`);
+      return { success: true, provider: emailConfig.provider, verificationUrl };
+    } catch (error) {
+      error_log(`Email send error: ${error.message}`);
+      return { success: false, error: 'EMAIL_SEND_ERROR', provider: emailConfig.provider };
     }
   }
 

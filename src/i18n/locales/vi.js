@@ -173,12 +173,6 @@ export default {
     'listSuccess': 'Lấy danh sách token bị chặn thành công',
     'getSuccess': 'Lấy chi tiết token bị chặn thành công'
   },
-  'common': {
-    'errors': {
-      'notFound': 'Không tìm thấy tài nguyên'
-    },
-    'success': 'Thao tác thành công'
-  },
   'dates': {
     'changedAt': 'Được thay đổi lúc {{date, datetime}}',
     'checkedAt': 'Được kiểm tra lúc {{date, datetime}}',
@@ -669,6 +663,8 @@ export default {
       'deactivationFailed': 'Không thể vô hiệu hóa tài khoản người dùng cho {{userName}}: {{reason}}',
       'deleteFailed': 'Không thể xóa người dùng {{userName}}: {{reason}}',
       'emailExists': 'Email {{email}} đã tồn tại trong hệ thống',
+      'emailVerificationFailed': 'Xác minh email thất bại: {{reason}}',
+      'emailVerificationSystemError': 'Không thể xác minh việc thay đổi email do lỗi hệ thống. Vui lòng thử lại sau.',
       'inactive': 'Tài khoản người dùng {{userName}} đang ở trạng thái không hoạt động',
       'insufficientPermissions': 'Không đủ quyền để sửa đổi người dùng {{userName}} ({{userRole}})',
       'listFailed': 'Không thể truy xuất danh sách người dùng: {{reason}}',
@@ -1026,7 +1022,8 @@ export default {
       'suspended': 'Tài khoản người dùng đã được đình chỉ thành công cho {{userName}} đến {{suspendedUntil, datetime}}',
       'unsuspended': 'Việc đình chỉ tài khoản người dùng đã được gỡ bỏ cho {{userName}} bởi {{liftedBy}}',
       'updated': 'Thông tin cá nhân đã được cập nhật thành công cho {{userName}}. Các trường được cập nhật: {{updatedFields}}',
-      'updated_other': '{{count}} hồ sơ người dùng đã được cập nhật thành công'
+      'updated_other': '{{count}} hồ sơ người dùng đã được cập nhật thành công',
+      'updatedWithEmailVerification': 'Hồ sơ đã được cập nhật. Vui lòng kiểm tra địa chỉ email mới {{newEmail}} của bạn để xác minh và hoàn tất thay đổi.'
     }
   },
   'system': {

@@ -173,12 +173,6 @@ export default {
     'listSuccess': 'Tokens en lista negra recuperados con éxito',
     'getSuccess': 'Detalles de la entrada en lista negra recuperados con éxito'
   },
-  'common': {
-    'errors': {
-      'notFound': 'Recurso no encontrado'
-    },
-    'success': 'Operación exitosa'
-  },
   'dates': {
     'changedAt': 'Cambiado el {{date, datetime}}',
     'checkedAt': 'Verificado el {{date, datetime}}',
@@ -669,6 +663,8 @@ export default {
       'deactivationFailed': 'Error al desactivar la cuenta de usuario para {{userName}}: {{reason}}',
       'deleteFailed': 'Error al eliminar el usuario {{userName}}: {{reason}}',
       'emailExists': 'La dirección de correo electrónico {{email}} ya está registrada en el sistema',
+      'emailVerificationFailed': 'La verificación del correo electrónico falló: {{reason}}',
+      'emailVerificationSystemError': 'No se pudo verificar el cambio de correo electrónico debido a un error del sistema. Por favor, inténtelo de nuevo más tarde.',
       'inactive': 'La cuenta de usuario {{userName}} está inactiva',
       'insufficientPermissions': 'Permisos insuficientes para modificar el usuario {{userName}} ({{userRole}})',
       'listFailed': 'Error al recuperar la lista de usuarios: {{reason}}',
@@ -1026,7 +1022,8 @@ export default {
       'suspended': 'Cuenta de usuario suspendida exitosamente para {{userName}} hasta {{suspendedUntil, datetime}}',
       'unsuspended': 'Suspensión de cuenta de usuario levantada para {{userName}} por {{liftedBy}}',
       'updated': 'Perfil de usuario actualizado exitosamente para {{userName}} - campos: {{updatedFields}}',
-      'updated_other': '{{count}} perfiles de usuario actualizados exitosamente'
+      'updated_other': '{{count}} perfiles de usuario actualizados exitosamente',
+      'updatedWithEmailVerification': 'Perfil actualizado. Por favor, verifique su nueva dirección de correo electrónico {{newEmail}} para confirmar y completar el cambio.'
     }
   },
   'system': {

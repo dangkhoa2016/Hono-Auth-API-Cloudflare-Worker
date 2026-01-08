@@ -663,6 +663,8 @@ export default {
       'deactivationFailed': 'Fehler beim Deaktivieren des Benutzerkontos für {{userName}}: {{reason}}',
       'deleteFailed': 'Fehler beim Löschen des Benutzers {{userName}}: {{reason}}',
       'emailExists': 'E-Mail-Adresse {{email}} ist bereits im System registriert',
+      'emailVerificationFailed': 'E-Mail-Verifizierung fehlgeschlagen: {{reason}}',
+      'emailVerificationSystemError': 'Änderung der E-Mail-Adresse konnte aufgrund eines Systemfehlers nicht verifiziert werden. Bitte versuchen Sie es später erneut.',
       'inactive': 'Benutzerkonto {{userName}} ist inaktiv',
       'insufficientPermissions': 'Unzureichende Berechtigungen zum Ändern des Benutzers {{userName}} ({{userRole}})',
       'listFailed': 'Fehler beim Abrufen der Benutzerliste: {{reason}}',
@@ -1020,7 +1022,8 @@ export default {
       'suspended': 'Benutzerkonto erfolgreich für {{userName}} bis {{suspendedUntil, datetime}} gesperrt',
       'unsuspended': 'Benutzerkontosperrung für {{userName}} von {{liftedBy}} aufgehoben',
       'updated': 'Benutzerprofil erfolgreich für {{userName}} aktualisiert – Felder: {{updatedFields}}',
-      'updated_other': '{{count}} Benutzerprofile erfolgreich aktualisiert'
+      'updated_other': '{{count}} Benutzerprofile erfolgreich aktualisiert',
+      'updatedWithEmailVerification': 'Profil aktualisiert. Bitte überprüfen Sie Ihre neue E-Mail-Adresse {{newEmail}}, um die Änderung zu bestätigen und abzuschließen.'
     }
   },
   'system': {

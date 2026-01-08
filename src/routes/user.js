@@ -8,7 +8,7 @@ import { i18nValidatorsMiddleware } from '../middleware/i18nValidator.js';
 // import { zValidator } from '@hono/zod-validator'; // Removed: using i18n validators only
 // Import removed: now using i18n validators only
 // import { createUserSchema, updateProfileSchema } from '../schemas/user.js';
-import { getFeatureFlags } from '../utils/dynamicConfig.js';
+import { getFeatureFlags, getAppSettings } from '../utils/dynamicConfig.js';
 import { unifiedMiddlewares } from '../middleware/unifiedRequestMiddleware.js';
 import { handleStandardError } from '../utils/errorHandler.js';
 import { ROLES, USER_STATUSES } from '../constants/roles.js';
@@ -54,7 +54,8 @@ user.on('GET', ['/profile', '/me'], authMiddleware, async (c) => {
       email: userDetails.email,
       status: userDetails.status,
       created_at: userDetails.created_at,
-      role: userDetails.role
+      role: userDetails.role,
+      new_email: userDetails.new_email
     }, tSuccess(c, 'user.profileRetrieved', {
       userName: userDetails.full_name,
       userRole: userDetails.role,
@@ -172,6 +173,43 @@ user.post('/register', i18nValidatorsMiddleware.register(), async (c) => {
   }
 });
 
+// GET /verify-email - Verify email change token
+user.get('/verify-email', async (c) => {
+  const token = c.req.query('token');
+
+  userRoutes_log('Email change verification request with token');
+
+  try {
+    if (!token) {
+      return await handleStandardError(c, new Error('MISSING_TOKEN'), 'Verify email - missing token', userRoutes_log, 'validation.missingToken', {}, 400);
+    }
+
+    const userService = createUserService(c.env);
+    const result = await userService.verifyEmailChange(token);
+
+    if (!result.success) {
+      return await handleStandardError(c, new Error(result.error), 'Verify email failed', userRoutes_log, 'user.emailVerificationFailed', { reason: result.message }, 400);
+    }
+
+    userRoutes_log('Email change verified successfully');
+
+    // Fetch updated user to return data
+    const updatedUser = await userService.findByEmail(result.updatedEmail || (await userService.findById(result.userId)).email);
+
+    return c.json(createSuccessResponse({
+      email: updatedUser.email,
+      full_name: updatedUser.full_name,
+      id: updatedUser.id
+    }, tSuccess(c, 'user.emailVerified', {
+      email: updatedUser.email,
+      userName: updatedUser.full_name
+    })));
+
+  } catch (error) {
+    return await handleStandardError(c, error, 'Failed to verify email', error_log, 'user.emailVerificationSystemError');
+  }
+});
+
 // PUT /profile - Update profile information with XSS protection
 // PUT /me - Alias for profile update with XSS protection
 user.on('PUT', ['/profile', '/me'], authMiddleware, i18nValidatorsMiddleware.updateProfile(), async (c) => {
@@ -182,34 +220,70 @@ user.on('PUT', ['/profile', '/me'], authMiddleware, i18nValidatorsMiddleware.upd
   try {
     const updateData = c.req.valid('json'); // This data is now XSS-protected by Zod schema
     const userService = createUserService(c.env);
+    const emailService = createEmailService(c.env);
+    const appSettings = await getAppSettings(c.env);
 
-    // Check if new email conflicts (if email is being changed)
-    if (updateData.email) {
-      const existingUser = await userService.findByEmail(updateData.email);
-      if (existingUser && existingUser.id !== userPayload.user_id) {
-        return await handleStandardError(c, new Error('EMAIL_EXISTS'), 'Update user profile (PUT) - email exists', userRoutes_log, 'user.emailExists', { email: updateData.email }, 400);
+    let emailVerificationPending = false;
+    let newEmail = null;
+
+    // Handle email change request
+    if (updateData.email && updateData.email !== userPayload.email) {
+      newEmail = updateData.email;
+      const requestResult = await userService.requestEmailChange(userPayload.user_id, newEmail);
+
+      if (!requestResult.success) {
+        if (requestResult.error === 'EMAIL_ALREADY_EXISTS') {
+          return await handleStandardError(c, new Error('EMAIL_EXISTS'), 'Update user profile - email exists', userRoutes_log, 'user.emailExists', { email: newEmail }, 400);
+        }
+        throw new Error(requestResult.error || 'Failed to request email change');
       }
+
+      // Send verification email
+      await emailService.sendEmailChangeVerification(requestResult.data, {
+        locale: c.get('language'),
+        ipAddress: getClientIP(c),
+        userAgent: c.req.header('user-agent'),
+        baseUrl: appSettings.url
+      });
+
+      emailVerificationPending = true;
+      delete updateData.email; // Don't update email directly
+    } else if (updateData.email === userPayload.email) {
+      delete updateData.email; // No change
     }
 
-    // Update user information (data is already sanitized by Zod schema)
-    await userService.update(userPayload.user_id, updateData);
+    // Update other fields
+    if (Object.keys(updateData).length > 0) {
+      await userService.update(userPayload.user_id, updateData);
+    }
 
-    // Get user information after update
+    // Get updated user (email might still be old one)
     const updatedUser = await userService.findById(userPayload.user_id);
 
     userRoutes_log(`Profile updated successfully for user: ${userPayload.user_id}`);
+
+    // Construct response message
+    let messageKey = 'user.updated';
+    const messageParams = {
+      userName: updatedUser.full_name,
+      updatedFields: Object.keys(updateData).join(', ')
+    };
+
+    if (emailVerificationPending) {
+      messageKey = 'user.updatedWithEmailVerification';
+      messageParams.newEmail = newEmail;
+    }
 
     return c.json(createSuccessResponse({
       id: updatedUser.id,
       full_name: updatedUser.full_name,
       email: updatedUser.email,
+      new_email: updatedUser.new_email,
       status: updatedUser.status,
       created_at: updatedUser.created_at,
-      role: updatedUser.role
-    }, tSuccess(c, 'user.updated', {
-      userName: updatedUser.full_name,
-      updatedFields: Object.keys(updateData).join(', ')
-    })));
+      role: updatedUser.role,
+      emailVerificationPending
+    }, tSuccess(c, messageKey, messageParams)));
 
   } catch (error) {
     return await handleStandardError(c, error, 'Failed to update user profile', error_log, 'user.updateFailed', { userName: 'User', reason: error.message });

@@ -173,12 +173,6 @@ export default {
     'getSuccess': 'Blacklist entry details retrieved successfully',
     'tokenNotFound': 'Token not found'
   },
-  'common': {
-    'errors': {
-      'notFound': 'Resource not found'
-    },
-    'success': 'Operation successful'
-  },
   'dates': {
     'changedAt': 'Changed at {{date, datetime}}',
     'checkedAt': 'Checked at {{date, datetime}}',
@@ -669,6 +663,8 @@ export default {
       'deactivationFailed': 'Failed to deactivate user account for {{userName}}: {{reason}}',
       'deleteFailed': 'Failed to delete user {{userName}}: {{reason}}',
       'emailExists': 'Email address {{email}} is already registered in the system',
+      'emailVerificationFailed': 'Email verification failed: {{reason}}',
+      'emailVerificationSystemError': 'Failed to verify email change due to a system error. Please try again later.',
       'inactive': 'User account {{userName}} is inactive',
       'insufficientPermissions': 'Insufficient permissions to modify user {{userName}} ({{userRole}})',
       'listFailed': 'Failed to retrieve users list: {{reason}}',
@@ -1026,7 +1022,8 @@ export default {
       'suspended': 'User account suspended successfully for {{userName}} until {{suspendedUntil, datetime}}',
       'unsuspended': 'User account suspension lifted for {{userName}} by {{liftedBy}}',
       'updated': 'User profile updated successfully for {{userName}} - fields: {{updatedFields}}',
-      'updated_other': '{{count}} user profiles updated successfully'
+      'updated_other': '{{count}} user profiles updated successfully',
+      'updatedWithEmailVerification': 'Profile updated. Please check your new email address {{newEmail}} to verify and complete the change.'
     }
   },
   'system': {
