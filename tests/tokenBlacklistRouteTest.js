@@ -23,7 +23,7 @@
 import { TestClient } from './utils/testClient.js';
 import { TestLogger } from './utils/testLogger.js';
 import { TestAssertions } from './utils/testAssertions.js';
-import { TEST_USERS, TEST_CONFIG } from './config/testConfig.js';
+import { TEST_USERS, TEST_CONFIG, API_ENDPOINTS } from './config/testConfig.js';
 
 class TokenBlacklistTests {
   constructor() {
@@ -58,7 +58,7 @@ class TokenBlacklistTests {
   async setupAuthentication() {
     try {
       this.logger.info('Authenticating as Super Admin...');
-      const loginRes = await this.client.post('/api/auth/login', {
+      const loginRes = await this.client.post(API_ENDPOINTS.login, {
         email: this.superAdmin.email,
         password: this.superAdmin.password
       });
@@ -99,7 +99,7 @@ class TokenBlacklistTests {
       reason: 'Test Blacklist'
     };
 
-    const res = await this.client.post('/api/admin/token-blacklist', payload);
+    const res = await this.client.post(API_ENDPOINTS.adminTokenBlacklist, payload);
 
     if (res.status !== 201) {
       console.log('Create failed with status:', res.status);
@@ -118,7 +118,7 @@ class TokenBlacklistTests {
   async testListBlacklistTokens() {
     this.logger.logSectionHeader('GET /api/admin/token-blacklist - List Tokens');
 
-    const res = await this.client.get('/api/admin/token-blacklist?page=1&limit=10&search=test-jti');
+    const res = await this.client.get(`${API_ENDPOINTS.adminTokenBlacklist}?page=1&limit=10&search=test-jti`);
 
     if (res.status !== 200) {
       console.log('List failed with status:', res.status);
@@ -146,7 +146,7 @@ class TokenBlacklistTests {
       throw new Error('Skipping test: No created token ID');
     }
 
-    const res = await this.client.get(`/api/admin/token-blacklist/${this.createdTokenId}`);
+    const res = await this.client.get(`${API_ENDPOINTS.adminTokenBlacklist}/${this.createdTokenId}`);
 
     this.assert.assertStatus(res.status, 200, 'Should return 200 OK');
     this.assert.assertTrue(res.data.success, 'Response success should be true');
@@ -161,13 +161,13 @@ class TokenBlacklistTests {
 
     if (!this.createdTokenId) {return;}
 
-    const res = await this.client.delete(`/api/admin/token-blacklist/${this.createdTokenId}`);
+    const res = await this.client.delete(`${API_ENDPOINTS.adminTokenBlacklist}/${this.createdTokenId}`);
 
     this.assert.assertStatus(res.status, 200, 'Should return 200 OK');
     this.assert.assertTrue(res.data.success, 'Response success should be true');
 
     // Verify it is gone
-    const checkRes = await this.client.get(`/api/admin/token-blacklist/${this.createdTokenId}`);
+    const checkRes = await this.client.get(`${API_ENDPOINTS.adminTokenBlacklist}/${this.createdTokenId}`);
 
     if (checkRes.status !== 404) {
       console.log('Delete Check failed with status:', checkRes.status);
@@ -190,7 +190,7 @@ class TokenBlacklistTests {
       ids: [id1, id2]
     };
 
-    const res = await this.client.post('/api/admin/token-blacklist/bulk-delete', payload);
+    const res = await this.client.post(API_ENDPOINTS.adminTokenBlacklistBulkDelete, payload);
     this.assert.assertStatus(res.status, 200, 'Should return 200 OK');
     this.assert.assertTrue(res.data.success, 'Response success should be true');
     this.assert.assertEqual(res.data.data.deleted_sub_count, 2, 'Should delete 2 items');
@@ -205,10 +205,10 @@ class TokenBlacklistTests {
       userId: 2,
       reason: 'Bulk Test'
     };
-    await this.client.post('/api/admin/token-blacklist', payload);
+    await this.client.post(API_ENDPOINTS.adminTokenBlacklist, payload);
     // We need to fetch it back to get ID as create only returns success boolean currently
     // So we search for it
-    const listRes = await this.client.get(`/api/admin/token-blacklist?search=${jti}`);
+    const listRes = await this.client.get(`${API_ENDPOINTS.adminTokenBlacklist}?search=${jti}`);
     return listRes.data.data.items[0].id;
   }
 }
