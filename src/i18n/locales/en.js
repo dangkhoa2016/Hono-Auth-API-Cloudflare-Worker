@@ -165,6 +165,20 @@ export default {
     'unauthorized': 'Unauthorized access',
     'userNotFound': 'User not found or inactive'
   },
+  'tokenBlacklist': {
+    'createSuccess': 'Token successfully added to blacklist',
+    'deleteSuccess': 'Token successfully removed from blacklist',
+    'bulkDeleteSuccess': 'Bulk token deletion successful',
+    'listSuccess': 'Blacklist tokens retrieved successfully',
+    'getSuccess': 'Blacklist entry details retrieved successfully',
+    'tokenNotFound': 'Token not found'
+  },
+  'common': {
+    'errors': {
+      'notFound': 'Resource not found'
+    },
+    'success': 'Operation successful'
+  },
   'dates': {
     'changedAt': 'Changed at {{date, datetime}}',
     'checkedAt': 'Checked at {{date, datetime}}',
@@ -202,7 +216,12 @@ export default {
       'systemHealth': 'Get comprehensive system health status (admin access required)',
       'updateUser': 'Update user information (admin access required)',
       'userDetails': 'Get user details (admin access required)',
-      'usersList': 'List all users (admin access required)'
+      'usersList': 'List all users (admin access required)',
+      'blacklistList': 'List blacklisted tokens (Super Admin only)',
+      'blacklistCreate': 'Manually blacklist a token (Super Admin only)',
+      'blacklistDetails': 'Get blacklist entry details (Super Admin only)',
+      'blacklistBulkDelete': 'Bulk delete blacklist entries (Super Admin only)',
+      'blacklistDelete': 'Delete blacklist entry (Super Admin only)'
     },
     'advanced_audit': {
       'analytics': 'Advanced audit analytics (admin access required)',

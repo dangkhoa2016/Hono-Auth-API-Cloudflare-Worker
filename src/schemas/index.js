@@ -23,6 +23,7 @@ export * from './user.js';
 
 // Admin and role management schemas
 export * from './admin.js';
+export * from './tokenBlacklist.js';
 
 // Audit logging schemas
 export * from './audit.js';

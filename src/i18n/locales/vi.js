@@ -165,6 +165,20 @@ export default {
     'unauthorized': 'Truy cập không được phép',
     'userNotFound': 'Không tìm thấy người dùng hoặc tài khoản không hoạt động'
   },
+  'tokenBlacklist': {
+    'createSuccess': 'Token đã được thêm vào danh sách đen thành công',
+    'deleteSuccess': 'Token đã được xóa khỏi danh sách đen thành công',
+    'bulkDeleteSuccess': 'Xóa hàng loạt token thành công',
+    'tokenNotFound': 'Không tìm thấy token',
+    'listSuccess': 'Lấy danh sách token bị chặn thành công',
+    'getSuccess': 'Lấy chi tiết token bị chặn thành công'
+  },
+  'common': {
+    'errors': {
+      'notFound': 'Không tìm thấy tài nguyên'
+    },
+    'success': 'Thao tác thành công'
+  },
   'dates': {
     'changedAt': 'Được thay đổi lúc {{date, datetime}}',
     'checkedAt': 'Được kiểm tra lúc {{date, datetime}}',
@@ -202,7 +216,12 @@ export default {
       'systemHealth': 'Lấy trạng thái sức khỏe hệ thống toàn diện (yêu cầu quyền admin)',
       'updateUser': 'Cập nhật thông tin người dùng (yêu cầu quyền admin)',
       'userDetails': 'Lấy chi tiết người dùng (yêu cầu quyền admin)',
-      'usersList': 'Liệt kê tất cả người dùng (yêu cầu quyền admin)'
+      'usersList': 'Liệt kê tất cả người dùng (yêu cầu quyền admin)',
+      'blacklistList': 'Liệt kê các token bị liệt vào danh sách đen (Chỉ dành cho Super Admin)',
+      'blacklistCreate': 'Thêm thủ công token vào danh sách đen (Chỉ dành cho Super Admin)',
+      'blacklistDetails': 'Xem chi tiết mục danh sách đen (Chỉ dành cho Super Admin)',
+      'blacklistBulkDelete': 'Xóa hàng loạt mục danh sách đen (Chỉ dành cho Super Admin)',
+      'blacklistDelete': 'Xóa mục danh sách đen (Chỉ dành cho Super Admin)'
     },
     'advanced_audit': {
       'analytics': 'Phân tích audit nâng cao (yêu cầu quyền admin)',

@@ -165,6 +165,20 @@ export default {
     'unauthorized': 'Accès non autorisé',
     'userNotFound': 'Utilisateur non trouvé ou inactif'
   },
+  'tokenBlacklist': {
+    'createSuccess': 'Jeton ajouté à la liste noire avec succès',
+    'deleteSuccess': 'Jeton supprimé de la liste noire avec succès',
+    'bulkDeleteSuccess': 'Suppression massive de jetons réussie',
+    'tokenNotFound': 'Jeton introuvable',
+    'listSuccess': 'Jetons sur liste noire récupérés avec succès',
+    'getSuccess': 'Détails de l\'entrée sur liste noire récupérés avec succès'
+  },
+  'common': {
+    'errors': {
+      'notFound': 'Ressource non trouvée'
+    },
+    'success': 'Opération réussie'
+  },
   'dates': {
     'changedAt': 'Modifié le {{date, datetime}}',
     'checkedAt': 'Vérifié le {{date, datetime}}',
@@ -202,7 +216,12 @@ export default {
       'systemHealth': 'Obtenir l\'état de santé complet du système (accès admin requis)',
       'updateUser': 'Mettre à jour les informations utilisateur (accès admin requis)',
       'userDetails': 'Obtenir les détails de l\'utilisateur (accès admin requis)',
-      'usersList': 'Lister tous les utilisateurs (accès admin requis)'
+      'usersList': 'Lister tous les utilisateurs (accès admin requis)',
+      'blacklistList': 'Lister les jetons sur liste noire (Super Admin uniquement)',
+      'blacklistCreate': 'Mettre un jeton sur liste noire manuellement (Super Admin uniquement)',
+      'blacklistDetails': 'Obtenir les détails de l\'entrée sur liste noire (Super Admin uniquement)',
+      'blacklistBulkDelete': 'Suppression massive d\'entrées sur liste noire (Super Admin uniquement)',
+      'blacklistDelete': 'Supprimer une entrée sur liste noire (Super Admin uniquement)'
     },
     'advanced_audit': {
       'analytics': 'Analyses d\'audit avancées (accès admin requis)',

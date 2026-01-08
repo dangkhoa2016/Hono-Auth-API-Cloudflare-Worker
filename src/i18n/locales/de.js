@@ -165,6 +165,14 @@ export default {
     'unauthorized': 'Unbefugter Zugriff',
     'userNotFound': 'Benutzer nicht gefunden oder inaktiv'
   },
+  'tokenBlacklist': {
+    'createSuccess': 'Token erfolgreich zur schwarzen Liste hinzugefügt',
+    'deleteSuccess': 'Token erfolgreich von der schwarzen Liste entfernt',
+    'bulkDeleteSuccess': 'Massengoeschung von Tokens erfolgreich',
+    'listSuccess': 'Liste der Tokens auf der schwarzen Liste erfolgreich abgerufen',
+    'getSuccess': 'Details zum Eintrag auf der schwarzen Liste erfolgreich abgerufen',
+    'tokenNotFound': 'Token nicht gefunden'
+  },
   'dates': {
     'changedAt': 'Geändert am {{date, datetime}}',
     'checkedAt': 'Geprüft am {{date, datetime}}',
@@ -202,7 +210,12 @@ export default {
       'systemHealth': 'Umfassenden Systemgesundheitsstatus abrufen (Admin-Zugriff erforderlich)',
       'updateUser': 'Benutzerinformationen aktualisieren (Admin-Zugriff erforderlich)',
       'userDetails': 'Benutzerdetails abrufen (Admin-Zugriff erforderlich)',
-      'usersList': 'Alle Benutzer auflisten (Admin-Zugriff erforderlich)'
+      'usersList': 'Alle Benutzer auflisten (Admin-Zugriff erforderlich)',
+      'blacklistList': 'Liste der Tokens auf der schwarzen Liste (nur Super-Admin)',
+      'blacklistCreate': 'Token manuell auf die schwarze Liste setzen (nur Super-Admin)',
+      'blacklistDetails': 'Details zum Eintrag auf der schwarzen Liste abrufen (nur Super-Admin)',
+      'blacklistBulkDelete': 'Massengoeschung von Eintraegen auf der schwarzen Liste (nur Super-Admin)',
+      'blacklistDelete': 'Eintrag auf der schwarzen Liste loeschen (nur Super-Admin)'
     },
     'advanced_audit': {
       'analytics': 'Erweiterte Audit-Analytik (Admin-Zugriff erforderlich)',

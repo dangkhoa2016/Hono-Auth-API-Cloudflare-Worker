@@ -9,6 +9,7 @@ import './authRoutes.js';
 import './userRoutes.js';
 import './adminRoutes.js';
 import './kvAdminRoutes.js';
+import './tokenBlacklistRoutes.js';
 import './auditRoutes.js';
 import './realtimeMonitoringRoutes.js';
 import './securityIncidentRoutes.js';
