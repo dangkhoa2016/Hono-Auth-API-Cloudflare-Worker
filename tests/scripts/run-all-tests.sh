@@ -251,6 +251,8 @@ main() {
     run_test "Simple Tests" "npm run test:simple"
     run_test "Optimized Service Tests" "npm run test:optimized"
     run_test "Token Security Tests" "npm run test:token_security"
+    run_test "Token Blacklist Route Tests" "node tests/tokenBlacklistRouteTest.js"
+    run_test "Suspended User Token Tests" "node tests/suspendedUserTokenTest.js"
     
     # Audit System Test Suites (10 additional tests)
     echo ""
