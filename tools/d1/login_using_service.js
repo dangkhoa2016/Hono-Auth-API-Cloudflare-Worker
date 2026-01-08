@@ -1,12 +1,23 @@
 import { AuthService } from '../../src/services/authService.js';
 import { getPlatformProxy } from 'wrangler';
+import { createKvConfigService } from '../../src/utils/serviceFactory.js';
 
+// test env credentials
 const userEmail = 'test-superadmin@example.com';
 const userPassword = 'password123';
+
+// development env credentials
+// const userEmail = 'super@admin.local';
+// const userPassword = 'password123';
+
 
 
 (async () => {
   const { env } = await getPlatformProxy({ environment: 'test' });
+  // const { env } = await getPlatformProxy({ environment: 'development' });
+  const kvConfig = createKvConfigService(env);
+  // disable rate limiting for testing
+  await kvConfig.set('RATE_LIMIT_DISABLED', 'true');
 
   const authService = new AuthService(env);
 
