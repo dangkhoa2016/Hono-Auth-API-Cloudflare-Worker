@@ -181,7 +181,7 @@ api.get('/route-metadata', authMiddleware, (c) => {
       const permissions = routeData.permissions;
       const canAccess = permissions?.public || (permissions?.roles && permissions.roles.includes(userRole));
 
-      if (!canAccess) return;
+      if (!canAccess) {return;}
 
       filteredCategoryRoutes[routeKey] = {
         description: t(c, routeData.i18nKey),

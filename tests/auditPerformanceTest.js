@@ -656,10 +656,10 @@ class AuditPerformanceTest {
       const successCount = results.filter(r => r.status === 200).length;
 
       this.logger.info(`Load balance test: ${successCount}/${promises.length} requests succeeded in ${totalTime}ms`);
-      
+
       // Allow server to recover
       await new Promise(resolve => setTimeout(resolve, 2000));
-      
+
       this.logger.success('Audit load balance test completed');
     } catch (error) {
       this.logger.error(`[testAuditLoadBalance] Audit load balance test failed: ${error.message}`);

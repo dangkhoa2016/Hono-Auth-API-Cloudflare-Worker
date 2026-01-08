@@ -165,6 +165,20 @@ export default {
     'unauthorized': 'Acceso no autorizado',
     'userNotFound': 'Usuario no encontrado o inactivo'
   },
+  'tokenBlacklist': {
+    'createSuccess': 'Token añadido a la lista negra con éxito',
+    'deleteSuccess': 'Token eliminado de la lista negra con éxito',
+    'bulkDeleteSuccess': 'Eliminación masiva de tokens exitosa',
+    'tokenNotFound': 'Token no encontrado',
+    'listSuccess': 'Tokens en lista negra recuperados con éxito',
+    'getSuccess': 'Detalles de la entrada en lista negra recuperados con éxito'
+  },
+  'common': {
+    'errors': {
+      'notFound': 'Recurso no encontrado'
+    },
+    'success': 'Operación exitosa'
+  },
   'dates': {
     'changedAt': 'Cambiado el {{date, datetime}}',
     'checkedAt': 'Verificado el {{date, datetime}}',
@@ -202,7 +216,12 @@ export default {
       'systemHealth': 'Obtener estado completo de salud del sistema (requiere acceso de admin)',
       'updateUser': 'Actualizar información de usuario (requiere acceso de admin)',
       'userDetails': 'Obtener detalles de usuario (requiere acceso de admin)',
-      'usersList': 'Listar todos los usuarios (requiere acceso de admin)'
+      'usersList': 'Listar todos los usuarios (requiere acceso de admin)',
+      'blacklistList': 'Listar tokens en lista negra (solo Super Admin)',
+      'blacklistCreate': 'Poner token en lista negra manualmente (solo Super Admin)',
+      'blacklistDetails': 'Obtener detalles de entrada en lista negra (solo Super Admin)',
+      'blacklistBulkDelete': 'Borrado masivo de entradas en lista negra (solo Super Admin)',
+      'blacklistDelete': 'Borrar entrada de lista negra (solo Super Admin)'
     },
     'advanced_audit': {
       'analytics': 'Análisis avanzado de auditoría (requiere acceso de admin)',
