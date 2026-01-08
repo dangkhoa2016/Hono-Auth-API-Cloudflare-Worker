@@ -173,12 +173,6 @@ export default {
     'listSuccess': 'ブラックリストのトークンが正常に取得されました',
     'getSuccess': 'ブラックリストのエントリ詳細が正常に取得されました'
   },
-  'common': {
-    'errors': {
-      'notFound': 'リソースが見つかりません'
-    },
-    'success': '操作は成功しました'
-  },
   'dates': {
     'changedAt': '{{date, datetime}} に変更',
     'checkedAt': '{{date, datetime}} に確認',
@@ -669,6 +663,8 @@ export default {
       'deactivationFailed': '{{userName}} のユーザーアカウントの非アクティブ化に失敗しました: {{reason}}',
       'deleteFailed': 'ユーザー {{userName}} の削除に失敗しました: {{reason}}',
       'emailExists': 'メールアドレス {{email}} はすでにシステムに登録されています',
+      'emailVerificationFailed': 'メール認証に失敗しました: {{reason}}',
+      'emailVerificationSystemError': 'システムエラーのため、メールアドレスの変更を確認できませんでした。後でもう一度お試しください。',
       'inactive': 'ユーザーアカウント {{userName}} は非アクティブです',
       'insufficientPermissions': 'ユーザー {{userName}} ({{userRole}}) を変更する権限がありません',
       'listFailed': 'ユーザーリストの取得に失敗しました: {{reason}}',
@@ -1026,7 +1022,8 @@ export default {
       'suspended': '{{userName}} のユーザーアカウントを {{suspendedUntil, datetime}} まで正常に停止しました',
       'unsuspended': '{{liftedBy}} によって {{userName}} のユーザーアカウントの停止が解除されました',
       'updated': '{{userName}} のユーザープロファイルを正常に更新しました - フィールド: {{updatedFields}}',
-      'updated_other': '{{count}} 件のユーザープロファイルを正常に更新しました'
+      'updated_other': '{{count}} 件のユーザープロファイルを正常に更新しました',
+      'updatedWithEmailVerification': 'プロフィールが更新されました。新しいメールアドレス {{newEmail}} を確認して、変更を完了してください。'
     }
   },
   'system': {

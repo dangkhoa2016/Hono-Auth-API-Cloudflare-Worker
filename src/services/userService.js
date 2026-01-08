@@ -59,7 +59,7 @@ export class UserService extends BaseService {
 
     try {
       const user = await this.dbService.select(
-        'SELECT id, full_name, email, role, status, created_at FROM users WHERE id = ?',
+        'SELECT id, full_name, email, new_email, role, status, created_at FROM users WHERE id = ?',
         [id],
         true
       );
@@ -1198,6 +1198,136 @@ export class UserService extends BaseService {
     } catch (error) {
       dbError_log(`Error regenerating activation token: ${error.message}`);
       return null;
+    }
+  }
+
+  /**
+   * Request email change
+   * @param {number} userId - User ID
+   * @param {string} newEmail - New email address
+   * @returns {Promise<{success: boolean, data?: Object, error?: string}>}
+   */
+  async requestEmailChange(userId, newEmail) {
+    userService_log(`Requesting email change for user ${userId} to ${newEmail}`);
+
+    try {
+      // Check if new email is already in use
+      const existingUser = await this.findByEmail(newEmail);
+      if (existingUser) {
+        return { success: false, error: 'EMAIL_ALREADY_EXISTS', message: 'Email is already in use' };
+      }
+
+      // Generate verification token
+      const token = this.generateActivationToken(); // Reuse same token generator
+      const expiresAt = new Date();
+      expiresAt.setHours(expiresAt.getHours() + 24); // 24 hours expiry
+
+      const { setClause, params } = this.dbService.buildSetClause({
+        new_email: newEmail,
+        email_verification_token: token,
+        email_verification_expires_at: expiresAt.toISOString()
+      });
+
+      const paramsWithId = [...params, userId]; // params is a spreadable array
+
+      const result = await this.dbService.update(
+        `UPDATE users SET ${setClause} WHERE id = ?`,
+        paramsWithId
+      );
+
+      if (!result || !result.success) {
+        return { success: false, error: 'UPDATE_FAILED', message: 'Failed to update user record' };
+      }
+
+      // Allow fetching user details to send email
+      const user = await this.findById(userId);
+      user.new_email = newEmail;
+      user.email_verification_token = token;
+
+      return { success: true, data: user };
+
+    } catch (error) {
+      dbError_log(`Error requesting email change: ${error.message}`);
+      return { success: false, error: 'SYSTEM_ERROR', details: error.message };
+    }
+  }
+
+  /**
+   * Find user by email verification token
+   * @param {string} token - Verification token
+   * @returns {Promise<Object|null>} User object
+   */
+  async findByEmailVerificationToken(token) {
+    query_log('Finding user by email verification token');
+    try {
+      const user = await this.dbService.select(
+        'SELECT * FROM users WHERE email_verification_token = ?',
+        [token],
+        true
+      );
+      if (!user) {return null;}
+      return user;
+    } catch (error) {
+      dbError_log(`Error finding user by verification token: ${error.message}`);
+      return null;
+    }
+  }
+
+  /**
+   * Verify and complete email change
+   * @param {string} token - Verification token
+   * @returns {Promise<{success: boolean, error?: string}>}
+   */
+  async verifyEmailChange(token) {
+    userService_log('Verifying email change token');
+
+    try {
+      const user = await this.findByEmailVerificationToken(token);
+
+      if (!user) {
+        return { success: false, error: 'INVALID_TOKEN', message: 'Token not found' };
+      }
+
+      if (!user.new_email) {
+        return { success: false, error: 'INVALID_STATE', message: 'No pending email change' };
+      }
+
+      // Check expiry
+      if (new Date(user.email_verification_expires_at) < new Date()) {
+        return { success: false, error: 'TOKEN_EXPIRED', message: 'Token has expired' };
+      }
+
+      // Final check for collision (race condition)
+      const collision = await this.findByEmail(user.new_email);
+      if (collision && collision.id !== user.id) {
+        return { success: false, error: 'EMAIL_TAKEN', message: 'New email is now taken' };
+      }
+
+      // Update email and clear pending fields
+      const { setClause, params } = this.dbService.buildSetClause({
+        email: user.new_email,
+        new_email: null,
+        email_verification_token: null,
+        email_verification_expires_at: null
+      });
+
+      const paramsWithId = [...params, user.id];
+
+      const result = await this.dbService.update(
+        `UPDATE users SET ${setClause} WHERE id = ?`,
+        paramsWithId
+      );
+
+      if (!result || !result.success) {
+        return { success: false, error: 'UPDATE_FAILED', message: 'Failed to update email' };
+      }
+
+      userService_log(`Email updated successfully for user ${user.id} to ${user.new_email}`);
+      return { success: true, updatedEmail: user.new_email, userId: user.id };
+
+    } catch (error) {
+      dbError_log(`Error verifying email change: ${error.message}`);
+      return { success: false, error: 'SYSTEM_ERROR', details: error.message };
     }
   }
 }

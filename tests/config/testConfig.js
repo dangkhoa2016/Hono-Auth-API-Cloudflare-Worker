@@ -105,6 +105,7 @@ export const API_ENDPOINTS = {
   refreshToken: '/api/auth/refresh_token',
   logout: '/api/auth/logout',
   logoutAll: '/api/auth/logout-all',
+  activate: '/api/auth/activate',
 
   // User endpoints
   register: '/api/user/register',
@@ -112,6 +113,7 @@ export const API_ENDPOINTS = {
   me: '/api/user/me',
   userUpload: '/api/user/upload',
   userChangePassword: '/api/user/change-password',
+  verifyEmail: '/api/user/verify-email',
 
   // Admin endpoints
   adminDashboard: '/api/admin/dashboard',
