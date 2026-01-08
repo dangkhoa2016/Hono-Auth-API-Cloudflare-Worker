@@ -205,7 +205,7 @@ class TokenBlacklistTests {
       userId: 2,
       reason: 'Bulk Test'
     };
-    const res = await this.client.post('/api/admin/token-blacklist', payload);
+    await this.client.post('/api/admin/token-blacklist', payload);
     // We need to fetch it back to get ID as create only returns success boolean currently
     // So we search for it
     const listRes = await this.client.get(`/api/admin/token-blacklist?search=${jti}`);

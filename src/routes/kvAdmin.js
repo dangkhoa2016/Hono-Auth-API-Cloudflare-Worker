@@ -719,7 +719,7 @@ kvAdmin.post('/rate-limits/seed', async (c) => {
         attempts: attempts,
         firstAttempt: timestamp,
         lastAttempt: timestamp,
-        metadata: { reason: "seed_api", index: i }
+        metadata: { reason: 'seed_api', index: i }
       };
 
       await kvService.putRaw(key, JSON.stringify(value), { expirationTtl: 86400 });
@@ -758,10 +758,10 @@ kvAdmin.post('/rate-limits/prune-time', async (c) => {
 
     // Helper to parse timestamp
     const parseTimestamp = (input) => {
-      if (typeof input === 'number') return input;
-      if (/^\d+$/.test(input)) return parseInt(input, 10);
+      if (typeof input === 'number') {return input;}
+      if (/^\d+$/.test(input)) {return parseInt(input, 10);}
       const date = new Date(input);
-      if (!isNaN(date.getTime())) return date.getTime();
+      if (!isNaN(date.getTime())) {return date.getTime();}
       throw new Error(`Invalid date format: "${input}"`);
     };
 
@@ -787,10 +787,10 @@ kvAdmin.post('/rate-limits/prune-time', async (c) => {
         checkedCount++;
         try {
           const value = await kvService.getRaw(key.name, 'json');
-          
+
           if (value && (value.firstAttempt || value.lastAttempt)) {
             const timestamp = value.firstAttempt || value.lastAttempt;
-            
+
             if (timestamp >= startTime && timestamp <= endTime) {
               if (dryRun) {
                 affectedKeys.push({ key: key.name, timestamp });

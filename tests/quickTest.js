@@ -78,7 +78,7 @@ class QuickTests {
       while (attempts < maxAttempts) {
         try {
           response = await this.client.get(API_ENDPOINTS.health);
-          if (response.status === 200) break;
+          if (response.status === 200) {break;}
         } catch (e) {
           // ignore error and retry
         }
