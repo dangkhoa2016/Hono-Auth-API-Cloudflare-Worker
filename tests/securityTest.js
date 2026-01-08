@@ -297,7 +297,7 @@ class SecurityTests {
 
   async _clearConfigCaches() {
     const adminClient = await this._getSuperAdminClient();
-    const response = await adminClient.post('/api/kv-admin/configs/cache/clear', {});
+    const response = await adminClient.post(API_ENDPOINTS.kvAdminConfigsCacheClear, {});
 
     if (response.status !== 200 || !response.data?.success) {
       this.logger.warning('KV cache clear endpoint did not return success status');

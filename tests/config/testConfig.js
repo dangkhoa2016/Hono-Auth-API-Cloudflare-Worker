@@ -120,6 +120,8 @@ export const API_ENDPOINTS = {
   adminSettings: '/api/admin/settings',
   adminBackup: '/api/admin/backup',
   adminSystemHealth: '/api/admin/system-health',
+  adminTokenBlacklist: '/api/admin/token-blacklist',
+  adminTokenBlacklistBulkDelete: '/api/admin/token-blacklist/bulk-delete',
 
   // KV Admin endpoints
   kvAdminConfigs: '/api/kv-admin/configs',

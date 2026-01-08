@@ -989,7 +989,7 @@ class ComprehensiveI18nTest {
 
     try {
       // Test unsupported language 'xx' - should return error with interpolation
-      const response = await this.client.get('/api/translations/xx', {
+      const response = await this.client.get(API_ENDPOINTS.translationsByLang.replace(':language', 'xx'), {
         headers: { 'Accept-Language': 'en' }
       });
 
@@ -1021,7 +1021,10 @@ class ComprehensiveI18nTest {
 
     try {
       // Test non-existent section 'nonexistent' for English
-      const response = await this.client.get('/api/translations/en/section/nonexistent', {
+      const endpoint = API_ENDPOINTS.translationsSection
+        .replace(':language', 'en')
+        .replace(':section', 'nonexistent');
+      const response = await this.client.get(endpoint, {
         headers: { 'Accept-Language': 'en' }
       });
 
@@ -1049,7 +1052,7 @@ class ComprehensiveI18nTest {
 
     try {
       // Test successful retrieval of English translations
-      const response = await this.client.get('/api/translations/en', {
+      const response = await this.client.get(API_ENDPOINTS.translationsByLang.replace(':language', 'en'), {
         headers: { 'Accept-Language': 'en' }
       });
 
@@ -1089,7 +1092,7 @@ class ComprehensiveI18nTest {
       for (const lang of languages) {
         this.logger.info(`Testing ${lang.name} (${lang.code}) error messages...`);
 
-        const response = await this.client.get('/api/translations/invalid_lang', {
+        const response = await this.client.get(API_ENDPOINTS.translationsByLang.replace(':language', 'invalid_lang'), {
           headers: { 'Accept-Language': lang.code }
         });
 
@@ -1118,7 +1121,8 @@ class ComprehensiveI18nTest {
 
     try {
       // Force an error in plurals test by sending invalid JSON
-      const response = await this.client.post('/api/translations/test/plurals', 'invalid json}', {
+      const endpoint = API_ENDPOINTS.translationsTestPlurals || '/api/translations/test/plurals';
+      const response = await this.client.post(endpoint, 'invalid json}', {
         headers: {
           'Accept-Language': 'en',
           'Content-Type': 'application/json'
@@ -1163,7 +1167,7 @@ class ComprehensiveI18nTest {
 
     try {
       // Test user profile access without authentication (should trigger error)
-      const response = await this.client.get('/api/user/profile', {
+      const response = await this.client.get(API_ENDPOINTS.profile, {
         headers: { 'Accept-Language': 'en' }
         // No Authorization header - should trigger auth error
       });
@@ -1187,7 +1191,7 @@ class ComprehensiveI18nTest {
 
     try {
       // Test successful demo route
-      const response = await this.client.get('/api/translations/demo/enhanced', {
+      const response = await this.client.get(API_ENDPOINTS.translationsDemoEnhanced || '/api/translations/demo/enhanced', {
         headers: { 'Accept-Language': 'en' }
       });
 
@@ -1217,7 +1221,7 @@ class ComprehensiveI18nTest {
 
     try {
       const startTime = Date.now();
-      const response = await this.client.get('/api/translations', {
+      const response = await this.client.get(API_ENDPOINTS.translations, {
         headers: { 'Accept-Language': 'en' }
       });
       const responseTime = Date.now() - startTime;
