@@ -173,12 +173,6 @@ export default {
     'listSuccess': 'ดึงรายการโทเค็นที่ถูกบล็อกสำเร็จ',
     'getSuccess': 'ดึงรายละเอียดโทเค็นที่ถูกบล็อกสำเร็จ'
   },
-  'common': {
-    'errors': {
-      'notFound': 'ไม่พบทรัพยากร'
-    },
-    'success': 'การดำเนินการสำเร็จ'
-  },
   'dates': {
     'changedAt': 'เปลี่ยนแปลงที่ {{date, datetime}}',
     'checkedAt': 'ตรวจสอบที่ {{date, datetime}}',
@@ -669,6 +663,8 @@ export default {
       'deactivationFailed': 'ไม่สามารถปิดใช้งานบัญชีผู้ใช้สำหรับ {{userName}}: {{reason}}',
       'deleteFailed': 'ล้มเหลวในการลบผู้ใช้ {{userName}}: {{reason}}',
       'emailExists': 'ที่อยู่อีเมล {{email}} ถูกลงทะเบียนในระบบแล้ว',
+      'emailVerificationFailed': 'การยืนยันอีเมลล้มเหลว: {{reason}}',
+      'emailVerificationSystemError': 'ไม่สามารถตรวจสอบการเปลี่ยนอีเมลได้เนื่องจากข้อผิดพลาดของระบบ โปรดลองอีกครั้งในภายหลัง',
       'inactive': 'บัญชีผู้ใช้ {{userName}} ไม่ได้ใช้งาน',
       'insufficientPermissions': 'สิทธิ์ไม่เพียงพอในการแก้ไขผู้ใช้ {{userName}} ({{userRole}})',
       'listFailed': 'ล้มเหลวในการดึงรายชื่อผู้ใช้: {{reason}}',
@@ -1026,7 +1022,8 @@ export default {
       'suspended': 'ระงับบัญชีผู้ใช้สำเร็จสำหรับ {{userName}} จนถึง {{suspendedUntil, datetime}}',
       'unsuspended': 'ยกเลิกการระงับบัญชีผู้ใช้สำหรับ {{userName}} โดย {{liftedBy}}',
       'updated': 'อัพเดทโปรไฟล์ผู้ใช้สำเร็จสำหรับ {{userName}} - ฟิลด์: {{updatedFields}}',
-      'updated_other': 'อัพเดทโปรไฟล์ผู้ใช้ {{count}} โปรไฟล์สำเร็จ'
+      'updated_other': 'อัพเดทโปรไฟล์ผู้ใช้ {{count}} โปรไฟล์สำเร็จ',
+      'updatedWithEmailVerification': 'อัปเดตโปรไฟล์แล้ว โปรดตรวจสอบที่อยู่อีเมลใหม่ {{newEmail}} เพื่อยืนยันและดำเนินการเปลี่ยนแปลงให้เสร็จสมบูรณ์'
     }
   },
   'system': {

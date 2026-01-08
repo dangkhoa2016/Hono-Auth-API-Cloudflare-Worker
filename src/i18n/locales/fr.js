@@ -173,12 +173,6 @@ export default {
     'listSuccess': 'Jetons sur liste noire récupérés avec succès',
     'getSuccess': 'Détails de l\'entrée sur liste noire récupérés avec succès'
   },
-  'common': {
-    'errors': {
-      'notFound': 'Ressource non trouvée'
-    },
-    'success': 'Opération réussie'
-  },
   'dates': {
     'changedAt': 'Modifié le {{date, datetime}}',
     'checkedAt': 'Vérifié le {{date, datetime}}',
@@ -669,6 +663,8 @@ export default {
       'deactivationFailed': 'Échec de la désactivation du compte utilisateur pour {{userName}} : {{reason}}',
       'deleteFailed': 'Échec de la suppression de l\'utilisateur {{userName}} : {{reason}}',
       'emailExists': 'L\'adresse e-mail {{email}} est déjà enregistrée dans le système',
+      'emailVerificationFailed': 'La vérification de l\'e-mail a échoué : {{reason}}',
+      'emailVerificationSystemError': 'Échec de la vérification du changement d\'e-mail en raison d\'une erreur système. Veuillez réessayer plus tard.',
       'inactive': 'Le compte utilisateur {{userName}} est inactif',
       'insufficientPermissions': 'Permissions insuffisantes pour modifier l\'utilisateur {{userName}} ({{userRole}})',
       'listFailed': 'Échec de la récupération de la liste des utilisateurs : {{reason}}',
@@ -1026,7 +1022,8 @@ export default {
       'suspended': 'Compte utilisateur suspendu avec succès pour {{userName}} jusqu\'à {{suspendedUntil, datetime}}',
       'unsuspended': 'Suspension de compte utilisateur levée pour {{userName}} par {{liftedBy}}',
       'updated': 'Profil utilisateur mis à jour avec succès pour {{userName}} - champs : {{updatedFields}}',
-      'updated_other': '{{count}} profils utilisateur mis à jour avec succès'
+      'updated_other': '{{count}} profils utilisateur mis à jour avec succès',
+      'updatedWithEmailVerification': 'Profil mis à jour. Veuillez vérifier votre nouvelle adresse e-mail {{newEmail}} pour confirmer et terminer le changement.'
     }
   },
   'system': {
