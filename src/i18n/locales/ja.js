@@ -165,6 +165,20 @@ export default {
     'unauthorized': '許可されていないアクセス',
     'userNotFound': 'ユーザーが見つからないか、非アクティブです'
   },
+  'tokenBlacklist': {
+    'createSuccess': 'トークンがブラックリストに正常に追加されました',
+    'deleteSuccess': 'トークンがブラックリストから正常に削除されました',
+    'bulkDeleteSuccess': 'トークンの一括削除に成功しました',
+    'tokenNotFound': 'トークンが見つかりません',
+    'listSuccess': 'ブラックリストのトークンが正常に取得されました',
+    'getSuccess': 'ブラックリストのエントリ詳細が正常に取得されました'
+  },
+  'common': {
+    'errors': {
+      'notFound': 'リソースが見つかりません'
+    },
+    'success': '操作は成功しました'
+  },
   'dates': {
     'changedAt': '{{date, datetime}} に変更',
     'checkedAt': '{{date, datetime}} に確認',
@@ -202,7 +216,12 @@ export default {
       'systemHealth': '包括的なシステムヘルス状態を取得（管理者アクセス必須）',
       'updateUser': 'ユーザー情報を更新（管理者アクセス必須）',
       'userDetails': 'ユーザー詳細を取得（管理者アクセス必須）',
-      'usersList': '全ユーザーをリスト（管理者アクセス必須）'
+      'usersList': '全ユーザーをリスト（管理者アクセス必須）',
+      'blacklistList': 'ブラックリストトークンの一覧（スーパー管理者のみ）',
+      'blacklistCreate': 'トークンを手動でブラックリストに追加（スーパー管理者のみ）',
+      'blacklistDetails': 'ブラックリストエントリの詳細を取得（スーパー管理者のみ）',
+      'blacklistBulkDelete': 'ブラックリストエントリの一括削除（スーパー管理者のみ）',
+      'blacklistDelete': 'ブラックリストエントリの削除（スーパー管理者のみ）'
     },
     'advanced_audit': {
       'analytics': '高度な監査分析（管理者アクセス必須）',

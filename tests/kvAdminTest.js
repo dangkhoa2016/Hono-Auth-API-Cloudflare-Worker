@@ -884,7 +884,7 @@ class KVAdminTests {
 
       this.assert.assertSuccess(response, 'Rate limit prune time dry run');
       this.assert.assertEqual(response.data.data.dryRun, true, 'Should be dry run');
-      
+
       this.logger.success('Rate Limit Prune Time test completed successfully');
     } catch (error) {
       this.logger.error(`[testRateLimitPruneTime] Rate Limit Prune Time test failed: ${error.message}`);
@@ -905,7 +905,7 @@ class KVAdminTests {
         { prefix, count: 3 },
         { 'Authorization': `Bearer ${this.superAdminToken}` }
       );
-      
+
       const keys = seedResponse.data.data.createdKeys;
 
       // Batch delete dry run

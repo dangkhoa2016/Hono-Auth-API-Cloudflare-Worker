@@ -18,6 +18,7 @@ npx wrangler d1 execute hono-auth-api-db-development --env dev --local --command
 
 npx wrangler d1 export hono-auth-api-db-test --env test --local --output ./hono-export.sql
 
+npx wrangler d1 execute DB --local --env test --command "SELECT id, email, role, status FROM users WHERE email='test-superadmin@example.com' OR role='super_admin'"
 
 -----
 

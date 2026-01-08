@@ -352,7 +352,7 @@ class PerformanceTests {
   async testThroughput() {
     try {
       this.logger.info('Testing throughput performance...');
-      
+
       // Allow server to recover from previous tests
       await new Promise(resolve => setTimeout(resolve, 1000));
 
@@ -365,14 +365,14 @@ class PerformanceTests {
       // Keep making requests for the duration
       while (Date.now() - startTime < duration) {
         try {
-          const batch = Array(batchSize).fill().map(() => 
+          const batch = Array(batchSize).fill().map(() =>
             this.client.get(API_ENDPOINTS.health)
               .then(res => {
-                if (res.status !== 200) throw new Error(`Status ${res.status}`);
+                if (res.status !== 200) {throw new Error(`Status ${res.status}`);}
                 return res;
               })
           );
-          
+
           await Promise.all(batch);
           requestCount += batchSize;
         } catch (error) {
@@ -444,7 +444,7 @@ class PerformanceTests {
   async testStressTesting() {
     try {
       this.logger.info('Testing stress testing performance...');
-      
+
       // Allow server to recover from previous tests
       await new Promise(resolve => setTimeout(resolve, 2000));
 

@@ -292,7 +292,7 @@ export class KVConfigService {
    * @param {string} type - 'text', 'json', 'arrayBuffer', 'stream'
    */
   async getRaw(key, type = 'text') {
-    return this.kv.get(key, type);
+    return await this.kv.get(key, type);
   }
 
   /**
@@ -301,7 +301,7 @@ export class KVConfigService {
    * @param {string} type - 'text', 'json', 'arrayBuffer', 'stream'
    */
   async getWithMetadataRaw(key, type = 'text') {
-    return this.kv.getWithMetadata(key, type);
+    return await this.kv.getWithMetadata(key, type);
   }
 
   /**
@@ -311,7 +311,7 @@ export class KVConfigService {
    * @param {Object} options - KV options (expiration, expirationTtl, metadata)
    */
   async putRaw(key, value, options = {}) {
-    return this.kv.put(key, value, options);
+    return await this.kv.put(key, value, options);
   }
 
   /**
@@ -319,7 +319,7 @@ export class KVConfigService {
    * @param {string} key - The exact key to delete
    */
   async deleteRaw(key) {
-    return this.kv.delete(key);
+    return await this.kv.delete(key);
   }
 
   /**
@@ -327,7 +327,7 @@ export class KVConfigService {
    * @param {Object} options - List options (prefix, limit, cursor)
    */
   async listRaw(options = {}) {
-    return this.kv.list(options);
+    return await this.kv.list(options);
   }
 
   // ==========================================================================
