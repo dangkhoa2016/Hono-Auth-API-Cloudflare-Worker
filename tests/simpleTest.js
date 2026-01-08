@@ -72,7 +72,7 @@ class SimpleTest {
 
     try {
       this.logger.info(`Base URL: ${this.baseUrl}`);
-      const response = await this.client.get('/');
+      const response = await this.client.get(API_ENDPOINTS.root);
 
       this.assert.assertEqual(response.status, 200, 'Root endpoint should be accessible');
       this.assert.exists(response.data, 'Should return response data');
@@ -142,7 +142,7 @@ class SimpleTest {
 
     try {
       const startTime = Date.now();
-      const response = await this.client.get('/');
+      const response = await this.client.get(API_ENDPOINTS.root);
       const responseTime = Date.now() - startTime;
 
       this.assert.assertEqual(response.status, 200, 'Should connect successfully');
