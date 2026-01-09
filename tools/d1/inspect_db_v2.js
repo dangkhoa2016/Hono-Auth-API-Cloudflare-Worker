@@ -1,4 +1,29 @@
-import { getPlatformProxy } from 'wrangler';
+/**
+ * DATABASE INSPECTION TOOL / CÔNG CỤ KIỂM TRA DATABASE
+ * ----------------------------------------------------------------------------
+ * This script runs a comprehensive inspection of the D1 database, executing a set
+ * of predefined queries to check schema, users, audit logs, and security data.
+ *
+ * Script này chạy kiểm tra toàn diện database D1, thực hiện một tập hợp các
+ * truy vấn định sẵn để kiểm tra schema, người dùng, nhật ký kiểm toán và dữ liệu bảo mật.
+ *
+ * Usage / Cách sử dụng:
+ *
+ * 1. Default (Local Development) / Mặc định (Local Development):
+ *    node tools/d1/inspect_db_v2.js
+ *
+ * 2. Specific Environment (Local) / Môi trường cụ thể (Local):
+ *    node tools/d1/inspect_db_v2.js staging
+ *    node tools/d1/inspect_db_v2.js production
+ *
+ * 3. Remote Database / Database từ xa (Remote):
+ *    node tools/d1/inspect_db_v2.js staging --remote
+ *    node tools/d1/inspect_db_v2.js production --remote
+ * ----------------------------------------------------------------------------
+ */
+import { execSync } from 'child_process';
+import fs from 'fs';
+import path from 'path';
 
 // Queries categorized for better organization
 const queries = {
@@ -93,61 +118,76 @@ const queries = {
   ]
 };
 
-async function inspectDatabase(db) {
+function executeCommand(command) {
+    // This function is no longer used but kept for interface compatibility if needed later, 
+    // or we can remove it. For now, we inline execution in inspectDatabase.
+}
+
+async function inspectDatabase(database_name, environment, locationFlag) {
   console.log('🔍 Starting Database Inspection...');
+  console.log(`📡 Database: ${database_name} (${environment}) [${locationFlag}]`);
   console.log('==================================');
 
-  // Helper to run a list of queries
-  async function runQueryGroup(groupName, queryList) {
-    console.log(`\n📂 Category: ${groupName.toUpperCase()}`);
+  for (const [category, queryList] of Object.entries(queries)) {
+    console.log(`\n📂 Category: ${category.toUpperCase()}`);
     console.log('----------------------------------');
     
     for (const { name, query } of queryList) {
       console.log(`\n📋 ${name}`);
       console.log(`   Query: ${query}`);
+      
       try {
-        const result = await db.prepare(query).all();
-        // Check if results are in 'results' property (D1 standard) or directly returned
-        const rows = result.results || result;
+        // Safe quote the query for shell execution
+        // We use single quotes for the query string in shell command, so we escape single quotes in SQL
+        const safeQuery = query.replace(/"/g, '\\"');
+        const command = `npx wrangler d1 execute ${database_name} --env ${environment} --command "${safeQuery}" ${locationFlag} --json`;
         
+        // Execute sync
+        // Using direct execSync instead of helper to localize logic and simplify
+        const output = execSync(command, { encoding: 'utf8', stdio: ['ignore', 'pipe', 'ignore'] });
+        
+        const jsonStart = output.indexOf('[');
+        if (jsonStart === -1) {
+            console.log('   (No content returned or error parsing output)');
+            continue;
+        }
+        
+        const jsonStr = output.substring(jsonStart);
+        const parsed = JSON.parse(jsonStr);
+        // Wrangler usually returns [{ results: [...], meta: ... }] for single command
+        // Note: Sometimes it might return multiple results if the query string had semicolons, but here we process 1 query at a time.
+        const res = parsed[0]; 
+
+        if (!res || !res.success) {
+            console.log(`   ⚠️ Query failed.`);
+             if (res && res.error) console.log(`   Error: ${res.error}`);
+            continue;
+        }
+
+        const rows = res.results;
         if (Array.isArray(rows) && rows.length > 0) {
           console.table(rows);
-        } else if (Array.isArray(rows) && rows.length === 0) {
-          console.log('   (No results found)');
         } else {
-             // Fallback for unexpected format
-             console.log(result);
+          console.log('   (No results found)');
         }
+
       } catch (error) {
-        // Some tables might not exist yet if migrations haven't run fully or if the query is invalid for the current schema
-        // We log nicely instead of crashing
-        console.log(`   ⚠️ Error or Table not found: ${error.message}`);
+        console.log(`   ⚠️ Error executing query: ${error.message}`);
       }
     }
   }
 
-  // Iterate over all categories
-  for (const [category, queryList] of Object.entries(queries)) {
-    await runQueryGroup(category, queryList);
-  }
-  
   console.log('\n==================================');
   console.log('✅ Inspection Complete');
 }
 
 (async () => {
-  try {
-    const { env } = await getPlatformProxy({ environment: 'development' });
-    if (!env || !env.DB) {
-        throw new Error('DB binding not found. Make sure wrangler.toml has [[d1_databases]] configured correctly.');
-    }
+    const args = process.argv.slice(2);
+    // Find first non-flag argument as environment, default to 'development'
+    const environment = args.find(arg => !arg.startsWith('--')) || 'development';
+    const isRemote = args.includes('--remote');
+    const locationFlag = isRemote ? '--remote' : '--local';
+    const database_name = `hono-auth-api-db-${environment}`;
 
-    await inspectDatabase(env.DB);
-
-  } catch (error) {
-     console.error('Fatal Error during inspection:', error);
-  } finally {
-     process.exit(0);
-  }
-
+    await inspectDatabase(database_name, environment, locationFlag);
 })();
