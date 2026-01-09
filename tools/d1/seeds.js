@@ -1,3 +1,30 @@
+/**
+ * DATABASE SEEDING TOOL / CÔNG CỤ TẠO DỮ LIỆU MẪU DATABASE
+ * ----------------------------------------------------------------------------
+ * This script generates and applies seed data to the D1 database. It creates
+ * demo users, audit logs, security incidents, and token history.
+ * IMPORTANT: It clears existing data in the target tables before seeding.
+ *
+ * Script này tạo và áp dụng dữ liệu mẫu vào database D1. Nó tạo ra người dùng demo,
+ * nhật ký kiểm toán, sự cố bảo mật và lịch sử token.
+ * QUAN TRỌNG: Nó sẽ xóa dữ liệu hiện có trong các bảng mục tiêu trước khi seeding.
+ *
+ * Usage / Cách sử dụng:
+ *
+ * 1. Default (Local Development) / Mặc định (Local Development):
+ *    node tools/d1/seeds.js
+ *
+ * 2. Specific Environment (Local) / Môi trường cụ thể (Local):
+ *    node tools/d1/seeds.js staging
+ *
+ * 3. Remote Database / Database từ xa (Remote):
+ *    node tools/d1/seeds.js staging --remote
+ *    node tools/d1/seeds.js production --remote
+ *
+ * Note: After seeding, it automatically runs the verification script to confirm data.
+ * Lưu ý: Sau khi seeding, nó tự động chạy script xác minh để kiểm tra dữ liệu.
+ * ----------------------------------------------------------------------------
+ */
 import bcrypt from 'bcryptjs';
 import { execSync } from 'child_process';
 import fs from 'fs';
@@ -265,12 +292,12 @@ function processWranglerOutput(result) {
     }
 }
 
-function runVerification(environment) {
+function runVerification(environment, locationFlag) {
      console.log('\n🔄 Running verification...');
      // Using import.meta.url to construct __dirname manually
      const __dirname = path.dirname(new URL(import.meta.url).pathname);
      try {
-         execSync(`node "${path.join(__dirname, 'verify-seeds.js')}" ${environment}`, { stdio: 'inherit' });
+         execSync(`node "${path.join(__dirname, 'verify-seeds.js')}" ${environment} ${locationFlag}`, { stdio: 'inherit' });
      } catch (verifyErr) {
          console.error('⚠️ Verification script execution failed:', verifyErr.message);
      }
@@ -282,12 +309,17 @@ function runVerification(environment) {
 
 async function main() {
   try {
-    const environment = process.argv[2] || 'development';
+    const args = process.argv.slice(2);
+    // Find first non-flag argument as environment, default to 'development'
+    const environment = args.find(arg => !arg.startsWith('--')) || 'development';
+    const isRemote = args.includes('--remote');
+    const locationFlag = isRemote ? '--remote' : '--local';
+
     const database_name = `hono-auth-api-db-${environment}`;
     const __dirname = path.dirname(new URL(import.meta.url).pathname);
     const outputFilePath = path.join(__dirname, OUTPUT_FILE_NAME);
     
-    console.log(`🌱 Generating seed SQL for environment: ${environment}`);
+    console.log(`🌱 Generating seed SQL for environment: ${environment} (${isRemote ? 'REMOTE' : 'LOCAL'})`);
     console.log(`📝 Output file: ${outputFilePath}`);
 
     // Prepare data
@@ -313,14 +345,14 @@ async function main() {
     console.log('✅ SQL file generated successfully!');
 
     // Execute
-    console.log(`🚀 Executing seed file on D1 (${database_name})...`);
-    const command = `npx wrangler d1 execute ${database_name} --env ${environment} --file "${outputFilePath}" --local`;
+    console.log(`🚀 Executing seed file on D1 (${database_name}) [${locationFlag}]...`);
+    const command = `npx wrangler@latest d1 execute ${database_name} --env ${environment} --file "${outputFilePath}" ${locationFlag}`;
     
     const result = executeCommand(command);
     
     // Process Output & Run Verification
     if (processWranglerOutput(result)) {
-        runVerification(environment);
+        runVerification(environment, locationFlag);
     } else {
         process.exit(1);
     }
