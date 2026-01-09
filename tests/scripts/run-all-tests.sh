@@ -253,6 +253,7 @@ main() {
     run_test "Token Security Tests" "npm run test:token_security"
     run_test "Token Blacklist Route Tests" "node tests/tokenBlacklistRouteTest.js"
     run_test "Suspended User Token Tests" "node tests/suspendedUserTokenTest.js"
+    run_test "Email Change Verification Tests" "node tests/emailChangeVerificationTest.js"
     
     # Audit System Test Suites (10 additional tests)
     echo ""
