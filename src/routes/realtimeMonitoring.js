@@ -492,7 +492,7 @@ realtimeMonitoring.get('/alerts/rules', requireSuperAdmin, async (c) => {
       message: tSuccess(c, 'realtimeMonitoring.alerts.rulesRetrieved', {
         actor: c.get('user')?.fullName || 'System',
         ruleCount: rules.totalRules || 0,
-        activeRules: rules.activeRules || 0
+        activeRules: rules.enabledRules || 0
       })
     });
   } catch (error) {

@@ -479,8 +479,15 @@ class RealtimeMonitoringTest {
         Authorization: `Bearer ${this.tokens.superAdmin}`
       });
 
+      if (rulesResponse.status !== 200 && rulesResponse.status !== 403) {
+        this.logger.error(`Get alert rules failed with status ${rulesResponse.status}`);
+        if (rulesResponse.data) {
+           this.logger.error(`Response data: ${JSON.stringify(rulesResponse.data, null, 2)}`);
+        }
+      }
+
       this.assert.assertTrue(rulesResponse.status === 200 || rulesResponse.status === 403,
-        'Should access alert rules');
+        `Should access alert rules (Got ${rulesResponse.status})`);
 
       // Test create alert rule
       const createResponse = await this.client.post(API_ENDPOINTS.realtimeMonitoringAlertsRules, {

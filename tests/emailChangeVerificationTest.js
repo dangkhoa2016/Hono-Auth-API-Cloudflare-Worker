@@ -95,7 +95,11 @@ class EmailChangeVerificationTests {
 
     this.logger.logSummary();
 
-    process.exit(1);
+    if (this.logger.failCount > 0) {
+      process.exit(1);
+    } else {
+      process.exit(0);
+    }
   }
 
   /**
