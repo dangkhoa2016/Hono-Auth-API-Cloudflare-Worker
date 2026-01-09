@@ -130,7 +130,17 @@ function generateUsersSql(users, hashedPwd) {
 
   for (const user of users) {
     const escapedFullName = escapeString(user.full_name);
-    lines.push(`INSERT INTO users (id, full_name, email, password, role, status, created_at, updated_at) VALUES (${user.id}, '${escapedFullName}', '${user.email}', '${escapedHashedPassword}', '${user.role}', '${user.status}', datetime('now'), datetime('now'));`);
+    
+    // Random created_at (last 90 days)
+    const createdDate = new Date(Date.now() - Math.floor(Math.random() * 90 * 24 * 60 * 60 * 1000));
+    const createdAt = createdDate.toISOString().replace('T', ' ').substring(0, 19);
+
+    // Random updated_at (between created_at and now)
+    const updatedDate = new Date(createdDate.getTime() + Math.floor(Math.random() * (Date.now() - createdDate.getTime())));
+    const updatedAt = updatedDate.toISOString().replace('T', ' ').substring(0, 19);
+    
+    const activatedAt = user.status === 'active' ? "datetime('now')" : "NULL";
+    lines.push(`INSERT INTO users (id, full_name, email, password, role, status, created_at, updated_at, activated_at) VALUES (${user.id}, '${escapedFullName}', '${user.email}', '${escapedHashedPassword}', '${user.role}', '${user.status}', '${createdAt}', '${updatedAt}', ${activatedAt});`);
   }
   lines.push('');
   return lines;
