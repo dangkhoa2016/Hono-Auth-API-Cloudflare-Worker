@@ -89,13 +89,14 @@ curl "http://localhost:8787/api/auth/login?lang=vi" -X POST \
 
 ## 📚 Tổ chức tài liệu
 
-Tất cả tài liệu nằm trong thư mục [documents](documents) với cặp EN/VI (34 tệp: 18 EN, 16 VI; tài liệu bảo mật token có file EN riêng và file VI riêng không hậu tố `_vi`).
+Tất cả tài liệu nằm trong thư mục [documents](documents) với cặp EN/VI (40 tệp: 20 EN, 20 VI).
 
-- **Tài liệu cốt lõi**: [SETUP_GUIDE_vi.md](documents/SETUP_GUIDE_vi.md), [ROLE_COMPLETE_GUIDE_vi.md](documents/ROLE_COMPLETE_GUIDE_vi.md), [DEBUG_DEVELOPMENT_GUIDE_vi.md](documents/DEBUG_DEVELOPMENT_GUIDE_vi.md), [I18N_MASTER_GUIDE_vi.md](documents/I18N_MASTER_GUIDE_vi.md), [ZOD_GUIDE_vi.md](documents/ZOD_GUIDE_vi.md), [SCHEMAS_GUIDE_vi.md](documents/SCHEMAS_GUIDE_vi.md), [ESLINT_GUIDE_vi.md](documents/ESLINT_GUIDE_vi.md), [WRANGLER_CONFIG_GUIDE_vi.md](documents/WRANGLER_CONFIG_GUIDE_vi.md), [DATABASE_SERVICE_vi.md](documents/DATABASE_SERVICE_vi.md), [DYNAMIC_CONFIG_GUIDE_vi.md](documents/DYNAMIC_CONFIG_GUIDE_vi.md), [MANUAL_SEND_EMAIL_GUIDE_vi.md](documents/MANUAL_SEND_EMAIL_GUIDE_vi.md)
+- **Tài liệu cốt lõi**: [SETUP_GUIDE_vi.md](documents/SETUP_GUIDE_vi.md), [ROLE_COMPLETE_GUIDE_vi.md](documents/ROLE_COMPLETE_GUIDE_vi.md), [DEBUG_DEVELOPMENT_GUIDE_vi.md](documents/DEBUG_DEVELOPMENT_GUIDE_vi.md), [I18N_MASTER_GUIDE_vi.md](documents/I18N_MASTER_GUIDE_vi.md), [ZOD_GUIDE_vi.md](documents/ZOD_GUIDE_vi.md), [SCHEMAS_GUIDE_vi.md](documents/SCHEMAS_GUIDE_vi.md), [ESLINT_GUIDE_vi.md](documents/ESLINT_GUIDE_vi.md), [WRANGLER_CONFIG_GUIDE_vi.md](documents/WRANGLER_CONFIG_GUIDE_vi.md), [DATABASE_SERVICE_vi.md](documents/DATABASE_SERVICE_vi.md), [DYNAMIC_CONFIG_GUIDE_vi.md](documents/DYNAMIC_CONFIG_GUIDE_vi.md), [MANUAL_SEND_EMAIL_GUIDE_vi.md](documents/MANUAL_SEND_EMAIL_GUIDE_vi.md), [DATABASE_INSPECTION_GUIDE_vi.md](documents/DATABASE_INSPECTION_GUIDE_vi.md)
+- **Tài liệu tính năng**: [TOKEN_BLACKLIST_GUIDE_vi.md](documents/TOKEN_BLACKLIST_GUIDE_vi.md), [EMAIL_CHANGE_VERIFICATION_GUIDE_vi.md](documents/EMAIL_CHANGE_VERIFICATION_GUIDE_vi.md)
 - **Kiểm thử**: [TEST_GUIDE_vi.md](documents/TEST_GUIDE_vi.md), [TEST_SCRIPTS_vi.md](documents/TEST_SCRIPTS_vi.md)
 - **Tính năng doanh nghiệp**: [ENTERPRISE_AUDIT_SYSTEM_COMPLETE_GUIDE_vi.md](documents/ENTERPRISE_AUDIT_SYSTEM_COMPLETE_GUIDE_vi.md), [AUDIT_API_REFERENCE_vi.md](documents/AUDIT_API_REFERENCE_vi.md), [AUDIT_KV_CONFIGURATION_GUIDE_vi.md](documents/AUDIT_KV_CONFIGURATION_GUIDE_vi.md)
-- **Bảo mật token**: [TOKEN_SECURITY_COMPREHENSIVE_GUIDE.md](documents/TOKEN_SECURITY_COMPREHENSIVE_GUIDE.md) (VI) và [TOKEN_SECURITY_COMPREHENSIVE_GUIDE_EN.md](documents/TOKEN_SECURITY_COMPREHENSIVE_GUIDE_EN.md) (EN)
-- **Đa ngôn ngữ**: hầu hết tài liệu có bản `_vi`; các bản EN/VI tham chiếu lẫn nhau để dễ tra cứu
+- **Bảo mật token**: [TOKEN_SECURITY_COMPREHENSIVE_GUIDE_vi.md](documents/TOKEN_SECURITY_COMPREHENSIVE_GUIDE_vi.md)
+- **Đa ngôn ngữ**: mỗi tài liệu trên đều có bản gốc tiếng Anh.
 
 ### 🎯 Bắt đầu nhanh
 1. **Cài đặt**: [documents/SETUP_GUIDE_vi.md](documents/SETUP_GUIDE_vi.md) - Cài đặt môi trường đa môi trường

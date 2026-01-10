@@ -228,6 +228,23 @@ Wrangler log levels control how verbose the wrangler tool itself is, separate fr
 | `error` | Minimal | Fastest | Production environment |
 | `none` | Silent | Fastest | Testing, CI/CD |
 
+### Response Body Capture (Dynamic Debugging)
+
+For deep debugging of API responses without restarting the server, you can enable Response Body Capture via KV configuration.
+
+- **Key**: `ENABLE_RESPONSE_BODY_CAPTURE`
+- **Effect**: Logs the full JSON response body for every request.
+- **Security**: ⚠️ Logs sensitive data. Use only in Development/Test environments.
+
+**Usage:**
+```bash
+# Enable capture
+node tools/kv/kv-config-manager.js set ENABLE_RESPONSE_BODY_CAPTURE true --type boolean
+
+# Disable capture
+node tools/kv/kv-config-manager.js set ENABLE_RESPONSE_BODY_CAPTURE false --type boolean
+```
+
 ---
 
 ## 📦 Usage Methods
