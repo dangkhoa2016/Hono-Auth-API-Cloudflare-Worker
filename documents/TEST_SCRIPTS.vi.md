@@ -415,6 +415,7 @@ Comprehensive shell scripts để manual testing của role-based permissions s�
 | `test-favicon.sh` | **Static Asset Testing** | Favicon và static asset endpoint validation |
 | `test-kv-admin.sh` | **KV Administration Testing** | KV store management và configuration testing |
 | `test-kv-audit-config.sh` | **KV Audit Configuration** | KV audit system configuration validation |
+| `test-response-capture.sh` | **Debug Response Capture** | Test cấu hình dynamic response body capture |
 
 ## 🎯 Enterprise Audit System Testing Scripts
 
