@@ -30,6 +30,13 @@ DELETE FROM sqlite_sequence WHERE name='audit_logs_archive';
 DELETE FROM audit_logs;
 DELETE FROM sqlite_sequence WHERE name='audit_logs';
 
+-- Reset token security tables
+DELETE FROM token_blacklist;
+DELETE FROM sqlite_sequence WHERE name='token_blacklist';
+
+DELETE FROM token_audit_logs;
+DELETE FROM sqlite_sequence WHERE name='token_audit_logs';
+
 -- Reset failed login limits (related to security)
 DELETE FROM failed_login_limits;
 DELETE FROM sqlite_sequence WHERE name='failed_login_limits';
@@ -52,6 +59,7 @@ DELETE FROM users;
 DELETE FROM sqlite_sequence WHERE name='users';
 
 -- Insert test users with different roles
+-- Added activated_at to support recent schema changes
 INSERT OR IGNORE INTO users (
   full_name, 
   email, 
@@ -59,7 +67,8 @@ INSERT OR IGNORE INTO users (
   role, 
   status, 
   created_at, 
-  updated_at
+  updated_at,
+  activated_at
 ) VALUES 
 
 -- Super Admin test user
@@ -70,6 +79,7 @@ INSERT OR IGNORE INTO users (
   'super_admin', 
   'active', 
   datetime('now'), 
+  datetime('now'),
   datetime('now')
 ),
 
@@ -81,6 +91,7 @@ INSERT OR IGNORE INTO users (
   'user', 
   'active', 
   datetime('now'), 
+  datetime('now'),
   datetime('now')
 ),
 
@@ -92,6 +103,7 @@ INSERT OR IGNORE INTO users (
   'admin', 
   'active', 
   datetime('now'), 
+  datetime('now'),
   datetime('now')
 ),
 
@@ -103,6 +115,7 @@ INSERT OR IGNORE INTO users (
   'user', 
   'active', 
   datetime('now'), 
+  datetime('now'),
   datetime('now')
 ),
 
@@ -113,7 +126,8 @@ INSERT OR IGNORE INTO users (
   'user', 
   'inactive', 
   datetime('now'), 
-  datetime('now')
+  datetime('now'),
+  NULL
 );
 
 -- Verify the inserted users
