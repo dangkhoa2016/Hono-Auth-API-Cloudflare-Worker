@@ -359,6 +359,66 @@
             ]
           },
           "category": "admin"
+        },
+        "GET /api/admin/token-blacklist": {
+          "description": "List blacklisted tokens (Super Admin only)",
+          "method": "GET",
+          "path": "/api/admin/token-blacklist",
+          "permissions": {
+            "public": false,
+            "roles": [
+              "super_admin"
+            ]
+          },
+          "category": "admin"
+        },
+        "POST /api/admin/token-blacklist": {
+          "description": "Manually blacklist a token (Super Admin only)",
+          "method": "POST",
+          "path": "/api/admin/token-blacklist",
+          "permissions": {
+            "public": false,
+            "roles": [
+              "super_admin"
+            ]
+          },
+          "category": "admin"
+        },
+        "GET /api/admin/token-blacklist/:id": {
+          "description": "Get blacklist entry details (Super Admin only)",
+          "method": "GET",
+          "path": "/api/admin/token-blacklist/:id",
+          "permissions": {
+            "public": false,
+            "roles": [
+              "super_admin"
+            ]
+          },
+          "category": "admin"
+        },
+        "POST /api/admin/token-blacklist/bulk-delete": {
+          "description": "Bulk delete blacklist entries (Super Admin only)",
+          "method": "POST",
+          "path": "/api/admin/token-blacklist/bulk-delete",
+          "permissions": {
+            "public": false,
+            "roles": [
+              "super_admin"
+            ]
+          },
+          "category": "admin"
+        },
+        "DELETE /api/admin/token-blacklist/:id": {
+          "description": "Delete blacklist entry (Super Admin only)",
+          "method": "DELETE",
+          "path": "/api/admin/token-blacklist/:id",
+          "permissions": {
+            "public": false,
+            "roles": [
+              "super_admin"
+            ]
+          },
+          "category": "admin"
         }
       },
       "kv_admin": {
@@ -1337,7 +1397,7 @@
       }
     },
     "summary": {
-      "total_routes": 106,
+      "total_routes": 111,
       "total_categories": 12,
       "categories": [
         "system",
@@ -1358,7 +1418,7 @@
         "assets": 5,
         "auth": 4,
         "user": 5,
-        "admin": 9,
+        "admin": 14,
         "kv_admin": 17,
         "audit": 5,
         "advanced_audit": 11,
