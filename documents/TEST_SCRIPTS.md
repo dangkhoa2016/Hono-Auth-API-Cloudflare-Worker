@@ -394,8 +394,7 @@ Comprehensive shell scripts for manual testing of role-based permissions using c
 | `test-system-health.sh` | **System Health Monitoring** | Health endpoints and system status validation |
 | `test-favicon.sh` | **Static Asset Testing** | Favicon and static asset endpoint validation |
 | `test-kv-admin.sh` | **KV Administration Testing** | KV store management and configuration testing |
-| `test-kv-audit-config.sh` | **KV Audit Configuration** | KV audit system configuration validation |
-
+| `test-kv-audit-config.sh` | **KV Audit Configuration** | KV audit system configuration validation || `test-response-capture.sh` | **Debug Response Capture** | Test response body capture dynamic configuration |
 ## 🎯 Enterprise Audit System Testing Scripts
 
 ### Unified Audit Testing

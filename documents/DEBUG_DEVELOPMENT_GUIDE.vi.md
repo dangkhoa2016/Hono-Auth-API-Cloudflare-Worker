@@ -228,6 +228,23 @@ Wrangler log levels điều khiển mức độ chi tiết của wrangler tool, 
 | `error` | Tối thiểu | Nhanh nhất | Production environment |
 | `none` | Im lặng | Nhanh nhất | Testing, CI/CD |
 
+### Ghi Lại Nội Dung Phản Hồi (Dynamic Debugging)
+
+Để debug sâu nội dung phản hồi API mà không cần khởi động lại server, bạn có thể bật tính năng Ghi Lại Nội Dung Phản Hồi (Response Body Capture) thông qua cấu hình KV.
+
+- **Khóa**: `ENABLE_RESPONSE_BODY_CAPTURE`
+- **Tác dụng**: Ghi log toàn bộ nội dung JSON phản hồi cho mỗi request.
+- **Bảo mật**: ⚠️ Ghi lại dữ liệu nhạy cảm. Chỉ sử dụng trong môi trường Development/Test.
+
+**Sử dụng:**
+```bash
+# Bật tính năng
+node tools/kv/kv-config-manager.js set ENABLE_RESPONSE_BODY_CAPTURE true --type boolean
+
+# Tắt tính năng
+node tools/kv/kv-config-manager.js set ENABLE_RESPONSE_BODY_CAPTURE false --type boolean
+```
+
 ---
 
 ## 📦 Phương Thức Sử Dụng

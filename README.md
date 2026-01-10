@@ -36,13 +36,14 @@ A comprehensive Cloudflare Workers project using the Hono.js framework (JavaScri
 
 ## 📚 Documentation Organization
 
-All guides live in [documents](./documents) with English and Vietnamese pairs unless noted otherwise (34 files total: 18 EN, 16 VI).
+All guides live in [documents](./documents) with English and Vietnamese pairs (40 files total: 20 EN, 20 VI).
 
-- **Core guides**: [SETUP_GUIDE.md](documents/SETUP_GUIDE.md), [ROLE_COMPLETE_GUIDE.md](documents/ROLE_COMPLETE_GUIDE.md), [DEBUG_DEVELOPMENT_GUIDE.md](documents/DEBUG_DEVELOPMENT_GUIDE.md), [I18N_MASTER_GUIDE.md](documents/I18N_MASTER_GUIDE.md), [ZOD_GUIDE.md](documents/ZOD_GUIDE.md), [SCHEMAS_GUIDE.md](documents/SCHEMAS_GUIDE.md), [ESLINT_GUIDE.md](documents/ESLINT_GUIDE.md), [WRANGLER_CONFIG_GUIDE.md](documents/WRANGLER_CONFIG_GUIDE.md), [DATABASE_SERVICE.md](documents/DATABASE_SERVICE.md), [DYNAMIC_CONFIG_GUIDE.md](documents/DYNAMIC_CONFIG_GUIDE.md), [MANUAL_SEND_EMAIL_GUIDE.md](documents/MANUAL_SEND_EMAIL_GUIDE.md)
+- **Core guides**: [SETUP_GUIDE.md](documents/SETUP_GUIDE.md), [ROLE_COMPLETE_GUIDE.md](documents/ROLE_COMPLETE_GUIDE.md), [DEBUG_DEVELOPMENT_GUIDE.md](documents/DEBUG_DEVELOPMENT_GUIDE.md), [I18N_MASTER_GUIDE.md](documents/I18N_MASTER_GUIDE.md), [ZOD_GUIDE.md](documents/ZOD_GUIDE.md), [SCHEMAS_GUIDE.md](documents/SCHEMAS_GUIDE.md), [ESLINT_GUIDE.md](documents/ESLINT_GUIDE.md), [WRANGLER_CONFIG_GUIDE.md](documents/WRANGLER_CONFIG_GUIDE.md), [DATABASE_SERVICE.md](documents/DATABASE_SERVICE.md), [DYNAMIC_CONFIG_GUIDE.md](documents/DYNAMIC_CONFIG_GUIDE.md), [MANUAL_SEND_EMAIL_GUIDE.md](documents/MANUAL_SEND_EMAIL_GUIDE.md), [DATABASE_INSPECTION_GUIDE.md](documents/DATABASE_INSPECTION_GUIDE.md)
+- **Feature guides**: [TOKEN_BLACKLIST_GUIDE.md](documents/TOKEN_BLACKLIST_GUIDE.md), [EMAIL_CHANGE_VERIFICATION_GUIDE.md](documents/EMAIL_CHANGE_VERIFICATION_GUIDE.md)
 - **Testing**: [TEST_GUIDE.md](documents/TEST_GUIDE.md) and [TEST_SCRIPTS.md](documents/TEST_SCRIPTS.md)
 - **Enterprise audit**: [ENTERPRISE_AUDIT_SYSTEM_COMPLETE_GUIDE.md](documents/ENTERPRISE_AUDIT_SYSTEM_COMPLETE_GUIDE.md), [AUDIT_API_REFERENCE.md](documents/AUDIT_API_REFERENCE.md), [AUDIT_KV_CONFIGURATION_GUIDE.md](documents/AUDIT_KV_CONFIGURATION_GUIDE.md)
-- **Token security**: [TOKEN_SECURITY_COMPREHENSIVE_GUIDE.md](documents/TOKEN_SECURITY_COMPREHENSIVE_GUIDE.md) (VI) and [TOKEN_SECURITY_COMPREHENSIVE_GUIDE_EN.md](documents/TOKEN_SECURITY_COMPREHENSIVE_GUIDE_EN.md) (EN)
-- **Multi-language**: every guide above has a `_vi` twin where available; token security is provided as separate EN and VI files
+- **Token security**: [TOKEN_SECURITY_COMPREHENSIVE_GUIDE.md](documents/TOKEN_SECURITY_COMPREHENSIVE_GUIDE.md)
+- **Multi-language**: every guide above has a `_vi` twin.
 
 ### 🎯 Quick Start
 1. **Setup**: [documents/SETUP_GUIDE.md](documents/SETUP_GUIDE.md) for multi-environment initialization
