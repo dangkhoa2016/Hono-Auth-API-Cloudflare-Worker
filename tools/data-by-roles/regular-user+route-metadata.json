@@ -1,0 +1,5 @@
+{
+  "success": false,
+  "error": "Access forbidden - insufficient privileges",
+  "message": "Admin access required for this operation"
+}

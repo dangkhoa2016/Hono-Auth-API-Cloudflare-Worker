@@ -47,7 +47,12 @@
       "PUT /api/admin/users/:id/role": "Change user role (Super Admin access required)",
       "GET /api/admin/dashboard": "Get comprehensive dashboard data (admin access required)",
       "GET /api/admin/stats": "Get system statistics (admin access required)",
-      "GET /api/admin/system-health": "Get comprehensive system health status (admin access required)"
+      "GET /api/admin/system-health": "Get comprehensive system health status (admin access required)",
+      "GET /api/admin/token-blacklist": "List blacklisted tokens (Super Admin only)",
+      "POST /api/admin/token-blacklist": "Manually blacklist a token (Super Admin only)",
+      "GET /api/admin/token-blacklist/:id": "Get blacklist entry details (Super Admin only)",
+      "POST /api/admin/token-blacklist/bulk-delete": "Bulk delete blacklist entries (Super Admin only)",
+      "DELETE /api/admin/token-blacklist/:id": "Delete blacklist entry (Super Admin only)"
     },
     "kv_admin": {
       "GET /api/kv-admin/configs": "View KV configurations (Super Admin only)",
@@ -142,8 +147,8 @@
     }
   },
   "route_summary": {
-    "total_available": 106,
-    "total_system": 106,
+    "total_available": 111,
+    "total_system": 111,
     "categories": [
       "system",
       "assets",
