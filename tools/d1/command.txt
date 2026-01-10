@@ -32,13 +32,13 @@ npx wrangler@latest d1 execute DB --local --env test --command "SELECT id, email
 npx wrangler@latest d1 execute hono-auth-api-db-development --local --command="SELECT * FROM Users"
 => ✘ [ERROR] Couldn't find a D1 DB with the name or binding 'hono-auth-api-db-development' in your wrangler@latest.toml file.
 
-npx wrangler@latest d1 execute hono-auth-api-worker-test --env test --command="SELECT * FROM Users"
-=> ✘ [ERROR] Couldn't find a D1 DB with the name or binding 'hono-auth-api-worker-test' in your wrangler@latest.toml file.
+npx wrangler@latest d1 execute hono-auth-api-cloudflare-worker-test --env test --command="SELECT * FROM Users"
+=> ✘ [ERROR] Couldn't find a D1 DB with the name or binding 'hono-auth-api-cloudflare-worker-test' in your wrangler@latest.toml file.
 
-npx wrangler@latest d1 execute hono-auth-api-worker-test --local --command="SELECT * FROM Users"
-=> ✘ [ERROR] Couldn't find a D1 DB with the name or binding 'hono-auth-api-worker-test' in your wrangler@latest.toml file.
+npx wrangler@latest d1 execute hono-auth-api-cloudflare-worker-test --local --command="SELECT * FROM Users"
+=> ✘ [ERROR] Couldn't find a D1 DB with the name or binding 'hono-auth-api-cloudflare-worker-test' in your wrangler@latest.toml file.
 
-npx wrangler@latest d1 execute hono-auth-api-worker-test --env TEST --command="SELECT * FROM Users"
+npx wrangler@latest d1 execute hono-auth-api-cloudflare-worker-test --env TEST --command="SELECT * FROM Users"
 => 
 ✘ [ERROR] Processing wrangler@latest.toml configuration:
 

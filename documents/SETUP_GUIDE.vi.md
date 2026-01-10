@@ -7,7 +7,7 @@
 ### 1. Clone và cài đặt dependencies
 ```bash
 git clone <repository-url>
-cd hono-auth-api-worker
+cd hono-auth-api-cloudflare-worker
 npm install
 ```
 

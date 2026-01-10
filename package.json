@@ -1,5 +1,5 @@
 {
-  "name": "hono-auth-api-worker",
+  "name": "hono-auth-api-cloudflare-worker",
   "version": "1.0.0",
   "description": "Hono.js authentication worker with Cloudflare D1",
   "type": "module",

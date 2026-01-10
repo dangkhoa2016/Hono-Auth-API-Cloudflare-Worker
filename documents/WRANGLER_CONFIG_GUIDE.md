@@ -57,7 +57,7 @@ nano .dev.vars.staging
 #### Development Environment
 ```toml
 [env.development]
-name = "hono-auth-api-worker-development"
+name = "hono-auth-api-cloudflare-worker-development"
 [[env.development.d1_databases]]
 binding = "DB"
 database_name = "hono-auth-api-db-development"
@@ -69,7 +69,7 @@ migrations_dir = "migrations"
 #### Test Environment  
 ```toml
 [env.test]
-name = "hono-auth-api-worker-test"
+name = "hono-auth-api-cloudflare-worker-test"
 [[env.test.d1_databases]]
 binding = "DB"
 database_name = "hono-auth-api-db-test"
@@ -81,7 +81,7 @@ migrations_dir = "migrations"
 #### Staging Environment
 ```toml
 [env.staging]
-name = "hono-auth-api-worker-staging"
+name = "hono-auth-api-cloudflare-worker-staging"
 [[env.staging.d1_databases]]
 binding = "DB"
 database_name = "hono-auth-api-db-staging" 
@@ -225,7 +225,7 @@ npm run dev
 ### Environment Not Loading Correctly
 ```bash
 # Verify environment name in wrangler.toml
-# Should match: hono-auth-api-worker-{environment}
+# Should match: hono-auth-api-cloudflare-worker-{environment}
 
 # Check dev command uses correct environment
 npm run dev          # Should use [env.development] 
