@@ -1,4 +1,4 @@
-name = "hono-auth-api-worker"
+name = "hono-auth-api-cloudflare-worker"
 main = "src/index.js"
 compatibility_date = "2024-01-01"
 
@@ -23,7 +23,7 @@ preview_database_id = "YOUR_STAGING_DATABASE_ID"
 
 # DEVELOPMENT environment
 [env.development]
-name = "hono-auth-api-worker-development"
+name = "hono-auth-api-cloudflare-worker-development"
 [[env.development.d1_databases]]
 binding = "DB"
 database_name = "hono-auth-api-db-development"
@@ -34,7 +34,7 @@ migrations_dir = "migrations"
 
 # TEST environment
 [env.test]
-name = "hono-auth-api-worker-test"
+name = "hono-auth-api-cloudflare-worker-test"
 [[env.test.d1_databases]]
 binding = "DB"
 database_name = "hono-auth-api-db-test"
@@ -45,7 +45,7 @@ migrations_dir = "migrations"
 
 # STAGING environment
 [env.staging]
-name = "hono-auth-api-worker-staging"
+name = "hono-auth-api-cloudflare-worker-staging"
 [[env.staging.d1_databases]]
 binding = "DB"
 database_name = "hono-auth-api-db-staging"
