@@ -131,63 +131,163 @@ export class BaseSchemaBuilder {
   }
 
   /**
-   * Email validation schema
+   * Helper to create validation with required check and early return
+   * @param {Object} params - Validation parameters
+   * @param {string} params.fieldName - Field name for translation keys
+   * @param {boolean} params.required - Whether field is required
+   * @param {Function} params.additionalValidations - Additional validation logic
+   * @param {boolean} params.applySanitization - Whether to apply sanitization
+   * @returns {z.ZodString} Zod string schema
    */
-  email(required = true) {
+  createValidatedString({ fieldName, required = true, additionalValidations, applySanitization = false }) {
     let schema = z.string({
-      required_error: required ? tl(this.lang, 'validation.fieldRequired.email') : undefined
+      required_error: required ? tl(this.lang, `validation.fieldRequired.${fieldName}`) : undefined
     });
 
     if (required) {
-      schema = schema.min(1, { message: tl(this.lang, 'validation.fieldRequired.email') });
+      schema = schema.superRefine((val, ctx) => {
+        // Check empty first - if empty, only return this error and stop
+        if (!val || val.length === 0) {
+          ctx.addIssue({
+            code: z.ZodIssueCode.too_small,
+            minimum: 1,
+            type: 'string',
+            inclusive: true,
+            message: tl(this.lang, `validation.fieldRequired.${fieldName}`)
+          });
+          return z.NEVER; // Stop further validation
+        }
+        
+        // Run additional validations only if not empty
+        if (additionalValidations) {
+          additionalValidations(val, ctx, this.lang);
+        }
+      });
+
+      // Apply sanitization if needed
+      if (applySanitization) {
+        schema = schema.transform((val, ctx) => sanitizeInput(val, ctx, this.lang));
+      }
     }
 
-    return schema
-      .email({ message: tl(this.lang, 'validation.formatValidation.email.invalid') })
-      .max(SCHEMA_CONFIG.EMAIL_MAX_LENGTH, {
-        message: tl(this.lang, 'validation.lengthValidation.email.tooLong', { maxLength: SCHEMA_CONFIG.EMAIL_MAX_LENGTH })
-      })
-      .transform((val, ctx) => sanitizeInput(val, ctx, this.lang));
+    return schema;
+  }
+
+  /**
+   * Email validation schema
+   */
+  email(required = true) {
+    if (required) {
+      return this.createValidatedString({
+        fieldName: 'email',
+        required: true,
+        applySanitization: true,
+        additionalValidations: (val, ctx, lang) => {
+          // Check email format
+          const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+          if (!emailRegex.test(val)) {
+            ctx.addIssue({
+              code: z.ZodIssueCode.invalid_string,
+              validation: 'email',
+              message: tl(lang, 'validation.formatValidation.email.invalid')
+            });
+          }
+          
+          // Check maximum length
+          if (val.length > SCHEMA_CONFIG.EMAIL_MAX_LENGTH) {
+            ctx.addIssue({
+              code: z.ZodIssueCode.too_big,
+              maximum: SCHEMA_CONFIG.EMAIL_MAX_LENGTH,
+              type: 'string',
+              inclusive: true,
+              message: tl(lang, 'validation.lengthValidation.email.tooLong', { maxLength: SCHEMA_CONFIG.EMAIL_MAX_LENGTH })
+            });
+          }
+        }
+      });
+    } else {
+      return z.string()
+        .email({ message: tl(this.lang, 'validation.formatValidation.email.invalid') })
+        .max(SCHEMA_CONFIG.EMAIL_MAX_LENGTH, {
+          message: tl(this.lang, 'validation.lengthValidation.email.tooLong', { maxLength: SCHEMA_CONFIG.EMAIL_MAX_LENGTH })
+        })
+        .transform((val, ctx) => sanitizeInput(val, ctx, this.lang));
+    }
   }
 
   /**
    * Password validation schema
    */
   password(required = true) {
-    let schema = z.string({
-      required_error: required ? tl(this.lang, 'validation.fieldRequired.password') : undefined
-    });
-
     if (required) {
-      schema = schema.min(1, { message: tl(this.lang, 'validation.fieldRequired.password') });
-    }
-
-    return schema
-      .min(SCHEMA_CONFIG.PASSWORD_MIN_LENGTH, {
-        message: tl(this.lang, 'validation.lengthValidation.password.tooShort', { minLength: SCHEMA_CONFIG.PASSWORD_MIN_LENGTH })
-      })
-      .max(SCHEMA_CONFIG.PASSWORD_MAX_LENGTH, {
-        message: tl(this.lang, 'validation.lengthValidation.password.tooLong', { maxLength: SCHEMA_CONFIG.PASSWORD_MAX_LENGTH })
+      return this.createValidatedString({
+        fieldName: 'password',
+        required: true,
+        applySanitization: false,
+        additionalValidations: (val, ctx, lang) => {
+          // Check minimum length
+          if (val.length < SCHEMA_CONFIG.PASSWORD_MIN_LENGTH) {
+            ctx.addIssue({
+              code: z.ZodIssueCode.too_small,
+              minimum: SCHEMA_CONFIG.PASSWORD_MIN_LENGTH,
+              type: 'string',
+              inclusive: true,
+              message: tl(lang, 'validation.lengthValidation.password.tooShort', { minLength: SCHEMA_CONFIG.PASSWORD_MIN_LENGTH })
+            });
+          }
+          
+          // Check maximum length
+          if (val.length > SCHEMA_CONFIG.PASSWORD_MAX_LENGTH) {
+            ctx.addIssue({
+              code: z.ZodIssueCode.too_big,
+              maximum: SCHEMA_CONFIG.PASSWORD_MAX_LENGTH,
+              type: 'string',
+              inclusive: true,
+              message: tl(lang, 'validation.lengthValidation.password.tooLong', { maxLength: SCHEMA_CONFIG.PASSWORD_MAX_LENGTH })
+            });
+          }
+        }
       });
+    } else {
+      return z.string()
+        .min(SCHEMA_CONFIG.PASSWORD_MIN_LENGTH, {
+          message: tl(this.lang, 'validation.lengthValidation.password.tooShort', { minLength: SCHEMA_CONFIG.PASSWORD_MIN_LENGTH })
+        })
+        .max(SCHEMA_CONFIG.PASSWORD_MAX_LENGTH, {
+          message: tl(this.lang, 'validation.lengthValidation.password.tooLong', { maxLength: SCHEMA_CONFIG.PASSWORD_MAX_LENGTH })
+        });
+    }
   }
 
   /**
    * Name validation schema (for user names, rule names, etc.)
    */
   name(required = true) {
-    let schema = z.string({
-      required_error: required ? tl(this.lang, 'validation.fieldRequired.name') : undefined
-    });
-
     if (required) {
-      schema = schema.min(1, { message: tl(this.lang, 'validation.fieldRequired.name') });
+      return this.createValidatedString({
+        fieldName: 'name',
+        required: true,
+        applySanitization: true,
+        additionalValidations: (val, ctx, lang) => {
+          // Check maximum length
+          if (val.length > SCHEMA_CONFIG.NAME_MAX_LENGTH) {
+            ctx.addIssue({
+              code: z.ZodIssueCode.too_big,
+              maximum: SCHEMA_CONFIG.NAME_MAX_LENGTH,
+              type: 'string',
+              inclusive: true,
+              message: tl(lang, 'validation.lengthValidation.name.tooLong', { maxLength: SCHEMA_CONFIG.NAME_MAX_LENGTH })
+            });
+          }
+        }
+      });
+    } else {
+      return z.string()
+        .max(SCHEMA_CONFIG.NAME_MAX_LENGTH, {
+          message: tl(this.lang, 'validation.lengthValidation.name.tooLong', { maxLength: SCHEMA_CONFIG.NAME_MAX_LENGTH })
+        })
+        .transform((val, ctx) => sanitizeInput(val, ctx, this.lang));
     }
-
-    return schema
-      .max(SCHEMA_CONFIG.NAME_MAX_LENGTH, {
-        message: tl(this.lang, 'validation.lengthValidation.name.tooLong', { maxLength: SCHEMA_CONFIG.NAME_MAX_LENGTH })
-      })
-      .transform((val, ctx) => sanitizeInput(val, ctx, this.lang));
   }
 
   /**
