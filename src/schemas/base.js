@@ -159,7 +159,7 @@ export class BaseSchemaBuilder {
           });
           return z.NEVER; // Stop further validation
         }
-        
+
         // Run additional validations only if not empty
         if (additionalValidations) {
           additionalValidations(val, ctx, this.lang);
@@ -194,7 +194,7 @@ export class BaseSchemaBuilder {
               message: tl(lang, 'validation.formatValidation.email.invalid')
             });
           }
-          
+
           // Check maximum length
           if (val.length > SCHEMA_CONFIG.EMAIL_MAX_LENGTH) {
             ctx.addIssue({
@@ -237,7 +237,7 @@ export class BaseSchemaBuilder {
               message: tl(lang, 'validation.lengthValidation.password.tooShort', { minLength: SCHEMA_CONFIG.PASSWORD_MIN_LENGTH })
             });
           }
-          
+
           // Check maximum length
           if (val.length > SCHEMA_CONFIG.PASSWORD_MAX_LENGTH) {
             ctx.addIssue({

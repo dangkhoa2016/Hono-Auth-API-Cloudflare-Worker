@@ -482,7 +482,7 @@ class RealtimeMonitoringTest {
       if (rulesResponse.status !== 200 && rulesResponse.status !== 403) {
         this.logger.error(`Get alert rules failed with status ${rulesResponse.status}`);
         if (rulesResponse.data) {
-           this.logger.error(`Response data: ${JSON.stringify(rulesResponse.data, null, 2)}`);
+          this.logger.error(`Response data: ${JSON.stringify(rulesResponse.data, null, 2)}`);
         }
       }
 
