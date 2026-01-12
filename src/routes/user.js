@@ -154,7 +154,18 @@ user.post('/register', i18nValidatorsMiddleware.register(), async (c) => {
       }
     }
 
-    const successKey = featureFlags.autoActivateUserOnRegister ? 'user.registered' : 'user.registeredPendingActivation';
+    // Determine appropriate success message based on registration flow
+    let successKey;
+    if (featureFlags.autoActivateUserOnRegister) {
+      // Account is auto-activated, ready to use
+      successKey = 'user.registered';
+    } else if (emailStatus.skipped && emailStatus.reason === 'EMAIL_DISABLED') {
+      // Email sending is disabled by admin, user needs manual activation
+      successKey = 'user.registeredEmailDisabled';
+    } else {
+      // Normal flow: email sent or attempted, user should check email
+      successKey = 'user.registeredPendingActivation';
+    }
 
     const safeUserData = { ...result.data };
     delete safeUserData.activation_token;
@@ -165,7 +176,7 @@ user.post('/register', i18nValidatorsMiddleware.register(), async (c) => {
       email_notification: emailStatus
     }, tSuccess(c, successKey, {
       userName: full_name,
-      userRole: result.data.role || ROLES.USER
+      userRole: (result.data.role || ROLES.USER).toUpperCase()
     })), 201);
 
   } catch (error) {

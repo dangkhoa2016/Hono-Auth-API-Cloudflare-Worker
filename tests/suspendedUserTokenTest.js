@@ -3,7 +3,7 @@
 /**
  * Suspended User Token Test Suite
  * specific test to verify that a suspended user's token is immediately invalidated or rejected.
- * 
+ *
  * Scenario:
  * 1. An active user logs in and gets a valid token.
  * 2. An admin suspends the user account.
