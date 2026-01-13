@@ -45,6 +45,9 @@ class AuthTests {
   async runAll() {
     this.logger.logSuiteHeader('🔐 Starting Authentication Tests');
 
+    // Ensure rate limit state is clean before running any auth flows
+    await this._resetRateLimits();
+
     const tests = [
       this.testUserRegistration,
       this.testRegistrationRequiresActivation,
@@ -946,6 +949,24 @@ class AuthTests {
     }
 
     clearServiceCaches();
+  }
+
+  async _resetRateLimits() {
+    try {
+      const adminClient = await this._getSuperAdminClient();
+
+      const prefixes = ['ratelimit:', 'hono-auth-api:ratelimit:'];
+      for (const prefix of prefixes) {
+        const resp = await adminClient.post(API_ENDPOINTS.kvAdminRateLimitClean, { prefix });
+        if (resp.status !== 200 || !resp.data?.success) {
+          this.logger.warning(`Rate limit reset did not return success for prefix ${prefix}`);
+        } else {
+          this.logger.info(`Rate limit keys cleared for prefix ${prefix}`);
+        }
+      }
+    } catch (error) {
+      this.logger.warning(`Unable to reset rate limits before tests: ${error.message}`);
+    }
   }
 }
 

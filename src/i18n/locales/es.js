@@ -420,6 +420,7 @@ export default {
     },
     'auth': {
       'accountDisabled': 'La cuenta de usuario {{userName}} está deshabilitada por el administrador',
+      'accountInactive': 'Tu cuenta está inactiva. Actívala por correo electrónico o contacta con el soporte.',
       'accountLocked': 'Cuenta bloqueada durante {{duration, time}} debido a intentos fallidos de inicio de sesión',
       'accountNotVerified': 'La dirección de correo electrónico para {{userName}} no está verificada',
       'cannotAccessOtherUsers': 'No se puede acceder a recursos de otros usuarios',

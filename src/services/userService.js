@@ -31,7 +31,7 @@ export class UserService extends BaseService {
 
     try {
       const user = await this.dbService.select(
-        'SELECT id, full_name, email, password, role, status FROM users WHERE email = ?',
+        'SELECT id, full_name, email, password, role, status, disabled_by_admin FROM users WHERE email = ?',
         [email],
         true
       );
@@ -59,7 +59,7 @@ export class UserService extends BaseService {
 
     try {
       const user = await this.dbService.select(
-        'SELECT id, full_name, email, new_email, role, status, created_at FROM users WHERE id = ?',
+        'SELECT id, full_name, email, new_email, role, status, created_at, disabled_by_admin FROM users WHERE id = ?',
         [id],
         true
       );

@@ -420,6 +420,7 @@ export default {
     },
     'auth': {
       'accountDisabled': 'Tài khoản người dùng {{userName}} bị vô hiệu hóa bởi quản trị viên',
+      'accountInactive': 'Tài khoản của bạn chưa được kích hoạt. Vui lòng kích hoạt qua email hoặc liên hệ hỗ trợ.',
       'accountLocked': 'Tài khoản bị khóa trong {{duration, time}} do lần thử đăng nhập thất bại',
       'accountNotVerified': 'Địa chỉ email cho {{userName}} chưa được xác minh',
       'cannotAccessOtherUsers': 'Không thể truy cập tài nguyên của người dùng khác',
