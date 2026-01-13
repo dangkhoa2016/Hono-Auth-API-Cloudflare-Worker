@@ -92,8 +92,8 @@ export class AuthService extends BaseService {
       const user = await this.userService.findByEmail(email);
       authService_log(`User found: ${user ? 'YES' : 'NO'}`);
 
-      if (!user || user.status !== 'active') {
-        authService_log(`Login failed: user not found or inactive for email: ${email}`);
+      if (!user) {
+        authService_log(`Login failed: user not found for email: ${email}`);
 
         if (!isRateLimitDisabled) {
           const ops = [
@@ -151,6 +151,25 @@ export class AuthService extends BaseService {
         return {
           success: false,
           error: 'INVALID_CREDENTIALS',
+          statusCode: 401
+        };
+      }
+
+      // Credentials are valid; now enforce account state constraints
+      if (user.disabled_by_admin) {
+        authService_log(`Login blocked after password check: user disabled by admin for email: ${email}`);
+        return {
+          success: false,
+          error: 'ACCOUNT_DISABLED',
+          statusCode: 403
+        };
+      }
+
+      if (user.status !== 'active') {
+        authService_log(`Login blocked after password check: user inactive for email: ${email}`);
+        return {
+          success: false,
+          error: 'ACCOUNT_INACTIVE',
           statusCode: 401
         };
       }

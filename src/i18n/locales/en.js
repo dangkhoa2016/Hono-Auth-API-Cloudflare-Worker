@@ -420,6 +420,7 @@ export default {
     },
     'auth': {
       'accountDisabled': 'User account {{userName}} is disabled by administrator',
+      'accountInactive': 'Your account is inactive. Please activate it via email or contact support.',
       'accountLocked': 'Account locked for {{duration, time}} due to failed login attempts',
       'accountNotVerified': 'Email address for {{userName}} is not verified',
       'cannotAccessOtherUsers': 'Cannot access other users\' resources',

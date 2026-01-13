@@ -33,7 +33,7 @@ export async function getDynamicConfig(env, key, defaultValue = null, preferKV =
       const kvValue = await kvConfig.get(key);
       if (kvValue !== null && kvValue !== undefined) {
         dynamicConfig_log(`Dynamic config from cloudflare KV: ${key} = ${kvValue}`);
-        return kvValue;
+        return parseEnvValue(kvValue);
       }
 
       // Fallback to env
@@ -58,7 +58,7 @@ export async function getDynamicConfig(env, key, defaultValue = null, preferKV =
         const kvValue = await kvConfig.get(key);
         if (kvValue !== null && kvValue !== undefined) {
           dynamicConfig_log(`Dynamic config fallback to KV: ${key} = ${kvValue}`);
-          return kvValue;
+          return parseEnvValue(kvValue);
         }
       }
 

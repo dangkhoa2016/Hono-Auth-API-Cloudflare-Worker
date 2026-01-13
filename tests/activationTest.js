@@ -302,7 +302,7 @@ class ActivationTests {
     // Admin disables the account (need super admin)
     const updateResponse = await this.superAdminClient.put(
       `${API_ENDPOINTS.adminUsers}/${user.id}`,
-      { status: 'inactive' }
+      { disabled_by_admin: true }
     );
 
     if (updateResponse.status !== 200) {
