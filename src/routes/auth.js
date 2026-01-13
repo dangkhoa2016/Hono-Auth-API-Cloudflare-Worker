@@ -63,8 +63,22 @@ auth.post('/login', strictRateLimitMiddleware, i18nValidatorsMiddleware.login(),
         }, statusCode);
       }
 
+      const errorKeyMap = {
+        RATE_LIMIT_EXCEEDED: 'auth.rateLimitExceeded',
+        INVALID_CREDENTIALS: 'auth.invalidCredentials',
+        ACCOUNT_INACTIVE: 'auth.accountInactive',
+        ACCOUNT_DISABLED: 'auth.accountDisabled'
+      };
+
+      const errorKey = errorKeyMap[result.error] || 'auth.loginFailedGeneric';
+
+      // Provide i18n interpolation params when available (e.g., {{userName}})
+      const i18nParams = (result.error === 'ACCOUNT_DISABLED' || result.error === 'ACCOUNT_INACTIVE')
+        ? { userName: email }
+        : {};
+
       // Directly map error key for standardized handler; statusCode carries original 4xx/429
-      return await handleStandardError(c, new Error(result.error || 'LOGIN_ERROR'), 'Login failed (client domain)', authRoutes_log, result.error === 'RATE_LIMIT_EXCEEDED' ? 'auth.rateLimitExceeded' : result.error === 'INVALID_CREDENTIALS' ? 'auth.invalidCredentials' : 'auth.loginFailedGeneric', {}, statusCode);
+      return await handleStandardError(c, new Error(result.error || 'LOGIN_ERROR'), 'Login failed (client domain)', authRoutes_log, errorKey, i18nParams, statusCode);
     }
 
     // Set user info in context for middleware audit logging

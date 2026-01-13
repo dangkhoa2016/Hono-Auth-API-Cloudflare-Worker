@@ -420,6 +420,7 @@ export default {
     },
     'auth': {
       'accountDisabled': 'ユーザーアカウント {{userName}} は管理者によって無効にされています',
+      'accountInactive': 'アカウントは無効状態です。メールで有効化するか、サポートに連絡してください。',
       'accountLocked': 'ログイン試行の失敗によりアカウントが {{duration, time}} ロックされています',
       'accountNotVerified': '{{userName}} のメールアドレスは認証されていません',
       'cannotAccessOtherUsers': '他のユーザーのリソースにアクセスできません',
