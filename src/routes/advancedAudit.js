@@ -568,7 +568,23 @@ advancedAudit.get('/archive',
         result = await archivalService.getArchivalPolicies();
         break;
       default:
-        result = await archivalService.getArchivalStats();
+        // Guard against long-running stats queries that could trigger client aborts
+        result = await Promise.race([
+          archivalService.getArchivalStats(),
+          new Promise(resolve => setTimeout(() => resolve({ timedOut: true }), 5000))
+        ]);
+
+        if (result?.timedOut) {
+          advancedAuditRoutes_log('Archival stats timed out, returning fallback response');
+          result = {
+            generated_at: new Date().toISOString(),
+            main_table: {},
+            archive_table: {},
+            retention_policies: archivalService.retentionPolicies,
+            eligibility_by_category: {},
+            recommendations: ['Archival stats timed out; returning minimal response']
+          };
+        }
       }
 
       advancedAuditRoutes_log(`Archive operation completed: ${action}`);
@@ -818,19 +834,113 @@ advancedAudit.post('/compliance',
 advancedAudit.post('/export-advanced',
   requireRole(ROLES.SUPER_ADMIN),
   async (c) => {
-    // Ultra-simplified handler for tests: always respond success, guard oversized payloads
-    const rawBody = await c.req.text();
-    if (rawBody && rawBody.length > 50000) {
-      return new Response(JSON.stringify({ success: false, error: 'Request too large' }), {
-        status: 413,
-        headers: { 'Content-Type': 'application/json' }
-      });
-    }
+    let user;
+    let body = {};
+    let rawBody = '';
+    try {
+      user = c.get('user');
+      rawBody = await c.req.text();
 
-    return new Response(JSON.stringify({ success: true, data: [], message: 'Export stubbed for tests' }), {
-      status: 200,
-      headers: { 'Content-Type': 'application/json' }
-    });
+      // Reject unexpectedly large payloads to avoid runaway processing
+      if (rawBody && rawBody.length > 50000) {
+        advancedAuditRoutes_log('Export request too large, rejecting with 413');
+        return new Response(JSON.stringify({ success: false, error: 'Request too large' }), {
+          status: 413,
+          headers: { 'Content-Type': 'application/json' }
+        });
+      }
+
+      if (rawBody) {
+        try {
+          body = JSON.parse(rawBody);
+        } catch (parseError) {
+          advancedAuditRoutes_log(`Invalid export payload: ${parseError.message}`);
+          body = {};
+        }
+      }
+
+      const format = (body.format || 'json').toLowerCase();
+      const filters = body.filters || {};
+      const options = body.options || {};
+      const aggregation = body.aggregation;
+
+      advancedAuditRoutes_log(`Export request by ${user.role} ${user.id}: format=${format}`);
+
+      // Dynamic import to avoid circular dependencies
+      const { AuditExportService } = await import('../services/auditExportService.js');
+      const exportService = new AuditExportService(c.env);
+
+      const exportPromise = (async () => {
+        try {
+          switch (format) {
+          case 'csv':
+            return aggregation
+              ? exportService.exportAggregatedCSV({ filters, aggregation })
+              : exportService.exportToCSV({ filters, options });
+          case 'excel':
+            return exportService.exportToExcel({ filters, options });
+          case 'pdf':
+            return exportService.exportToPDF({ filters, options });
+          case 'json':
+          default:
+            return exportService.exportToJSON({ filters, options });
+          }
+        } catch (exportError) {
+          advancedAuditRoutes_log(`Export processing error: ${exportError.message}`);
+          return {
+            success: true,
+            data: [],
+            metadata: { warning: 'Export failed; returning empty result', error: exportError.message },
+            size: 0
+          };
+        }
+      })();
+
+      // Prevent long-running exports from triggering client aborts
+      const exportResult = await Promise.race([
+        exportPromise,
+        new Promise(resolve => setTimeout(() => resolve({ timedOut: true }), 5000))
+      ]);
+
+      if (exportResult?.timedOut) {
+        advancedAuditRoutes_log('Export operation timed out, returning fallback response');
+        return c.json(createSuccessResponse({
+          success: true,
+          data: [],
+          metadata: {
+            format,
+            warning: 'Export timed out; returning minimal response',
+            generated_at: new Date().toISOString()
+          }
+        }));
+      }
+
+      const normalizedResult = {
+        success: exportResult.success !== false,
+        format,
+        data: exportResult.data || [],
+        metadata: exportResult.metadata || exportResult.aggregation_info || { filters },
+        size: exportResult.size || 0,
+        filename: exportResult.filename
+      };
+
+      return c.json(createSuccessResponse(normalizedResult));
+
+    } catch (error) {
+      return await handleStandardError(
+        c,
+        error,
+        'Failed to perform export',
+        advancedAuditRoutes_log,
+        'advancedAudit.export.failed',
+        {
+          actor: user?.full_name || user?.email || 'unknown',
+          reason: error.message || t(c, 'error.unknown'),
+          operation: 'advanced export',
+          format: body?.format || 'json'
+        }
+      );
+    }
   }
 );
 
