@@ -7,6 +7,7 @@ import { authMiddleware } from '../middleware/auth.js';
 import { getAllRoutes } from '../constants/routeRegistry.js';
 import { unifiedMiddlewares } from '../middleware/unifiedRequestMiddleware.js';
 import { ROLES, ROLE_COMBINATIONS } from '../constants/roles.js';
+const EXCLUDE_API_INFO = ['assets', 'user', 'auth'];
 
 const api = new Hono();
 // Apply auto middleware for all API system routes
@@ -46,6 +47,11 @@ api.get('/api', authMiddleware, async (c) => {
   const userRole = currentUser.role;
 
   Object.keys(routeRegistry).forEach(category => {
+    // Hide category routes from /api response as they are not useful to end users
+    if (EXCLUDE_API_INFO.includes(category)) {
+      return;
+    }
+
     const categoryRoutes = routeRegistry[category];
     const filteredCategoryRoutes = {};
 
