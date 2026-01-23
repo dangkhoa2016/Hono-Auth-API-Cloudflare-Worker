@@ -43,6 +43,38 @@ class SuperAdminUserTests {
     this.createdUserIds = [];
   }
 
+  wait(ms) {
+    return new Promise(resolve => setTimeout(resolve, ms));
+  }
+
+  generateUniqueEmail(baseEmail) {
+    const [local, domain = 'example.com'] = baseEmail.split('@');
+    return `${local}_${Date.now()}@${domain}`;
+  }
+
+  async createUserForTest(userData, contextLabel) {
+    const attempts = 3;
+    let payload = { ...userData };
+    let lastResponse;
+
+    for (let attempt = 1; attempt <= attempts; attempt++) {
+      const response = await this.client.post(API_ENDPOINTS.adminUsers, payload);
+      lastResponse = response;
+
+      const userId = response?.data?.data?.id;
+      if (response.status === 201 && response?.data?.success && userId) {
+        this.createdUserIds.push(userId);
+        return { userId, response };
+      }
+
+      this.logger.warning(`[${contextLabel}] Create attempt ${attempt}/${attempts} failed (status ${response.status}). Retrying...`);
+      payload = { ...userData, email: this.generateUniqueEmail(userData.email) };
+      await this.wait(150 * attempt);
+    }
+
+    throw new Error(`[${contextLabel}] Failed to create test user. Last response: ${JSON.stringify(lastResponse?.data)}`);
+  }
+
   async runAll() {
     this.logger.logSuiteHeader('🔧 Starting Super Admin User Role Tests');
 
@@ -215,10 +247,7 @@ class SuperAdminUserTests {
         role: 'user'
       };
 
-      const createResponse = await this.client.post(API_ENDPOINTS.adminUsers, testUser);
-
-      const userId = createResponse.data.data.id;
-      this.createdUserIds.push(userId);
+      const { userId } = await this.createUserForTest(testUser, 'testUpdateUserWithoutRole');
 
       // Test update without role parameter
       const updateData = {
@@ -254,10 +283,7 @@ class SuperAdminUserTests {
         role: 'user'
       };
 
-      const createResponse = await this.client.post(API_ENDPOINTS.adminUsers, testUser);
-
-      const userId = createResponse.data.data.id;
-      this.createdUserIds.push(userId);
+      const { userId } = await this.createUserForTest(testUser, 'testChangeUserRole');
 
       // Test role change via dedicated endpoint
       const roleChangeData = {
