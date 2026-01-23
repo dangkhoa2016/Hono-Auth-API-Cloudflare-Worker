@@ -18,26 +18,6 @@
       "GET /api": "Comprehensive API information and endpoints",
       "GET /route-metadata": "System route discovery (admin only)"
     },
-    "assets": {
-      "GET /favicon": "Favicon and icon resources",
-      "GET /favicon.ico": "Favicon and icon resources",
-      "GET /favicon.png": "Favicon and icon resources",
-      "GET /apple-touch-icon.png": "Favicon and icon resources",
-      "GET /icon-192.png": "Favicon and icon resources"
-    },
-    "auth": {
-      "POST /api/auth/login": "Login with email and password",
-      "POST /api/auth/refresh_token": "Refresh access token",
-      "POST /api/auth/logout": "Logout and invalidate tokens",
-      "POST /api/auth/logout-all": "Logout from all devices (revoke all tokens)"
-    },
-    "user": {
-      "POST /api/user/register": "Register new user",
-      "GET /api/user/profile": "Get user profile (requires authentication)",
-      "PUT /api/user/profile": "Update user profile (requires authentication)",
-      "GET /api/user/me": "Get current user info (requires authentication)",
-      "POST /api/user/change-password": "Change password (requires authentication)"
-    },
     "admin": {
       "GET /api/admin/users": "List all users (admin access required)",
       "POST /api/admin/users": "Create new user (admin access required)",
@@ -123,13 +103,10 @@
     }
   },
   "route_summary": {
-    "total_available": 89,
+    "total_available": 75,
     "total_system": 111,
     "categories": [
       "system",
-      "assets",
-      "auth",
-      "user",
       "admin",
       "audit",
       "advanced_audit",
