@@ -88,6 +88,31 @@ class UnifiedTestSuite {
     this.testUsers = {};
   }
 
+  wait(ms) {
+    return new Promise(resolve => setTimeout(resolve, ms));
+  }
+
+  async loginWithRetry(credentials, label, attempts = 3) {
+    let lastError;
+
+    for (let attempt = 1; attempt <= attempts; attempt++) {
+      try {
+        const response = await this.client.post(API_ENDPOINTS.login, credentials);
+        this.assert.assertSuccess(response, label);
+        return response;
+      } catch (error) {
+        lastError = error;
+        this.logger.warning(`[loginWithRetry] ${label} attempt ${attempt}/${attempts} failed: ${error.message}`);
+
+        if (attempt < attempts) {
+          await this.wait(300 * attempt);
+        }
+      }
+    }
+
+    throw lastError;
+  }
+
   /**
    * Setup authentication for all roles
    */
@@ -96,24 +121,21 @@ class UnifiedTestSuite {
       this.logger.info('Setting up authentication for all roles...');
 
       // Regular user authentication
-      const regularLogin = await this.client.post(API_ENDPOINTS.login, TEST_USERS.regular);
-      this.assert.assertSuccess(regularLogin, 'Regular user login');
+      const regularLogin = await this.loginWithRetry(TEST_USERS.regular, 'Regular user login');
       this.tokens.regular = {
         accessToken: regularLogin.data.data.access_token,
         refreshToken: regularLogin.data.data.refresh_token
       };
 
       // Admin user authentication
-      const adminLogin = await this.client.post(API_ENDPOINTS.login, TEST_USERS.admin);
-      this.assert.assertSuccess(adminLogin, 'Admin user login');
+      const adminLogin = await this.loginWithRetry(TEST_USERS.admin, 'Admin user login');
       this.tokens.admin = {
         accessToken: adminLogin.data.data.access_token,
         refreshToken: adminLogin.data.data.refresh_token
       };
 
       // Super admin authentication
-      const superAdminLogin = await this.client.post(API_ENDPOINTS.login, TEST_USERS.super_admin);
-      this.assert.assertSuccess(superAdminLogin, 'Super admin login');
+      const superAdminLogin = await this.loginWithRetry(TEST_USERS.super_admin, 'Super admin login');
       this.tokens.super_admin = {
         accessToken: superAdminLogin.data.data.access_token,
         refreshToken: superAdminLogin.data.data.refresh_token

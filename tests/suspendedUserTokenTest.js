@@ -92,7 +92,7 @@ class SuspendedUserTokenTests {
     this.logger.info('Victim created via Admin API');
 
     // 2b. Login
-    this.client.setAuthToken(null);
+    this.client.clearAuthToken();
     const loginRes = await this.client.post(API_ENDPOINTS.login, {
       email: this.victimUser.email,
       password: this.victimUser.password
