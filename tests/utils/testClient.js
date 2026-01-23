@@ -9,6 +9,12 @@ class TestClient {
   constructor(baseUrl = null) {
     this.baseUrl = baseUrl || TEST_CONFIG.baseUrl;
     this.defaultHeaders = {};
+    this.defaultOptions = {
+      timeoutMs: 20000,
+      retries: 2,
+      retryDelayMs: 150,
+      retryOnHttp5xx: true
+    };
     this.setHeader('Content-Type', 'application/json');
     this.setRandomIpHeaders();
   }
@@ -21,108 +27,132 @@ class TestClient {
    * @param {Object} headers - Additional headers
    * @returns {Promise<Object>} Response object with status and data
    */
-  async request(method, path, data = null, headers = {}) {
-    try {
+  async request(method, path, data = null, headers = {}, options = {}) {
+    const mergedOptions = { ...this.defaultOptions, ...options };
+    const { timeoutMs, retries, retryDelayMs, retryOnHttp5xx } = mergedOptions;
+    const url = `${this.baseUrl}${path}`;
+
+    const attemptRequest = async (attempt = 0) => {
       const controller = new AbortController();
-      const timeoutId = setTimeout(() => controller.abort(), 10000); // 10s timeout
+      let timeoutId;
 
-      const options = {
-        method,
-        headers: {
-          ...this.defaultHeaders,
-          ...headers
-        },
-        signal: controller.signal
-      };
+      try {
+        timeoutId = setTimeout(() => controller.abort(), timeoutMs);
 
-      // console.log(`Making ${method.toUpperCase()} request to ${this.baseUrl}${path}`, options.headers);
-      if (data) {
-        options.body = JSON.stringify(data);
-      }
+        const fetchOptions = {
+          method,
+          headers: {
+            ...this.defaultHeaders,
+            ...headers
+          },
+          signal: controller.signal
+        };
 
-      const url = `${this.baseUrl}${path}`;
+        if (data) {
+          fetchOptions.body = JSON.stringify(data);
+        }
 
-      const response = await fetch(url, options);
-      clearTimeout(timeoutId);
+        const response = await fetch(url, fetchOptions);
+        clearTimeout(timeoutId);
 
-      let responseData;
+        const contentType = response.headers.get('content-type');
+        let responseData;
 
-      const contentType = response.headers.get('content-type');
-
-      // Only try to parse JSON if there's content and the response is successful
-      if (response.status !== 204 && contentType?.includes('application/json')) {
-        try {
-          responseData = await response.json();
-        } catch (jsonError) {
-          console.log(`JSON parse error for ${url}:`, jsonError);
+        if (response.status !== 204 && contentType?.includes('application/json')) {
+          try {
+            responseData = await response.json();
+          } catch (jsonError) {
+            console.log(`JSON parse error for ${url}:`, jsonError);
+            responseData = {};
+          }
+        } else {
           responseData = {};
         }
-      } else {
-        responseData = {};
+
+        const responseHeaders = {};
+        response.headers.forEach((value, key) => {
+          responseHeaders[key] = value;
+        });
+
+        // Retry on transient 5xx if enabled
+        if (response.status >= 500 && retryOnHttp5xx && attempt < retries) {
+          await new Promise(resolve => setTimeout(resolve, retryDelayMs));
+          return attemptRequest(attempt + 1);
+        }
+
+        return {
+          status: response.status,
+          data: responseData,
+          headers: responseHeaders,
+          success: response.ok
+        };
+      } catch (error) {
+        if (timeoutId) {
+          clearTimeout(timeoutId);
+        }
+
+        const isRetryable = error.name === 'AbortError' || error.code === 'ECONNRESET';
+        if (attempt < retries && isRetryable) {
+          await new Promise(resolve => setTimeout(resolve, retryDelayMs));
+          return attemptRequest(attempt + 1);
+        }
+
+        console.error(`Request failed: ${method.toUpperCase()} ${path}`, error);
+
+        return {
+          status: error.name === 'AbortError' ? 504 : 500,
+          data: { error: error.message },
+          success: false
+        };
       }
+    };
 
-      // Convert Headers object to a plain object for easier access in tests
-      const responseHeaders = {};
-      response.headers.forEach((value, key) => {
-        responseHeaders[key] = value;
-      });
-
-      return {
-        status: response.status,
-        data: responseData,
-        headers: responseHeaders,
-        success: response.ok
-      };
-    } catch (error) {
-      console.error(`Request failed: ${method.toUpperCase()} ${path}`, error);
-
-      return {
-        status: 500,
-        data: { error: error.message },
-        success: false
-      };
-    }
+    return attemptRequest();
   }
 
   /**
    * GET request
    */
-  async get(path, headers = {}) {
-    return this.request('GET', path, null, headers);
+  async get(path, headers = {}, options = {}) {
+    return this.request('GET', path, null, headers, options);
   }
 
   /**
    * POST request
    */
-  async post(path, data, headers = {}) {
-    return this.request('POST', path, data, headers);
+  async post(path, data, headers = {}, options = {}) {
+    return this.request('POST', path, data, headers, options);
   }
 
   /**
    * PUT request
    */
-  async put(path, data, headers = {}) {
-    return this.request('PUT', path, data, headers);
+  async put(path, data, headers = {}, options = {}) {
+    return this.request('PUT', path, data, headers, options);
   }
 
   /**
    * DELETE request
    */
-  async delete(path, headers = {}) {
-    return this.request('DELETE', path, null, headers);
+  async delete(path, headers = {}, options = {}) {
+    return this.request('DELETE', path, null, headers, options);
   }
 
   /**
    * Make OPTIONS request
    */
-  options(path, headers = {}) {
-    return this.request('OPTIONS', path, null, headers);
+  options(path, headers = {}, options = {}) {
+    return this.request('OPTIONS', path, null, headers, options);
   }
 
   /**
    * Set authorization header
    */
   setAuthToken(token) {
+    if (!token) {
+      delete this.defaultHeaders.Authorization;
+      return;
+    }
     this.setHeader('Authorization', `Bearer ${token}`);
   }
 

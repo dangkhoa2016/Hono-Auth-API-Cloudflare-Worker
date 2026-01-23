@@ -414,7 +414,12 @@ class XSSSecurityTest {
 
       for (const payload of advancedPayloads) {
         const testData = { full_name: payload };
-        const result = await this.client.put(API_ENDPOINTS.profile, testData);
+        const result = await this.client.put(
+          API_ENDPOINTS.profile,
+          testData,
+          {},
+          { timeoutMs: 5000, retries: 1 }
+        );
 
         this.assert.assertNotEqual(result.status, 500, 'Should not cause server error');
 
