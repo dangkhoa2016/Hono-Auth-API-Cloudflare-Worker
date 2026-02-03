@@ -228,6 +228,10 @@ export class AuthService extends BaseService {
         data: {
           access_token: tokens.accessToken,
           refresh_token: tokens.refreshToken,
+          expires_in: tokens.accessTokenPayload?.exp ? tokens.accessTokenPayload.exp - Math.floor(Date.now() / 1000) : null,
+          expires_at: tokens.accessTokenPayload?.exp || null,
+          refresh_expires_in: tokens.refreshTokenPayload?.exp ? tokens.refreshTokenPayload.exp - Math.floor(Date.now() / 1000) : null,
+          refresh_expires_at: tokens.refreshTokenPayload?.exp || null,
           user: {
             id: user.id,
             full_name: user.full_name,
@@ -340,6 +344,10 @@ export class AuthService extends BaseService {
         data: {
           access_token: tokens.accessToken,
           refresh_token: tokens.refreshToken,
+          expires_in: tokens.accessTokenPayload?.exp ? tokens.accessTokenPayload.exp - Math.floor(Date.now() / 1000) : null,
+          expires_at: tokens.accessTokenPayload?.exp || null,
+          refresh_expires_in: tokens.refreshTokenPayload?.exp ? tokens.refreshTokenPayload.exp - Math.floor(Date.now() / 1000) : null,
+          refresh_expires_at: tokens.refreshTokenPayload?.exp || null,
           user: {
             id: user.id,
             full_name: user.full_name,
