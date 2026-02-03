@@ -1,6 +1,6 @@
 import { BaseService } from './baseService.js';
 import { tokenService_log, error_log } from '../utils/debug.js';
-import { signToken, verifyToken } from '../utils/jwt.js';
+import { createTokenPayload, signToken, verifyToken } from '../utils/jwt.js';
 
 const textEncoder = new TextEncoder();
 
@@ -54,7 +54,6 @@ export class TokenService extends BaseService {
     try {
       const jwtConfig = await this.getJwtConfig();
       const tokenSecurityConfig = await this.getTokenSecurityConfig();
-      const now = Math.floor(Date.now() / 1000);
       const subjectPrefix = jwtConfig.subjectPrefix || 'user';
       const subject = `${subjectPrefix}:${user.id}`;
       const audienceClaim = Array.isArray(jwtConfig.audience)
@@ -74,7 +73,7 @@ export class TokenService extends BaseService {
       const sessionId = metadata?.sessionId || metadata?.session_id;
       const clientId = metadata?.clientId || metadata?.client_id;
 
-      const accessPayload = {
+      const accessPayloadBase = {
         sub: subject,
         iss: jwtConfig.issuer,
         aud: audienceClaim,
@@ -82,39 +81,39 @@ export class TokenService extends BaseService {
         full_name: user.full_name,
         email: user.email,
         role: user.role,
-        jti: this._generateJti(),
-        iat: now,
-        exp: now + jwtConfig.accessTokenExpires
+        jti: this._generateJti()
       };
 
       if (scopeValue) {
-        accessPayload.scope = scopeValue;
+        accessPayloadBase.scope = scopeValue;
       }
 
       if (clientId) {
-        accessPayload.client_id = clientId;
+        accessPayloadBase.client_id = clientId;
       }
 
       if (sessionId) {
-        accessPayload.session_id = sessionId;
+        accessPayloadBase.session_id = sessionId;
       }
 
       if (ipHash) {
         const ipClaimKey = tokenSecurityConfig.enforceAccessTokenIpBinding ? 'ip_hash' : 'ip_hint';
-        accessPayload[ipClaimKey] = ipHash;
+        accessPayloadBase[ipClaimKey] = ipHash;
       }
 
       if (userAgentHash) {
         const uaClaimKey = tokenSecurityConfig.enforceAccessTokenUserAgentBinding ? 'ua_hash' : 'ua_hint';
-        accessPayload[uaClaimKey] = userAgentHash;
+        accessPayloadBase[uaClaimKey] = userAgentHash;
       }
 
-      const refreshPayload = {
+      const accessPayload = await createTokenPayload(accessPayloadBase, 'access', this.env);
+
+      const refreshPayloadBase = {
         user_id: user.id,
-        jti: this._generateJti(),
-        iat: now,
-        exp: now + jwtConfig.refreshTokenExpires
+        jti: this._generateJti()
       };
+
+      const refreshPayload = await createTokenPayload(refreshPayloadBase, 'refresh', this.env);
 
       const accessToken = await signToken(accessPayload, jwtConfig.secret);
       const refreshToken = await signToken(refreshPayload, jwtConfig.secret);

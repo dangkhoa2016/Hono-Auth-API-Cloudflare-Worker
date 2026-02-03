@@ -7,19 +7,18 @@ const JWT_ALGORITHM = 'HS256';
 /**
  * Create JWT token with payload and expiration time
  * @param {Object} payload - Data to encode
- * @param {string} expiresIn - Expiration time ('1h' or '3d')
+ * @param {'access'|'refresh'} tokenType - Token type to derive expiration
  * @param {Object} env - Environment context for configuration
  * @returns {Promise<Object>} Token payload with iat and exp
 */
-export async function createTokenPayload(payload, expiresIn = '1h', env = null) {
+export async function createTokenPayload(payload, tokenType = 'access', env = null) {
   const now = Math.floor(Date.now() / 1000);
   const jwtConfig = await getJwtSettings(env);
 
-  const exp = expiresIn === '1h' ?
-    now + jwtConfig.accessTokenExpires :
-    now + jwtConfig.refreshTokenExpires;
+  const isRefresh = tokenType === 'refresh';
+  const exp = now + (isRefresh ? jwtConfig.refreshTokenExpires : jwtConfig.accessTokenExpires);
 
-  jwt_log(`Creating token payload for: ${payload.user_id || 'unknown'}, expires in: ${exp - now} seconds (${expiresIn})`);
+  jwt_log(`Creating token payload for: ${payload.user_id || 'unknown'}, expires in: ${exp - now} seconds (${tokenType})`);
 
   return {
     ...payload,

@@ -61,6 +61,8 @@ class AuthTests {
       this.testRefreshTokenReuseDetection,
       this.testRefreshTokenReuseRevokesActiveTokens,
       this.testPasswordValidation,
+      this.testExpiredRefreshToken,
+      this.testInvalidRefreshToken,
       this.testJWTExpiration,
       this.testRateLimiting,
       this.testRateLimitingSharedIdentityAcrossIps,
@@ -466,6 +468,130 @@ class AuthTests {
       this.refreshToken = null;
       this.lastRotatedOutRefreshToken = null;
       this.client.clearAuthToken();
+    }
+  }
+
+  /**
+   * Test invalid refresh token scenarios
+   * Tests various invalid refresh token formats and values
+   */
+  async testInvalidRefreshToken() {
+    this.logger.info('Testing invalid refresh token scenarios...');
+
+    try {
+      const invalidTokenScenarios = [
+        {
+          name: 'Missing refresh_token field',
+          payload: {},
+          expectedStatus: [400, 401]
+        },
+        {
+          name: 'Null refresh_token',
+          payload: { refresh_token: null },
+          expectedStatus: [400, 401]
+        },
+        {
+          name: 'Empty string refresh_token',
+          payload: { refresh_token: '' },
+          expectedStatus: [400, 401]
+        },
+        {
+          name: 'Invalid JWT format - no dots',
+          payload: { refresh_token: 'invalid_token_without_dots' },
+          expectedStatus: [400, 401]
+        },
+        {
+          name: 'Invalid JWT format - only one dot',
+          payload: { refresh_token: 'invalid.token' },
+          expectedStatus: [400, 401]
+        },
+        {
+          name: 'Invalid JWT format - garbage value',
+          payload: { refresh_token: 'xxx.yyy.zzz' },
+          expectedStatus: [400, 401]
+        },
+        {
+          name: 'Non-existent refresh token',
+          payload: { refresh_token: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIn0.dozjgNryP4J3jVmNHl0w5N_XgL0n3I9PlFUP0THsR8U' },
+          expectedStatus: [400, 401]
+        },
+        {
+          name: 'Truly malformed token',
+          payload: { refresh_token: 'not a token at all!@#$%^&*()' },
+          expectedStatus: [400, 401]
+        }
+      ];
+
+      for (const scenario of invalidTokenScenarios) {
+        this.logger.info(`Testing: ${scenario.name}`);
+
+        const response = await this.client.post(API_ENDPOINTS.refreshToken, scenario.payload);
+
+        this.assert.assertTrue(
+          scenario.expectedStatus.includes(response.status),
+          `${scenario.name}: Expected status ${scenario.expectedStatus.join(' or ')}, got ${response.status}`
+        );
+
+        this.assert.assertEqual(
+          response.success,
+          false,
+          `${scenario.name}: Response should indicate failure`
+        );
+
+        // Verify error response structure
+        if (response.data && response.data.error) {
+          this.logger.info(`  Error: "${response.data.error}"`);
+        }
+
+        this.logger.info(`  ✓ ${scenario.name} - Status: ${response.status}`);
+      }
+
+      this.logger.success('Invalid refresh token test completed successfully');
+    } catch (error) {
+      this.logger.error(`[testInvalidRefreshToken] Test failed: ${error.message}`);
+      throw error;
+    }
+  }
+
+  /**
+   * Test expired refresh token handling
+   * Tests that expired tokens are rejected with appropriate error
+   */
+  async testExpiredRefreshToken() {
+    this.logger.info('Testing expired refresh token handling...');
+
+    try {
+      // Create an expired JWT (payload with past expiration)
+      // This is a pre-crafted JWT with exp set to a past timestamp (Jan 1, 2020)
+      // Structure: header.payload.signature
+      // The payload is: {"sub": "test_user", "exp": 1577836800}
+      const expiredToken = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJ0ZXN0X3VzZXIiLCJleHAiOjE1Nzc4MzY4MDB9.T8nQB_yF_1RXqFUMbQs_9-oWNT-lG8-9XxkLwzKxU1Y';
+
+      const response = await this.client.post(API_ENDPOINTS.refreshToken, {
+        refresh_token: expiredToken
+      });
+
+      // Expired token should be rejected
+      this.assert.assertTrue(
+        [400, 401].includes(response.status),
+        `Expired refresh token should return 400 or 401, got ${response.status}`
+      );
+
+      this.assert.assertEqual(
+        response.success,
+        false,
+        'Expired token response should indicate failure'
+      );
+
+      // Verify error response has error message
+      if (response.data && response.data.error) {
+        this.logger.info(`Expired token error: "${response.data.error}"`);
+      }
+
+      this.logger.success('Expired refresh token test completed successfully');
+    } catch (error) {
+      this.logger.error(`[testExpiredRefreshToken] Test failed: ${error.message}`);
+      throw error;
     }
   }
 
