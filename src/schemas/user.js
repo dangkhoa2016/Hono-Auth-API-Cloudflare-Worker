@@ -3,6 +3,7 @@
  * I18n-aware Zod schemas for user management endpoints
  */
 
+import { z } from 'zod';
 import { createSchemaBuilder } from './base.js';
 import { getAllRoles, DEFAULT_USER_ROLE, getAllUserStatuses, DEFAULT_USER_STATUS } from '../constants/roles.js';
 
@@ -112,10 +113,16 @@ export function createUpdateUserWithoutRoleSchema(lang = 'en') {
  */
 export function createUserListQuerySchema(lang = 'en') {
   const builder = createSchemaBuilder(lang);
+  const emptyToUndefined = (value) => {
+    if (value === '' || value === null || (typeof value === 'string' && /^\s*nan\s*$/i.test(value))) {
+      return undefined;
+    }
+    return value;
+  };
 
   return builder.object({
-    page: builder.number('page', 1).default(1).optional(),
-    limit: builder.number('limit', 1, 100).default(10).optional(),
+    page: z.preprocess(emptyToUndefined, builder.coerceNumber('page', 1)).default(1).optional(),
+    limit: z.preprocess(emptyToUndefined, builder.coerceNumber('limit', 1, 100)).default(10).optional(),
     role: builder.enum(getAllRoles(), 'role').optional(),
     status: builder.enum(getAllUserStatuses(), 'status').optional(),
     search: builder.string('search', 0, 100).optional()
