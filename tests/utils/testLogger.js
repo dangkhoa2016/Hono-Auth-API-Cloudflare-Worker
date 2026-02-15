@@ -101,6 +101,13 @@ class TestLogger {
   warning(message) {
     this.logMessage(message, 'warning');
   }
+
+  /**
+   * Log section header
+   */
+  section(sectionText) {
+    this.logSectionHeader(sectionText);
+  }
 }
 
 export { TestLogger };
