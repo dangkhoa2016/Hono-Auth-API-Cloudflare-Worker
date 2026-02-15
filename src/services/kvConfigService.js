@@ -90,13 +90,10 @@ export class KVConfigService {
       const stringValue = JSON.stringify(value);
       await this.kv.put(key, stringValue);
 
-      // Update cache
-      this.cache.set(key, {
-        value: value,
-        expiry: Date.now() + this.defaultCacheTTL
-      });
-
-      kvConfigService_log(`Set KV config: ${key} = ${value}`);
+      // Invalidate cache for this specific key to force fresh fetch on next read
+      // This ensures immediate consistency after an update
+      this.cache.delete(key);
+      kvConfigService_log(`Set KV config: ${key} = ${value} (cache invalidated for this key)`);
       return true;
     } catch (error) {
       kvConfigService_log(`Error setting key ${key}: ${error.message}`);
@@ -148,7 +145,9 @@ export class KVConfigService {
 
       for (const item of list.keys) {
         const value = await this.get(item.name, null, false);
-        configs[item.name] = value;
+        // Strip prefix from key name for consistent object keys
+        const keyWithoutPrefix = item.name.replace(`${CLOUDFLARE_KV_PREFIX}:`, '');
+        configs[keyWithoutPrefix] = value;
       }
 
       kvConfigService_log(`Retrieved all configs: ${Object.keys(configs).length} items`);
@@ -165,6 +164,29 @@ export class KVConfigService {
   clearCache() {
     this.cache.clear();
     kvConfigService_log('Cache cleared');
+  }
+
+  /**
+   * Invalidate cache for specific keys
+   * @param {string|Array<string>} keys - Key(s) to invalidate
+   */
+  invalidateCacheKeys(keys) {
+    if (!Array.isArray(keys)) {
+      keys = [keys];
+    }
+    
+    keys.forEach(key => {
+      // Handle keys with and without prefix
+      let cacheKey = key;
+      if (!key.startsWith(CLOUDFLARE_KV_PREFIX)) {
+        cacheKey = this.realKey(key);
+      }
+      
+      if (this.cache.has(cacheKey)) {
+        this.cache.delete(cacheKey);
+        kvConfigService_log(`Invalidated cache for key: ${cacheKey}`);
+      }
+    });
   }
 
   /**

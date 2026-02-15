@@ -76,8 +76,21 @@ export class ServiceConfigManager {
    */
   clearAllCache() {
     this._globalCache.clear();
+    
+    // Also clear cache for all service instances
+    for (const [key, instance] of this._instances.entries()) {
+      // Clear KVConfigService's own cache
+      if (instance && typeof instance.clearCache === 'function') {
+        instance.clearCache();
+      }
+      // Clear BaseService's config cache
+      if (instance && typeof instance.clearConfigCache === 'function') {
+        instance.clearConfigCache();
+      }
+    }
+    
     this._instances.clear();
-    serviceConfig_log('Cleared all global cache and service instances');
+    serviceConfig_log('Cleared all global cache, KV config caches, BaseService caches, and service instances');
   }
 
   /**
