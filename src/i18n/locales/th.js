@@ -39,8 +39,6 @@ export default {
     'activeUsersCount': 'ผู้ใช้ที่ใช้งาน {{count}} คน',
     'activeUsersCount_other': 'ผู้ใช้ที่ใช้งาน {{count}} คน ({{percentage}})',
     'changedByUser': 'เปลี่ยนแปลงโดย {{username}} ({{role}})',
-    'changesApplied': 'ใช้งานการเปลี่ยนแปลง {{count}} ครั้ง',
-    'changesApplied_other': 'ใช้งานการเปลี่ยนแปลง {{count}} ครั้ง',
     'checkedByUser': 'ตรวจสอบโดย {{username}} ({{role}})',
     'createdByUser': 'สร้างโดย {{username}} ({{role}})',
     'dashboardDataRetrieved': 'โหลดแดชบอร์ดด้วยภาพรวมระบบ {{totalUsers}} (การเข้าถึง {{accessLevel}}) {{requestedBy}} {{dataFreshness}}',
@@ -69,7 +67,7 @@ export default {
     'userDetailsRetrieved': 'ดึงข้อมูลรายละเอียดผู้ใช้: {{userName}} ({{userRole}}, {{userStatus}}) {{joinedDate}} {{requestedBy}}',
     'usersListRetrieved': 'ดึงข้อมูล {{count}} ผู้ใช้สำเร็จแล้ว (แสดง {{displayedCount}} ในหน้า {{currentPage}} จาก {{totalPages}}) {{requestedBy}}',
     'usersListRetrieved_other': 'ดึงข้อมูล {{count}} ผู้ใช้สำเร็จแล้ว (แสดง {{displayedCount}} ในหน้า {{currentPage}} จาก {{totalPages}}) {{requestedBy}}',
-    'userUpdatedSuccessfully': 'อัพเดทผู้ใช้ {{updatedUserName}} สำเร็จแล้ว {{changesCount}} {{updatedBy}} {{timestamp}}'
+    'userUpdatedSuccessfully': 'อัพเดทผู้ใช้ {{updatedUserName}} สำเร็จแล้ว {{updatedBy}} {{timestamp}}'
   },
   'api': {
     'databaseError': 'เกิดข้อผิดพลาดของฐานข้อมูล',
@@ -528,7 +526,7 @@ export default {
       'featureNotFound': 'ไม่พบฟีเจอร์หรือไม่ได้รับอนุญาต',
       'featureToggleFailed': 'ไม่สามารถเปลี่ยนฟีเจอร์ "{{feature}}" ได้: {{reason}}',
       'invalidFeatureValue': 'ค่าฟีเจอร์ไม่ถูกต้อง - ต้องเป็นค่าบูลีน',
-      'invalidKey': 'คีย์การกำหนดค่า "{{key}}" ไม่ได้รับอนุญาต - คีย์ที่ถูกต้อง: {{validKeys}}',
+      'invalidKey': 'คีย์การกำหนดค่า "{{key}}" ไม่ได้รับอนุญาต',
       'keyNotFound': 'ไม่พบคีย์การกำหนดค่า "{{key}}"',
       'performanceSettingsRetrieveFailed': 'ไม่สามารถดึงข้อมูลการตั้งค่าประสิทธิภาพได้: {{reason}}',
       'realtimeSettingsRetrieveFailed': 'ไม่สามารถดึงข้อมูลการตั้งค่าการตรวจสอบแบบเรียลไทม์ได้: {{reason}}',

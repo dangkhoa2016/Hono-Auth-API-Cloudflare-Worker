@@ -351,9 +351,6 @@ class AdminMessageTranslationTests {
         this.assert.assertStringContains(message, 'Super Administrator', 'Should contain updater role "Super Administrator"');
       }
 
-      // Check for changes count
-      this.assert.assertStringContains(message, 'changes applied', 'Should include changes count');
-
       // Check for timestamp
       this.assert.assertStringContains(message, 'Updated at', 'Should include "Updated at" timestamp');
 
