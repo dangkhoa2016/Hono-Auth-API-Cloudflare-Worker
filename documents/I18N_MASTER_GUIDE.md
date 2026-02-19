@@ -971,11 +971,8 @@ const message = tf(c, 'admin.users.created', {
 **After**: "User John Doe updated successfully. 3 changes applied Updated by Admin User (Super Administrator) Updated at 2025-07-30T12:58:23.606Z"
 
 ```javascript
-const changesCount = Object.keys(validData).length;
 const message = tf(c, 'admin.users.updated', {
   userName: user.full_name,
-  changesCount: changesCount,
-  changeDescription: tp(c, 'admin.common.changesApplied', changesCount),
   updatedBy: currentUser.full_name,
   updatedByRole: tc(c, 'roles.display', currentUser.role),
   updatedAt: new Date().toISOString()

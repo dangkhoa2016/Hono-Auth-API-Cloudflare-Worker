@@ -39,8 +39,6 @@ export default {
     'activeUsersCount': '{{count}} người dùng hoạt động',
     'activeUsersCount_other': '{{count}} người dùng hoạt động ({{percentage}})',
     'changedByUser': 'Được thay đổi bởi {{username}} ({{role}})',
-    'changesApplied': 'Đã áp dụng {{count}} thay đổi',
-    'changesApplied_other': 'Đã áp dụng {{count}} thay đổi',
     'checkedByUser': 'Được kiểm tra bởi {{username}} ({{role}})',
     'createdByUser': 'Được tạo bởi {{username}} ({{role}})',
     'dashboardDataRetrieved': 'Dashboard đã tải với tổng quan {{totalUsers}} hệ thống (quyền truy cập {{accessLevel}}). {{requestedBy}} {{dataFreshness}}',
@@ -69,7 +67,7 @@ export default {
     'userDetailsRetrieved': 'Chi tiết người dùng: {{userName}} ({{userRole}}, {{userStatus}}). {{joinedDate}} {{requestedBy}}',
     'usersListRetrieved': 'Đã lấy thành công {{count}} người dùng (hiển thị {{displayedCount}} trang {{currentPage}}/{{totalPages}}). {{requestedBy}}',
     'usersListRetrieved_other': 'Đã lấy thành công {{count}} người dùng (hiển thị {{displayedCount}} trang {{currentPage}}/{{totalPages}}). {{requestedBy}}',
-    'userUpdatedSuccessfully': 'Người dùng {{updatedUserName}} đã được cập nhật. {{changesCount}} {{updatedBy}} {{timestamp}}'
+    'userUpdatedSuccessfully': 'Người dùng {{updatedUserName}} đã được cập nhật. {{updatedBy}} {{timestamp}}'
   },
   'api': {
     'databaseError': 'Đã xảy ra lỗi cơ sở dữ liệu',

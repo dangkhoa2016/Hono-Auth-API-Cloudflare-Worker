@@ -39,8 +39,6 @@ export default {
     'activeUsersCount': '{{count}} active user',
     'activeUsersCount_other': '{{count}} active users ({{percentage}})',
     'changedByUser': 'Changed by {{username}} ({{role}})',
-    'changesApplied': '{{count}} change applied',
-    'changesApplied_other': '{{count}} changes applied',
     'checkedByUser': 'Checked by {{username}} ({{role}})',
     'createdByUser': 'Created by {{username}} ({{role}})',
     'dashboardDataRetrieved': 'Dashboard loaded with {{totalUsers}} system overview ({{accessLevel}} access). {{requestedBy}} {{dataFreshness}}',
@@ -69,7 +67,7 @@ export default {
     'userDetailsRetrieved': 'User details retrieved: {{userName}} ({{userRole}}, {{userStatus}}). {{joinedDate}} {{requestedBy}}',
     'usersListRetrieved': 'Successfully retrieved {{count}} user (showing {{displayedCount}} on page {{currentPage}} of {{totalPages}}). {{requestedBy}}',
     'usersListRetrieved_other': 'Successfully retrieved {{count}} users (showing {{displayedCount}} on page {{currentPage}} of {{totalPages}}). {{requestedBy}}',
-    'userUpdatedSuccessfully': 'User {{updatedUserName}} updated successfully. {{changesCount}} {{updatedBy}} {{timestamp}}'
+    'userUpdatedSuccessfully': 'User {{updatedUserName}} updated successfully. {{updatedBy}} {{timestamp}}'
   },
   'api': {
     'databaseError': 'Database error occurred',
@@ -528,7 +526,7 @@ export default {
       'featureNotFound': 'Feature not found or not allowed',
       'featureToggleFailed': 'Failed to toggle feature "{{feature}}": {{reason}}',
       'invalidFeatureValue': 'Invalid feature value - must be boolean',
-      'invalidKey': 'Configuration key "{{key}}" is not allowed - valid keys: {{validKeys}}',
+      'invalidKey': 'Configuration key "{{key}}" is not allowed',
       'keyNotFound': 'Configuration key "{{key}}" not found',
       'performanceSettingsRetrieveFailed': 'Failed to retrieve performance settings: {{reason}}',
       'realtimeSettingsRetrieveFailed': 'Failed to retrieve real-time monitoring settings: {{reason}}',

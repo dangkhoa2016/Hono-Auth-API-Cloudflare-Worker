@@ -1,7 +1,7 @@
 import { Hono } from 'hono';
 import { authMiddleware } from '../middleware/auth.js';
 import { requireRole } from '../middleware/authorization.js';
-import { DEFAULT_CONFIGS, KV_CONFIG_KEYS, isValidKVKey, getAllKVKeys } from '../constants/kvKeys.js';
+import { DEFAULT_CONFIGS, KV_CONFIG_KEYS, isValidKVKey } from '../constants/kvKeys.js';
 import { kvAdminRoutes_log } from '../utils/debug.js';
 import { ROLE_COMBINATIONS } from '../constants/roles.js';
 import { unifiedMiddlewares } from '../middleware/unifiedRequestMiddleware.js';
@@ -131,7 +131,7 @@ kvAdmin.get('/configs/:key', async (c) => {
   if (!isValidKVKey(key)) {
     return c.json({
       success: false,
-      error: tError(c, 'kv.invalidKey', { key, validKeys: getAllKVKeys().join(', ') })
+      error: tError(c, 'kv.invalidKey', { key })
     }, 400);
   }
 
@@ -176,7 +176,7 @@ kvAdmin.put('/configs/:key', i18nValidatorsMiddleware.configUpdate('json'), asyn
   if (!isValidKVKey(key)) {
     return c.json({
       success: false,
-      error: tError(c, 'kv.invalidKey', { key, validKeys: getAllKVKeys().join(', ') })
+      error: tError(c, 'kv.invalidKey', { key })
     }, 400);
   }
 
@@ -238,7 +238,7 @@ kvAdmin.post('/configs/batch', i18nValidatorsMiddleware.configBatchUpdate('json'
 
     // Check if the key is allowed
     if (!isValidKVKey(key)) {
-      errors[key] = tError(c, 'kv.invalidKey', { key, validKeys: getAllKVKeys().join(', ') });
+      errors[key] = tError(c, 'kv.invalidKey', { key });
       continue;
     }
 
@@ -296,7 +296,7 @@ kvAdmin.delete('/configs/:key', async (c) => {
   if (!isValidKVKey(key)) {
     return c.json({
       success: false,
-      error: tError(c, 'kv.invalidKey', { key, validKeys: getAllKVKeys().join(', ') })
+      error: tError(c, 'kv.invalidKey', { key })
     }, 400);
   }
 
