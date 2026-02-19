@@ -39,8 +39,6 @@ export default {
     'activeUsersCount': 'アクティブユーザー {{count}} 人',
     'activeUsersCount_other': 'アクティブユーザー {{count}} 人 ({{percentage}})',
     'changedByUser': '{{username}} ({{role}}) が変更しました',
-    'changesApplied': '{{count}} 件の変更を適用しました',
-    'changesApplied_other': '{{count}} 件の変更を適用しました',
     'checkedByUser': '{{username}} ({{role}}) が確認しました',
     'createdByUser': '{{username}} ({{role}}) が作成しました',
     'dashboardDataRetrieved': 'ダッシュボードを {{totalUsers}} のシステム概要で読み込みました ({{accessLevel}} アクセス)。{{requestedBy}} {{dataFreshness}}',
@@ -69,7 +67,7 @@ export default {
     'userDetailsRetrieved': 'ユーザー詳細を取得しました: {{userName}} ({{userRole}}, {{userStatus}})。{{joinedDate}} {{requestedBy}}',
     'usersListRetrieved': '{{count}} ユーザーを正常に取得しました ({{currentPage}}/{{totalPages}} ページに {{displayedCount}} 件表示)。{{requestedBy}}',
     'usersListRetrieved_other': '{{count}} ユーザーを正常に取得しました ({{currentPage}}/{{totalPages}} ページに {{displayedCount}} 件表示)。{{requestedBy}}',
-    'userUpdatedSuccessfully': 'ユーザー {{updatedUserName}} を正常に更新しました。{{changesCount}} {{updatedBy}} {{timestamp}}'
+    'userUpdatedSuccessfully': 'ユーザー {{updatedUserName}} を正常に更新しました。{{updatedBy}} {{timestamp}}'
   },
   'api': {
     'databaseError': 'データベースエラーが発生しました',

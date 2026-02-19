@@ -1006,11 +1006,8 @@ const message = tf(c, 'admin.users.created', {
 **Sau**: "Người dùng John Doe được cập nhật thành công. 3 thay đổi được áp dụng Được cập nhật bởi Admin User (Siêu quản trị viên) Được cập nhật lúc 30-07-2025T12:58:23.606Z"
 
 ```javascript
-const changesCount = Object.keys(validData).length;
 const message = tf(c, 'admin.users.updated', {
   userName: user.full_name,
-  changesCount: changesCount,
-  changeDescription: tp(c, 'admin.common.changesApplied', changesCount),
   updatedBy: currentUser.full_name,
   updatedByRole: tc(c, 'roles.display', currentUser.role),
   updatedAt: new Date().toISOString()

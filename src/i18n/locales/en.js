@@ -39,8 +39,6 @@ export default {
     'activeUsersCount': '{{count}} active user',
     'activeUsersCount_other': '{{count}} active users ({{percentage}})',
     'changedByUser': 'Changed by {{username}} ({{role}})',
-    'changesApplied': '{{count}} change applied',
-    'changesApplied_other': '{{count}} changes applied',
     'checkedByUser': 'Checked by {{username}} ({{role}})',
     'createdByUser': 'Created by {{username}} ({{role}})',
     'dashboardDataRetrieved': 'Dashboard loaded with {{totalUsers}} system overview ({{accessLevel}} access). {{requestedBy}} {{dataFreshness}}',
@@ -69,7 +67,7 @@ export default {
     'userDetailsRetrieved': 'User details retrieved: {{userName}} ({{userRole}}, {{userStatus}}). {{joinedDate}} {{requestedBy}}',
     'usersListRetrieved': 'Successfully retrieved {{count}} user (showing {{displayedCount}} on page {{currentPage}} of {{totalPages}}). {{requestedBy}}',
     'usersListRetrieved_other': 'Successfully retrieved {{count}} users (showing {{displayedCount}} on page {{currentPage}} of {{totalPages}}). {{requestedBy}}',
-    'userUpdatedSuccessfully': 'User {{updatedUserName}} updated successfully. {{changesCount}} {{updatedBy}} {{timestamp}}'
+    'userUpdatedSuccessfully': 'User {{updatedUserName}} updated successfully. {{updatedBy}} {{timestamp}}'
   },
   'api': {
     'databaseError': 'Database error occurred',

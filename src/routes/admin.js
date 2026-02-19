@@ -256,9 +256,6 @@ admin.put('/users/:id', requireOwnerOrAdmin('id'), i18nValidatorsMiddleware.upda
         username: currentUser.full_name || currentUser.email,
         role: t(c, 'roles.displayName', { context: currentUser.role })
       }),
-      changesCount: t(c, 'admin.changesApplied', {
-        count: Object.keys(updateData).length
-      }),
       timestamp: t(c, 'dates.updatedAt', { date: new Date().toISOString() })
     });
 

@@ -39,8 +39,6 @@ export default {
     'activeUsersCount': '{{count}} utilisateur actif',
     'activeUsersCount_other': '{{count}} utilisateurs actifs ({{percentage}})',
     'changedByUser': 'Modifié par {{username}} ({{role}})',
-    'changesApplied': '{{count}} modification appliquée',
-    'changesApplied_other': '{{count}} modifications appliquées',
     'checkedByUser': 'Vérifié par {{username}} ({{role}})',
     'createdByUser': 'Créé par {{username}} ({{role}})',
     'dashboardDataRetrieved': 'Tableau de bord chargé avec {{totalUsers}} aperçu du système (accès {{accessLevel}}). {{requestedBy}} {{dataFreshness}}',
@@ -69,7 +67,7 @@ export default {
     'userDetailsRetrieved': 'Détails de l\'utilisateur récupérés : {{userName}} ({{userRole}}, {{userStatus}}). {{joinedDate}} {{requestedBy}}',
     'usersListRetrieved': 'Récupération réussie de {{count}} utilisateur (affichage de {{displayedCount}} sur la page {{currentPage}} sur {{totalPages}}). {{requestedBy}}',
     'usersListRetrieved_other': 'Récupération réussie de {{count}} utilisateurs (affichage de {{displayedCount}} sur la page {{currentPage}} sur {{totalPages}}). {{requestedBy}}',
-    'userUpdatedSuccessfully': 'Utilisateur {{updatedUserName}} mis à jour avec succès. {{changesCount}} {{updatedBy}} {{timestamp}}'
+    'userUpdatedSuccessfully': 'Utilisateur {{updatedUserName}} mis à jour avec succès. {{updatedBy}} {{timestamp}}'
   },
   'api': {
     'databaseError': 'Erreur de base de données survenue',

@@ -39,8 +39,6 @@ export default {
     'activeUsersCount': '{{count}} aktiver Benutzer',
     'activeUsersCount_other': '{{count}} aktive Benutzer ({{percentage}})',
     'changedByUser': 'Geändert von {{username}} ({{role}})',
-    'changesApplied': '{{count}} Änderung angewendet',
-    'changesApplied_other': '{{count}} Änderungen angewendet',
     'checkedByUser': 'Geprüft von {{username}} ({{role}})',
     'createdByUser': 'Erstellt von {{username}} ({{role}})',
     'dashboardDataRetrieved': 'Dashboard geladen mit {{totalUsers}} Systemübersicht ({{accessLevel}} Zugriff).{{requestedBy}} {{dataFreshness}}',
@@ -69,7 +67,7 @@ export default {
     'userDetailsRetrieved': 'Benutzerdetails abgerufen: {{userName}} ({{userRole}}, {{userStatus}}).{{joinedDate}} {{requestedBy}}',
     'usersListRetrieved': '{{count}} Benutzer erfolgreich abgerufen ({{displayedCount}} auf Seite {{currentPage}} von {{totalPages}} angezeigt). {{requestedBy}}',
     'usersListRetrieved_other': '{{count}} Benutzer erfolgreich abgerufen ({{displayedCount}} auf Seite {{currentPage}} von {{totalPages}} angezeigt). {{requestedBy}}',
-    'userUpdatedSuccessfully': 'Benutzer {{updatedUserName}} erfolgreich aktualisiert.{{changesCount}} {{updatedBy}} {{timestamp}}'
+    'userUpdatedSuccessfully': 'Benutzer {{updatedUserName}} erfolgreich aktualisiert. {{updatedBy}} {{timestamp}}'
   },
   'api': {
     'databaseError': 'Datenbankfehler aufgetreten',

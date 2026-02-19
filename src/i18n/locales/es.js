@@ -39,8 +39,6 @@ export default {
     'activeUsersCount': '{{count}} usuario activo',
     'activeUsersCount_other': '{{count}} usuarios activos ({{percentage}})',
     'changedByUser': 'Cambiado por {{username}} ({{role}})',
-    'changesApplied': '{{count}} cambio aplicado',
-    'changesApplied_other': '{{count}} cambios aplicados',
     'checkedByUser': 'Verificado por {{username}} ({{role}})',
     'createdByUser': 'Creado por {{username}} ({{role}})',
     'dashboardDataRetrieved': 'Panel de control cargado con {{totalUsers}} vista general del sistema (acceso {{accessLevel}}).{{requestedBy}} {{dataFreshness}}',
@@ -69,7 +67,7 @@ export default {
     'userDetailsRetrieved': 'Detalles del usuario recuperados: {{userName}} ({{userRole}}, {{userStatus}}).{{joinedDate}} {{requestedBy}}',
     'usersListRetrieved': 'Se recuperó exitosamente {{count}} usuario (mostrando {{displayedCount}} en la página {{currentPage}} de {{totalPages}}). {{requestedBy}}',
     'usersListRetrieved_other': 'Se recuperaron exitosamente {{count}} usuarios (mostrando {{displayedCount}} en la página {{currentPage}} de {{totalPages}}). {{requestedBy}}',
-    'userUpdatedSuccessfully': 'Usuario {{updatedUserName}} actualizado exitosamente.{{changesCount}} {{updatedBy}} {{timestamp}}'
+    'userUpdatedSuccessfully': 'Usuario {{updatedUserName}} actualizado exitosamente.{{updatedBy}} {{timestamp}}'
   },
   'api': {
     'databaseError': 'Error de base de datos ocurrido',
