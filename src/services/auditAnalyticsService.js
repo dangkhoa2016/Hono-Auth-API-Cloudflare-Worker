@@ -127,7 +127,7 @@ export class AuditAnalyticsService extends BaseService {
   async getUserBehaviorAnalytics(options = {}) {
     const {
       timeframe = '7d',
-      userRole = null,
+      actorRole = null,
       // includeInactive = false
     } = options;
 
@@ -135,7 +135,7 @@ export class AuditAnalyticsService extends BaseService {
 
     try {
       const timeframeSql = this.getTimeframeSQL(timeframe);
-      const roleFilter = userRole ? `AND actor_role = '${userRole}'` : '';
+      const roleFilter = actorRole ? `AND actor_role = '${actorRole}'` : '';
 
       // Execute queries in parallel
       const [activityPatterns, actionsByRole, peakHours] = await Promise.all([
@@ -196,7 +196,7 @@ export class AuditAnalyticsService extends BaseService {
 
       const analytics = {
         timeframe,
-        actor_role_filter: userRole,
+        actor_role_filter: actorRole,
         generated_at: new Date().toISOString(),
         behavior_summary: {
           activity_patterns: activityPatterns || [],

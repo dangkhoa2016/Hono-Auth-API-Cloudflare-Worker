@@ -62,7 +62,7 @@ advancedAudit.get('/analytics',
         overview: {
           timeframe: query.timeframe,
           generated_at: new Date().toISOString(),
-          user_role: user.role
+          actor_role: user.role
         },
         security: securityAnalytics.security_summary || {},
         behavior: behaviorAnalytics.behavior_summary || {},
@@ -216,7 +216,7 @@ advancedAudit.get('/analytics/behavior',
 
       const analytics = await analyticsService.getUserBehaviorAnalytics({
         timeframe: query.timeframe,
-        userRole: query.userRole,
+        actorRole: query.actorRole,
         includeInactive: query.includeDetails
       });
 
@@ -244,7 +244,7 @@ advancedAudit.get('/analytics/behavior',
           actor: user.full_name || user.email,
           patternsFound: analytics.behavior_summary?.pattern_count || 0,
           usersAnalyzed: analytics.behavior_summary?.users_analyzed || 0,
-          targetRole: query.userRole || 'all roles'
+          targetRole: query.actorRole || 'all roles'
         })
       ));
 
@@ -260,7 +260,7 @@ advancedAudit.get('/analytics/behavior',
           reason: error.message || t(c, 'error.unknown'),
           operation: 'retrieve behavior analytics',
           timeframe: query?.timeframe || 'unknown',
-          targetRole: query?.userRole || 'all roles'
+          targetRole: query?.actorRole || 'all roles'
         }
       );
     }
@@ -1026,7 +1026,7 @@ function convertAnalyticsToCSV(analytics) {
 
   // Overview data
   lines.push(`Overview,Generated At,,${analytics.overview.generated_at},Timeframe: ${analytics.overview.timeframe}`);
-  lines.push(`Overview,User Role,,${analytics.overview.user_role},`);
+  lines.push(`Overview,User Role,,${analytics.overview.actor_role},`);
 
   // Security data
   if (analytics.security) {
@@ -1091,7 +1091,7 @@ function convertBehaviorAnalyticsToCSV(analytics) {
   lines.push('User ID,Role,Total Actions,Unique Actions,Active Days,Business Hours %');
 
   analytics.behavior_summary.activity_patterns.forEach(item => {
-    lines.push(`${item.user_id},${item.user_role},${item.total_actions},${item.unique_actions},${item.active_days},${item.business_hours_percentage}`);
+    lines.push(`${item.user_id},${item.actor_role},${item.total_actions},${item.unique_actions},${item.active_days},${item.business_hours_percentage}`);
   });
 
   return lines.join('\n');
@@ -1104,7 +1104,7 @@ function convertComplianceReportToCSV(report) {
   report.compliance_summary.access_patterns.forEach(item => {
     const successRate = item.successful_attempts && item.failed_attempts ?
       Math.round((item.successful_attempts / (item.successful_attempts + item.failed_attempts)) * 100) : 100;
-    lines.push(`${item.action},${item.user_role},${item.frequency},${item.unique_users},${successRate}%`);
+    lines.push(`${item.action},${item.actor_role},${item.frequency},${item.unique_users},${successRate}%`);
   });
 
   return lines.join('\n');
