@@ -132,7 +132,7 @@ export class AuditHelper {
     return await auditLogService.log({
       action,
       actor_id: details.user_id || null,
-      actor_role: details.user_role || null,
+      actor_role: details.actor_role || null,
       actor_email: email,
       target_type: 'AUTH',
       target_id: 'authentication',

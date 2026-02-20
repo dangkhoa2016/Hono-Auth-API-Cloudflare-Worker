@@ -24,7 +24,7 @@ export function createAuditQuerySchema(lang = 'en') {
     userId: builder.coerceNumber('userId', 1).optional(),
     action: builder.string('action', 0, 50).optional(),
     entityType: builder.string('entityType', 0, 100).optional(),
-    userRole: builder.enum(getAllRoles(), 'userRole').optional(),
+    actorRole: builder.enum(getAllRoles(), 'actorRole').optional(),
     startDate: builder.string('startDate').optional(),
     endDate: builder.string('endDate').optional(),
     search: builder.string('search', 0, 200).optional()
@@ -47,7 +47,7 @@ export function createAuditSearchSchema(lang = 'en') {
     userId: builder.coerceNumber('userId', 1).optional(),
     action: builder.string('action', 0, 50).optional(),
     entityType: builder.string('entityType', 0, 100).optional(),
-    userRole: builder.enum(getAllRoles(), 'userRole').optional(),
+    actorRole: builder.enum(getAllRoles(), 'actorRole').optional(),
     startDate: builder.string('startDate').optional(),
     endDate: builder.string('endDate').optional(),
     sortBy: builder.string('sortBy', 0, 50).optional().default('created_at'),
@@ -55,7 +55,7 @@ export function createAuditSearchSchema(lang = 'en') {
     searchFields: builder.string('searchFields').optional() // comma-separated fields to search in
   }, 'auditSearch').refine((data) => {
     // At least one of query, search, action, userId, or other filters must be provided
-    return data.query || data.search || data.action || data.userId || data.entityType || data.userRole || data.startDate;
+    return data.query || data.search || data.action || data.userId || data.entityType || data.actorRole || data.startDate;
   }, {
     // Provide required interpolation parameter 'min' used in translation string
     message: builder.tl('validation.auditSearch.atLeastOneFilterRequired', { min: 1 })
