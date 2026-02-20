@@ -20,7 +20,7 @@ export function createAnalyticsQuerySchema(lang = 'en') {
 
   return builder.object({
     timeframe: builder.enum(['1h', '24h', '7d', '30d', '90d', '1y'], 'timeframe').default('24h'),
-    userRole: builder.enum(getAllRoles(), 'userRole').optional(),
+    actorRole: builder.enum(getAllRoles(), 'actorRole').optional(),
     includeDetails: builder.coerceBoolean('includeDetails').default(false),
     format: builder.enum(['json', 'csv'], 'format').default('json')
   }, 'analyticsQuery');
@@ -122,7 +122,7 @@ export function createComplianceQuerySchema(lang = 'en') {
 
   return builder.object({
     timeframe: builder.enum(['1h', '24h', '7d', '30d', '90d', '1y'], 'timeframe').default('24h'),
-    userRole: builder.enum(getAllRoles(), 'userRole').optional(),
+    actorRole: builder.enum(getAllRoles(), 'actorRole').optional(),
     includeDetails: builder.boolean('includeDetails').default(false),
     format: builder.enum(['json', 'csv'], 'format').default('json'),
     includeUserData: builder.boolean('includeUserData').default(false)

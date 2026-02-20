@@ -171,6 +171,7 @@ export class AuditLogService extends BaseService {
         query,           // Search query for full-text search
         action,
         actor_id,
+        actor_role,
         target_type,
         start_date,
         end_date,
@@ -196,6 +197,7 @@ export class AuditLogService extends BaseService {
       const { whereClause, params } = buildAuditWhereClause({
         action,
         actor_id,
+        actor_role,
         target_type,
         start_date,
         end_date,
@@ -556,11 +558,11 @@ export class AuditLogService extends BaseService {
 
       const {
         timeframe = '7d',
-        userRole = null
+        actorRole = null
       } = options;
 
       const timeframeSql = this.getTimeframeSQL(timeframe);
-      const roleFilter = userRole ? `AND actor_role = '${userRole}'` : '';
+      const roleFilter = actorRole ? `AND actor_role = '${actorRole}'` : '';
 
       // User activity patterns
       const activityPatternsQuery = `
@@ -624,7 +626,7 @@ export class AuditLogService extends BaseService {
 
       const result = {
         timeframe,
-        actor_role_filter: userRole,
+        actor_role_filter: actorRole,
         generated_at: new Date().toISOString(),
         behavior_summary: {
           activity_patterns: activityPatterns || [],

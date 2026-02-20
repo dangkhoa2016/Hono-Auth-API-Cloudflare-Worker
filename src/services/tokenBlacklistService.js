@@ -166,7 +166,7 @@ export class TokenBlacklistService extends BaseService {
         `SELECT tb.*, 
                 u.email as user_email, 
                 u.full_name as user_full_name,
-                u.role as user_role,
+                u.role as actor_role,
                 (SELECT COUNT(*) FROM token_audit_logs tal WHERE tal.token_jti = tb.jti) as usage_count
          FROM token_blacklist tb
          LEFT JOIN users u ON tb.user_id = u.id

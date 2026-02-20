@@ -554,7 +554,7 @@ export class BaseSchemaBuilder {
     return this.object({
       severity: this.enum(['low', 'medium', 'high', 'critical'], 'severity').optional(),
       department: this.string('department', 0, 100).optional(),
-      userRole: this.enum(getAllRoles(), 'userRole').optional()
+      actorRole: this.enum(getAllRoles(), 'actorRole').optional()
     }, 'filterCriteria').optional();
   }
 

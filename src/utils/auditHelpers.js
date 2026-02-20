@@ -25,6 +25,11 @@ export function buildAuditWhereClause(filters = {}, params = []) {
     newParams.push(filters.actor_id);
   }
 
+  if (filters.actor_role) {
+    conditions.push('actor_role = ?');
+    newParams.push(filters.actor_role);
+  }
+
   if (filters.target_type) {
     conditions.push('target_type = ?');
     newParams.push(filters.target_type);

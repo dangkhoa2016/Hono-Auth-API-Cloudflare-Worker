@@ -32,6 +32,7 @@ audit.get('/logs',
   async (c) => {
     const user = c.get('user');
     const query = c.req.valid('query');
+    const actorRoleFilter = query.actorRole || c.req.query('actorRole');
 
     try {
       auditRoutes_log(`Audit logs request by ${user.role} ${user.id} with filters:`, query);
@@ -43,6 +44,7 @@ audit.get('/logs',
         exclude_super_admin: user.role === ROLES.ADMIN, // Admin users only see non-super_admin logs
         action: query.action,
         actor_id: query.userId,
+        actor_role: actorRoleFilter,
         target_type: query.entityType,
         start_date: query.startDate,
         end_date: query.endDate
@@ -123,12 +125,16 @@ audit.get('/search',
   async (c) => {
     const user = c.get('user');
     const query = c.req.valid('query');
+    const actorRoleFilter = query.actorRole || c.req.query('actorRole');
 
     try {
       auditRoutes_log(`Audit search request by ${user.role} ${user.id}:`, query);
 
       const auditLogService = createAuditLogService(c.env);
-      const result = await auditLogService.searchLogs(query, user.role, user.id);
+      const result = await auditLogService.searchLogs({
+        ...query,
+        actorRole: actorRoleFilter
+      }, user.role, user.id);
 
       if (!result.success) {
         return await handleStandardError(
