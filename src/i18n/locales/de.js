@@ -526,7 +526,7 @@ export default {
       'featureNotFound': 'Feature nicht gefunden oder nicht erlaubt',
       'featureToggleFailed': 'Feature "{{feature}}" konnte nicht umgeschaltet werden: {{reason}}',
       'invalidFeatureValue': 'Ungültiger Feature-Wert - muss boolean sein',
-      'invalidKey': 'Konfigurationsschlüssel „{{key}}“ ist nicht zulässig – gültige Schlüssel: {{validKeys}}',
+      'invalidKey': 'Konfigurationsschlüssel "{{key}}" ist nicht zulässig',
       'keyNotFound': 'Konfigurationsschlüssel „{{key}}“ nicht gefunden',
       'performanceSettingsRetrieveFailed': 'Leistungseinstellungen konnten nicht abgerufen werden: {{reason}}',
       'realtimeSettingsRetrieveFailed': 'Echtzeit-Überwachungseinstellungen konnten nicht abgerufen werden: {{reason}}',

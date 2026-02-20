@@ -526,7 +526,7 @@ export default {
       'featureNotFound': 'フィーチャーが見つからないか、許可されていません',
       'featureToggleFailed': 'フィーチャー「{{feature}}」の切り替えに失敗しました: {{reason}}',
       'invalidFeatureValue': '無効なフィーチャー値 - ブール値である必要があります',
-      'invalidKey': '設定キー "{{key}}" は許可されていません - 有効なキー: {{validKeys}}',
+      'invalidKey': '設定キー "{{key}}" は許可されていません',
       'keyNotFound': '設定キー "{{key}}" が見つかりません',
       'performanceSettingsRetrieveFailed': 'パフォーマンス設定の取得に失敗しました: {{reason}}',
       'realtimeSettingsRetrieveFailed': 'リアルタイムモニタリング設定の取得に失敗しました: {{reason}}',

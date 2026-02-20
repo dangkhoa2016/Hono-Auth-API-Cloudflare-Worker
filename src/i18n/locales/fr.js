@@ -526,7 +526,7 @@ export default {
       'featureNotFound': 'Fonctionnalité introuvable ou non autorisée',
       'featureToggleFailed': 'Impossible de basculer la fonctionnalité "{{feature}}" : {{reason}}',
       'invalidFeatureValue': 'Valeur de fonctionnalité invalide - doit être booléenne',
-      'invalidKey': 'La clé de configuration « {{key}} » n\'est pas autorisée - clés valides : {{validKeys}}',
+      'invalidKey': 'La clé de configuration "{{key}}" n\'est pas autorisée',
       'keyNotFound': 'Clé de configuration « {{key}} » introuvable',
       'performanceSettingsRetrieveFailed': 'Impossible de récupérer les paramètres de performance : {{reason}}',
       'realtimeSettingsRetrieveFailed': 'Impossible de récupérer les paramètres de surveillance en temps réel : {{reason}}',

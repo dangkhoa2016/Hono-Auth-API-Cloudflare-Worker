@@ -526,7 +526,7 @@ export default {
       'featureNotFound': 'ไม่พบฟีเจอร์หรือไม่ได้รับอนุญาต',
       'featureToggleFailed': 'ไม่สามารถเปลี่ยนฟีเจอร์ "{{feature}}" ได้: {{reason}}',
       'invalidFeatureValue': 'ค่าฟีเจอร์ไม่ถูกต้อง - ต้องเป็นค่าบูลีน',
-      'invalidKey': 'คีย์การกำหนดค่า "{{key}}" ไม่ได้รับอนุญาต - คีย์ที่ถูกต้อง: {{validKeys}}',
+      'invalidKey': 'คีย์การกำหนดค่า "{{key}}" ไม่ได้รับอนุญาต',
       'keyNotFound': 'ไม่พบคีย์การกำหนดค่า "{{key}}"',
       'performanceSettingsRetrieveFailed': 'ไม่สามารถดึงข้อมูลการตั้งค่าประสิทธิภาพได้: {{reason}}',
       'realtimeSettingsRetrieveFailed': 'ไม่สามารถดึงข้อมูลการตั้งค่าการตรวจสอบแบบเรียลไทม์ได้: {{reason}}',

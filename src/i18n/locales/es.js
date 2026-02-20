@@ -526,7 +526,7 @@ export default {
       'featureNotFound': 'Característica no encontrada o no permitida',
       'featureToggleFailed': 'Error al alternar característica "{{feature}}": {{reason}}',
       'invalidFeatureValue': 'Valor de característica inválido - debe ser booleano',
-      'invalidKey': 'La clave de configuración "{{key}}" no está permitida - claves válidas: {{validKeys}}',
+      'invalidKey': 'La clave de configuración "{{key}}" no está permitida',
       'keyNotFound': 'Clave de configuración "{{key}}" no encontrada',
       'performanceSettingsRetrieveFailed': 'Error al recuperar configuraciones de rendimiento: {{reason}}',
       'realtimeSettingsRetrieveFailed': 'Error al recuperar configuraciones de monitoreo en tiempo real: {{reason}}',
