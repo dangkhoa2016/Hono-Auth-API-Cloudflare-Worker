@@ -593,11 +593,11 @@ admin.get('/system-health', requireAdmin, async (c) => {
 
     // Security assessment using environment configuration
     const securityStatus = {
-      recentFailedLogins: databaseMetrics.security.recentFailures1h,
+      recentFailedLogins: databaseMetrics.security.recentFailures,
       totalFailedAttempts: databaseMetrics.security.totalFailedAttempts,
       uniqueIpsWithFailures: databaseMetrics.security.uniqueIpsWithFailures,
-      riskLevel: databaseMetrics.security.recentFailures1h > securityConfig.highRiskThreshold ? 'high' :
-        databaseMetrics.security.recentFailures1h > (securityConfig.highRiskThreshold / 2) ? 'medium' : 'low'
+      riskLevel: databaseMetrics.security.recentFailures > securityConfig.highRiskThreshold ? 'high' :
+        databaseMetrics.security.recentFailures > (securityConfig.highRiskThreshold / 2) ? 'medium' : 'low'
     };
 
     // Performance assessment using environment configuration
