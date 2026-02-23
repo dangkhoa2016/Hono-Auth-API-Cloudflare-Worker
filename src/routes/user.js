@@ -221,6 +221,50 @@ user.get('/verify-email', async (c) => {
   }
 });
 
+// DELETE /pending-email - Clear pending unverified email change for current user
+user.delete('/pending-email', authMiddleware, async (c) => {
+  const userPayload = c.get('user');
+
+  userRoutes_log(`Clear pending email request for user: ${userPayload.user_id}`);
+
+  try {
+    const userService = createUserService(c.env);
+    const result = await userService.clearPendingEmailChange(userPayload.user_id);
+
+    if (!result.success) {
+      if (result.error === 'USER_NOT_FOUND') {
+        return await handleStandardError(c, new Error('NOT_FOUND'), 'Clear pending email - user not found', userRoutes_log, 'user.notFound', { userName: `User ID: ${userPayload.user_id}` }, 404);
+      }
+
+      if (result.error === 'NO_PENDING_EMAIL_CHANGE') {
+        return await handleStandardError(c, new Error('NO_PENDING_EMAIL_CHANGE'), 'Clear pending email - no pending change', userRoutes_log, 'user.updateFailed', { userName: getUserActor(c), reason: 'No pending email change' }, 400);
+      }
+
+      return await handleStandardError(c, new Error(result.error), 'Clear pending email failed with unknown error', error_log, 'system.serverError');
+    }
+
+    const updatedUser = await userService.findById(userPayload.user_id);
+
+    userRoutes_log(`Pending email cleared successfully for user: ${userPayload.user_id}`);
+
+    return c.json(createSuccessResponse({
+      id: updatedUser.id,
+      full_name: updatedUser.full_name,
+      email: updatedUser.email,
+      new_email: updatedUser.new_email,
+      status: updatedUser.status,
+      created_at: updatedUser.created_at,
+      role: updatedUser.role,
+      emailVerificationPending: false
+    }, tSuccess(c, 'user.updated', {
+      userName: updatedUser.full_name,
+      updatedFields: 'new_email'
+    })));
+  } catch (error) {
+    return await handleStandardError(c, error, 'Failed to clear pending email change', error_log, 'user.updateFailed', { userName: 'User', reason: error.message });
+  }
+});
+
 // PUT /profile - Update profile information with XSS protection
 // PUT /me - Alias for profile update with XSS protection
 user.on('PUT', ['/profile', '/me'], authMiddleware, i18nValidatorsMiddleware.updateProfile(), async (c) => {

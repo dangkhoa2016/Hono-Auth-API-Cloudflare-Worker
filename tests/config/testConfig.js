@@ -114,6 +114,7 @@ export const API_ENDPOINTS = {
   userUpload: '/api/user/upload',
   userChangePassword: '/api/user/change-password',
   verifyEmail: '/api/user/verify-email',
+  clearPendingEmail: '/api/user/pending-email',
 
   // Admin endpoints
   adminDashboard: '/api/admin/dashboard',

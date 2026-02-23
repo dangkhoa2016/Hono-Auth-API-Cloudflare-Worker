@@ -1755,4 +1755,16 @@ curl -s -X POST http://localhost:8788/api/auth/login -H "Content-Type: applicati
 for role in user admin superadmin; do echo "=== Testing $role ===" && curl -s -X POST http://localhost:8788/api/auth/login -H "Content-Type: application/json" -d "{\"email\":\"test-${role}@example.com\",\"password\":\"password123\"}" | jq -r '.data.access_token' | xargs -I {} curl -s -H "Authorization: Bearer {}" http://localhost:8788/api/admin/users | jq .; done
 ```
 
+### Pending Email Clear Flow Script
+
+Use this script to verify the full flow for the new endpoint:
+- Request email change
+- Clear pending email once (expect `200`)
+- Clear pending email again (expect `400`)
+
+```bash
+# Run from project root
+bash tests/scripts/test-pending-email-clear.sh
+```
+
 This comprehensive guide covers all aspects of RBAC testing for the Hono Auth Worker system. Use these commands to validate the security and functionality of your authentication system.
