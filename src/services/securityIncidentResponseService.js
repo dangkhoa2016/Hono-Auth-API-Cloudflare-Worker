@@ -421,20 +421,65 @@ class IncidentResponseEngine {
  * Manages security incident lifecycle and storage
 */
 class IncidentManager {
+  // --- Response Actions DB CRUD ---
+  async addResponseActionRecord(action) {
+    // Insert into DB
+    await this.db.insert(
+      `INSERT INTO incident_response_actions (incident_id, rule_id, rule_name, action_type, action_status, priority, params, result, executed_at, completed_at, error_message, created_at)
+       VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+      [
+        action.incident_id,
+        action.rule_id || null,
+        action.rule_name || null,
+        action.action_type,
+        action.action_status || 'completed',
+        action.priority || 0,
+        action.params ? JSON.stringify(action.params) : null,
+        action.result ? JSON.stringify(action.result) : null,
+        action.executed_at || new Date().toISOString(),
+        action.completed_at || null,
+        action.error_message || null,
+        action.executed_at || new Date().toISOString()
+      ]
+    );
+    // Optionally: update cache if needed
+  }
+
+  async getResponseActions(incidentId) {
+    const rows = await this.db.select(
+      `SELECT * FROM incident_response_actions WHERE incident_id = ? ORDER BY executed_at ASC`,
+      [incidentId]
+    );
+    return rows.map(row => ({
+      id: row.id,
+      incident_id: row.incident_id,
+      rule_id: row.rule_id,
+      rule_name: row.rule_name,
+      action_type: row.action_type,
+      action_status: row.action_status,
+      priority: row.priority,
+      params: row.params ? JSON.parse(row.params) : null,
+      result: row.result ? JSON.parse(row.result) : null,
+      executed_at: row.executed_at,
+      completed_at: row.completed_at,
+      error_message: row.error_message,
+      created_at: row.created_at
+    }));
+  }
+
   constructor(databaseService) {
     this.db = databaseService;
-    this.incidents = new Map();
+    this.incidents = new Map(); // RAM cache: id -> incident
     this.incidentCounter = 0;
-
     securityIncident_log('IncidentManager initialized');
   }
 
   /**
    * Create a new security incident
    */
-  createIncident(incidentData) {
+  async createIncident(incidentData) {
     const incidentId = `SEC_${Date.now()}_${++this.incidentCounter}`;
-
+    const now = new Date().toISOString();
     const incident = {
       id: incidentId,
       type: incidentData.type,
@@ -443,55 +488,55 @@ class IncidentManager {
       title: incidentData.title,
       description: incidentData.description,
       metadata: incidentData.metadata || {},
-      detectedAt: new Date().toISOString(),
-      updatedAt: new Date().toISOString(),
+      detectedAt: now,
+      updatedAt: now,
       assignee: null,
-      timeline: [{
-        timestamp: new Date().toISOString(),
-        event: 'incident_created',
-        description: 'Security incident detected and created',
-        actor: 'system'
-      }],
-      responseResults: [],
-      tags: incidentData.tags || []
     };
-
-    this.incidents.set(incidentId, incident);
+    // Insert into DB
+    await this.db.insert(
+      `INSERT INTO security_incidents (id, type, severity, status, title, description, metadata, detected_at, updated_at, tags, created_by) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+      [incident.id, incident.type, incident.severity, incident.status, incident.title, incident.description, JSON.stringify(incident.metadata), incident.detectedAt, incident.updatedAt, JSON.stringify(incident.tags), incidentData.metadata?.createdBy || 'system']
+    );
+    // Add timeline entry in DB
+    await this.db.insert(
+      `INSERT INTO incident_timeline (incident_id, timestamp, event_type, description, actor, details) VALUES (?, ?, ?, ?, ?, ?)`,
+      [incident.id, now, 'incident_created', 'Security incident detected and created', 'system', null]
+    );
+    // Cache in RAM
+    this.incidents.set(incidentId, { ...incident, timeline: [{ timestamp: now, event: 'incident_created', description: 'Security incident detected and created', actor: 'system' }], responseResults: [] });
     securityIncident_log(`Security incident created: ${incidentId} (${incident.type})`);
-
-    return incident;
+    return this.incidents.get(incidentId);
   }
 
   /**
    * Update incident status
    */
-  updateIncidentStatus(incidentId, newStatus, updateInfo = {}) {
-    const incident = this.incidents.get(incidentId);
+  async updateIncidentStatus(incidentId, newStatus, updateInfo = {}) {
+    let incident = this.incidents.get(incidentId);
     if (!incident) {
-      throw new Error(`Incident not found: ${incidentId}`);
+      // Try to load from DB
+      incident = await this.getIncident(incidentId);
+      if (!incident) throw new Error(`Incident not found: ${incidentId}`);
     }
-
     const oldStatus = incident.status;
     incident.status = newStatus;
     incident.updatedAt = new Date().toISOString();
-
-    if (updateInfo.assignedTo) {
-      incident.assignee = updateInfo.assignedTo;
-    }
-
-    if (updateInfo.resolution) {
-      incident.resolution = updateInfo.resolution;
-    }
-
-    // Add timeline entry
-    incident.timeline.push({
-      timestamp: new Date().toISOString(),
-      event: 'status_change',
-      description: `Status changed from ${oldStatus} to ${newStatus}`,
-      actor: updateInfo.actor || 'system',
-      resolution: updateInfo.resolution
-    });
-
+    if (updateInfo.assignedTo) incident.assignee = updateInfo.assignedTo;
+    if (updateInfo.resolution) incident.resolution = updateInfo.resolution;
+    // Update DB
+    await this.db.update(
+      `UPDATE security_incidents SET status=?, updated_at=?, assignee=?, notes=? WHERE id=?`,
+      [incident.status, incident.updatedAt, incident.assignee, updateInfo.resolution || null, incidentId]
+    );
+    // Add timeline entry in DB
+    await this.db.insert(
+      `INSERT INTO incident_timeline (incident_id, timestamp, event_type, description, actor, details) VALUES (?, ?, ?, ?, ?, ?)`,
+      [incidentId, incident.updatedAt, 'status_change', `Status changed from ${oldStatus} to ${newStatus}`, updateInfo.actor || 'system', updateInfo.resolution ? JSON.stringify({ resolution: updateInfo.resolution }) : null]
+    );
+    // Update cache
+    if (!incident.timeline) incident.timeline = [];
+    incident.timeline.push({ timestamp: incident.updatedAt, event: 'status_change', description: `Status changed from ${oldStatus} to ${newStatus}`, actor: updateInfo.actor || 'system', resolution: updateInfo.resolution });
+    this.incidents.set(incidentId, incident);
     securityIncident_log(`Incident ${incidentId} status updated: ${oldStatus} -> ${newStatus}`);
     return incident;
   }
@@ -499,24 +544,37 @@ class IncidentManager {
   /**
    * Add response results to incident
    */
-  addResponseResults(incidentId, responseResults) {
-    const incident = this.incidents.get(incidentId);
+  async addResponseResults(incidentId, responseResults) {
+    let incident = this.incidents.get(incidentId);
     if (!incident) {
-      throw new Error(`Incident not found: ${incidentId}`);
+      incident = await this.getIncident(incidentId);
+      if (!incident) throw new Error(`Incident not found: ${incidentId}`);
     }
-
+    if (!incident.responseResults) incident.responseResults = [];
     incident.responseResults.push(responseResults);
     incident.updatedAt = new Date().toISOString();
-
-    // Add timeline entry
-    incident.timeline.push({
-      timestamp: new Date().toISOString(),
-      event: 'response_executed',
-      description: `Automated response executed: ${responseResults.actionsExecuted} actions`,
-      actor: 'automated_response_system',
-      details: responseResults
-    });
-
+    // Insert response actions into DB (flattened)
+    if (responseResults.results && Array.isArray(responseResults.results)) {
+      for (const ruleResult of responseResults.results) {
+        if (ruleResult.actions && Array.isArray(ruleResult.actions)) {
+          for (const action of ruleResult.actions) {
+            await this.db.insert(
+              `INSERT INTO incident_response_actions (incident_id, rule_id, rule_name, action_type, action_status, priority, params, result, executed_at, completed_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+              [incidentId, ruleResult.ruleId, ruleResult.ruleName, action.action, action.success ? 'completed' : 'failed', action.priority || 0, action.params ? JSON.stringify(action.params) : null, JSON.stringify(action), action.timestamp || incident.updatedAt, action.timestamp || incident.updatedAt]
+            );
+          }
+        }
+      }
+    }
+    // Add timeline entry in DB
+    await this.db.insert(
+      `INSERT INTO incident_timeline (incident_id, timestamp, event_type, description, actor, details) VALUES (?, ?, ?, ?, ?, ?)`,
+      [incidentId, incident.updatedAt, 'response_executed', `Automated response executed: ${responseResults.actionsExecuted} actions`, 'automated_response_system', JSON.stringify(responseResults)]
+    );
+    // Update cache
+    if (!incident.timeline) incident.timeline = [];
+    incident.timeline.push({ timestamp: incident.updatedAt, event: 'response_executed', description: `Automated response executed: ${responseResults.actionsExecuted} actions`, actor: 'automated_response_system', details: responseResults });
+    this.incidents.set(incidentId, incident);
     securityIncident_log(`Response results added to incident ${incidentId}`);
     return incident;
   }
@@ -524,58 +582,74 @@ class IncidentManager {
   /**
    * Get incident by ID
    */
-  getIncident(incidentId) {
-    return this.incidents.get(incidentId);
+  async getIncident(incidentId) {
+    // Try RAM cache first
+    if (this.incidents.has(incidentId)) return this.incidents.get(incidentId);
+    // Load from DB
+    const row = await this.db.select('SELECT * FROM security_incidents WHERE id = ?', [incidentId], true);
+    if (!row) return null;
+    // Load timeline
+    const timeline = await this.db.select('SELECT * FROM incident_timeline WHERE incident_id = ? ORDER BY timestamp ASC', [incidentId]);
+    // Load response actions
+    const responseActions = await this.db.select('SELECT * FROM incident_response_actions WHERE incident_id = ?', [incidentId]);
+    // Parse JSON fields
+    row.metadata = row.metadata ? JSON.parse(row.metadata) : {};
+    row.tags = row.tags ? JSON.parse(row.tags) : [];
+    row.timeline = timeline || [];
+    row.responseResults = responseActions || [];
+    this.incidents.set(incidentId, row);
+    return row;
   }
 
   /**
    * Get all incidents with optional filters
    */
-  getIncidents(filters = {}) {
-    let incidents = Array.from(this.incidents.values());
+  async getIncidents(filters = {}) {
+    // Build WHERE clause
+    const allowedFields = ['status', 'severity', 'type'];
+    const search = typeof filters.search === 'string' ? filters.search.trim() : '';
+    const { whereClause: baseWhereClause, params: baseParams } = this.db.buildWhereClause(filters, allowedFields);
 
-    // Filter by status
-    if (filters.status) {
-      incidents = incidents.filter(i => i.status === filters.status);
+    const whereParts = [];
+    const params = [];
+
+    if (baseWhereClause) {
+      whereParts.push(baseWhereClause.replace(/^WHERE\s+/i, ''));
+      params.push(...baseParams);
     }
 
-    // Filter by severity
-    if (filters.severity) {
-      incidents = incidents.filter(i => i.severity === filters.severity);
+    if (search) {
+      const likeValue = `%${search}%`;
+      whereParts.push('(id LIKE ? OR title LIKE ? OR type LIKE ? OR description LIKE ? OR created_by LIKE ?)');
+      params.push(likeValue, likeValue, likeValue, likeValue, likeValue);
     }
 
-    // Filter by type
-    if (filters.type) {
-      incidents = incidents.filter(i => i.type === filters.type);
-    }
+    const whereClause = whereParts.length > 0 ? `WHERE ${whereParts.join(' AND ')}` : '';
 
-    // Filter by time range
-    if (filters.startTime) {
-      const startTime = new Date(filters.startTime);
-      incidents = incidents.filter(i => new Date(i.detectedAt) >= startTime);
-    }
-
-    if (filters.endTime) {
-      const endTime = new Date(filters.endTime);
-      incidents = incidents.filter(i => new Date(i.detectedAt) <= endTime);
-    }
-
-    // Sort by detection time (newest first)
-    incidents.sort((a, b) => new Date(b.detectedAt) - new Date(a.detectedAt));
-
-    // Pagination
     const page = filters.page || 1;
     const limit = filters.limit || 50;
-    const startIndex = (page - 1) * limit;
-    const endIndex = startIndex + limit;
-
+    const offset = (page - 1) * limit;
+    const sql = `SELECT * FROM security_incidents ${whereClause} ORDER BY detected_at DESC LIMIT ? OFFSET ?`;
+    const allParams = [...params, limit, offset];
+    const rows = await this.db.select(sql, allParams);
+    // Parse JSON fields and cache
+    const incidents = [];
+    for (const row of rows) {
+      row.metadata = row.metadata ? JSON.parse(row.metadata) : {};
+      row.tags = row.tags ? JSON.parse(row.tags) : [];
+      // Optionally load timeline/response if needed (skip for perf)
+      this.incidents.set(row.id, row);
+      incidents.push(row);
+    }
+    // Get total count
+    const countRow = await this.db.select(`SELECT COUNT(*) as total FROM security_incidents ${whereClause}`, params, true);
     return {
-      incidents: incidents.slice(startIndex, endIndex),
+      incidents,
       pagination: {
         page,
         limit,
-        total: incidents.length,
-        pages: Math.ceil(incidents.length / limit)
+        total: countRow?.total || 0,
+        pages: Math.ceil((countRow?.total || 0) / limit)
       }
     };
   }
@@ -583,40 +657,36 @@ class IncidentManager {
   /**
    * Get incident statistics
    */
-  getIncidentStats() {
-    const incidents = Array.from(this.incidents.values());
-    const last24h = new Date(Date.now() - 24 * 60 * 60 * 1000);
-    const last7d = new Date(Date.now() - 7 * 24 * 60 * 60 * 1000);
-
+  async getIncidentStats() {
+    // Total
+    const totalRow = await this.db.select('SELECT COUNT(*) as total FROM security_incidents', [], true);
+    // By status
+    const byStatusRows = await this.db.select('SELECT status, COUNT(*) as count FROM security_incidents GROUP BY status');
+    // By severity
+    const bySeverityRows = await this.db.select('SELECT severity, COUNT(*) as count FROM security_incidents GROUP BY severity');
+    // By type
+    const byTypeRows = await this.db.select('SELECT type, COUNT(*) as count FROM security_incidents GROUP BY type');
+    // Recent
+    const last24hRow = await this.db.select('SELECT COUNT(*) as count FROM security_incidents WHERE detected_at >= datetime("now", "-24 hours")', [], true);
+    const last7dRow = await this.db.select('SELECT COUNT(*) as count FROM security_incidents WHERE detected_at >= datetime("now", "-7 days")', [], true);
+    // Open incidents
+    const openRow = await this.db.select('SELECT COUNT(*) as count FROM security_incidents WHERE status NOT IN (?, ?)', [INCIDENT_STATUS.RESOLVED, INCIDENT_STATUS.FALSE_POSITIVE], true);
+    // Compose stats
     const stats = {
-      total: incidents.length,
+      total: totalRow?.total || 0,
       byStatus: {},
       bySeverity: {},
       byType: {},
       recent: {
-        last24h: incidents.filter(i => new Date(i.detectedAt) >= last24h).length,
-        last7d: incidents.filter(i => new Date(i.detectedAt) >= last7d).length
+        last24h: last24hRow?.count || 0,
+        last7d: last7dRow?.count || 0
       },
-      avgResolutionTime: 0,
-      openIncidents: incidents.filter(i => ![INCIDENT_STATUS.RESOLVED, INCIDENT_STATUS.FALSE_POSITIVE].includes(i.status)).length
+      avgResolutionTime: 0, // TODO: calculate from resolved_at - detected_at
+      openIncidents: openRow?.count || 0
     };
-
-    // Count by status
-    for (const status of Object.values(INCIDENT_STATUS)) {
-      stats.byStatus[status] = incidents.filter(i => i.status === status).length;
-    }
-
-    // Count by severity
-    for (const severity of Object.values(INCIDENT_SEVERITY)) {
-      stats.bySeverity[severity] = incidents.filter(i => i.severity === severity).length;
-    }
-
-    // Count by type
-    const types = [...new Set(incidents.map(i => i.type))];
-    for (const type of types) {
-      stats.byType[type] = incidents.filter(i => i.type === type).length;
-    }
-
+    for (const row of byStatusRows) stats.byStatus[row.status] = row.count;
+    for (const row of bySeverityRows) stats.bySeverity[row.severity] = row.count;
+    for (const row of byTypeRows) stats.byType[row.type] = row.count;
     return stats;
   }
 }
@@ -640,7 +710,7 @@ export class SecurityIncidentResponseService extends BaseService {
   async processThreat(threatData) {
     try {
       // Create security incident from threat
-      const incident = this.incidentManager.createIncident({
+      const incident = await this.incidentManager.createIncident({
         type: threatData.threatType || threatData.type,
         severity: this.mapThreatSeverityToIncident(threatData.severity),
         title: `Security Threat: ${threatData.threatType || threatData.type}`,
@@ -656,11 +726,11 @@ export class SecurityIncidentResponseService extends BaseService {
       const responseResults = await this.responseEngine.executeResponse(incident);
 
       // Add response results to incident
-      this.incidentManager.addResponseResults(incident.id, responseResults);
+      await this.incidentManager.addResponseResults(incident.id, responseResults);
 
       // Update incident status based on response
       if (responseResults.actionsExecuted > 0) {
-        this.incidentManager.updateIncidentStatus(incident.id, INCIDENT_STATUS.CONTAINED, {
+        await this.incidentManager.updateIncidentStatus(incident.id, INCIDENT_STATUS.CONTAINED, {
           actor: 'automated_response',
           notes: `Automated response executed: ${responseResults.actionsExecuted} actions`
         });
@@ -696,12 +766,11 @@ export class SecurityIncidentResponseService extends BaseService {
   /**
    * Create manual security incident
    */
-  createManualIncident(incidentData) {
-    const incident = this.incidentManager.createIncident({
+  async createManualIncident(incidentData) {
+    const incident = await this.incidentManager.createIncident({
       ...incidentData,
       tags: [...(incidentData.tags || []), 'manual']
     });
-
     securityIncident_log(`Manual incident created: ${incident.id}`);
     return incident;
   }
@@ -709,29 +778,29 @@ export class SecurityIncidentResponseService extends BaseService {
   /**
    * Update incident status
    */
-  updateIncidentStatus(incidentId, newStatus, updateInfo = {}) {
-    return this.incidentManager.updateIncidentStatus(incidentId, newStatus, updateInfo);
+  async updateIncidentStatus(incidentId, newStatus, updateInfo = {}) {
+    return await this.incidentManager.updateIncidentStatus(incidentId, newStatus, updateInfo);
   }
 
   /**
    * Get incident details
    */
-  getIncident(incidentId) {
-    return this.incidentManager.getIncident(incidentId);
+  async getIncident(incidentId) {
+    return await this.incidentManager.getIncident(incidentId);
   }
 
   /**
    * Get incidents with filters
    */
-  getIncidents(filters = {}) {
-    return this.incidentManager.getIncidents(filters);
+  async getIncidents(filters = {}) {
+    return await this.incidentManager.getIncidents(filters);
   }
 
   /**
    * Get incident statistics
    */
-  getIncidentStatistics() {
-    return this.incidentManager.getIncidentStats();
+  async getIncidentStatistics() {
+    return await this.incidentManager.getIncidentStats();
   }
 
   /**
@@ -745,7 +814,7 @@ export class SecurityIncidentResponseService extends BaseService {
    * Execute manual response action
    */
   async executeManualResponse(incidentId, actions) {
-    const incident = this.incidentManager.getIncident(incidentId);
+    const incident = await this.incidentManager.getIncident(incidentId);
     if (!incident) {
       throw new Error(`Incident not found: ${incidentId}`);
     }
@@ -799,7 +868,7 @@ export class SecurityIncidentResponseService extends BaseService {
       manual: true
     };
 
-    this.incidentManager.addResponseResults(incidentId, manualResponseResults);
+    await this.incidentManager.addResponseResults(incidentId, manualResponseResults);
 
     securityIncident_log(`Manual response executed for incident ${incidentId}`);
     return manualResponseResults;
