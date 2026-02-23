@@ -1253,6 +1253,48 @@ export class UserService extends BaseService {
   }
 
   /**
+   * Clear pending email change data for user
+   * @param {number} userId - User ID
+   * @returns {Promise<{success: boolean, error?: string, message?: string}>}
+   */
+  async clearPendingEmailChange(userId) {
+    userService_log(`Clearing pending email change for user ${userId}`);
+
+    try {
+      const user = await this.findById(userId);
+
+      if (!user) {
+        return { success: false, error: 'USER_NOT_FOUND', message: 'User not found' };
+      }
+
+      if (!user.new_email) {
+        return { success: false, error: 'NO_PENDING_EMAIL_CHANGE', message: 'No pending email change to clear' };
+      }
+
+      const { setClause, params } = this.dbService.buildSetClause({
+        new_email: null,
+        email_verification_token: null,
+        email_verification_expires_at: null
+      });
+
+      const result = await this.dbService.update(
+        `UPDATE users SET ${setClause} WHERE id = ?`,
+        [...params, userId]
+      );
+
+      if (!result || !result.success) {
+        return { success: false, error: 'UPDATE_FAILED', message: 'Failed to clear pending email change' };
+      }
+
+      userService_log(`Pending email change cleared for user ${userId}`);
+      return { success: true };
+    } catch (error) {
+      dbError_log(`Error clearing pending email change: ${error.message}`);
+      return { success: false, error: 'SYSTEM_ERROR', details: error.message };
+    }
+  }
+
+  /**
    * Find user by email verification token
    * @param {string} token - Verification token
    * @returns {Promise<Object|null>} User object
