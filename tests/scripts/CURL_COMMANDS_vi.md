@@ -1753,4 +1753,16 @@ curl -s -X POST http://localhost:8788/api/auth/login -H "Content-Type: applicati
 for role in user admin superadmin; do echo "=== Kiểm thử $role ===" && curl -s -X POST http://localhost:8788/api/auth/login -H "Content-Type: application/json" -d "{\"email\":\"test-${role}@example.com\",\"password\":\"password123\"}" | jq -r '.data.access_token' | xargs -I {} curl -s -H "Authorization: Bearer {}" http://localhost:8788/api/admin/users | jq .; done
 ```
 
+### Script Test Flow Xóa Email Chờ Xác Minh
+
+Sử dụng script này để kiểm tra đầy đủ flow của endpoint mới:
+- Yêu cầu đổi email
+- Xóa email chờ xác minh lần 1 (kỳ vọng `200`)
+- Xóa email chờ xác minh lần 2 (kỳ vọng `400`)
+
+```bash
+# Chạy từ thư mục gốc project
+bash tests/scripts/test-pending-email-clear.sh
+```
+
 Hướng dẫn toàn diện này bao gồm tất cả các khía cạnh kiểm thử RBAC cho hệ thống Hono Auth Worker. Sử dụng những lệnh này để validate tính bảo mật và chức năng của hệ thống xác thực của bạn.

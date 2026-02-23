@@ -8,14 +8,17 @@
  * 2. Login to get authentication token.
  * 3. Request Email Change via PUT /profile.
  * 4. Verify API response indicates pending verification.
- * 5. Retrieve verification token from local DB.
- * 6. Verify Email Change via GET /verify-email.
- * 7. Verify user profile reflects new email.
+ * 5. Clear pending email change via DELETE /pending-email.
+ * 6. Request email change again.
+ * 7. Retrieve verification token from local DB.
+ * 8. Verify Email Change via GET /verify-email.
+ * 9. Verify user profile reflects new email.
  *
  * Test coverage:
  * - User Registration and Activation
  * - Authentication
  * - Profile Update (Email Change Request)
+ * - Pending Email Change Deletion
  * - Database Direct Access (Token Retrieval)
  * - Email Verification Endpoint
  * - Profile State Validation
@@ -76,6 +79,9 @@ class EmailChangeVerificationTests {
 
     const tests = [
       this.testRequestEmailChange,
+      this.testClearPendingEmailChange,
+      this.testClearPendingEmailChangeAgainShouldFail,
+      this.testRequestEmailChangeAgain,
       this.testVerifyEmailChange,
       this.testValidateFinalState
     ];
@@ -167,7 +173,7 @@ class EmailChangeVerificationTests {
    * Test: Verify Email Change
    */
   async testVerifyEmailChange() {
-    this.logger.info('3. Verifying Email Change');
+    this.logger.info('5. Verifying Email Change');
 
     // Retrieve token from DB
     const token = await this.getVerificationTokenFromDB(this.testUser.email);
@@ -187,7 +193,7 @@ class EmailChangeVerificationTests {
    * Test: Validate Final Profile State
    */
   async testValidateFinalState() {
-    this.logger.info('4. Validating Final Profile State');
+    this.logger.info('6. Validating Final Profile State');
 
     // Get Profile using the token (which should still be valid, as user ID hasn't changed)
     const res = await this.client.get(API_ENDPOINTS.profile);
@@ -200,9 +206,62 @@ class EmailChangeVerificationTests {
   }
 
   /**
+   * Test: Clear pending email change
+   */
+  async testClearPendingEmailChange() {
+    this.logger.info('3. Clearing Pending Email Change');
+
+    const clearRes = await this.client.delete(API_ENDPOINTS.clearPendingEmail);
+    this.assert.assertStatus(clearRes.status, 200, 'Clear pending email request failed');
+
+    const data = clearRes.data.data;
+    this.assert.assertEqual(data.emailVerificationPending, false, 'emailVerificationPending should be false after clear');
+    this.assert.assertEqual(data.new_email, null, 'new_email should be null after clear');
+    this.assert.assertEqual(data.email, this.testUser.email, 'Primary email should remain unchanged after clear');
+
+    // Ensure verification token is removed in DB
+    const tokenAfterClear = await this.getVerificationTokenFromDB(this.testUser.email, false);
+    this.assert.assertEqual(tokenAfterClear, null, 'Verification token should be cleared from DB');
+
+    this.logger.success('Pending email change cleared successfully');
+  }
+
+  /**
+   * Test: Request email change again after clearing
+   */
+  async testRequestEmailChangeAgain() {
+    this.logger.info(`4. Re-requesting Email Change to: ${this.newEmail}`);
+
+    const res = await this.client.put(API_ENDPOINTS.profile, {
+      email: this.newEmail
+    });
+
+    this.assert.assertStatus(res.status, 200, 'Second profile update request failed');
+
+    const data = res.data.data;
+    this.assert.assertEqual(data.emailVerificationPending, true, 'emailVerificationPending should be true after re-request');
+    this.assert.assertEqual(data.new_email, this.newEmail, 'new_email should match requested email after re-request');
+    this.assert.assertEqual(data.email, this.testUser.email, 'Current email should still be old email before verify');
+
+    this.logger.success('Email change re-requested successfully');
+  }
+
+  /**
+   * Test: Clear pending email change again should fail
+   */
+  async testClearPendingEmailChangeAgainShouldFail() {
+    this.logger.info('3.1. Clearing Pending Email Change Again (Expect 400)');
+
+    const clearRes = await this.client.delete(API_ENDPOINTS.clearPendingEmail);
+    this.assert.assertStatus(clearRes.status, 400, 'Second clear pending email request should fail with 400');
+
+    this.logger.success('Second clear pending email request correctly returned 400');
+  }
+
+  /**
    * Helper: Get verification token from DB
    */
-  async getVerificationTokenFromDB(email) {
+  async getVerificationTokenFromDB(email, shouldThrowIfMissing = true) {
     try {
       this.logger.info('Querying database for verification token...');
 
@@ -216,11 +275,18 @@ class EmailChangeVerificationTests {
         return result.email_verification_token;
       }
 
-      this.logger.error(`Token query result: ${JSON.stringify(result)}`);
-      throw new Error('Token not found in query result');
+      if (shouldThrowIfMissing) {
+        this.logger.error(`Token query result: ${JSON.stringify(result)}`);
+        throw new Error('Token not found in query result');
+      }
+
+      return null;
     } catch (error) {
       this.logger.error(`Failed to query DB: ${error.message}`);
-      throw error;
+      if (shouldThrowIfMissing) {
+        throw error;
+      }
+      return null;
     }
   }
 
