@@ -28,9 +28,8 @@ securityIncident.use('*', unifiedMiddlewares.auto());
 securityIncident.get('/incidents', async (c) => {
   try {
     const securityService = createSecurityIncidentResponseService(c.env);
-
-    // Parse query parameters
     const filters = {
+      search: c.req.query('search'),
       status: c.req.query('status'),
       severity: c.req.query('severity'),
       type: c.req.query('type'),
@@ -39,14 +38,14 @@ securityIncident.get('/incidents', async (c) => {
       startTime: c.req.query('startTime'),
       endTime: c.req.query('endTime')
     };
-
-    const result = securityService.getIncidents(filters);
-
+    const result = await securityService.getIncidents(filters);
     securityIncidentRoutes_log(`Retrieved ${result.incidents.length} incidents`);
-
     return c.json({
       success: true,
-      data: result,
+      data: {
+        incidents: result.incidents,
+        pagination: result.pagination
+      },
       message: tSuccess(c, 'security.incidents.retrieved', {
         actor: c.get('user')?.fullName || c.get('user')?.email || 'System',
         incidentCount: result.incidents.length,
@@ -59,7 +58,6 @@ securityIncident.get('/incidents', async (c) => {
     return await handleStandardError(c, error, 'Failed to retrieve security incidents', securityIncidentRoutes_log, 'security.incidents.retrieveFailed', {
       actor: c.get('user')?.fullName || c.get('user')?.email || 'System',
       reason: error.message,
-      // Use existing endpoint description key for operation label (dedicated operations.* keys not defined yet)
       operation: t(c, 'endpoints.security_incident.incidents')
     });
   }
@@ -74,19 +72,14 @@ securityIncident.post('/incidents', i18nValidatorsMiddleware.createIncident('jso
     const securityService = createSecurityIncidentResponseService(c.env);
     const incidentData = c.req.valid('json');
     const user = c.get('user');
-
-    // Add creator information
     incidentData.metadata = {
       ...incidentData.metadata,
       createdBy: user.id,
       creatorEmail: user.email,
       manual: true
     };
-
-    const incident = securityService.createManualIncident(incidentData);
-
+    const incident = await securityService.createManualIncident(incidentData);
     securityIncidentRoutes_log(`Manual incident created: ${incident.id} by user ${user.id}`);
-
     return c.json({
       success: true,
       data: incident,
@@ -115,23 +108,18 @@ securityIncident.get('/incidents/:id', async (c) => {
   try {
     const securityService = createSecurityIncidentResponseService(c.env);
     const incidentId = c.req.param('id');
-
-    const incident = securityService.getIncident(incidentId);
-
-    if (!incident) {
+    const incident = await securityService.getIncident(incidentId);
+    if (!incident || !incident.id) {
       return c.json({
         success: false,
         error: tError(c, 'security.incident.notFound', {
           incidentId,
           requestedBy: c.get('user')?.email || 'Unknown',
-          // Provide operation context for interpolation consistency
           operation: t(c, 'endpoints.security_incident.incidentDetails')
         })
       }, 404);
     }
-
     securityIncidentRoutes_log(`Retrieved incident details: ${incidentId}`);
-
     return c.json({
       success: true,
       data: incident,
@@ -140,7 +128,7 @@ securityIncident.get('/incidents/:id', async (c) => {
         incidentId,
         status: incident.status || 'unknown',
         severity: incident.severity || 'unknown',
-        createdAt: incident.createdAt || 'unknown'
+        createdAt: incident.detectedAt || 'unknown'
       })
     });
   } catch (error) {
@@ -163,29 +151,34 @@ securityIncident.put('/incidents/:id/status', i18nValidatorsMiddleware.updateInc
     const incidentId = c.req.param('id');
     const updateData = c.req.valid('json');
     const user = c.get('user');
-
     const updateInfo = {
       ...updateData,
       actor: user.email
     };
-
-    const updatedIncident = securityService.updateIncidentStatus(incidentId, updateData.status, updateInfo);
-
+    const updatedIncident = await securityService.updateIncidentStatus(incidentId, updateData.status, updateInfo);
+    if (!updatedIncident || !updatedIncident.id) {
+      return c.json({
+        success: false,
+        error: tError(c, 'security.incident.notFound', {
+          incidentId,
+          operation: t(c, 'endpoints.security_incident.incidentStatus'),
+          requestedBy: user.email || user.fullName || 'Unknown'
+        })
+      }, 404);
+    }
     securityIncidentRoutes_log(`Incident status updated: ${incidentId} -> ${updateData.status} by ${user.email}`);
-
     return c.json({
       success: true,
       data: updatedIncident,
       message: tSuccess(c, 'security.incident.statusUpdated', {
         incidentId,
         actor: user.fullName || user.email,
-        oldStatus: updatedIncident.previousStatus || 'unknown',
+        oldStatus: updatedIncident.status || 'unknown',
         newStatus: updateData.status,
         timestamp: new Date().toISOString()
       })
     });
   } catch (error) {
-    // Check if it's a "not found" error (broaden pattern just in case)
     if (error.message && /incident not found/i.test(error.message)) {
       return c.json({
         success: false,
@@ -196,7 +189,6 @@ securityIncident.put('/incidents/:id/status', i18nValidatorsMiddleware.updateInc
         })
       }, 404);
     }
-
     return await handleStandardError(c, error, 'Failed to update security incident status', securityIncidentRoutes_log, 'security.incidents.statusUpdateFailed', {
       incidentId: c.req.param('id'),
       actor: c.get('user')?.fullName || c.get('user')?.email || 'System',
@@ -216,13 +208,19 @@ securityIncident.post('/incidents/:id/response', i18nValidatorsMiddleware.manual
     const incidentId = c.req.param('id');
     const responseData = c.req.valid('json');
     const user = c.get('user');
-
-    // Convert single response to array format expected by service
     const actions = [responseData];
     const responseResult = await securityService.executeManualResponse(incidentId, actions);
-
+    if (!responseResult || !responseResult.incidentId) {
+      return c.json({
+        success: false,
+        error: tError(c, 'security.incident.notFound', {
+          incidentId,
+          operation: t(c, 'endpoints.security_incident.incidentResponse'),
+          requestedBy: user.email || user.fullName || 'Unknown'
+        })
+      }, 404);
+    }
     securityIncidentRoutes_log(`Manual response executed for incident ${incidentId} by ${user.email}`);
-
     return c.json({
       success: true,
       data: responseResult,
@@ -235,7 +233,6 @@ securityIncident.post('/incidents/:id/response', i18nValidatorsMiddleware.manual
       })
     });
   } catch (error) {
-    // Check if it's a "not found" error (broaden pattern just in case)
     if (error.message && /incident not found/i.test(error.message)) {
       return c.json({
         success: false,
@@ -246,7 +243,6 @@ securityIncident.post('/incidents/:id/response', i18nValidatorsMiddleware.manual
         })
       }, 404);
     }
-
     return await handleStandardError(c, error, 'Failed to execute manual response for security incident', securityIncidentRoutes_log, 'security.incidents.responseExecuteFailed', {
       incidentId: c.req.param('id'),
       actor: c.get('user')?.fullName || c.get('user')?.email || 'System',
@@ -263,19 +259,16 @@ securityIncident.post('/incidents/:id/response', i18nValidatorsMiddleware.manual
 securityIncident.get('/statistics', async (c) => {
   try {
     const securityService = createSecurityIncidentResponseService(c.env);
-
-    const stats = securityService.getIncidentStatistics();
-
+    const stats = await securityService.getIncidentStatistics();
     securityIncidentRoutes_log('Retrieved incident statistics');
-
     return c.json({
       success: true,
       data: stats,
       message: tSuccess(c, 'security.statistics.retrieved', {
         actor: c.get('user')?.fullName || c.get('user')?.email || 'System',
-        totalIncidents: stats.totalIncidents || 0,
-        activeIncidents: stats.activeIncidents || 0,
-        resolvedIncidents: stats.resolvedIncidents || 0,
+        totalIncidents: stats.total || 0,
+        activeIncidents: stats.openIncidents || 0,
+        resolvedIncidents: stats.byStatus?.resolved || 0,
         retrievedAt: new Date().toISOString()
       })
     });
