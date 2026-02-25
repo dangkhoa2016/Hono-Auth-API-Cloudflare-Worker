@@ -1,10 +1,17 @@
 import { DatabaseService } from '../../src/services/databaseService.js';
 import { getPlatformProxy } from 'wrangler';
+import { fileURLToPath } from 'node:url';
 
 (async () => {
-//   const { env: { DB } } = await getPlatformProxy({ environment: 'test' });
-  const { env: { DB } } = await getPlatformProxy({ environment: 'development' });
-  const databaseService = new DatabaseService(DB);
+  const configPath = fileURLToPath(new URL('../../wrangler.toml', import.meta.url));
+  // const { env } = await getPlatformProxy({ configPath, environment: 'test' });
+  const { env } = await getPlatformProxy({ configPath, environment: 'development' });
+
+  if (!env?.DB) {
+    throw new Error('D1 binding DB is missing from getPlatformProxy environment');
+  }
+
+  const databaseService = new DatabaseService(env);
 
   // Example get a user by ID
   console.log('Getting user with ID 1');
@@ -18,7 +25,7 @@ import { getPlatformProxy } from 'wrangler';
 
   // Example call execute method
   console.log('Executing query to get users with role "admin" or "user"');
-  result = await databaseService.execute('select * from users where role in (?, ?)', ['admin', 'user']);
+  result = await databaseService.execute('select * from users where role in (?, ?)', ['admin', 'user'], 'all');
   console.log(result);
 
   process.exit(0);
