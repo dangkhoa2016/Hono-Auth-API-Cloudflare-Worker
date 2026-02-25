@@ -330,7 +330,7 @@ export class DatabaseService {
       const securityStats = await this.select(`
         SELECT 
           COALESCE(SUM(attempts_count), 0) as total_failed_attempts,
-          COALESCE(SUM(CASE WHEN last_attempt_at >= datetime('now', '-${recentHours} hours') THEN attempts_count ELSE 0 END), 0) as recent_failures_1h,
+          COALESCE(SUM(CASE WHEN last_attempt_at >= datetime('now', '-${recentHours} hours') THEN attempts_count ELSE 0 END), 0) as recent_failures,
           COALESCE(COUNT(DISTINCT CASE WHEN context LIKE 'auth:ip%' THEN identifier END), 0) as unique_ips_with_failures
         FROM rate_limit_counters
         WHERE context LIKE 'auth:%'
@@ -354,7 +354,7 @@ export class DatabaseService {
         },
         security: {
           totalFailedAttempts: securityStats?.total_failed_attempts || 0,
-          recentFailures1h: securityStats?.recent_failures_1h || 0,
+          recentFailures: securityStats?.recent_failures || 0,
           uniqueIpsWithFailures: securityStats?.unique_ips_with_failures || 0
         }
       };
@@ -382,7 +382,7 @@ export class DatabaseService {
         },
         security: {
           totalFailedAttempts: 0,
-          recentFailures1h: 0,
+          recentFailures: 0,
           uniqueIpsWithFailures: 0
         }
       };
