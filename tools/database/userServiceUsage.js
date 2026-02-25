@@ -1,7 +1,16 @@
 import { UserService } from '../../src/services/userService.js';
 import { getPlatformProxy } from 'wrangler';
+import { fileURLToPath } from 'node:url';
 
 (async () => {
+  const configPath = fileURLToPath(new URL('../../wrangler.toml', import.meta.url));
+  const { env } = await getPlatformProxy({ configPath, environment: 'test' });
+  // const { env } = await getPlatformProxy({ configPath, environment: 'development' });
+
+  if (!env?.DB) {
+    throw new Error('D1 binding DB is missing from getPlatformProxy environment');
+  }
+
   const { env: { DB } } = await getPlatformProxy({ environment: 'test' });
 
   const userService = new UserService(DB);
