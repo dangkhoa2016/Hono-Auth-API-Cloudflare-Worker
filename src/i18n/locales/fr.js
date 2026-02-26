@@ -21,8 +21,8 @@ export default {
       'adminDashboardAccess': 'accès au tableau de bord administrateur',
       'adminRoutesAccess': 'accès aux routes administrateur',
       'createUser': 'création d\'utilisateur',
-      'deleteUser': 'suppression de l\'utilisateur #{{userId}}',
-      'updateUser': 'mise à jour de l\'utilisateur #{{userId}}'
+      'deleteUser': 'suppression de l\'utilisateur [#{{userId}}]',
+      'updateUser': 'mise à jour de l\'utilisateur [#{{userId}}]'
     },
     'protectionReason': {
       'hierarchy': 'La hiérarchie des rôles doit être maintenue',
@@ -38,21 +38,21 @@ export default {
     'accountDeletionSuggestion': 'Contactez un autre administrateur pour la gestion du compte',
     'activeUsersCount': '{{count}} utilisateur actif',
     'activeUsersCount_other': '{{count}} utilisateurs actifs ({{percentage}})',
-    'changedByUser': 'Modifié par {{username}} ({{role}})',
-    'checkedByUser': 'Vérifié par {{username}} ({{role}})',
-    'createdByUser': 'Créé par {{username}} ({{role}})',
+    'changedByUser': 'Modifié par [{{username}}] ({{role}})',
+    'checkedByUser': 'Vérifié par [{{username}}] ({{role}})',
+    'createdByUser': 'Créé par [{{username}}] ({{role}})',
     'dashboardDataRetrieved': 'Tableau de bord chargé avec {{totalUsers}} aperçu du système (accès {{accessLevel}}). {{requestedBy}} {{dataFreshness}}',
     'dashboardRetrieved': 'Données du tableau de bord récupérées avec succès',
     'dataFreshness': 'Généré le {{timestamp}}',
-    'deletedByUser': 'Supprimé par {{username}} ({{role}})',
+    'deletedByUser': 'Supprimé par [{{username}}] ({{role}})',
     'effectiveImmediately': 'Modifications effectives immédiatement',
     'failedLoginAttempts': '{{count}} échec de connexion au cours de la dernière heure',
     'failedLoginAttempts_other': '{{count}} échecs de connexion au cours de la dernière heure',
     'performanceGrade': 'Performance : {{grade}}',
-    'requestedByUser': 'Demandé par {{username}} ({{role}})',
+    'requestedByUser': 'Demandé par [{{username}}] ({{role}})',
     'responseTime': 'Temps de réponse : {{time}}{{unit}}',
     'restrictedRoleAccess': 'Accès refusé : {{currentRole}} ne peut pas afficher les utilisateurs {{requestedRole}}',
-    'roleChangedSuccessfully': 'Rôle changé de {{oldRole}} à {{newRole}} pour {{targetUserName}}. {{changedBy}} {{timestamp}} {{effectiveImmediately}}',
+    'roleChangedSuccessfully': 'Rôle changé de {{oldRole}} à {{newRole}} pour [{{targetUserName}}]. {{changedBy}} {{timestamp}} {{effectiveImmediately}}',
     'routeDiscoverySuccess': 'Routes du système récupérées avec succès',
     'securityRisk': 'Risque de sécurité : {{level}} ({{failedAttempts}})',
     'statisticsRetrieved': 'Statistiques du système : {{totalUsers}}, utilisateurs actifs : {{activeUsers}} (portée {{dataScope}}). {{requestedBy}}',
@@ -61,13 +61,13 @@ export default {
     'systemHealthRetrievedFailed': 'Échec de la récupération des informations de santé du système',
     'totalUsersCount': '{{count}} utilisateur au total',
     'totalUsersCount_other': '{{count}} utilisateurs au total',
-    'updatedByUser': 'Mis à jour par {{username}} ({{role}})',
-    'userCreatedSuccessfully': 'Nouvel utilisateur {{userName}} créé avec le rôle {{newUserRole}}. {{createdBy}} {{timestamp}}',
+    'updatedByUser': 'Mis à jour par [{{username}}] ({{role}})',
+    'userCreatedSuccessfully': 'Nouvel utilisateur [{{userName}}] créé avec le rôle {{newUserRole}}. {{createdBy}} {{timestamp}}',
     'userDeletedSuccessfully': 'Compte utilisateur supprimé définitivement. {{deletedBy}} {{timestamp}} Action : {{action}}',
-    'userDetailsRetrieved': 'Détails de l\'utilisateur récupérés : {{userName}} ({{userRole}}, {{userStatus}}). {{joinedDate}} {{requestedBy}}',
+    'userDetailsRetrieved': 'Détails de l\'utilisateur récupérés : [{{userName}}] ({{userRole}}, {{userStatus}}). {{joinedDate}} {{requestedBy}}',
     'usersListRetrieved': 'Récupération réussie de {{count}} utilisateur (affichage de {{displayedCount}} sur la page {{currentPage}} sur {{totalPages}}). {{requestedBy}}',
     'usersListRetrieved_other': 'Récupération réussie de {{count}} utilisateurs (affichage de {{displayedCount}} sur la page {{currentPage}} sur {{totalPages}}). {{requestedBy}}',
-    'userUpdatedSuccessfully': 'Utilisateur {{updatedUserName}} mis à jour avec succès. {{updatedBy}} {{timestamp}}'
+    'userUpdatedSuccessfully': 'Utilisateur [{{updatedUserName}}] mis à jour avec succès. {{updatedBy}} {{timestamp}}'
   },
   'api': {
     'databaseError': 'Erreur de base de données survenue',
@@ -134,14 +134,14 @@ export default {
     'cannotAccessOtherUsers': 'Impossible d\'accéder aux ressources d\'autres utilisateurs',
     'cannotAccessSuperAdmin': 'Impossible d\'accéder aux ressources du Super Administrateur',
     'cannotChangeAdminRole': 'Impossible de changer le rôle d\'autres administrateurs',
-    'cannotChangeOwnRole': '{{userName}} ({{currentRole}}) ne peut pas changer son propre rôle - {{reason}}',
+    'cannotChangeOwnRole': '[{{userName}}] ({{currentRole}}) ne peut pas changer son propre rôle - {{reason}}',
     'cannotCreateAdmin': 'Impossible de créer des comptes administrateur',
     'cannotCreateHigherRole': '{{currentRole}} ne peut pas créer de comptes {{requestedRole}} en raison des restrictions de hiérarchie des rôles',
     'cannotCreateSuperAdmin': 'Impossible de créer des comptes Super Administrateur',
-    'cannotDeleteOwnAccount': '{{userName}} ({{role}}) ne peut pas supprimer son propre compte. {{suggestion}}',
+    'cannotDeleteOwnAccount': '[{{userName}}] ({{role}}) ne peut pas supprimer son propre compte. {{suggestion}}',
     'cannotDeleteSuperAdmin': 'Impossible de supprimer le compte {{targetRole}} - {{reason}} (tentative par {{currentRole}})',
     'cannotDeleteYourself': 'Impossible de supprimer votre propre compte',
-    'cannotModifyHigherRoleUser': '{{currentRole}} ne peut pas modifier {{targetUserName}} ({{targetRole}}) - {{reason}}',
+    'cannotModifyHigherRoleUser': '{{currentRole}} ne peut pas modifier [{{targetUserName}}] ({{targetRole}}) - {{reason}}',
     'cannotModifySuperAdmin': 'Impossible de modifier les comptes Super Administrateur',
     'cannotPromoteToHigherRole': '{{currentRole}} ne peut pas promouvoir les utilisateurs vers {{requestedRole}} - {{reason}}',
     'cannotPromoteToSuperAdmin': 'Impossible de promouvoir l\'utilisateur au rang de Super Administrateur',
@@ -187,14 +187,14 @@ export default {
       'disclaimer': 'Si vous n\'avez pas demandé ce compte, ignorez cet e-mail ou contactez le support.',
       'email': 'E-mail d\'inscription : {{email}}',
       'expiryWarning': 'Ce lien d\'activation expirera dans {{hours}} heures.',
-      'footer': 'Ceci est un message automatique de {{appName}}. Ne répondez pas à cet email.',
-      'greeting': 'Bonjour {{userName}},',
+      'footer': 'Ceci est un message automatique de [{{appName}}]. Ne répondez pas à cet email.',
+      'greeting': 'Bonjour [{{userName}}],',
       'instructions': 'Cet e-mail confirme que nous avons reçu vos informations de compte. Si une activation ou approbation est nécessaire, vous recevrez un autre e-mail.',
-      'intro': 'Merci de vous être inscrit(e) sur {{appName}}.',
+      'intro': 'Merci de vous être inscrit(e) sur [{{appName}}].',
       'ip': 'Adresse IP de la requête : {{ip}}',
       'securityNote': 'Pour votre sécurité, ne partagez jamais ce lien avec personne.',
-      'subject': '{{appName}} - Confirmez votre inscription',
-      'thanks': 'Merci,\nL\'équipe {{appName}}',
+      'subject': '[{{appName}}] - Confirmez votre inscription',
+      'thanks': 'Merci,\nL\'équipe [{{appName}}]',
       'time': 'Heure d\'inscription : {{timestamp}}'
     }
   },
@@ -310,9 +310,9 @@ export default {
     'security_incident': {
       'bulkDelete': 'Suppression en masse de {{count}} incidents de sécurité (accès administrateur {{actor}} requis)',
       'create': 'Créer un nouvel incident de sécurité (accès administrateur {{actor}} requis, type {{type}}, gravité {{severity}})',
-      'deleteById': 'Supprimer l\'incident de sécurité {{incidentId}} (accès administrateur {{actor}} requis)',
+      'deleteById': 'Supprimer l\'incident de sécurité [#{{incidentId}}] (accès administrateur {{actor}} requis)',
       'exportCsv': 'Exporter {{count}} incidents de sécurité vers CSV (accès administrateur {{actor}} requis, plage de dates : {{dateRange}})',
-      'getById': 'Obtenir un incident de sécurité par ID {{incidentId}} (accès administrateur {{actor}} requis)',
+      'getById': 'Obtenir un incident de sécurité par [#{{incidentId}}] (accès administrateur {{actor}} requis)',
       'getDashboard': 'Obtenir le tableau de bord des incidents de sécurité (accès administrateur {{actor}} requis, filtres : {{filters}})',
       'getStatistics': 'Obtenir les statistiques des incidents de sécurité (accès administrateur {{actor}} requis, période : {{period}})',
       'incidentDetails': 'Obtenir les détails de l\'incident (accès admin requis)',
@@ -325,8 +325,8 @@ export default {
       'serviceStatus': 'Obtenir le statut du service (accès admin requis)',
       'simulate': 'Simuler un incident de sécurité (accès admin requis)',
       'statistics': 'Obtenir les statistiques d\'incident (accès admin requis)',
-      'updateById': 'Mettre à jour l\'incident de sécurité {{incidentId}} (accès administrateur {{actor}} requis, champs mis à jour : {{fields}})',
-      'updateStatus': 'Mettre à jour le statut de l\'incident de sécurité {{incidentId}} à {{status}} (accès administrateur {{actor}} requis)'
+      'updateById': 'Mettre à jour l\'incident de sécurité [#{{incidentId}}] (accès administrateur {{actor}} requis, champs mis à jour : {{fields}})',
+      'updateStatus': 'Mettre à jour le statut de l\'incident de sécurité [#{{incidentId}}] à {{status}} (accès administrateur {{actor}} requis)'
     },
     'system': {
       'apiInfo': 'Informations complètes de l\'API et points de terminaison',
@@ -376,7 +376,7 @@ export default {
         'failed': 'Impossible de récupérer l\'analyse comportementale - {{actor}} n\'a pas pu compléter {{operation}} pour {{timeframe}} ciblant {{targetRole}}: {{reason}}'
       },
       'compliance': {
-        'customComplianceFailed': 'Impossible de générer le rapport de conformité personnalisé - {{actor}} n\'a pas pu compléter {{operation}} pour "{{reportName}}" ({{reportType}}): {{reason}}',
+        'customComplianceFailed': 'Impossible de générer le rapport de conformité personnalisé - {{actor}} n\'a pas pu compléter {{operation}} pour "[{{reportName}}]" ({{reportType}}): {{reason}}',
         'failed': 'Impossible de générer le rapport de conformité - {{actor}} n\'a pas pu compléter {{operation}} pour {{timeframe}} avec le format {{format}}: {{reason}}',
         'reportFailed': 'Impossible de générer le rapport de conformité - {{actor}} n\'a pas pu effectuer {{operation}} pour le rapport {{type}}: {{reason}}'
       },
@@ -417,16 +417,16 @@ export default {
       }
     },
     'auth': {
-      'accountDisabled': 'Le compte utilisateur {{userName}} est désactivé par l\'administrateur',
+      'accountDisabled': 'Le compte utilisateur [{{userName}}] est désactivé par l\'administrateur',
       'accountInactive': 'Votre compte est inactif. Veuillez l\'activer par e-mail ou contacter le support.',
       'accountLocked': 'Compte verrouillé pour {{duration, time}} en raison de tentatives de connexion échouées',
-      'accountNotVerified': 'L\'adresse e-mail de {{userName}} n\'est pas vérifiée',
+      'accountNotVerified': 'L\'adresse e-mail de [{{userName}}] n\'est pas vérifiée',
       'cannotAccessOtherUsers': 'Impossible d\'accéder aux ressources d\'autres utilisateurs',
-      'cannotChangeOwnRole': '{{userName}} ({{currentRole}}) ne peut pas changer son propre rôle - {{reason}}',
+      'cannotChangeOwnRole': '[{{userName}}] ({{currentRole}}) ne peut pas changer son propre rôle - {{reason}}',
       'cannotCreateHigherRole': '{{currentRole}} ne peut pas créer de comptes {{requestedRole}} en raison des restrictions de hiérarchie des rôles',
       'cannotDeleteSuperAdmin': 'Impossible de supprimer le compte Super Administrateur',
       'cannotDeleteYourself': 'Impossible de supprimer votre propre compte',
-      'cannotModifyHigherRoleUser': 'Impossible de modifier {{targetUserName}} ({{targetRole}}) - {{currentRole}} {{reason}}',
+      'cannotModifyHigherRoleUser': 'Impossible de modifier [{{targetUserName}}] ({{targetRole}}) - {{currentRole}} {{reason}}',
       'cannotPromoteToHigherRole': '{{currentRole}} ne peut pas promouvoir les utilisateurs vers {{requestedRole}} - {{reason}}',
       'deleteNotAllowed': 'Opération de suppression non autorisée pour votre rôle',
       'failed': 'Échec de l\'authentification : {{reason}}',
@@ -437,8 +437,8 @@ export default {
       'invalidCredentials_context_user': 'Identifiants invalides fournis pour la connexion au compte utilisateur',
       'loginFailed': 'Le processus de connexion a échoué pour {{actor}} (Raison: {{reason}}, Opération: {{operation}}, IP: {{ipAddress}})',
       'mfaFailed': 'L\'authentification multi-facteurs a échoué : {{reason}}',
-      'mfaRequired': 'L\'authentification multi-facteurs est requise pour {{userName}}',
-      'passwordIncorrect': 'Le mot de passe est incorrect pour l\'utilisateur {{userName}}',
+      'mfaRequired': 'L\'authentification multi-facteurs est requise pour [{{userName}}]',
+      'passwordIncorrect': 'Le mot de passe est incorrect pour l\'utilisateur [{{userName}}]',
       'permissionDenied': 'Permission refusée pour l\'action : {{action}}',
       'rateLimitExceeded': 'Limite de débit dépassée : {{currentRequests}}/{{maxRequests}} requêtes par {{timeWindow}}',
       'refreshTokenExpired': 'Le jeton de rafraîchissement a expiré le {{expiredAt, datetime}}',
@@ -471,11 +471,11 @@ export default {
       'workflowViolation': 'Violation de flux de travail : l\'étape {{step}} ne peut pas être effectuée dans l\'état actuel {{currentState}}'
     },
     'file': {
-      'accessDenied': 'Accès refusé au fichier « {{filename}} » : {{reason}}',
+      'accessDenied': 'Accès refusé au fichier « [{{filename}}] » : {{reason}}',
       'corrupted': 'Le fichier semble corrompu ou incomplet',
       'formatUnsupported': 'Format de fichier non supporté pour l\'opération : {{operation}}',
       'invalidType': 'Le type de fichier « {{fileType}} » n\'est pas autorisé - types supportés : {{allowedTypes}}',
-      'notFound': 'Fichier « {{filename}} » introuvable',
+      'notFound': 'Fichier « [{{filename}}] » introuvable',
       'processingFailed': 'Le traitement du fichier a échoué : {{reason}}',
       'quotaExceeded': 'Quota de stockage dépassé : {{used, number}}Mo / {{quota, number}}Mo',
       'tooLarge': 'La taille du fichier {{actualSize, number}}Mo dépasse la limite de {{maxSize, number}}Mo',
@@ -498,14 +498,14 @@ export default {
       'translationsFailed': 'Impossible de récupérer les informations de traduction : {{reason}}'
     },
     'integration': {
-      'apiLimitExceeded': 'Limite de débit API dépassée pour {{serviceName}} : {{limit}} requêtes par {{period}}',
-      'authenticationFailed': 'L\'authentification a échoué avec {{serviceName}} : {{reason}}',
-      'credentialsExpired': 'Les identifiants API pour {{serviceName}} ont expiré le {{expiredDate, date}}',
-      'dataTransformFailed': 'La transformation des données a échoué pour {{serviceName}} : {{reason}}',
-      'invalidResponse': 'Réponse invalide de {{serviceName}} : {{details}}',
-      'serviceDown': 'Le service externe {{serviceName}} est actuellement en panne',
-      'syncFailed': 'La synchronisation des données a échoué avec {{serviceName}} : {{reason}}',
-      'webhookTimeout': 'Délai d\'attente du webhook de {{serviceName}} après {{timeout, number}}ms'
+      'apiLimitExceeded': 'Limite de débit API dépassée pour [{{serviceName}}] : {{limit}} requêtes par {{period}}',
+      'authenticationFailed': 'L\'authentification a échoué avec [{{serviceName}}] : {{reason}}',
+      'credentialsExpired': 'Les identifiants API pour [{{serviceName}}] ont expiré le {{expiredDate, date}}',
+      'dataTransformFailed': 'La transformation des données a échoué pour [{{serviceName}}] : {{reason}}',
+      'invalidResponse': 'Réponse invalide de [{{serviceName}}] : {{details}}',
+      'serviceDown': 'Le service externe [{{serviceName}}] est actuellement en panne',
+      'syncFailed': 'La synchronisation des données a échoué avec [{{serviceName}}] : {{reason}}',
+      'webhookTimeout': 'Délai d\'attente du webhook de [{{serviceName}}] après {{timeout, number}}ms'
     },
     'kv': {
       'accessDenied': 'Accès refusé pour la clé de configuration « {{key}} » - nécessite le rôle {{requiredRole}}',
@@ -553,12 +553,12 @@ export default {
       'retentionPoliciesRetrieveFailed': 'Échec de la récupération des politiques de rétention pour {{actor}} (Raison: {{reason}}, Opération: {{operation}})'
     },
     'network': {
-      'apiError': 'Erreur API externe de {{apiName}} : {{error}}',
+      'apiError': 'Erreur API externe de [{{apiName}}] : {{error}}',
       'bandwidthExceeded': 'Limite de bande passante dépassée : {{usage, number}}Mo/{{limit, number}}Mo',
       'connectionFailed': 'La connexion a échoué à {{service, uppercase}} : {{reason}}',
       'connectionRefused': 'Connexion refusée par {{service}} sur le port {{port}}',
-      'dnsResolutionFailed': 'Échec de la résolution DNS pour {{hostname}}',
-      'hostUnreachable': 'L\'hôte {{hostname}} est inaccessible',
+      'dnsResolutionFailed': 'Échec de la résolution DNS pour [{{hostname}}]',
+      'hostUnreachable': 'L\'hôte [{{hostname}}] est inaccessible',
       'httpError': 'Erreur HTTP {{statusCode}} : {{statusMessage}}',
       'protocolError': 'Erreur de protocole réseau : {{protocol}} - {{details}}',
       'proxyError': 'Erreur du serveur proxy : {{proxyAddress}} - {{reason}}',
@@ -611,7 +611,7 @@ export default {
     },
     'security': {
       'incident': {
-        'notFound': 'Incident de sécurité non trouvé (ID : {{incidentId}}, Opération : {{operation}}, Demandé par : {{requestedBy}})'
+        'notFound': 'Incident de sécurité non trouvé ([#{{incidentId}}], Opération : {{operation}}, Demandé par : {{requestedBy}})'
       },
       'incidents': {
         'createFailed': '{{actor}} a échoué à créer un incident de sécurité (Erreur : {{errorType}}) à {{timestamp}}',
@@ -653,41 +653,41 @@ export default {
       'workerUnavailable': 'Aucun travailleur disponible pour traiter la requête'
     },
     'user': {
-      'accountLocked': 'Le compte utilisateur {{userName}} est verrouillé en raison de {{reason}}',
-      'accountSuspended': 'Le compte utilisateur {{userName}} est suspendu jusqu\'à {{suspendedUntil, datetime}}',
-      'activationFailed': 'Échec de l\'activation du compte utilisateur pour {{userName}} : {{reason}}',
+      'accountLocked': 'Le compte utilisateur [{{userName}}] est verrouillé en raison de {{reason}}',
+      'accountSuspended': 'Le compte utilisateur [{{userName}}] est suspendu jusqu\'à {{suspendedUntil, datetime}}',
+      'activationFailed': 'Échec de l\'activation du compte utilisateur pour [{{userName}}] : {{reason}}',
       'bulkOperationFailed': 'L\'opération en bloc a échoué pour {{failedCount}} utilisateur sur {{totalCount}}',
       'bulkOperationFailed_other': 'L\'opération en bloc a échoué pour {{failedCount}} utilisateurs sur {{totalCount}}',
       'createFailed': 'Échec de la création du compte utilisateur pour {{email}} : {{reason}}',
-      'deactivationFailed': 'Échec de la désactivation du compte utilisateur pour {{userName}} : {{reason}}',
-      'deleteFailed': 'Échec de la suppression de l\'utilisateur {{userName}} : {{reason}}',
+      'deactivationFailed': 'Échec de la désactivation du compte utilisateur pour [{{userName}}] : {{reason}}',
+      'deleteFailed': 'Échec de la suppression de l\'utilisateur [{{userName}}] : {{reason}}',
       'emailExists': 'L\'adresse e-mail {{email}} est déjà enregistrée dans le système',
       'emailVerificationFailed': 'La vérification de l\'e-mail a échoué : {{reason}}',
       'emailVerificationSystemError': 'Échec de la vérification du changement d\'e-mail en raison d\'une erreur système. Veuillez réessayer plus tard.',
-      'inactive': 'Le compte utilisateur {{userName}} est inactif',
-      'insufficientPermissions': 'Permissions insuffisantes pour modifier l\'utilisateur {{userName}} ({{userRole}})',
+      'inactive': 'Le compte utilisateur [{{userName}}] est inactif',
+      'insufficientPermissions': 'Permissions insuffisantes pour modifier l\'utilisateur [{{userName}}] ({{userRole}})',
       'listFailed': 'Échec de la récupération de la liste des utilisateurs : {{reason}}',
-      'notFound': 'Utilisateur « {{userName}} » introuvable ou a été supprimé',
-      'notFoundById': 'Utilisateur avec l\'ID {{userId}} introuvable',
-      'passwordChangeFailed': 'Échec du changement de mot de passe pour {{userName}} : {{reason}}',
+      'notFound': 'Utilisateur « [{{userName}}] » introuvable ou a été supprimé',
+      'notFoundById': 'Utilisateur avec l\'[#{{userId}}] introuvable',
+      'passwordChangeFailed': 'Échec du changement de mot de passe pour [{{userName}}] : {{reason}}',
       'passwordIncorrect': 'Le mot de passe actuel est incorrect - veuillez réessayer',
-      'profileRetrieveFailed': 'Échec de la récupération du profil utilisateur pour {{userName}} : {{reason}}',
+      'profileRetrieveFailed': 'Échec de la récupération du profil utilisateur pour [{{userName}}] : {{reason}}',
       'registrationError': 'L\'enregistrement de l\'utilisateur a échoué en raison d\'une erreur système : {{details}}',
       'registrationFailed': 'L\'enregistrement de l\'utilisateur a échoué : {{reason}}',
-      'roleChangeFailed': 'Échec du changement de rôle pour {{userName}} de {{oldRole}} à {{newRole}} : {{reason}}',
-      'sessionLimitExceeded': 'L\'utilisateur {{userName}} a dépassé le nombre maximal de sessions concurrentes ({{currentSessions}}/{{maxSessions}})',
-      'updateFailed': 'Échec de la mise à jour du profil utilisateur pour {{userName}} : {{reason}}',
-      'usernameExists': 'Le nom d\'utilisateur « {{username}} » est déjà pris'
+      'roleChangeFailed': 'Échec du changement de rôle pour [{{userName}}] de {{oldRole}} à {{newRole}} : {{reason}}',
+      'sessionLimitExceeded': 'L\'utilisateur [{{userName}}] a dépassé le nombre maximal de sessions concurrentes ({{currentSessions}}/{{maxSessions}})',
+      'updateFailed': 'Échec de la mise à jour du profil utilisateur pour [{{userName}}] : {{reason}}',
+      'usernameExists': 'Le nom d\'utilisateur « [{{username}}] » est déjà pris'
     },
     'zodDemo': {
       'file': {
-        'uploadFailed': 'Téléchargement de fichier échoué - {{actor}} n\'a pas pu compléter {{operation}} pour "{{fileName}}" ({{fileSize}} octets) : {{reason}}'
+        'uploadFailed': 'Téléchargement de fichier échoué - {{actor}} n\'a pas pu compléter {{operation}} pour "[{{fileName}}]" ({{fileSize}} octets) : {{reason}}'
       },
       'search': {
         'failed': 'Opération de recherche échouée - {{actor}} n\'a pas pu compléter {{operation}} pour la requête "{{query}}" ({{searchType}}) : {{reason}}'
       },
       'user': {
-        'registrationFailed': 'Inscription de l\'utilisateur échouée - {{actor}} n\'a pas pu compléter {{operation}} pour {{userName}} ({{email}}) : {{reason}}'
+        'registrationFailed': 'Inscription de l\'utilisateur échouée - {{actor}} n\'a pas pu compléter {{operation}} pour [{{userName}}] ({{email}}) : {{reason}}'
       }
     },
     'businessRuleViolation': 'Violation de règle métier : {{rules}}',
@@ -722,7 +722,7 @@ export default {
   },
   'security': {
     'alerts': {
-      'alertTemplate': 'Alerte: {{name}} - {{eventType}}',
+      'alertTemplate': 'Alerte: [{{name}}] - {{eventType}}',
       'channelCreated': 'Canal d\'alerte créé avec succès',
       'channelsFailed': 'Échec de la récupération des canaux d\'alerte',
       'createChannelFailed': 'Échec de la création du canal d\'alerte',
@@ -757,11 +757,11 @@ export default {
       'reportCreated_other': 'Rapport administratif créé avec {{recordCount, number}} enregistrements',
       'securityScanCompleted': 'Analyse de sécurité terminée - {{threatsFound}} menace détectée',
       'securityScanCompleted_other': 'Analyse de sécurité terminée - {{threatsFound}} menaces détectées',
-      'serviceRestarted': 'Service système {{serviceName}} redémarré avec succès',
+      'serviceRestarted': 'Service système [{{serviceName}}] redémarré avec succès',
       'statsGenerated': 'Statistiques système générées avec succès pour la période {{period}} - {{dataPoints}} point de données',
       'statsGenerated_other': 'Statistiques système générées avec succès pour la période {{period}} - {{dataPoints}} points de données',
       'systemHealthy': 'Contrôle de santé du système terminé : {{status, uppercase}} ({{uptime, number}}% de temps de fonctionnement)',
-      'userDetailsRetrieved': 'Détails de l\'utilisateur récupérés : {{userName}} ({{userRole}}, {{userStatus}}). {{joinedDate}} {{requestedBy}}'
+      'userDetailsRetrieved': 'Détails de l\'utilisateur récupérés : [{{userName}}] ({{userRole}}, {{userStatus}}). {{joinedDate}} {{requestedBy}}'
     },
     'advancedAudit': {
       'analytics': {
@@ -794,19 +794,19 @@ export default {
       'statsRetrieved': 'Statistiques d\'audit récupérées avec succès'
     },
     'auth': {
-      'accessGranted': 'Accès accordé à {{resource}} pour {{userName}}',
-      'accountUnlocked': 'Compte {{userName}} déverrouillé avec succès par {{unlockedBy}}',
-      'loginSuccess': 'Connecté avec succès en tant que {{userName}} ({{userRole}}) à {{loginTime}}',
+      'accessGranted': 'Accès accordé à {{resource}} pour [{{userName}}]',
+      'accountUnlocked': 'Compte [{{userName}}] déverrouillé avec succès par {{unlockedBy}}',
+      'loginSuccess': 'Connecté avec succès en tant que [{{userName}}] ({{userRole}}) à {{loginTime}}',
       'logoutAllSuccess': 'Déconnecté de tous les appareils à {{logoutTime}}',
       'logoutSuccess': 'Déconnecté avec succès de {{deviceInfo}} à {{logoutTime}}',
-      'mfaEnabled': 'Authentification multi-facteurs activée avec succès pour {{userName}}',
+      'mfaEnabled': 'Authentification multi-facteurs activée avec succès pour [{{userName}}]',
       'mfaVerified': 'Authentification multi-facteurs vérifiée avec succès',
-      'passwordChanged': 'Mot de passe changé avec succès pour {{userName}} à {{changeTime}}',
+      'passwordChanged': 'Mot de passe changé avec succès pour [{{userName}}] à {{changeTime}}',
       'passwordReset': 'E-mail de réinitialisation du mot de passe envoyé à {{email}} - expire dans {{expiryMinutes}} minute',
       'passwordReset_other': 'E-mail de réinitialisation du mot de passe envoyé à {{email}} - expire dans {{expiryMinutes}} minutes',
-      'permissionGranted': 'Permission « {{permission}} » accordée à {{userName}}',
+      'permissionGranted': 'Permission « {{permission}} » accordée à [{{userName}}]',
       'rateLimitReset': 'Limite de débit réinitialisée avec succès pour {{ipAddress}}',
-      'roleAssigned': 'Rôle {{newRole}} attribué avec succès à {{userName}} par {{assignedBy}}',
+      'roleAssigned': 'Rôle {{newRole}} attribué avec succès à [{{userName}}] par {{assignedBy}}',
       'sessionCreated': 'Nouvelle session utilisateur créée avec {{sessionDuration}} minute de validité',
       'sessionCreated_other': 'Nouvelle session utilisateur créée avec {{sessionDuration}} minutes de validité',
       'sessionExtended': 'Session utilisateur étendue jusqu\'à {{newExpiry}}',
@@ -821,42 +821,42 @@ export default {
       'operationApproved': 'Opération métier « {{operation}} » approuvée par {{approvedBy}}',
       'processAutomated': 'Processus métier automatisé avec succès - {{automatedTasks}} tâche automatisée',
       'processAutomated_other': 'Processus métier automatisé avec succès - {{automatedTasks}} tâches automatisées',
-      'ruleApplied': 'Règle métier « {{ruleName}} » appliquée avec succès à {{affectedRecords}} enregistrement',
-      'ruleApplied_other': 'Règle métier « {{ruleName}} » appliquée avec succès à {{affectedRecords}} enregistrements',
+      'ruleApplied': 'Règle métier « [{{ruleName}}] » appliquée avec succès à {{affectedRecords}} enregistrement',
+      'ruleApplied_other': 'Règle métier « [{{ruleName}}] » appliquée avec succès à {{affectedRecords}} enregistrements',
       'validationPassed': 'Validation métier réussie pour {{entityType}} - tous les {{checkCount}} contrôles réussis',
       'validationPassed_other': 'Validation métier réussie pour {{entityType}} - tous les {{checkCount}} contrôles réussis',
-      'workflowCompleted': 'Flux de travail « {{workflowName}} » terminé avec succès en {{steps}} étape',
-      'workflowCompleted_other': 'Flux de travail « {{workflowName}} » terminé avec succès en {{steps}} étapes'
+      'workflowCompleted': 'Flux de travail « [{{workflowName}}] » terminé avec succès en {{steps}} étape',
+      'workflowCompleted_other': 'Flux de travail « [{{workflowName}}] » terminé avec succès en {{steps}} étapes'
     },
     'file': {
-      'backup': 'Sauvegarde du fichier créée avec succès pour « {{filename}} »',
+      'backup': 'Sauvegarde du fichier créée avec succès pour « [{{filename}}] »',
       'compressed': 'Fichier compressé avec succès - taille réduite de {{compressionRatio, number}}%',
       'converted': 'Fichier converti avec succès de {{sourceFormat}} à {{targetFormat}}',
       'copied': 'Fichier copié avec succès vers {{destinationPath}}',
-      'deleted': 'Fichier « {{filename}} » supprimé avec succès',
-      'downloadCompleted': 'Fichier « {{filename}} » téléchargé avec succès',
+      'deleted': 'Fichier « [{{filename}}] » supprimé avec succès',
+      'downloadCompleted': 'Fichier « [{{filename}}] » téléchargé avec succès',
       'extracted': 'Archive extraite avec succès - {{extractedCount}} fichier extrait',
       'extracted_other': 'Archive extraite avec succès - {{extractedCount}} fichiers extraits',
       'moved': 'Fichier déplacé avec succès de {{sourcePath}} à {{destinationPath}}',
-      'processingCompleted': 'Traitement du fichier terminé pour « {{filename}} » - {{operationsCount}} opération effectuée',
-      'processingCompleted_other': 'Traitement du fichier terminé pour « {{filename}} » - {{operationsCount}} opérations effectuées',
+      'processingCompleted': 'Traitement du fichier terminé pour « [{{filename}}] » - {{operationsCount}} opération effectuée',
+      'processingCompleted_other': 'Traitement du fichier terminé pour « [{{filename}}] » - {{operationsCount}} opérations effectuées',
       'restored': 'Fichier restauré avec succès à partir de la sauvegarde créée le {{backupDate, date}}',
-      'uploadCompleted': 'Fichier « {{filename}} » téléchargé avec succès ({{fileSize}})',
+      'uploadCompleted': 'Fichier « [{{filename}}] » téléchargé avec succès ({{fileSize}})',
       'uploadsBatch': 'Téléchargement par lots terminé : {{successCount}}/{{totalCount}} fichier traité',
       'uploadsBatch_other': 'Téléchargement par lots terminé : {{successCount}}/{{totalCount}} fichiers traités',
-      'validated': 'Validation du fichier réussie pour « {{filename}} » - format : {{fileFormat}}'
+      'validated': 'Validation du fichier réussie pour « [{{filename}}] » - format : {{fileFormat}}'
     },
     'integration': {
-      'apiCall': 'Appel API à {{serviceName}} terminé avec succès en {{responseTime, number}}ms',
-      'credentialsValidated': 'Identifiants API validés avec succès pour {{serviceName}}',
-      'dataSync': 'Synchronisation des données terminée avec {{serviceName}} - {{syncedRecords}} enregistrement traité',
-      'dataSync_other': 'Synchronisation des données terminée avec {{serviceName}} - {{syncedRecords}} enregistrements traités',
+      'apiCall': 'Appel API à [{{serviceName}}] terminé avec succès en {{responseTime, number}}ms',
+      'credentialsValidated': 'Identifiants API validés avec succès pour [{{serviceName}}]',
+      'dataSync': 'Synchronisation des données terminée avec [{{serviceName}}] - {{syncedRecords}} enregistrement traité',
+      'dataSync_other': 'Synchronisation des données terminée avec [{{serviceName}}] - {{syncedRecords}} enregistrements traités',
       'dataTransform': 'Transformation des données terminée - {{transformedRecords}} enregistrement traité',
       'dataTransform_other': 'Transformation des données terminée - {{transformedRecords}} enregistrements traités',
-      'healthCheckPassed': 'Contrôle de santé du service externe réussi pour {{serviceName}}',
+      'healthCheckPassed': 'Contrôle de santé du service externe réussi pour [{{serviceName}}]',
       'rateLimit': 'Statut de la limite de débit API : {{usedRequests}}/{{maxRequests}} requêtes restantes',
-      'serviceConnected': 'Connecté avec succès à {{serviceName}} - statut : {{serviceStatus}}',
-      'subscriptionActive': 'L\'abonnement au service est actif pour {{serviceName}} jusqu\'au {{expiryDate, date}}',
+      'serviceConnected': 'Connecté avec succès à [{{serviceName}}] - statut : {{serviceStatus}}',
+      'subscriptionActive': 'L\'abonnement au service est actif pour [{{serviceName}}] jusqu\'au {{expiryDate, date}}',
       'webhookDelivered': 'Webhook livré avec succès à {{webhookUrl}} - statut : {{deliveryStatus}}'
     },
     'kv': {
@@ -903,13 +903,13 @@ export default {
       'batchProcessed': 'Opération par lots terminée : {{successCount}}/{{totalCount}} éléments traités avec succès',
       'completed': 'Opération « {{operationType}} » terminée avec succès en {{duration}}ms',
       'completed_other': '{{count}} opérations terminées avec succès - temps moyen : {{avgDuration}}ms',
-      'taskFinished': 'Tâche « {{taskName}} » terminée avec succès avec {{resultCount}} résultat',
-      'taskFinished_other': 'Tâche « {{taskName}} » terminée avec succès avec {{resultCount}} résultats',
+      'taskFinished': 'Tâche « [{{taskName}}] » terminée avec succès avec {{resultCount}} résultat',
+      'taskFinished_other': 'Tâche « [{{taskName}}] » terminée avec succès avec {{resultCount}} résultats',
       'workflowCompleted': 'Flux de travail terminé avec succès - {{stepsCount}} étape exécutée',
       'workflowCompleted_other': 'Flux de travail terminé avec succès - {{stepsCount}} étapes exécutées'
     },
     'realtimeIncidents': {
-      'created': 'Incident de surveillance temps réel {{incidentId}} créé avec succès'
+      'created': 'Incident de surveillance temps réel [#{{incidentId}}] créé avec succès'
     },
     'realtimeMonitoring': {
       'alerts': {
@@ -926,7 +926,7 @@ export default {
         'realtimeRetrieved': 'Données du tableau de bord temps réel récupérées avec succès'
       },
       'incidents': {
-        'created': 'Incident de surveillance temps réel {{incidentId}} créé avec succès'
+        'created': 'Incident de surveillance temps réel [#{{incidentId}}] créé avec succès'
       },
       'monitoring': {
         'analysisCompleted': 'Analyse de la surveillance en temps réel terminée avec succès',
@@ -934,7 +934,7 @@ export default {
         'eventsRetrieved': 'Événements de surveillance récents récupérés avec succès',
         'started': 'La surveillance en temps réel a démarré avec succès',
         'stopped': 'La surveillance en temps réel s’est arrêtée avec succès',
-        'threatResolved': 'Menace en temps réel {{threatId}} résolue avec succès',
+        'threatResolved': 'Menace en temps réel [#{{threatId}}] résolue avec succès',
         'threatsRetrieved': 'Statut des menaces en temps réel récupéré avec succès'
       }
     },
@@ -944,16 +944,16 @@ export default {
     },
     'security': {
       'incident': {
-        'created': '{{actor}} a créé l\'incident de sécurité "{{title}}" avec une gravité {{severity}} (ID : {{incidentId}}, Type : {{type}})',
-        'responseExecuted': '{{actor}} a exécuté {{actionCount}} actions de réponse pour l\'incident {{incidentId}} (Type : {{actionType}}) à {{executedAt}}',
-        'retrieved': '{{actor}} a récupéré les détails de l\'incident {{incidentId}} (Statut : {{status}}, Gravité : {{severity}}, Créé : {{createdAt}})',
-        'statusUpdated': '{{actor}} a mis à jour le statut de l\'incident {{incidentId}} de "{{oldStatus}}" à "{{newStatus}}" à {{timestamp}}'
+        'created': '{{actor}} a créé l\'incident de sécurité "{{title}}" avec une gravité {{severity}} ([#{{incidentId}}], Type : {{type}})',
+        'responseExecuted': '{{actor}} a exécuté {{actionCount}} actions de réponse pour l\'incident [#{{incidentId}}] (Type : {{actionType}}) à {{executedAt}}',
+        'retrieved': '{{actor}} a récupéré les détails de l\'incident [#{{incidentId}}] (Statut : {{status}}, Gravité : {{severity}}, Créé : {{createdAt}})',
+        'statusUpdated': '{{actor}} a mis à jour le statut de l\'incident [#{{incidentId}}] de "{{oldStatus}}" à "{{newStatus}}" à {{timestamp}}'
       },
       'incidents': {
-        'created': '{{actor}} a créé l\'incident de sécurité "{{title}}" avec une gravité {{severity}} (ID : {{incidentId}}, Type : {{type}})',
-        'responseExecuted': '{{actor}} a exécuté {{actionCount}} actions de réponse pour l\'incident {{incidentId}} (Type : {{actionType}}) à {{executedAt}}',
+        'created': '{{actor}} a créé l\'incident de sécurité "{{title}}" avec une gravité {{severity}} ([#{{incidentId}}], Type : {{type}})',
+        'responseExecuted': '{{actor}} a exécuté {{actionCount}} actions de réponse pour l\'incident [#{{incidentId}}] (Type : {{actionType}}) à {{executedAt}}',
         'retrieved': '{{actor}} a récupéré avec succès {{incidentCount}} incidents de sécurité (page {{page}}, limite {{limit}}, filtres : {{filters}})',
-        'statusUpdated': '{{actor}} a mis à jour le statut de l\'incident {{incidentId}} de "{{oldStatus}}" à "{{newStatus}}" à {{timestamp}}'
+        'statusUpdated': '{{actor}} a mis à jour le statut de l\'incident [#{{incidentId}}] de "{{oldStatus}}" à "{{newStatus}}" à {{timestamp}}'
       },
       'monitoring': {
         'started': 'Surveillance en temps réel démarrée avec succès'
@@ -962,7 +962,7 @@ export default {
         'statusRetrieved': '{{actor}} a récupéré le statut du service : santé {{serviceHealth}}, version {{version}}, temps de fonctionnement {{uptime}} (Vérifié à : {{checkedAt}})'
       },
       'simulation': {
-        'completed': '{{actor}} a terminé la simulation {{threatType}} avec une gravité {{severity}} (ID de simulation : {{simulationId}}) à {{completedAt}}'
+        'completed': '{{actor}} a terminé la simulation {{threatType}} avec une gravité {{severity}} ([#{{simulationId}}]) à {{completedAt}}'
       },
       'statistics': {
         'retrieved': '{{actor}} a récupéré les statistiques de sécurité : {{totalIncidents}} total, {{activeIncidents}} actifs, {{resolvedIncidents}} résolus (Récupéré à : {{retrievedAt}})'
@@ -972,8 +972,8 @@ export default {
       'cacheConnected': 'Service de cache connecté avec succès à {{cacheService}}',
       'configurationLoaded': 'Configuration système chargée avec succès - {{configCount}} paramètre',
       'configurationLoaded_other': 'Configuration système chargée avec succès - {{configCount}} paramètres',
-      'connectionEstablished': 'Connexion établie avec succès à {{serviceName}}',
-      'databaseConnected': 'Connexion à la base de données établie avec succès à {{databaseName}}',
+      'connectionEstablished': 'Connexion établie avec succès à [{{serviceName}}]',
+      'databaseConnected': 'Connexion à la base de données établie avec succès à [{{databaseName}}]',
       'healthCheckPassed': 'Contrôle de santé du système réussi - tous les {{componentCount}} composants sains',
       'healthCheckPassed_other': 'Contrôle de santé du système réussi - tous les {{componentCount}} composants sains',
       'operationCompleted': 'Opération système « {{operation}} » terminée avec succès en {{duration, number}}ms',
@@ -982,46 +982,46 @@ export default {
       'resourceAllocated': 'Ressources système allouées avec succès : {{allocatedMemory, number}}Mo de mémoire',
       'resourceReleased': 'Ressources système libérées avec succès : {{releasedMemory, number}}Mo de mémoire',
       'rollbackCompleted': 'Retour arrière du système terminé avec succès vers la version {{previousVersion}}',
-      'serviceStarted': 'Service système {{serviceName}} démarré avec succès sur le port {{port}}',
-      'serviceStopped': 'Service système {{serviceName}} arrêté gracieusement',
-      'taskCompleted': 'Tâche d\'arrière-plan {{taskName}} terminée avec succès',
-      'taskScheduled': 'Tâche d\'arrière-plan {{taskName}} planifiée pour {{scheduledTime, datetime}}',
+      'serviceStarted': 'Service système [{{serviceName}}] démarré avec succès sur le port {{port}}',
+      'serviceStopped': 'Service système [{{serviceName}}] arrêté gracieusement',
+      'taskCompleted': 'Tâche d\'arrière-plan [{{taskName}}] terminée avec succès',
+      'taskScheduled': 'Tâche d\'arrière-plan [{{taskName}}] planifiée pour {{scheduledTime, datetime}}',
       'upgradeCompleted': 'Mise à niveau du système terminée avec succès vers la version {{newVersion}}'
     },
     'translations': {
       'retrieved': 'Traductions récupérées avec succès'
     },
     'user': {
-      'activated': 'Compte utilisateur activé avec succès pour {{userName}}',
+      'activated': 'Compte utilisateur activé avec succès pour [{{userName}}]',
       'activated_other': '{{count}} comptes utilisateur activés avec succès',
       'bulkOperationSuccess': 'Opération en bloc terminée : {{successCount}}/{{totalCount}} réussie',
-      'created': 'Compte utilisateur créé avec succès pour {{userName}} ({{email}})',
+      'created': 'Compte utilisateur créé avec succès pour [{{userName}}] ({{email}})',
       'created_other': '{{count}} comptes utilisateur créés avec succès',
-      'dataExported': 'Données utilisateur exportées avec succès ({{fileSize, number}}Ko) pour {{userName}}',
+      'dataExported': 'Données utilisateur exportées avec succès ({{fileSize, number}}Ko) pour [{{userName}}]',
       'dataImported': 'Données utilisateur importées avec succès - {{importedCount}} enregistrement traité',
       'dataImported_other': 'Données utilisateur importées avec succès - {{importedCount}} enregistrements traités',
-      'deactivated': 'Compte utilisateur désactivé avec succès pour {{userName}}',
+      'deactivated': 'Compte utilisateur désactivé avec succès pour [{{userName}}]',
       'deactivated_other': '{{count}} comptes utilisateur désactivés avec succès',
-      'deleted': 'Compte utilisateur supprimé avec succès pour {{userName}} par {{deletedBy}}',
+      'deleted': 'Compte utilisateur supprimé avec succès pour [{{userName}}] par {{deletedBy}}',
       'deleted_other': '{{count}} comptes utilisateur supprimés avec succès',
-      'emailUpdated': 'Adresse e-mail mise à jour de {{oldEmail}} à {{newEmail}} pour {{userName}}',
-      'emailVerified': 'Adresse e-mail {{email, lowercase}} vérifiée avec succès pour {{userName}}',
-      'loginHistory': 'Historique de connexion récupéré : {{entryCount}} entrée pour {{userName}}',
-      'loginHistory_other': 'Historique de connexion récupéré : {{entryCount}} entrées pour {{userName}}',
-      'passwordChanged': 'Mot de passe changé avec succès pour {{userName}}',
-      'permissionUpdated': 'Permissions utilisateur mises à jour avec succès pour {{userName}}',
-      'profileCompleted': 'Le profil utilisateur est maintenant complet à {{percent, number}}% pour {{userName}}',
-      'profileRetrieved': 'Profil utilisateur récupéré avec succès pour {{userName}} ({{userRole}}) par [{{requestedBy}}]',
-      'profileUpdated': 'Profil utilisateur mis à jour avec succès pour {{userName}} - {{fieldsCount}} champ modifié',
-      'profileUpdated_other': 'Profil utilisateur mis à jour avec succès pour {{userName}} - {{fieldsCount}} champs modifiés',
-      'registered': 'Utilisateur {{userName}} enregistré avec succès avec le rôle [{{userRole}}]',
-      'registeredEmailDisabled': 'Compte créé pour {{userName}}. Les notifications par e-mail sont actuellement désactivées par l\'administrateur. Veuillez contacter le support pour l\'activation du compte.',
-      'registeredPendingActivation': 'Inscription reçue pour {{userName}}. Veuillez vérifier votre email pour confirmer et activer votre compte avant de vous connecter.',
-      'roleChanged': 'Rôle utilisateur changé de {{oldRole}} à {{newRole}} pour {{userName}}',
-      'sessionTerminated': 'Toutes les sessions terminées avec succès pour {{userName}}',
-      'suspended': 'Compte utilisateur suspendu avec succès pour {{userName}} jusqu\'à {{suspendedUntil, datetime}}',
-      'unsuspended': 'Suspension de compte utilisateur levée pour {{userName}} par {{liftedBy}}',
-      'updated': 'Profil utilisateur mis à jour avec succès pour {{userName}} - champs : {{updatedFields}}',
+      'emailUpdated': 'Adresse e-mail mise à jour de {{oldEmail}} à {{newEmail}} pour [{{userName}}]',
+      'emailVerified': 'Adresse e-mail {{email, lowercase}} vérifiée avec succès pour [{{userName}}]',
+      'loginHistory': 'Historique de connexion récupéré : {{entryCount}} entrée pour [{{userName}}]',
+      'loginHistory_other': 'Historique de connexion récupéré : {{entryCount}} entrées pour [{{userName}}]',
+      'passwordChanged': 'Mot de passe changé avec succès pour [{{userName}}]',
+      'permissionUpdated': 'Permissions utilisateur mises à jour avec succès pour [{{userName}}]',
+      'profileCompleted': 'Le profil utilisateur est maintenant complet à {{percent, number}}% pour [{{userName}}]',
+      'profileRetrieved': 'Profil utilisateur récupéré avec succès pour [{{userName}}] ({{userRole}}) par [{{requestedBy}}]',
+      'profileUpdated': 'Profil utilisateur mis à jour avec succès pour [{{userName}}] - {{fieldsCount}} champ modifié',
+      'profileUpdated_other': 'Profil utilisateur mis à jour avec succès pour [{{userName}}] - {{fieldsCount}} champs modifiés',
+      'registered': 'Utilisateur [{{userName}}] enregistré avec succès avec le rôle [{{userRole}}]',
+      'registeredEmailDisabled': 'Compte créé pour [{{userName}}]. Les notifications par e-mail sont actuellement désactivées par l\'administrateur. Veuillez contacter le support pour l\'activation du compte.',
+      'registeredPendingActivation': 'Inscription reçue pour [{{userName}}]. Veuillez vérifier votre email pour confirmer et activer votre compte avant de vous connecter.',
+      'roleChanged': 'Rôle utilisateur changé de {{oldRole}} à {{newRole}} pour [{{userName}}]',
+      'sessionTerminated': 'Toutes les sessions terminées avec succès pour [{{userName}}]',
+      'suspended': 'Compte utilisateur suspendu avec succès pour [{{userName}}] jusqu\'à {{suspendedUntil, datetime}}',
+      'unsuspended': 'Suspension de compte utilisateur levée pour [{{userName}}] par {{liftedBy}}',
+      'updated': 'Profil utilisateur mis à jour avec succès pour [{{userName}}] - champs : {{updatedFields}}',
       'updated_other': '{{count}} profils utilisateur mis à jour avec succès',
       'updatedWithEmailVerification': 'Profil mis à jour. Veuillez vérifier votre nouvelle adresse e-mail {{newEmail}} pour confirmer et terminer le changement.'
     }
@@ -1494,7 +1494,7 @@ export default {
       'invalid': 'Mise à jour de politique de rétention invalide'
     },
     'security': {
-      'xssPatternDetected': 'Modèle XSS potentiel détecté : {{patternName}} n\'est pas autorisé'
+      'xssPatternDetected': 'Modèle XSS potentiel détecté : [{{patternName}}] n\'est pas autorisé'
     },
     'structureValidation': {
       'conditions': {
@@ -1547,11 +1547,11 @@ export default {
       'invalid': 'Le nom d\'utilisateur ne peut contenir que des lettres, des chiffres et des underscores',
       'invalidCharacters': 'Username can only contain letters, numbers, and underscores',
       'required': 'Le nom d\'utilisateur est requis',
-      'reserved': 'Le nom d\'utilisateur « {{username}} » est réservé et ne peut pas être utilisé',
+      'reserved': 'Le nom d\'utilisateur « [{{username}}] » est réservé et ne peut pas être utilisé',
       'tooLong': 'Le nom d\'utilisateur ne peut pas dépasser 30 caractères',
       'tooShort': 'Le nom d\'utilisateur doit contenir au moins 3 caractères',
       'tooShort_other': 'Le nom d\'utilisateur doit contenir au moins {{minLength}} caractères',
-      'unavailable': 'Le nom d\'utilisateur « {{username}} » n\'est pas disponible'
+      'unavailable': 'Le nom d\'utilisateur « [{{username}}] » n\'est pas disponible'
     },
     'filterArrayTooLarge': 'Tableau de filtres trop volumineux (max 500 éléments)',
     'filterArrayTooLarge_other': 'Le tableau de filtres avec {{count}} éléments dépasse le maximum de {{max}}',

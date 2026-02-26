@@ -21,8 +21,8 @@ export default {
       'adminDashboardAccess': '管理ダッシュボードアクセス',
       'adminRoutesAccess': '管理ルートアクセス',
       'createUser': 'ユーザー作成',
-      'deleteUser': 'ユーザー #{{userId}} を削除',
-      'updateUser': 'ユーザー #{{userId}} を更新'
+      'deleteUser': 'ユーザー [#{{userId}}] を削除',
+      'updateUser': 'ユーザー [#{{userId}}] を更新'
     },
     'protectionReason': {
       'hierarchy': 'ロール階層を維持する必要があります',
@@ -38,21 +38,21 @@ export default {
     'accountDeletionSuggestion': 'アカウント管理については、他の管理者にお問い合わせください',
     'activeUsersCount': 'アクティブユーザー {{count}} 人',
     'activeUsersCount_other': 'アクティブユーザー {{count}} 人 ({{percentage}})',
-    'changedByUser': '{{username}} ({{role}}) が変更しました',
-    'checkedByUser': '{{username}} ({{role}}) が確認しました',
-    'createdByUser': '{{username}} ({{role}}) が作成しました',
+    'changedByUser': '[{{username}}] ({{role}}) が変更しました',
+    'checkedByUser': '[{{username}}] ({{role}}) が確認しました',
+    'createdByUser': '[{{username}}] ({{role}}) が作成しました',
     'dashboardDataRetrieved': 'ダッシュボードを {{totalUsers}} のシステム概要で読み込みました ({{accessLevel}} アクセス)。{{requestedBy}} {{dataFreshness}}',
     'dashboardRetrieved': 'ダッシュボードデータを正常に取得しました',
     'dataFreshness': '{{timestamp}} に生成',
-    'deletedByUser': '{{username}} ({{role}}) が削除しました',
+    'deletedByUser': '[{{username}}] ({{role}}) が削除しました',
     'effectiveImmediately': '変更はすぐに有効になります',
     'failedLoginAttempts': '過去1時間に {{count}} 回のログイン失敗',
     'failedLoginAttempts_other': '過去1時間に {{count}} 回のログイン失敗',
     'performanceGrade': 'パフォーマンス: {{grade}}',
-    'requestedByUser': '{{username}} ({{role}}) が要求しました',
+    'requestedByUser': '[{{username}}] ({{role}}) が要求しました',
     'responseTime': '応答時間: {{time}}{{unit}}',
     'restrictedRoleAccess': 'アクセス拒否: {{currentRole}} は {{requestedRole}} ユーザーを表示できません',
-    'roleChangedSuccessfully': '{{targetUserName}} のロールを {{oldRole}} から {{newRole}} に変更しました。{{changedBy}} {{timestamp}} {{effectiveImmediately}}',
+    'roleChangedSuccessfully': '[{{targetUserName}}] のロールを {{oldRole}} から {{newRole}} に変更しました。{{changedBy}} {{timestamp}} {{effectiveImmediately}}',
     'routeDiscoverySuccess': 'システムルートを正常に取得しました',
     'securityRisk': 'セキュリティリスク: {{level}} ({{failedAttempts}})',
     'statisticsRetrieved': 'システム統計: {{totalUsers}}, アクティブユーザー: {{activeUsers}} ({{dataScope}} スコープ)。{{requestedBy}}',
@@ -61,13 +61,13 @@ export default {
     'systemHealthRetrievedFailed': 'システムヘルス情報の取得に失敗しました',
     'totalUsersCount': '合計 {{count}} ユーザー',
     'totalUsersCount_other': '合計 {{count}} ユーザー',
-    'updatedByUser': '{{username}} ({{role}}) が更新しました',
-    'userCreatedSuccessfully': '新しいユーザー {{userName}} を {{newUserRole}} ロールで作成しました。{{createdBy}} {{timestamp}}',
+    'updatedByUser': '[{{username}}] ({{role}}) が更新しました',
+    'userCreatedSuccessfully': '新しいユーザー [{{userName}}] を {{newUserRole}} ロールで作成しました。{{createdBy}} {{timestamp}}',
     'userDeletedSuccessfully': 'ユーザーアカウントを完全に削除しました。{{deletedBy}} {{timestamp}} アクション: {{action}}',
-    'userDetailsRetrieved': 'ユーザー詳細を取得しました: {{userName}} ({{userRole}}, {{userStatus}})。{{joinedDate}} {{requestedBy}}',
+    'userDetailsRetrieved': 'ユーザー詳細を取得しました: [{{userName}}] ({{userRole}}, {{userStatus}})。{{joinedDate}} {{requestedBy}}',
     'usersListRetrieved': '{{count}} ユーザーを正常に取得しました ({{currentPage}}/{{totalPages}} ページに {{displayedCount}} 件表示)。{{requestedBy}}',
     'usersListRetrieved_other': '{{count}} ユーザーを正常に取得しました ({{currentPage}}/{{totalPages}} ページに {{displayedCount}} 件表示)。{{requestedBy}}',
-    'userUpdatedSuccessfully': 'ユーザー {{updatedUserName}} を正常に更新しました。{{updatedBy}} {{timestamp}}'
+    'userUpdatedSuccessfully': 'ユーザー [{{updatedUserName}}] を正常に更新しました。{{updatedBy}} {{timestamp}}'
   },
   'api': {
     'databaseError': 'データベースエラーが発生しました',
@@ -138,10 +138,10 @@ export default {
     'cannotCreateAdmin': '管理者アカウントを作成できません',
     'cannotCreateHigherRole': '{{currentRole}} は役割階層の制限により {{requestedRole}} アカウントを作成できません',
     'cannotCreateSuperAdmin': 'スーパー管理者アカウントを作成できません',
-    'cannotDeleteOwnAccount': '{{userName}} ({{role}}) は自分のアカウントを削除できません。{{suggestion}}',
+    'cannotDeleteOwnAccount': '[{{userName}}] ({{role}}) は自分のアカウントを削除できません。{{suggestion}}',
     'cannotDeleteSuperAdmin': 'スーパー管理者アカウントを削除できません',
     'cannotDeleteYourself': '自分のアカウントを削除できません',
-    'cannotModifyHigherRoleUser': '{{targetUserName}} ({{targetRole}}) を変更できません - {{currentRole}} {{reason}}',
+    'cannotModifyHigherRoleUser': '[{{targetUserName}}] ({{targetRole}}) を変更できません - {{currentRole}} {{reason}}',
     'cannotModifySuperAdmin': 'スーパー管理者アカウントを変更できません',
     'cannotPromoteToHigherRole': '{{currentRole}} はユーザーを {{requestedRole}} に昇格できません - {{reason}}',
     'cannotPromoteToSuperAdmin': 'ユーザーをスーパー管理者に昇格できません',
@@ -187,14 +187,14 @@ export default {
       'disclaimer': 'このアカウントに心当たりがない場合は、このメールを無視するかサポートまでご連絡ください。',
       'email': '登録メールアドレス: {{email}}',
       'expiryWarning': 'この有効化リンクは{{hours}}時間後に期限切れになります。',
-      'footer': 'このメールは{{appName}}からの自動送信です。返信しないでください。',
-      'greeting': '{{userName}} 様',
+      'footer': 'このメールは[{{appName}}]からの自動送信です。返信しないでください。',
+      'greeting': '[{{userName}}] 様',
       'instructions': 'このメールはアカウント情報を受け取ったことを確認するものです。承認や有効化が必要な場合、別途メールをお送りします。',
-      'intro': '{{appName}} にご登録いただきありがとうございます。',
+      'intro': '[{{appName}}] にご登録いただきありがとうございます。',
       'ip': 'リクエストIP: {{ip}}',
       'securityNote': '安全のため、このリンクを他人と共有しないでください。',
-      'subject': '{{appName}} - 登録確認',
-      'thanks': 'ありがとうございます。\n{{appName}} チーム',
+      'subject': '[{{appName}}] - 登録確認',
+      'thanks': 'ありがとうございます。\n[{{appName}}] チーム',
       'time': '登録日時: {{timestamp}}'
     }
   },
@@ -310,9 +310,9 @@ export default {
     'security_incident': {
       'bulkDelete': '{{count}}件のセキュリティインシデントを一括削除（管理者{{actor}}のアクセスが必要）',
       'create': '新しいセキュリティインシデントを作成（管理者{{actor}}のアクセスが必要、タイプ{{type}}、重要度{{severity}}）',
-      'deleteById': 'セキュリティインシデント{{incidentId}}を削除（管理者{{actor}}のアクセスが必要）',
+      'deleteById': 'セキュリティインシデント[#{{incidentId}}]を削除（管理者{{actor}}のアクセスが必要）',
       'exportCsv': '{{count}}件のセキュリティインシデントをCSVにエクスポート（管理者{{actor}}のアクセスが必要、日付範囲：{{dateRange}}）',
-      'getById': 'ID {{incidentId}}でセキュリティインシデントを取得（管理者{{actor}}のアクセスが必要）',
+      'getById': '[#{{incidentId}}]でセキュリティインシデントを取得（管理者{{actor}}のアクセスが必要）',
       'getDashboard': 'セキュリティインシデントダッシュボードを取得（管理者{{actor}}のアクセスが必要、フィルター：{{filters}}）',
       'getStatistics': 'セキュリティインシデント統計を取得（管理者{{actor}}のアクセスが必要、期間：{{period}}）',
       'incidentDetails': 'インシデント詳細を取得（管理者アクセス必須）',
@@ -325,8 +325,8 @@ export default {
       'serviceStatus': 'サービス状態を取得（管理者アクセス必須）',
       'simulate': 'セキュリティインシデントをシミュレート（管理者アクセス必須）',
       'statistics': 'インシデント統計を取得（管理者アクセス必須）',
-      'updateById': 'セキュリティインシデント{{incidentId}}を更新（管理者{{actor}}のアクセスが必要、更新されたフィールド：{{fields}}）',
-      'updateStatus': 'セキュリティインシデント{{incidentId}}のステータスを{{status}}に更新（管理者{{actor}}のアクセスが必要）'
+      'updateById': 'セキュリティインシデント[#{{incidentId}}]を更新（管理者{{actor}}のアクセスが必要、更新されたフィールド：{{fields}}）',
+      'updateStatus': 'セキュリティインシデント[#{{incidentId}}]のステータスを{{status}}に更新（管理者{{actor}}のアクセスが必要）'
     },
     'system': {
       'apiInfo': '包括的なAPI情報とエンドポイント',
@@ -376,7 +376,7 @@ export default {
         'failed': '行動分析を取得できませんでした - {{actor}}が{{targetRole}}を対象とした{{timeframe}}の{{operation}}を完了できませんでした: {{reason}}'
       },
       'compliance': {
-        'customComplianceFailed': 'カスタムコンプライアンスレポートを生成できませんでした - {{actor}}が「{{reportName}}」({{reportType}})の{{operation}}を完了できませんでした: {{reason}}',
+        'customComplianceFailed': 'カスタムコンプライアンスレポートを生成できませんでした - {{actor}}が「[{{reportName}}]」({{reportType}})の{{operation}}を完了できませんでした: {{reason}}',
         'failed': 'コンプライアンスレポートを生成できませんでした - {{actor}}が{{format}}形式で{{timeframe}}の{{operation}}を完了できませんでした: {{reason}}',
         'reportFailed': 'コンプライアンスレポートを生成できませんでした - {{actor}}が{{type}}レポートの{{operation}}を実行できませんでした: {{reason}}'
       },
@@ -417,16 +417,16 @@ export default {
       }
     },
     'auth': {
-      'accountDisabled': 'ユーザーアカウント {{userName}} は管理者によって無効にされています',
+      'accountDisabled': 'ユーザーアカウント [{{userName}}] は管理者によって無効にされています',
       'accountInactive': 'アカウントは無効状態です。メールで有効化するか、サポートに連絡してください。',
       'accountLocked': 'ログイン試行の失敗によりアカウントが {{duration, time}} ロックされています',
-      'accountNotVerified': '{{userName}} のメールアドレスは認証されていません',
+      'accountNotVerified': '[{{userName}}] のメールアドレスは認証されていません',
       'cannotAccessOtherUsers': '他のユーザーのリソースにアクセスできません',
-      'cannotChangeOwnRole': '{{userName}} ({{currentRole}}) は自分の役割を変更できません - {{reason}}',
+      'cannotChangeOwnRole': '[{{userName}}] ({{currentRole}}) は自分の役割を変更できません - {{reason}}',
       'cannotCreateHigherRole': '{{currentRole}} は役割階層の制限により {{requestedRole}} アカウントを作成できません',
       'cannotDeleteSuperAdmin': 'スーパー管理者アカウントを削除できません',
       'cannotDeleteYourself': '自分のアカウントを削除できません',
-      'cannotModifyHigherRoleUser': '{{targetUserName}} ({{targetRole}}) を変更できません - {{currentRole}} {{reason}}',
+      'cannotModifyHigherRoleUser': '[{{targetUserName}}] ({{targetRole}}) を変更できません - {{currentRole}} {{reason}}',
       'cannotPromoteToHigherRole': '{{currentRole}} は {{requestedRole}} への昇格を実行できません - {{reason}}',
       'deleteNotAllowed': 'あなたの役割では削除操作は許可されていません',
       'failed': '認証に失敗しました: {{reason}}',
@@ -437,8 +437,8 @@ export default {
       'invalidCredentials_context_user': 'ユーザーアカウントログインに無効な認証情報が指定されました',
       'loginFailed': '{{actor}}のログインプロセスが失敗しました (理由: {{reason}}, 操作: {{operation}}, IP: {{ipAddress}})',
       'mfaFailed': '多要素認証に失敗しました: {{reason}}',
-      'mfaRequired': '{{userName}} には多要素認証が必要です',
-      'passwordIncorrect': 'ユーザー {{userName}} のパスワードが正しくありません',
+      'mfaRequired': '[{{userName}}] には多要素認証が必要です',
+      'passwordIncorrect': 'ユーザー [{{userName}}] のパスワードが正しくありません',
       'permissionDenied': 'アクションに対する権限が拒否されました: {{action}}',
       'rateLimitExceeded': 'レート制限を超過しました: {{timeWindow}} あたり {{currentRequests}}/{{maxRequests}} リクエスト',
       'refreshTokenExpired': 'リフレッシュトークンは {{expiredAt, datetime}} に期限切れになりました',
@@ -471,11 +471,11 @@ export default {
       'workflowViolation': 'ワークフロー違反: 現在の状態 {{currentState}} では {{step}} を実行できません'
     },
     'file': {
-      'accessDenied': 'ファイル "{{filename}}" へのアクセスが拒否されました: {{reason}}',
+      'accessDenied': 'ファイル "[{{filename}}]" へのアクセスが拒否されました: {{reason}}',
       'corrupted': 'ファイルが破損しているか不完全なようです',
       'formatUnsupported': '操作でファイル形式がサポートされていません: {{operation}}',
       'invalidType': 'ファイルタイプ "{{fileType}}" は許可されていません - サポートされているタイプ: {{allowedTypes}}',
-      'notFound': 'ファイル "{{filename}}" が見つかりません',
+      'notFound': 'ファイル "[{{filename}}]" が見つかりません',
       'processingFailed': 'ファイル処理に失敗しました: {{reason}}',
       'quotaExceeded': 'ストレージクォータを超過しました: {{used, number}}MB / {{quota, number}}MB',
       'tooLarge': 'ファイルサイズ {{actualSize, number}}MB は {{maxSize, number}}MB の制限を超えています',
@@ -498,14 +498,14 @@ export default {
       'translationsFailed': '翻訳情報の取得に失敗しました：{{reason}}'
     },
     'integration': {
-      'apiLimitExceeded': '{{serviceName}} の API レート制限を超過しました: {{period}} あたり {{limit}} リクエスト',
-      'authenticationFailed': '{{serviceName}} との認証に失敗しました: {{reason}}',
-      'credentialsExpired': '{{serviceName}} の API 認証情報は {{expiredDate, date}} に期限切れになりました',
-      'dataTransformFailed': '{{serviceName}} のデータ変換に失敗しました: {{reason}}',
-      'invalidResponse': '{{serviceName}} からの応答が無効です: {{details}}',
-      'serviceDown': '外部サービス {{serviceName}} は現在停止中です',
-      'syncFailed': '{{serviceName}} とのデータ同期に失敗しました: {{reason}}',
-      'webhookTimeout': '{{serviceName}} からのウェブフックが {{timeout, number}}ms 後にタイムアウトしました'
+      'apiLimitExceeded': '[{{serviceName}}] の API レート制限を超過しました: {{period}} あたり {{limit}} リクエスト',
+      'authenticationFailed': '[{{serviceName}}] との認証に失敗しました: {{reason}}',
+      'credentialsExpired': '[{{serviceName}}] の API 認証情報は {{expiredDate, date}} に期限切れになりました',
+      'dataTransformFailed': '[{{serviceName}}] のデータ変換に失敗しました: {{reason}}',
+      'invalidResponse': '[{{serviceName}}] からの応答が無効です: {{details}}',
+      'serviceDown': '外部サービス [{{serviceName}}] は現在停止中です',
+      'syncFailed': '[{{serviceName}}] とのデータ同期に失敗しました: {{reason}}',
+      'webhookTimeout': '[{{serviceName}}] からのウェブフックが {{timeout, number}}ms 後にタイムアウトしました'
     },
     'kv': {
       'accessDenied': '設定キー "{{key}}" へのアクセスが拒否されました - {{requiredRole}} ロールが必要です',
@@ -553,12 +553,12 @@ export default {
       'retentionPoliciesRetrieveFailed': '{{actor}}のリテンションポリシー取得に失敗しました (理由: {{reason}}, 操作: {{operation}})'
     },
     'network': {
-      'apiError': '{{apiName}} からの外部APIエラー: {{error}}',
+      'apiError': '[{{apiName}}] からの外部APIエラー: {{error}}',
       'bandwidthExceeded': '帯域幅制限を超過しました: {{usage, number}}MB/{{limit, number}}MB',
       'connectionFailed': '{{service, uppercase}} への接続に失敗しました: {{reason}}',
       'connectionRefused': 'ポート {{port}} の {{service}} によって接続が拒否されました',
-      'dnsResolutionFailed': '{{hostname}} の DNS 解決に失敗しました',
-      'hostUnreachable': 'ホスト {{hostname}} に到達できません',
+      'dnsResolutionFailed': '[{{hostname}}] の DNS 解決に失敗しました',
+      'hostUnreachable': 'ホスト [{{hostname}}] に到達できません',
       'httpError': 'HTTP エラー {{statusCode}}: {{statusMessage}}',
       'protocolError': 'ネットワークプロトコルエラー: {{protocol}} - {{details}}',
       'proxyError': 'プロキシサーバーエラー: {{proxyAddress}} - {{reason}}',
@@ -611,7 +611,7 @@ export default {
     },
     'security': {
       'incident': {
-        'notFound': 'セキュリティインシデントが見つかりません（ID：{{incidentId}}、操作：{{operation}}、リクエスト者：{{requestedBy}}）'
+        'notFound': 'セキュリティインシデントが見つかりません（[#{{incidentId}}]、操作：{{operation}}、リクエスト者：{{requestedBy}}）'
       },
       'incidents': {
         'createFailed': '{{actor}}がセキュリティインシデントの作成に失敗しました（エラー：{{errorType}}）{{timestamp}}',
@@ -653,41 +653,41 @@ export default {
       'workerUnavailable': 'リクエストを処理する利用可能なワーカーがありません'
     },
     'user': {
-      'accountLocked': 'ユーザーアカウント {{userName}} は {{reason}} によりロックされています',
-      'accountSuspended': 'ユーザーアカウント {{userName}} は {{suspendedUntil, datetime}} まで停止されています',
-      'activationFailed': '{{userName}} のユーザーアカウントのアクティブ化に失敗しました: {{reason}}',
+      'accountLocked': 'ユーザーアカウント [{{userName}}] は {{reason}} によりロックされています',
+      'accountSuspended': 'ユーザーアカウント [{{userName}}] は {{suspendedUntil, datetime}} まで停止されています',
+      'activationFailed': '[{{userName}}] のユーザーアカウントのアクティブ化に失敗しました: {{reason}}',
       'bulkOperationFailed': '{{totalCount}} 件中 {{failedCount}} 件のユーザーの一括操作が失敗しました',
       'bulkOperationFailed_other': '{{totalCount}} 件中 {{failedCount}} 件のユーザーの一括操作が失敗しました',
       'createFailed': '{{email}} のユーザーアカウントの作成に失敗しました: {{reason}}',
-      'deactivationFailed': '{{userName}} のユーザーアカウントの非アクティブ化に失敗しました: {{reason}}',
-      'deleteFailed': 'ユーザー {{userName}} の削除に失敗しました: {{reason}}',
+      'deactivationFailed': '[{{userName}}] のユーザーアカウントの非アクティブ化に失敗しました: {{reason}}',
+      'deleteFailed': 'ユーザー [{{userName}}] の削除に失敗しました: {{reason}}',
       'emailExists': 'メールアドレス {{email}} はすでにシステムに登録されています',
       'emailVerificationFailed': 'メール認証に失敗しました: {{reason}}',
       'emailVerificationSystemError': 'システムエラーのため、メールアドレスの変更を確認できませんでした。後でもう一度お試しください。',
-      'inactive': 'ユーザーアカウント {{userName}} は非アクティブです',
-      'insufficientPermissions': 'ユーザー {{userName}} ({{userRole}}) を変更する権限がありません',
+      'inactive': 'ユーザーアカウント [{{userName}}] は非アクティブです',
+      'insufficientPermissions': 'ユーザー [{{userName}}] ({{userRole}}) を変更する権限がありません',
       'listFailed': 'ユーザーリストの取得に失敗しました: {{reason}}',
-      'notFound': 'ユーザー "{{userName}}" が見つからないか、削除されています',
-      'notFoundById': 'ID {{userId}} のユーザーが見つかりません',
-      'passwordChangeFailed': '{{userName}} のパスワードの変更に失敗しました: {{reason}}',
+      'notFound': 'ユーザー "[{{userName}}]" が見つからないか、削除されています',
+      'notFoundById': '[#{{userId}}] のユーザーが見つかりません',
+      'passwordChangeFailed': '[{{userName}}] のパスワードの変更に失敗しました: {{reason}}',
       'passwordIncorrect': '現在のパスワードが正しくありません - もう一度お試しください',
-      'profileRetrieveFailed': '{{userName}} のユーザープロファイルの取得に失敗しました: {{reason}}',
+      'profileRetrieveFailed': '[{{userName}}] のユーザープロファイルの取得に失敗しました: {{reason}}',
       'registrationError': 'システムエラーによりユーザー登録に失敗しました: {{details}}',
       'registrationFailed': 'ユーザー登録に失敗しました: {{reason}}',
-      'roleChangeFailed': '{{userName}} のロールを {{oldRole}} から {{newRole}} に変更できませんでした: {{reason}}',
-      'sessionLimitExceeded': 'ユーザー {{userName}} は最大同時セッション数 ({{currentSessions}}/{{maxSessions}}) を超えました',
-      'updateFailed': '{{userName}} のユーザープロファイルの更新に失敗しました: {{reason}}',
-      'usernameExists': 'ユーザー名 "{{username}}" はすでに使用されています'
+      'roleChangeFailed': '[{{userName}}] のロールを {{oldRole}} から {{newRole}} に変更できませんでした: {{reason}}',
+      'sessionLimitExceeded': 'ユーザー [{{userName}}] は最大同時セッション数 ({{currentSessions}}/{{maxSessions}}) を超えました',
+      'updateFailed': '[{{userName}}] のユーザープロファイルの更新に失敗しました: {{reason}}',
+      'usernameExists': 'ユーザー名 "[{{username}}]" はすでに使用されています'
     },
     'zodDemo': {
       'file': {
-        'uploadFailed': 'ファイルアップロードが失敗しました - {{actor}}が"{{fileName}}" ({{fileSize}} バイト)の{{operation}}を完了できませんでした: {{reason}}'
+        'uploadFailed': 'ファイルアップロードが失敗しました - {{actor}}が"[{{fileName}}]" ({{fileSize}} バイト)の{{operation}}を完了できませんでした: {{reason}}'
       },
       'search': {
         'failed': '検索操作が失敗しました - {{actor}}がクエリ"{{query}}" ({{searchType}})の{{operation}}を完了できませんでした: {{reason}}'
       },
       'user': {
-        'registrationFailed': 'ユーザー登録が失敗しました - {{actor}}が{{userName}} ({{email}})の{{operation}}を完了できませんでした: {{reason}}'
+        'registrationFailed': 'ユーザー登録が失敗しました - {{actor}}が[{{userName}}] ({{email}})の{{operation}}を完了できませんでした: {{reason}}'
       }
     },
     'businessRuleViolation': 'ビジネスルール違反: {{rules}}',
@@ -722,7 +722,7 @@ export default {
   },
   'security': {
     'alerts': {
-      'alertTemplate': 'アラート: {{name}} - {{eventType}}',
+      'alertTemplate': 'アラート: [{{name}}] - {{eventType}}',
       'channelCreated': 'アラートチャンネルが正常に作成されました',
       'channelsFailed': 'アラートチャネルの取得に失敗しました',
       'createChannelFailed': 'アラートチャネルの作成に失敗しました',
@@ -757,11 +757,11 @@ export default {
       'reportCreated_other': '{{recordCount, number}} 件のレコードを含む管理レポートを作成しました',
       'securityScanCompleted': 'セキュリティスキャンが完了しました - {{threatsFound}} 件の脅威を検出しました',
       'securityScanCompleted_other': 'セキュリティスキャンが完了しました - {{threatsFound}} 件の脅威を検出しました',
-      'serviceRestarted': 'システムサービス {{serviceName}} を正常に再起動しました',
+      'serviceRestarted': 'システムサービス [{{serviceName}}] を正常に再起動しました',
       'statsGenerated': '{{period}} 期間のシステム統計を正常に生成しました - {{dataPoints}} データポイント',
       'statsGenerated_other': '{{period}} 期間のシステム統計を正常に生成しました - {{dataPoints}} データポイント',
       'systemHealthy': 'システムヘルスチェックが完了しました: {{status, uppercase}} (稼働時間 {{uptime, number}}%)',
-      'userDetailsRetrieved': 'ユーザー詳細を取得しました: {{userName}} ({{userRole}}, {{userStatus}})。{{joinedDate}} {{requestedBy}}'
+      'userDetailsRetrieved': 'ユーザー詳細を取得しました: [{{userName}}] ({{userRole}}, {{userStatus}})。{{joinedDate}} {{requestedBy}}'
     },
     'advancedAudit': {
       'analytics': {
@@ -794,19 +794,19 @@ export default {
       'statsRetrieved': '監査統計を正常に取得しました'
     },
     'auth': {
-      'accessGranted': '{{userName}} に {{resource}} へのアクセスを許可しました',
-      'accountUnlocked': '{{unlockedBy}} によってアカウント {{userName}} が正常にロック解除されました',
-      'loginSuccess': '{{userName}} ({{userRole}}) として {{loginTime}} に正常にログインしました',
+      'accessGranted': '[{{userName}}] に {{resource}} へのアクセスを許可しました',
+      'accountUnlocked': '{{unlockedBy}} によってアカウント [{{userName}}] が正常にロック解除されました',
+      'loginSuccess': '[{{userName}}] ({{userRole}}) として {{loginTime}} に正常にログインしました',
       'logoutAllSuccess': 'すべてのデバイスから {{logoutTime}} にログアウトしました',
       'logoutSuccess': '{{deviceInfo}} から {{logoutTime}} に正常にログアウトしました',
-      'mfaEnabled': '{{userName}} の多要素認証を正常に有効にしました',
+      'mfaEnabled': '[{{userName}}] の多要素認証を正常に有効にしました',
       'mfaVerified': '多要素認証を正常に検証しました',
-      'passwordChanged': '{{userName}} のパスワードを {{changeTime}} に正常に変更しました',
+      'passwordChanged': '[{{userName}}] のパスワードを {{changeTime}} に正常に変更しました',
       'passwordReset': 'パスワードリセットメールを {{email}} に送信しました - {{expiryMinutes}} 分後に期限切れになります',
       'passwordReset_other': 'パスワードリセットメールを {{email}} に送信しました - {{expiryMinutes}} 分後に期限切れになります',
-      'permissionGranted': '{{userName}} にパーミッション "{{permission}}" を付与しました',
+      'permissionGranted': '[{{userName}}] にパーミッション "{{permission}}" を付与しました',
       'rateLimitReset': '{{ipAddress}} のレート制限を正常にリセットしました',
-      'roleAssigned': '{{assignedBy}} によって {{newRole}} ロールが {{userName}} に正常に割り当てられました',
+      'roleAssigned': '{{assignedBy}} によって {{newRole}} ロールが [{{userName}}] に正常に割り当てられました',
       'sessionCreated': '{{sessionDuration}} 分の有効期間を持つ新しいユーザーセッションを作成しました',
       'sessionCreated_other': '{{sessionDuration}} 分の有効期間を持つ新しいユーザーセッションを作成しました',
       'sessionExtended': 'ユーザーセッションが {{newExpiry}} まで延長されました',
@@ -821,42 +821,42 @@ export default {
       'operationApproved': 'ビジネス操作 "{{operation}}" が {{approvedBy}} によって承認されました',
       'processAutomated': 'ビジネスプロセスを正常に自動化しました - {{automatedTasks}} 件のタスクを自動化しました',
       'processAutomated_other': 'ビジネスプロセスを正常に自動化しました - {{automatedTasks}} 件のタスクを自動化しました',
-      'ruleApplied': 'ビジネスルール "{{ruleName}}" を {{affectedRecords}} 件のレコードに正常に適用しました',
-      'ruleApplied_other': 'ビジネスルール "{{ruleName}}" を {{affectedRecords}} 件のレコードに正常に適用しました',
+      'ruleApplied': 'ビジネスルール "[{{ruleName}}]" を {{affectedRecords}} 件のレコードに正常に適用しました',
+      'ruleApplied_other': 'ビジネスルール "[{{ruleName}}]" を {{affectedRecords}} 件のレコードに正常に適用しました',
       'validationPassed': '{{entityType}} のビジネス検証に合格しました - すべての {{checkCount}} 件のチェックが成功しました',
       'validationPassed_other': '{{entityType}} のビジネス検証に合格しました - すべての {{checkCount}} 件のチェックが成功しました',
-      'workflowCompleted': 'ワークフロー "{{workflowName}}" が {{steps}} ステップで正常に完了しました',
-      'workflowCompleted_other': 'ワークフロー "{{workflowName}}" が {{steps}} ステップで正常に完了しました'
+      'workflowCompleted': 'ワークフロー "[{{workflowName}}]" が {{steps}} ステップで正常に完了しました',
+      'workflowCompleted_other': 'ワークフロー "[{{workflowName}}]" が {{steps}} ステップで正常に完了しました'
     },
     'file': {
-      'backup': 'ファイル "{{filename}}" のバックアップを正常に作成しました',
+      'backup': 'ファイル "[{{filename}}]" のバックアップを正常に作成しました',
       'compressed': 'ファイルを正常に圧縮しました - サイズが {{compressionRatio, number}}% 削減されました',
       'converted': 'ファイルを {{sourceFormat}} から {{targetFormat}} に正常に変換しました',
       'copied': 'ファイルを {{destinationPath}} に正常にコピーしました',
-      'deleted': 'ファイル "{{filename}}" を正常に削除しました',
-      'downloadCompleted': 'ファイル "{{filename}}" を正常にダウンロードしました',
+      'deleted': 'ファイル "[{{filename}}]" を正常に削除しました',
+      'downloadCompleted': 'ファイル "[{{filename}}]" を正常にダウンロードしました',
       'extracted': 'アーカイブを正常に解凍しました - {{extractedCount}} 件のファイルを解凍しました',
       'extracted_other': 'アーカイブを正常に解凍しました - {{extractedCount}} 件のファイルを解凍しました',
       'moved': 'ファイルを {{sourcePath}} から {{destinationPath}} に正常に移動しました',
-      'processingCompleted': 'ファイル "{{filename}}" の処理が完了しました - {{operationsCount}} 件の操作を実行しました',
-      'processingCompleted_other': 'ファイル "{{filename}}" の処理が完了しました - {{operationsCount}} 件の操作を実行しました',
+      'processingCompleted': 'ファイル "[{{filename}}]" の処理が完了しました - {{operationsCount}} 件の操作を実行しました',
+      'processingCompleted_other': 'ファイル "[{{filename}}]" の処理が完了しました - {{operationsCount}} 件の操作を実行しました',
       'restored': '{{backupDate, date}} に作成されたバックアップからファイルを正常に復元しました',
-      'uploadCompleted': 'ファイル "{{filename}}" を正常にアップロードしました ({{fileSize}})',
+      'uploadCompleted': 'ファイル "[{{filename}}]" を正常にアップロードしました ({{fileSize}})',
       'uploadsBatch': 'バッチアップロードが完了しました: {{totalCount}} 件中 {{successCount}} 件のファイルを処理しました',
       'uploadsBatch_other': 'バッチアップロードが完了しました: {{totalCount}} 件中 {{successCount}} 件のファイルを処理しました',
-      'validated': 'ファイル "{{filename}}" の検証に合格しました - 形式: {{fileFormat}}'
+      'validated': 'ファイル "[{{filename}}]" の検証に合格しました - 形式: {{fileFormat}}'
     },
     'integration': {
-      'apiCall': '{{serviceName}} への API 呼び出しが {{responseTime, number}}ms で正常に完了しました',
-      'credentialsValidated': '{{serviceName}} の API 認証情報を正常に検証しました',
-      'dataSync': '{{serviceName}} とのデータ同期が完了しました - {{syncedRecords}} 件のレコードを処理しました',
-      'dataSync_other': '{{serviceName}} とのデータ同期が完了しました - {{syncedRecords}} 件のレコードを処理しました',
+      'apiCall': '[{{serviceName}}] への API 呼び出しが {{responseTime, number}}ms で正常に完了しました',
+      'credentialsValidated': '[{{serviceName}}] の API 認証情報を正常に検証しました',
+      'dataSync': '[{{serviceName}}] とのデータ同期が完了しました - {{syncedRecords}} 件のレコードを処理しました',
+      'dataSync_other': '[{{serviceName}}] とのデータ同期が完了しました - {{syncedRecords}} 件のレコードを処理しました',
       'dataTransform': 'データ変換が完了しました - {{transformedRecords}} 件のレコードを処理しました',
       'dataTransform_other': 'データ変換が完了しました - {{transformedRecords}} 件のレコードを処理しました',
-      'healthCheckPassed': '{{serviceName}} の外部サービスヘルスチェックに合格しました',
+      'healthCheckPassed': '[{{serviceName}}] の外部サービスヘルスチェックに合格しました',
       'rateLimit': 'API レート制限ステータス: 残り {{usedRequests}}/{{maxRequests}} リクエスト',
-      'serviceConnected': '{{serviceName}} に正常に接続しました - ステータス: {{serviceStatus}}',
-      'subscriptionActive': '{{serviceName}} のサービスサブスクリプションは {{expiryDate, date}} までアクティブです',
+      'serviceConnected': '[{{serviceName}}] に正常に接続しました - ステータス: {{serviceStatus}}',
+      'subscriptionActive': '[{{serviceName}}] のサービスサブスクリプションは {{expiryDate, date}} までアクティブです',
       'webhookDelivered': 'ウェブフックが {{webhookUrl}} に正常に配信されました - ステータス: {{deliveryStatus}}'
     },
     'kv': {
@@ -903,8 +903,8 @@ export default {
       'batchProcessed': 'バッチ操作が完了しました: {{successCount}}/{{totalCount}} アイテムが正常に処理されました',
       'completed': '操作「{{operationType}}」が {{duration}}ms で正常に完了しました',
       'completed_other': '{{count}} 個の操作が正常に完了しました - 平均時間: {{avgDuration}}ms',
-      'taskFinished': 'タスク「{{taskName}}」が {{resultCount}} の結果で正常に完了しました',
-      'taskFinished_other': 'タスク「{{taskName}}」が {{resultCount}} の結果で正常に完了しました',
+      'taskFinished': 'タスク「[{{taskName}}]」が {{resultCount}} の結果で正常に完了しました',
+      'taskFinished_other': 'タスク「[{{taskName}}]」が {{resultCount}} の結果で正常に完了しました',
       'workflowCompleted': 'ワークフローが正常に完了しました - {{stepsCount}} ステップが実行されました',
       'workflowCompleted_other': 'ワークフローが正常に完了しました - {{stepsCount}} ステップが実行されました'
     },
@@ -926,7 +926,7 @@ export default {
         'realtimeRetrieved': 'リアルタイムダッシュボードデータを正常に取得しました'
       },
       'incidents': {
-        'created': 'リアルタイム監視インシデント {{incidentId}} が正常に作成されました'
+        'created': 'リアルタイム監視インシデント [#{{incidentId}}] が正常に作成されました'
       },
       'monitoring': {
         'analysisCompleted': 'リアルタイム監視分析が正常に完了しました',
@@ -934,7 +934,7 @@ export default {
         'eventsRetrieved': 'リアルタイム監視イベントを正常に取得しました',
         'started': 'リアルタイム監視が正常に開始されました',
         'stopped': 'リアルタイム監視が正常に停止されました',
-        'threatResolved': 'リアルタイム脅威 {{threatId}} を正常に解決しました',
+        'threatResolved': 'リアルタイム脅威 [#{{threatId}}] を正常に解決しました',
         'threatsRetrieved': 'リアルタイム脅威ステータスを正常に取得しました'
       }
     },
@@ -944,16 +944,16 @@ export default {
     },
     'security': {
       'incident': {
-        'created': '{{actor}}がセキュリティインシデント「{{title}}」を重要度{{severity}}で作成しました（ID：{{incidentId}}、タイプ：{{type}}）',
-        'responseExecuted': '{{actor}}がインシデント{{incidentId}}に対して{{actionCount}}件の対応アクションを実行しました（タイプ：{{actionType}}）（{{executedAt}}）',
-        'retrieved': '{{actor}}がインシデント{{incidentId}}の詳細を取得しました（ステータス：{{status}}、重要度：{{severity}}、作成日：{{createdAt}}）',
-        'statusUpdated': '{{actor}}がインシデント{{incidentId}}のステータスを「{{oldStatus}}」から「{{newStatus}}」に更新しました（{{timestamp}}）'
+        'created': '{{actor}}がセキュリティインシデント「{{title}}」を重要度{{severity}}で作成しました（[#{{incidentId}}]、タイプ：{{type}}）',
+        'responseExecuted': '{{actor}}がインシデント[#{{incidentId}}]に対して{{actionCount}}件の対応アクションを実行しました（タイプ：{{actionType}}）（{{executedAt}}）',
+        'retrieved': '{{actor}}がインシデント[#{{incidentId}}]の詳細を取得しました（ステータス：{{status}}、重要度：{{severity}}、作成日：{{createdAt}}）',
+        'statusUpdated': '{{actor}}がインシデント[#{{incidentId}}]のステータスを「{{oldStatus}}」から「{{newStatus}}」に更新しました（{{timestamp}}）'
       },
       'incidents': {
-        'created': '{{actor}}がセキュリティインシデント「{{title}}」を重要度{{severity}}で作成しました（ID：{{incidentId}}、タイプ：{{type}}）',
-        'responseExecuted': '{{actor}}がインシデント{{incidentId}}に対して{{actionCount}}件の対応アクションを実行しました（タイプ：{{actionType}}）（{{executedAt}}）',
+        'created': '{{actor}}がセキュリティインシデント「{{title}}」を重要度{{severity}}で作成しました（[#{{incidentId}}]、タイプ：{{type}}）',
+        'responseExecuted': '{{actor}}がインシデント[#{{incidentId}}]に対して{{actionCount}}件の対応アクションを実行しました（タイプ：{{actionType}}）（{{executedAt}}）',
         'retrieved': '{{actor}}が{{incidentCount}}件のセキュリティインシデントを正常に取得しました（ページ{{page}}、制限{{limit}}、フィルター：{{filters}}）',
-        'statusUpdated': '{{actor}}がインシデント{{incidentId}}のステータスを「{{oldStatus}}」から「{{newStatus}}」に更新しました（{{timestamp}}）'
+        'statusUpdated': '{{actor}}がインシデント[#{{incidentId}}]のステータスを「{{oldStatus}}」から「{{newStatus}}」に更新しました（{{timestamp}}）'
       },
       'monitoring': {
         'started': 'リアルタイム監視を正常に開始しました'
@@ -962,7 +962,7 @@ export default {
         'statusRetrieved': '{{actor}}がサービスステータスを取得しました：ヘルス{{serviceHealth}}、バージョン{{version}}、稼働時間{{uptime}}（確認日時：{{checkedAt}}）'
       },
       'simulation': {
-        'completed': '{{actor}}が{{threatType}}シミュレーションを重要度{{severity}}で完了しました（シミュレーションID：{{simulationId}}）（{{completedAt}}）'
+        'completed': '{{actor}}が{{threatType}}シミュレーションを重要度{{severity}}で完了しました（シミュレーション [#{{simulationId}}]）（{{completedAt}}）'
       },
       'statistics': {
         'retrieved': '{{actor}}がセキュリティ統計を取得しました：合計{{totalIncidents}}件、アクティブ{{activeIncidents}}件、解決済み{{resolvedIncidents}}件（取得日時：{{retrievedAt}}）'
@@ -972,8 +972,8 @@ export default {
       'cacheConnected': 'キャッシュサービス {{cacheService}} に正常に接続しました',
       'configurationLoaded': 'システム設定を正常に読み込みました - {{configCount}} 件の設定',
       'configurationLoaded_other': 'システム設定を正常に読み込みました - {{configCount}} 件の設定',
-      'connectionEstablished': '{{serviceName}} への接続を正常に確立しました',
-      'databaseConnected': '{{databaseName}} へのデータベース接続を正常に確立しました',
+      'connectionEstablished': '[{{serviceName}}] への接続を正常に確立しました',
+      'databaseConnected': '[{{databaseName}}] へのデータベース接続を正常に確立しました',
       'healthCheckPassed': 'システムヘルスチェックに合格しました - すべての {{componentCount}} コンポーネントが正常です',
       'healthCheckPassed_other': 'システムヘルスチェックに合格しました - すべての {{componentCount}} コンポーネントが正常です',
       'operationCompleted': 'システム操作 "{{operation}}" が {{duration, number}}ms で正常に完了しました',
@@ -982,46 +982,46 @@ export default {
       'resourceAllocated': 'システムリソースを正常に割り当てました: {{allocatedMemory, number}}MB メモリ',
       'resourceReleased': 'システムリソースを正常に解放しました: {{releasedMemory, number}}MB メモリ',
       'rollbackCompleted': 'システムロールバックがバージョン {{previousVersion}} に正常に完了しました',
-      'serviceStarted': 'システムサービス {{serviceName}} がポート {{port}} で正常に開始されました',
-      'serviceStopped': 'システムサービス {{serviceName}} が正常に停止しました',
-      'taskCompleted': 'バックグラウンドタスク {{taskName}} が正常に完了しました',
-      'taskScheduled': 'バックグラウンドタスク {{taskName}} を {{scheduledTime, datetime}} にスケジュールしました',
+      'serviceStarted': 'システムサービス [{{serviceName}}] がポート {{port}} で正常に開始されました',
+      'serviceStopped': 'システムサービス [{{serviceName}}] が正常に停止しました',
+      'taskCompleted': 'バックグラウンドタスク [{{taskName}}] が正常に完了しました',
+      'taskScheduled': 'バックグラウンドタスク [{{taskName}}] を {{scheduledTime, datetime}} にスケジュールしました',
       'upgradeCompleted': 'システムアップグレードがバージョン {{newVersion}} に正常に完了しました'
     },
     'translations': {
       'retrieved': '翻訳を正常に取得しました'
     },
     'user': {
-      'activated': '{{userName}} のユーザーアカウントを正常にアクティブ化しました',
+      'activated': '[{{userName}}] のユーザーアカウントを正常にアクティブ化しました',
       'activated_other': '{{count}} 件のユーザーアカウントを正常にアクティブ化しました',
       'bulkOperationSuccess': '一括操作が完了しました: {{totalCount}} 件中 {{successCount}} 件が成功',
-      'created': '{{userName}} ({{email}}) のユーザーアカウントを正常に作成しました',
+      'created': '[{{userName}}] ({{email}}) のユーザーアカウントを正常に作成しました',
       'created_other': '{{count}} 件のユーザーアカウントを正常に作成しました',
-      'dataExported': '{{userName}} のユーザーデータ ({{fileSize, number}}KB) を正常にエクスポートしました',
+      'dataExported': '[{{userName}}] のユーザーデータ ({{fileSize, number}}KB) を正常にエクスポートしました',
       'dataImported': 'ユーザーデータを正常にインポートしました - {{importedCount}} 件のレコードを処理しました',
       'dataImported_other': 'ユーザーデータを正常にインポートしました - {{importedCount}} 件のレコードを処理しました',
-      'deactivated': '{{userName}} のユーザーアカウントを正常に非アクティブ化しました',
+      'deactivated': '[{{userName}}] のユーザーアカウントを正常に非アクティブ化しました',
       'deactivated_other': '{{count}} 件のユーザーアカウントを正常に非アクティブ化しました',
-      'deleted': '{{deletedBy}} によって {{userName}} のユーザーアカウントを正常に削除しました',
+      'deleted': '{{deletedBy}} によって [{{userName}}] のユーザーアカウントを正常に削除しました',
       'deleted_other': '{{count}} 件のユーザーアカウントを正常に削除しました',
-      'emailUpdated': '{{userName}} のメールアドレスを {{oldEmail}} から {{newEmail}} に更新しました',
-      'emailVerified': '{{userName}} のメールアドレス {{email, lowercase}} を正常に検証しました',
-      'loginHistory': 'ログイン履歴を取得しました: {{userName}} の {{entryCount}} 件のエントリ',
-      'loginHistory_other': 'ログイン履歴を取得しました: {{userName}} の {{entryCount}} 件のエントリ',
-      'passwordChanged': 'って {{userName}} のパスワードを正常に変更しました',
-      'permissionUpdated': '{{userName}} のユーザー権限を正常に更新しました',
-      'profileCompleted': '{{userName}} のユーザープロファイルが {{percent, number}}% 完了しました',
-      'profileRetrieved': '[{{requestedBy}}] によって {{userName}} ({{userRole}}) のユーザープロファイルを正常に取得しました',
-      'profileUpdated': '{{userName}} のユーザープロフィールが正常に更新されました - {{fieldsCount}} 個のフィールドが変更されました',
-      'profileUpdated_other': '{{userName}} のユーザープロフィールが正常に更新されました - {{fieldsCount}} 個のフィールドが変更されました',
-      'registered': 'って {{userName}} が [{{userRole}}] ロールで正常に登録されました',
-      'registeredEmailDisabled': '{{userName}} のアカウントが作成されました。メール通知は現在管理者によって無効になっています。アカウントの有効化についてはサポートにお問い合わせください。',
-      'registeredPendingActivation': '{{userName}} の登録を受け付けました。ログインする前に、メールを確認してアカウントを確認・有効化してください。',
-      'roleChanged': '{{userName}} のユーザーロールを {{oldRole}} から {{newRole}} に変更しました',
-      'sessionTerminated': '{{userName}} のすべてのセッションを正常に終了しました',
-      'suspended': '{{userName}} のユーザーアカウントを {{suspendedUntil, datetime}} まで正常に停止しました',
-      'unsuspended': '{{liftedBy}} によって {{userName}} のユーザーアカウントの停止が解除されました',
-      'updated': '{{userName}} のユーザープロファイルを正常に更新しました - フィールド: {{updatedFields}}',
+      'emailUpdated': '[{{userName}}] のメールアドレスを {{oldEmail}} から {{newEmail}} に更新しました',
+      'emailVerified': '[{{userName}}] のメールアドレス {{email, lowercase}} を正常に検証しました',
+      'loginHistory': 'ログイン履歴を取得しました: [{{userName}}] の {{entryCount}} 件のエントリ',
+      'loginHistory_other': 'ログイン履歴を取得しました: [{{userName}}] の {{entryCount}} 件のエントリ',
+      'passwordChanged': 'って [{{userName}}] のパスワードを正常に変更しました',
+      'permissionUpdated': '[{{userName}}] のユーザー権限を正常に更新しました',
+      'profileCompleted': '[{{userName}}] のユーザープロファイルが {{percent, number}}% 完了しました',
+      'profileRetrieved': '[{{requestedBy}}] によって [{{userName}}] ({{userRole}}) のユーザープロファイルを正常に取得しました',
+      'profileUpdated': '[{{userName}}] のユーザープロフィールが正常に更新されました - {{fieldsCount}} 個のフィールドが変更されました',
+      'profileUpdated_other': '[{{userName}}] のユーザープロフィールが正常に更新されました - {{fieldsCount}} 個のフィールドが変更されました',
+      'registered': 'って [{{userName}}] が [{{userRole}}] ロールで正常に登録されました',
+      'registeredEmailDisabled': '[{{userName}}] のアカウントが作成されました。メール通知は現在管理者によって無効になっています。アカウントの有効化についてはサポートにお問い合わせください。',
+      'registeredPendingActivation': '[{{userName}}] の登録を受け付けました。ログインする前に、メールを確認してアカウントを確認・有効化してください。',
+      'roleChanged': '[{{userName}}] のユーザーロールを {{oldRole}} から {{newRole}} に変更しました',
+      'sessionTerminated': '[{{userName}}] のすべてのセッションを正常に終了しました',
+      'suspended': '[{{userName}}] のユーザーアカウントを {{suspendedUntil, datetime}} まで正常に停止しました',
+      'unsuspended': '{{liftedBy}} によって [{{userName}}] のユーザーアカウントの停止が解除されました',
+      'updated': '[{{userName}}] のユーザープロファイルを正常に更新しました - フィールド: {{updatedFields}}',
       'updated_other': '{{count}} 件のユーザープロファイルを正常に更新しました',
       'updatedWithEmailVerification': 'プロフィールが更新されました。新しいメールアドレス {{newEmail}} を確認して、変更を完了してください。'
     }
@@ -1494,7 +1494,7 @@ export default {
       'invalid': '無効な保持ポリシー更新'
     },
     'security': {
-      'xssPatternDetected': '潜在的なXSSパターンを検出: {{patternName}} は許可されていません'
+      'xssPatternDetected': '潜在的なXSSパターンを検出: [{{patternName}}] は許可されていません'
     },
     'structureValidation': {
       'conditions': {
@@ -1547,11 +1547,11 @@ export default {
       'invalid': 'ユーザー名は文字、数字、アンダースコアのみを含めることができます',
       'invalidCharacters': 'ユーザー名は文字、数字、アンダースコアのみを含めることができます',
       'required': 'ユーザー名は必須です',
-      'reserved': 'ユーザー名 "{{username}}" は予約されており使用できません',
+      'reserved': 'ユーザー名 "[{{username}}]" は予約されており使用できません',
       'tooLong': '長すぎます: ユーザー名は30文字を超えることはできません',
       'tooShort': '短すぎます: ユーザー名は少なくとも3文字である必要があります',
       'tooShort_other': '短すぎます: ユーザー名は少なくとも{{minLength}}文字である必要があります',
-      'unavailable': 'ユーザー名 "{{username}}" は使用できません'
+      'unavailable': 'ユーザー名 "[{{username}}]" は使用できません'
     },
     'filterArrayTooLarge': 'フィルター配列が大きすぎます（最大500項目）',
     'filterArrayTooLarge_other': '{{count}}個のアイテムを含むフィルター配列は、最大{{max}}個を超えています',
