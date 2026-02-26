@@ -21,8 +21,8 @@ export default {
       'adminDashboardAccess': 'การเข้าถึงแดชบอร์ดผู้ดูแลระบบ',
       'adminRoutesAccess': 'การเข้าถึงเส้นทางผู้ดูแลระบบ',
       'createUser': 'การสร้างผู้ใช้',
-      'deleteUser': 'ลบผู้ใช้ #{{userId}}',
-      'updateUser': 'อัพเดทผู้ใช้ #{{userId}}'
+      'deleteUser': 'ลบผู้ใช้ [#{{userId}}]',
+      'updateUser': 'อัพเดทผู้ใช้ [#{{userId}}]'
     },
     'protectionReason': {
       'hierarchy': 'ต้องรักษาลำดับชั้นบทบาท',
@@ -38,21 +38,21 @@ export default {
     'accountDeletionSuggestion': 'ติดต่อผู้ดูแลคนอื่นสำหรับการจัดการบัญชี',
     'activeUsersCount': 'ผู้ใช้ที่ใช้งาน {{count}} คน',
     'activeUsersCount_other': 'ผู้ใช้ที่ใช้งาน {{count}} คน ({{percentage}})',
-    'changedByUser': 'เปลี่ยนแปลงโดย {{username}} ({{role}})',
-    'checkedByUser': 'ตรวจสอบโดย {{username}} ({{role}})',
-    'createdByUser': 'สร้างโดย {{username}} ({{role}})',
+    'changedByUser': 'เปลี่ยนแปลงโดย [{{username}}] ({{role}})',
+    'checkedByUser': 'ตรวจสอบโดย [{{username}}] ({{role}})',
+    'createdByUser': 'สร้างโดย [{{username}}] ({{role}})',
     'dashboardDataRetrieved': 'โหลดแดชบอร์ดด้วยภาพรวมระบบ {{totalUsers}} (การเข้าถึง {{accessLevel}}) {{requestedBy}} {{dataFreshness}}',
     'dashboardRetrieved': 'ดึงข้อมูลแดชบอร์ดสำเร็จ',
     'dataFreshness': 'สร้างที่ {{timestamp}}',
-    'deletedByUser': 'ลบโดย {{username}} ({{role}})',
+    'deletedByUser': 'ลบโดย [{{username}}] ({{role}})',
     'effectiveImmediately': 'การเปลี่ยนแปลงมีผลทันที',
     'failedLoginAttempts': 'การพยายามเข้าสู่ระบบล้มเหลว {{count}} ครั้งในชั่วโมงที่ผ่านมา',
     'failedLoginAttempts_other': 'การพยายามเข้าสู่ระบบล้มเหลว {{count}} ครั้งในชั่วโมงที่ผ่านมา',
     'performanceGrade': 'ประสิทธิภาพ: {{grade}}',
-    'requestedByUser': 'ขอโดย {{username}} ({{role}})',
+    'requestedByUser': 'ขอโดย [{{username}}] ({{role}})',
     'responseTime': 'เวลาตอบสนอง: {{time}}{{unit}}',
     'restrictedRoleAccess': 'การเข้าถึงถูกปฏิเสธ: {{currentRole}} ไม่สามารถดูผู้ใช้ {{requestedRole}} ได้',
-    'roleChangedSuccessfully': 'เปลี่ยนบทบาทจาก {{oldRole}} เป็น {{newRole}} สำหรับ {{targetUserName}} {{changedBy}} {{timestamp}} {{effectiveImmediately}}',
+    'roleChangedSuccessfully': 'เปลี่ยนบทบาทจาก {{oldRole}} เป็น {{newRole}} สำหรับ [{{targetUserName}}] {{changedBy}} {{timestamp}} {{effectiveImmediately}}',
     'routeDiscoverySuccess': 'ดึงเส้นทางของระบบสำเร็จ',
     'securityRisk': 'ความเสี่ยงด้านความปลอดภัย: {{level}} ({{failedAttempts}})',
     'statisticsRetrieved': 'สถิติระบบ: {{totalUsers}}, ผู้ใช้ที่ใช้งาน: {{activeUsers}} (ขอบเขต {{dataScope}}) {{requestedBy}}',
@@ -61,13 +61,13 @@ export default {
     'systemHealthRetrievedFailed': 'ไม่สามารถดึงข้อมูลสุขภาพของระบบได้',
     'totalUsersCount': 'ผู้ใช้ทั้งหมด {{count}} คน',
     'totalUsersCount_other': 'ผู้ใช้ทั้งหมด {{count}} คน',
-    'updatedByUser': 'อัพเดทโดย {{username}} ({{role}})',
-    'userCreatedSuccessfully': 'สร้างผู้ใช้ใหม่ {{userName}} ด้วยบทบาท {{newUserRole}} สำเร็จ {{createdBy}} {{timestamp}}',
+    'updatedByUser': 'อัพเดทโดย [{{username}}] ({{role}})',
+    'userCreatedSuccessfully': 'สร้างผู้ใช้ใหม่ [{{userName}}] ด้วยบทบาท {{newUserRole}} สำเร็จ {{createdBy}} {{timestamp}}',
     'userDeletedSuccessfully': 'ลบบัญชีผู้ใช้อย่างถาวรแล้ว {{deletedBy}} {{timestamp}} การดำเนินการ: {{action}}',
-    'userDetailsRetrieved': 'ดึงข้อมูลรายละเอียดผู้ใช้: {{userName}} ({{userRole}}, {{userStatus}}) {{joinedDate}} {{requestedBy}}',
+    'userDetailsRetrieved': 'ดึงข้อมูลรายละเอียดผู้ใช้: [{{userName}}] ({{userRole}}, {{userStatus}}) {{joinedDate}} {{requestedBy}}',
     'usersListRetrieved': 'ดึงข้อมูล {{count}} ผู้ใช้สำเร็จแล้ว (แสดง {{displayedCount}} ในหน้า {{currentPage}} จาก {{totalPages}}) {{requestedBy}}',
     'usersListRetrieved_other': 'ดึงข้อมูล {{count}} ผู้ใช้สำเร็จแล้ว (แสดง {{displayedCount}} ในหน้า {{currentPage}} จาก {{totalPages}}) {{requestedBy}}',
-    'userUpdatedSuccessfully': 'อัพเดทผู้ใช้ {{updatedUserName}} สำเร็จแล้ว {{updatedBy}} {{timestamp}}'
+    'userUpdatedSuccessfully': 'อัพเดทผู้ใช้ [{{updatedUserName}}] สำเร็จแล้ว {{updatedBy}} {{timestamp}}'
   },
   'api': {
     'databaseError': 'เกิดข้อผิดพลาดของฐานข้อมูล',
@@ -138,10 +138,10 @@ export default {
     'cannotCreateAdmin': 'ไม่สามารถสร้างบัญชีผู้ดูแลระบบได้',
     'cannotCreateHigherRole': '{{currentRole}} ไม่สามารถสร้างบัญชี {{requestedRole}} ได้เนื่องจากข้อจำกัดในลำดับชั้นของบทบาท',
     'cannotCreateSuperAdmin': 'ไม่สามารถสร้างบัญชีผู้ดูแลระบบสูงสุดได้',
-    'cannotDeleteOwnAccount': '{{userName}} ({{role}}) ไม่สามารถลบบัญชีของตัวเองได้ {{suggestion}}',
+    'cannotDeleteOwnAccount': '[{{userName}}] ({{role}}) ไม่สามารถลบบัญชีของตัวเองได้ {{suggestion}}',
     'cannotDeleteSuperAdmin': 'ไม่สามารถลบบัญชีผู้ดูแลระบบสูงสุดได้',
     'cannotDeleteYourself': 'ไม่สามารถลบบัญชีของตัวเองได้',
-    'cannotModifyHigherRoleUser': 'ไม่สามารถแก้ไข {{targetUserName}} ({{targetRole}}) - {{currentRole}} {{reason}}',
+    'cannotModifyHigherRoleUser': 'ไม่สามารถแก้ไข [{{targetUserName}}] ({{targetRole}}) - {{currentRole}} {{reason}}',
     'cannotModifySuperAdmin': 'ไม่สามารถแก้ไขบัญชีผู้ดูแลระบบสูงสุดได้',
     'cannotPromoteToHigherRole': '{{currentRole}} ไม่สามารถเลื่อนตำแหน่งผู้ใช้เป็น {{requestedRole}} - {{reason}}',
     'cannotPromoteToSuperAdmin': 'ไม่สามารถเลื่อนตำแหน่งผู้ใช้เป็นผู้ดูแลระบบสูงสุดได้',
@@ -187,14 +187,14 @@ export default {
       'disclaimer': 'หากคุณไม่ได้ขอบัญชีนี้ โปรดละเว้นอีเมลหรือ ติดต่อฝ่ายสนับสนุน',
       'email': 'อีเมลที่ใช้สมัคร: {{email}}',
       'expiryWarning': 'ลิงก์เปิดใช้งานนี้จะหมดอายุภายใน {{hours}} ชั่วโมง',
-      'footer': 'นี่คืออีเมลอัตโนมัติจาก {{appName}} โปรดอย่าตอบกลับอีเมลนี้',
-      'greeting': 'สวัสดี {{userName}},',
+      'footer': 'นี่คืออีเมลอัตโนมัติจาก [{{appName}}] โปรดอย่าตอบกลับอีเมลนี้',
+      'greeting': 'สวัสดี [{{userName}}],',
       'instructions': 'อีเมลนี้ยืนยันว่าเราได้รับข้อมูลบัญชีของคุณแล้ว หากต้องมีการเปิดใช้งานหรืออนุมัติ คุณจะได้รับอีเมลติดตามผล',
-      'intro': 'ขอบคุณที่สมัครใช้งาน {{appName}}',
+      'intro': 'ขอบคุณที่สมัครใช้งาน [{{appName}}]',
       'ip': 'IP ที่ร้องขอ: {{ip}}',
       'securityNote': 'เพื่อความปลอดภัย ห้ามแชร์ลิงก์นี้กับผู้อื่น',
-      'subject': '{{appName}} - ยืนยันการสมัครสมาชิก',
-      'thanks': 'ขอบคุณ\nทีมงาน {{appName}}',
+      'subject': '[{{appName}}] - ยืนยันการสมัครสมาชิก',
+      'thanks': 'ขอบคุณ\nทีมงาน [{{appName}}]',
       'time': 'เวลาที่สมัคร: {{timestamp}}'
     }
   },
@@ -310,9 +310,9 @@ export default {
     'security_incident': {
       'bulkDelete': 'ลบหลายรายการ {{count}} เหตุการณ์ความปลอดภัย (ต้องการสิทธิ์ผู้ดูแลระบบ {{actor}})',
       'create': 'สร้างเหตุการณ์ความปลอดภัยใหม่ (ต้องการสิทธิ์ผู้ดูแลระบบ {{actor}}, ประเภท {{type}}, ระดับความรุนแรง {{severity}})',
-      'deleteById': 'ลบเหตุการณ์ความปลอดภัย {{incidentId}} (ต้องการสิทธิ์ผู้ดูแลระบบ {{actor}})',
+      'deleteById': 'ลบเหตุการณ์ความปลอดภัย [#{{incidentId}}] (ต้องการสิทธิ์ผู้ดูแลระบบ {{actor}})',
       'exportCsv': 'ส่งออก {{count}} เหตุการณ์ความปลอดภัยไปยัง CSV (ต้องการสิทธิ์ผู้ดูแลระบบ {{actor}}, ช่วงวันที่: {{dateRange}})',
-      'getById': 'รับเหตุการณ์ความปลอดภัยด้วย ID {{incidentId}} (ต้องการสิทธิ์ผู้ดูแลระบบ {{actor}})',
+      'getById': 'รับเหตุการณ์ความปลอดภัยด้วย [#{{incidentId}}] (ต้องการสิทธิ์ผู้ดูแลระบบ {{actor}})',
       'getDashboard': 'รับแดชบอร์ดเหตุการณ์ความปลอดภัย (ต้องการสิทธิ์ผู้ดูแลระบบ {{actor}}, ตัวกรอง: {{filters}})',
       'getStatistics': 'รับสถิติเหตุการณ์ความปลอดภัย (ต้องการสิทธิ์ผู้ดูแลระบบ {{actor}}, ระยะเวลา: {{period}})',
       'incidentDetails': 'รับรายละเอียดเหตุการณ์ (ต้องการสิทธิ์ผู้ดูแลระบบ)',
@@ -325,8 +325,8 @@ export default {
       'serviceStatus': 'รับสถานะบริการ (ต้องการสิทธิ์ผู้ดูแลระบบ)',
       'simulate': 'จำลองเหตุการณ์ความปลอดภัย (ต้องการสิทธิ์ผู้ดูแลระบบ)',
       'statistics': 'รับสถิติเหตุการณ์ (ต้องการสิทธิ์ผู้ดูแลระบบ)',
-      'updateById': 'อัปเดตเหตุการณ์ความปลอดภัย {{incidentId}} (ต้องการสิทธิ์ผู้ดูแลระบบ {{actor}}, ฟิลด์ที่อัปเดต: {{fields}})',
-      'updateStatus': 'อัปเดตสถานะเหตุการณ์ความปลอดภัย {{incidentId}} เป็น {{status}} (ต้องการสิทธิ์ผู้ดูแลระบบ {{actor}})'
+      'updateById': 'อัปเดตเหตุการณ์ความปลอดภัย [#{{incidentId}}] (ต้องการสิทธิ์ผู้ดูแลระบบ {{actor}}, ฟิลด์ที่อัปเดต: {{fields}})',
+      'updateStatus': 'อัปเดตสถานะเหตุการณ์ความปลอดภัย [#{{incidentId}}] เป็น {{status}} (ต้องการสิทธิ์ผู้ดูแลระบบ {{actor}})'
     },
     'system': {
       'apiInfo': 'ข้อมูล API และจุดสิ้นสุดที่ครอบคลุม',
@@ -376,7 +376,7 @@ export default {
         'failed': 'ไม่สามารถดึงการวิเคราะห์พฤติกรรมได้ - {{actor}} ไม่สามารถทำ {{operation}} สำหรับ {{timeframe}} ที่เป้าหมาย {{targetRole}} ให้เสร็จสิ้น: {{reason}}'
       },
       'compliance': {
-        'customComplianceFailed': 'ไม่สามารถสร้างรายงานการปฏิบัติตามกฎระเบียบแบบกำหนดเองได้ - {{actor}} ไม่สามารถทำ {{operation}} สำหรับ "{{reportName}}" ({{reportType}}) ให้เสร็จสิ้น: {{reason}}',
+        'customComplianceFailed': 'ไม่สามารถสร้างรายงานการปฏิบัติตามกฎระเบียบแบบกำหนดเองได้ - {{actor}} ไม่สามารถทำ {{operation}} สำหรับ "[{{reportName}}]" ({{reportType}}) ให้เสร็จสิ้น: {{reason}}',
         'failed': 'ไม่สามารถสร้างรายงานการปฏิบัติตามกฎระเบียบได้ - {{actor}} ไม่สามารถทำ {{operation}} สำหรับ {{timeframe}} ด้วยรูปแบบ {{format}} ให้เสร็จสิ้น: {{reason}}',
         'reportFailed': 'ไม่สามารถสร้างรายงานการปฏิบัติตามกฎระเบียบได้ - {{actor}} ไม่สามารถดำเนินการ {{operation}} สำหรับรายงาน {{type}}: {{reason}}'
       },
@@ -417,16 +417,16 @@ export default {
       }
     },
     'auth': {
-      'accountDisabled': 'บัญชีผู้ใช้ {{userName}} ถูกปิดใช้งานโดยผู้ดูแลระบบ',
+      'accountDisabled': 'บัญชีผู้ใช้ [{{userName}}] ถูกปิดใช้งานโดยผู้ดูแลระบบ',
       'accountInactive': 'บัญชีของคุณยังไม่เปิดใช้งาน กรุณายืนยันอีเมลหรือ ติดต่อฝ่ายสนับสนุน',
       'accountLocked': 'บัญชีถูกล็อคเป็นเวลา {{duration, time}} เนื่องจากการพยายามเข้าสู่ระบบล้มเหลว',
-      'accountNotVerified': 'ที่อยู่อีเมลสำหรับ {{userName}} ยังไม่ได้ยืนยัน',
+      'accountNotVerified': 'ที่อยู่อีเมลสำหรับ [{{userName}}] ยังไม่ได้ยืนยัน',
       'cannotAccessOtherUsers': 'ไม่สามารถเข้าถึงทรัพยากรของผู้ใช้อื่นได้',
-      'cannotChangeOwnRole': '{{userName}} ({{currentRole}}) ไม่สามารถเปลี่ยนบทบาทของตนเองได้ - {{reason}}',
+      'cannotChangeOwnRole': '[{{userName}}] ({{currentRole}}) ไม่สามารถเปลี่ยนบทบาทของตนเองได้ - {{reason}}',
       'cannotCreateHigherRole': '{{currentRole}} ไม่สามารถสร้างบัญชี {{requestedRole}} ได้เนื่องจากข้อจำกัดในลำดับชั้นของบทบาท',
       'cannotDeleteSuperAdmin': 'ไม่สามารถลบบัญชีผู้ดูแลระบบสูงสุดได้',
       'cannotDeleteYourself': 'ไม่สามารถลบบัญชีของตัวเองได้',
-      'cannotModifyHigherRoleUser': 'ไม่สามารถแก้ไข {{targetUserName}} ({{targetRole}}) - {{currentRole}} {{reason}}',
+      'cannotModifyHigherRoleUser': 'ไม่สามารถแก้ไข [{{targetUserName}}] ({{targetRole}}) - {{currentRole}} {{reason}}',
       'cannotPromoteToHigherRole': '{{currentRole}} ไม่สามารถเลื่อนระดับผู้ใช้เป็น {{requestedRole}} ได้ - {{reason}}',
       'deleteNotAllowed': 'ไม่อนุญาตให้ดำเนินการลบสำหรับบทบาทของคุณ',
       'failed': 'การตรวจสอบสิทธิ์ล้มเหลว: {{reason}}',
@@ -437,8 +437,8 @@ export default {
       'invalidCredentials_context_user': 'ข้อมูลประจำตัวไม่ถูกต้องสำหรับการเข้าสู่ระบบบัญชีผู้ใช้',
       'loginFailed': 'กระบวนการเข้าสู่ระบบล้มเหลวสำหรับ {{actor}} (เหตุผล: {{reason}}, การดำเนินการ: {{operation}}, IP: {{ipAddress}})',
       'mfaFailed': 'การยืนยันตัวตนแบบหลายปัจจัยล้มเหลว: {{reason}}',
-      'mfaRequired': 'ต้องมีการยืนยันตัวตนแบบหลายปัจจัยสำหรับ {{userName}}',
-      'passwordIncorrect': 'รหัสผ่านไม่ถูกต้องสำหรับผู้ใช้ {{userName}}',
+      'mfaRequired': 'ต้องมีการยืนยันตัวตนแบบหลายปัจจัยสำหรับ [{{userName}}]',
+      'passwordIncorrect': 'รหัสผ่านไม่ถูกต้องสำหรับผู้ใช้ [{{userName}}]',
       'permissionDenied': 'การอนุญาตถูกปฏิเสธสำหรับการดำเนินการ: {{action}}',
       'rateLimitExceeded': 'เกินขีดจำกัดอัตรา: {{currentRequests}}/{{maxRequests}} คำขอต่อ {{timeWindow}}',
       'refreshTokenExpired': 'โทเค็นรีเฟรชหมดอายุที่ {{expiredAt, datetime}}',
@@ -471,11 +471,11 @@ export default {
       'workflowViolation': 'การละเมิด Workflow: ไม่สามารถดำเนินการ {{step}} ในสถานะปัจจุบัน {{currentState}}'
     },
     'file': {
-      'accessDenied': 'การเข้าถึงไฟล์ "{{filename}}" ถูกปฏิเสธ: {{reason}}',
+      'accessDenied': 'การเข้าถึงไฟล์ "[{{filename}}]" ถูกปฏิเสธ: {{reason}}',
       'corrupted': 'ไฟล์ดูเหมือนจะเสียหายหรือไม่สมบูรณ์',
       'formatUnsupported': 'รูปแบบไฟล์ไม่รองรับสำหรับการดำเนินการ: {{operation}}',
       'invalidType': 'ประเภทไฟล์ "{{fileType}}" ไม่ได้รับอนุญาต - ประเภทที่รองรับ: {{allowedTypes}}',
-      'notFound': 'ไม่พบไฟล์ "{{filename}}"',
+      'notFound': 'ไม่พบไฟล์ "[{{filename}}]"',
       'processingFailed': 'การประมวลผลไฟล์ล้มเหลว: {{reason}}',
       'quotaExceeded': 'เกินโควตาที่เก็บข้อมูล: ใช้ไป {{used, number}}MB / โควตา {{quota, number}}MB',
       'tooLarge': 'ขนาดไฟล์ {{actualSize, number}}MB เกินขีดจำกัด {{maxSize, number}}MB',
@@ -498,14 +498,14 @@ export default {
       'translationsFailed': 'ไม่สามารถดึงข้อมูลการแปลได้: {{reason}}'
     },
     'integration': {
-      'apiLimitExceeded': 'เกินขีดจำกัดอัตรา API สำหรับ {{serviceName}}: {{limit}} คำขอต่อ {{period}}',
-      'authenticationFailed': 'การยืนยันตัวตนล้มเหลวกับ {{serviceName}}: {{reason}}',
-      'credentialsExpired': 'ข้อมูลประจำตัว API สำหรับ {{serviceName}} หมดอายุเมื่อวันที่ {{expiredDate, date}}',
-      'dataTransformFailed': 'การแปลงข้อมูลล้มเหลวสำหรับ {{serviceName}}: {{reason}}',
-      'invalidResponse': 'การตอบสนองไม่ถูกต้องจาก {{serviceName}}: {{details}}',
-      'serviceDown': 'บริการภายนอก {{serviceName}} ไม่สามารถใช้งานได้ในขณะนี้',
-      'syncFailed': 'การซิงโครไนซ์ข้อมูลล้มเหลวกับ {{serviceName}}: {{reason}}',
-      'webhookTimeout': 'Webhook หมดเวลาจาก {{serviceName}} หลังจาก {{timeout, number}}ms'
+      'apiLimitExceeded': 'เกินขีดจำกัดอัตรา API สำหรับ [{{serviceName}}]: {{limit}} คำขอต่อ {{period}}',
+      'authenticationFailed': 'การยืนยันตัวตนล้มเหลวกับ [{{serviceName}}]: {{reason}}',
+      'credentialsExpired': 'ข้อมูลประจำตัว API สำหรับ [{{serviceName}}] หมดอายุเมื่อวันที่ {{expiredDate, date}}',
+      'dataTransformFailed': 'การแปลงข้อมูลล้มเหลวสำหรับ [{{serviceName}}]: {{reason}}',
+      'invalidResponse': 'การตอบสนองไม่ถูกต้องจาก [{{serviceName}}]: {{details}}',
+      'serviceDown': 'บริการภายนอก [{{serviceName}}] ไม่สามารถใช้งานได้ในขณะนี้',
+      'syncFailed': 'การซิงโครไนซ์ข้อมูลล้มเหลวกับ [{{serviceName}}]: {{reason}}',
+      'webhookTimeout': 'Webhook หมดเวลาจาก [{{serviceName}}] หลังจาก {{timeout, number}}ms'
     },
     'kv': {
       'accessDenied': 'การเข้าถึงถูกปฏิเสธสำหรับคีย์การกำหนดค่า "{{key}}" - ต้องการบทบาท {{requiredRole}}',
@@ -553,12 +553,12 @@ export default {
       'retentionPoliciesRetrieveFailed': 'ไม่สามารถดึงนโยบายการเก็บรักษาสำหรับ {{actor}} ได้ (เหตุผล: {{reason}}, การดำเนินการ: {{operation}})'
     },
     'network': {
-      'apiError': 'ข้อผิดพลาด API ภายนอกจาก {{apiName}}: {{error}}',
+      'apiError': 'ข้อผิดพลาด API ภายนอกจาก [{{apiName}}]: {{error}}',
       'bandwidthExceeded': 'เกินขีดจำกัดแบนด์วิดธ์: {{usage, number}}MB/{{limit, number}}MB',
       'connectionFailed': 'การเชื่อมต่อล้มเหลวไปยัง {{service, uppercase}}: {{reason}}',
       'connectionRefused': 'การเชื่อมต่อถูกปฏิเสธโดย {{service}} บนพอร์ต {{port}}',
-      'dnsResolutionFailed': 'การแปลง DNS ล้มเหลวสำหรับ {{hostname}}',
-      'hostUnreachable': 'โฮสต์ {{hostname}} ไม่สามารถเข้าถึงได้',
+      'dnsResolutionFailed': 'การแปลง DNS ล้มเหลวสำหรับ [{{hostname}}]',
+      'hostUnreachable': 'โฮสต์ [{{hostname}}] ไม่สามารถเข้าถึงได้',
       'httpError': 'ข้อผิดพลาด HTTP {{statusCode}}: {{statusMessage}}',
       'protocolError': 'ข้อผิดพลาดโปรโตคอลเครือข่าย: {{protocol}} - {{details}}',
       'proxyError': 'ข้อผิดพลาดเซิร์ฟเวอร์พร็อกซี: {{proxyAddress}} - {{reason}}',
@@ -611,7 +611,7 @@ export default {
     },
     'security': {
       'incident': {
-        'notFound': 'ไม่พบเหตุการณ์ความปลอดภัย (ID: {{incidentId}}, การดำเนินการ: {{operation}}, ขอโดย: {{requestedBy}})'
+        'notFound': 'ไม่พบเหตุการณ์ความปลอดภัย ([#{{incidentId}}], การดำเนินการ: {{operation}}, ขอโดย: {{requestedBy}})'
       },
       'incidents': {
         'createFailed': '{{actor}} ไม่สามารถสร้างเหตุการณ์ความปลอดภัยได้ (ข้อผิดพลาด: {{errorType}}) เมื่อ {{timestamp}}',
@@ -653,41 +653,41 @@ export default {
       'workerUnavailable': 'ไม่มี Worker ที่พร้อมใช้งานเพื่อประมวลผลคำขอ'
     },
     'user': {
-      'accountLocked': 'บัญชีผู้ใช้ {{userName}} ถูกล็อคเนื่องจาก {{reason}}',
-      'accountSuspended': 'บัญชีผู้ใช้ {{userName}} ถูกระงับจนถึง {{suspendedUntil, datetime}}',
-      'activationFailed': 'ไม่สามารถเปิดใช้งานบัญชีผู้ใช้สำหรับ {{userName}}: {{reason}}',
+      'accountLocked': 'บัญชีผู้ใช้ [{{userName}}] ถูกล็อคเนื่องจาก {{reason}}',
+      'accountSuspended': 'บัญชีผู้ใช้ [{{userName}}] ถูกระงับจนถึง {{suspendedUntil, datetime}}',
+      'activationFailed': 'ไม่สามารถเปิดใช้งานบัญชีผู้ใช้สำหรับ [{{userName}}]: {{reason}}',
       'bulkOperationFailed': 'การดำเนินการแบบกลุ่มล้มเหลวสำหรับ {{failedCount}} จาก {{totalCount}} ผู้ใช้',
       'bulkOperationFailed_other': 'การดำเนินการแบบกลุ่มล้มเหลวสำหรับ {{failedCount}} จาก {{totalCount}} ผู้ใช้',
       'createFailed': 'ล้มเหลวในการสร้างบัญชีผู้ใช้สำหรับ {{email}}: {{reason}}',
-      'deactivationFailed': 'ไม่สามารถปิดใช้งานบัญชีผู้ใช้สำหรับ {{userName}}: {{reason}}',
-      'deleteFailed': 'ล้มเหลวในการลบผู้ใช้ {{userName}}: {{reason}}',
+      'deactivationFailed': 'ไม่สามารถปิดใช้งานบัญชีผู้ใช้สำหรับ [{{userName}}]: {{reason}}',
+      'deleteFailed': 'ล้มเหลวในการลบผู้ใช้ [{{userName}}]: {{reason}}',
       'emailExists': 'ที่อยู่อีเมล {{email}} ถูกลงทะเบียนในระบบแล้ว',
       'emailVerificationFailed': 'การยืนยันอีเมลล้มเหลว: {{reason}}',
       'emailVerificationSystemError': 'ไม่สามารถตรวจสอบการเปลี่ยนอีเมลได้เนื่องจากข้อผิดพลาดของระบบ โปรดลองอีกครั้งในภายหลัง',
-      'inactive': 'บัญชีผู้ใช้ {{userName}} ไม่ได้ใช้งาน',
-      'insufficientPermissions': 'สิทธิ์ไม่เพียงพอในการแก้ไขผู้ใช้ {{userName}} ({{userRole}})',
+      'inactive': 'บัญชีผู้ใช้ [{{userName}}] ไม่ได้ใช้งาน',
+      'insufficientPermissions': 'สิทธิ์ไม่เพียงพอในการแก้ไขผู้ใช้ [{{userName}}] ({{userRole}})',
       'listFailed': 'ล้มเหลวในการดึงรายชื่อผู้ใช้: {{reason}}',
-      'notFound': 'ผู้ใช้ "{{userName}}" ไม่พบหรือถูกลบแล้ว',
-      'notFoundById': 'ไม่พบผู้ใช้ที่มี ID {{userId}}',
-      'passwordChangeFailed': 'ล้มเหลวในการเปลี่ยนรหัสผ่านสำหรับ {{userName}}: {{reason}}',
+      'notFound': 'ผู้ใช้ "[{{userName}}]" ไม่พบหรือถูกลบแล้ว',
+      'notFoundById': 'ไม่พบผู้ใช้ที่มี [#{{userId}}]',
+      'passwordChangeFailed': 'ล้มเหลวในการเปลี่ยนรหัสผ่านสำหรับ [{{userName}}]: {{reason}}',
       'passwordIncorrect': 'รหัสผ่านปัจจุบันไม่ถูกต้อง - กรุณาลองใหม่',
-      'profileRetrieveFailed': 'ล้มเหลวในการดึงโปรไฟล์ผู้ใช้สำหรับ {{userName}}: {{reason}}',
+      'profileRetrieveFailed': 'ล้มเหลวในการดึงโปรไฟล์ผู้ใช้สำหรับ [{{userName}}]: {{reason}}',
       'registrationError': 'การลงทะเบียนผู้ใช้ล้มเหลวเนื่องจากข้อผิดพลาดระบบ: {{details}}',
       'registrationFailed': 'การลงทะเบียนผู้ใช้ล้มเหลว: {{reason}}',
-      'roleChangeFailed': 'ล้มเหลวในการเปลี่ยนบทบาทสำหรับ {{userName}} จาก {{oldRole}} เป็น {{newRole}}: {{reason}}',
-      'sessionLimitExceeded': 'ผู้ใช้ {{userName}} เกินขีดจำกัดเซสชันที่เกิดขึ้นพร้อมกันสูงสุด ({{currentSessions}}/{{maxSessions}})',
-      'updateFailed': 'ล้มเหลวในการอัพเดทโปรไฟล์ผู้ใช้สำหรับ {{userName}}: {{reason}}',
-      'usernameExists': 'ชื่อผู้ใช้ "{{username}}" ถูกใช้แล้ว'
+      'roleChangeFailed': 'ล้มเหลวในการเปลี่ยนบทบาทสำหรับ [{{userName}}] จาก {{oldRole}} เป็น {{newRole}}: {{reason}}',
+      'sessionLimitExceeded': 'ผู้ใช้ [{{userName}}] เกินขีดจำกัดเซสชันที่เกิดขึ้นพร้อมกันสูงสุด ({{currentSessions}}/{{maxSessions}})',
+      'updateFailed': 'ล้มเหลวในการอัพเดทโปรไฟล์ผู้ใช้สำหรับ [{{userName}}]: {{reason}}',
+      'usernameExists': 'ชื่อผู้ใช้ "[{{username}}]" ถูกใช้แล้ว'
     },
     'zodDemo': {
       'file': {
-        'uploadFailed': 'การอัปโหลดไฟล์ล้มเหลว - {{actor}} ไม่สามารถดำเนินการ {{operation}} สำหรับ "{{fileName}}" ({{fileSize}} ไบต์) ได้: {{reason}}'
+        'uploadFailed': 'การอัปโหลดไฟล์ล้มเหลว - {{actor}} ไม่สามารถดำเนินการ {{operation}} สำหรับ "[{{fileName}}]" ({{fileSize}} ไบต์) ได้: {{reason}}'
       },
       'search': {
         'failed': 'การค้นหาล้มเหลว - {{actor}} ไม่สามารถดำเนินการ {{operation}} สำหรับคำค้น "{{query}}" ({{searchType}}) ได้: {{reason}}'
       },
       'user': {
-        'registrationFailed': 'การลงทะเบียนผู้ใช้ล้มเหลว - {{actor}} ไม่สามารถดำเนินการ {{operation}} ให้กับ {{userName}} ({{email}}) ได้: {{reason}}'
+        'registrationFailed': 'การลงทะเบียนผู้ใช้ล้มเหลว - {{actor}} ไม่สามารถดำเนินการ {{operation}} ให้กับ [{{userName}}] ({{email}}) ได้: {{reason}}'
       }
     },
     'businessRuleViolation': 'การละเมิดกฎทางธุรกิจ: {{rules}}',
@@ -722,7 +722,7 @@ export default {
   },
   'security': {
     'alerts': {
-      'alertTemplate': 'การแจ้งเตือน: {{name}} - {{eventType}}',
+      'alertTemplate': 'การแจ้งเตือน: [{{name}}] - {{eventType}}',
       'channelCreated': 'สร้างช่องทางการแจ้งเตือนสำเร็จ',
       'channelsFailed': 'ล้มเหลวในการดึงช่องทางการแจ้งเตือน',
       'createChannelFailed': 'ล้มเหลวในการสร้างช่องทางการแจ้งเตือน',
@@ -757,11 +757,11 @@ export default {
       'reportCreated_other': 'สร้างรายงานการดูแลระบบด้วยเรคคอร์ด {{recordCount, number}} เรคคอร์ด',
       'securityScanCompleted': 'สแกนความปลอดภัยเสร็จสมบูรณ์ - ตรวจพบ {{threatsFound}} ภัยคุกคาม',
       'securityScanCompleted_other': 'สแกนความปลอดภัยเสร็จสมบูรณ์ - ตรวจพบ {{threatsFound}} ภัยคุกคาม',
-      'serviceRestarted': 'รีสตาร์ทบริการระบบ {{serviceName}} สำเร็จ',
+      'serviceRestarted': 'รีสตาร์ทบริการระบบ [{{serviceName}}] สำเร็จ',
       'statsGenerated': 'สร้างสถิติระบบสำเร็จสำหรับช่วงเวลา {{period}} - จุดข้อมูล {{dataPoints}} จุด',
       'statsGenerated_other': 'สร้างสถิติระบบสำเร็จสำหรับช่วงเวลา {{period}} - จุดข้อมูล {{dataPoints}} จุด',
       'systemHealthy': 'ตรวจสอบสุขภาพระบบเสร็จสิ้น: {{status, uppercase}} ({{uptime, number}}% เวลาทำงาน)',
-      'userDetailsRetrieved': 'ดึงข้อมูลรายละเอียดผู้ใช้: {{userName}} ({{userRole}}, {{userStatus}}). {{joinedDate}} {{requestedBy}}'
+      'userDetailsRetrieved': 'ดึงข้อมูลรายละเอียดผู้ใช้: [{{userName}}] ({{userRole}}, {{userStatus}}). {{joinedDate}} {{requestedBy}}'
     },
     'advancedAudit': {
       'analytics': {
@@ -794,19 +794,19 @@ export default {
       'statsRetrieved': 'ดึงสถิติการตรวจสอบสำเร็จ'
     },
     'auth': {
-      'accessGranted': 'อนุญาตการเข้าถึง {{resource}} สำหรับ {{userName}}',
-      'accountUnlocked': 'ปลดล็อคบัญชี {{userName}} สำเร็จโดย {{unlockedBy}}',
-      'loginSuccess': 'เข้าสู่ระบบสำเร็จในชื่อ {{userName}} ({{userRole}}) ที่ {{loginTime}}',
+      'accessGranted': 'อนุญาตการเข้าถึง {{resource}} สำหรับ [{{userName}}]',
+      'accountUnlocked': 'ปลดล็อคบัญชี [{{userName}}] สำเร็จโดย {{unlockedBy}}',
+      'loginSuccess': 'เข้าสู่ระบบสำเร็จในชื่อ [{{userName}}] ({{userRole}}) ที่ {{loginTime}}',
       'logoutAllSuccess': 'ออกจากระบบจากทุกอุปกรณ์ที่ {{logoutTime}}',
       'logoutSuccess': 'ออกจากระบบสำเร็จจาก {{deviceInfo}} ที่ {{logoutTime}}',
-      'mfaEnabled': 'เปิดใช้งานการยืนยันตัวตนแบบหลายปัจจัยสำเร็จสำหรับ {{userName}}',
+      'mfaEnabled': 'เปิดใช้งานการยืนยันตัวตนแบบหลายปัจจัยสำเร็จสำหรับ [{{userName}}]',
       'mfaVerified': 'ยืนยันตัวตนแบบหลายปัจจัยสำเร็จ',
-      'passwordChanged': 'เปลี่ยนรหัสผ่านสำเร็จสำหรับ {{userName}} ที่ {{changeTime}}',
+      'passwordChanged': 'เปลี่ยนรหัสผ่านสำเร็จสำหรับ [{{userName}}] ที่ {{changeTime}}',
       'passwordReset': 'ส่งอีเมลรีเซ็ตรหัสผ่านไปยัง {{email}} - หมดอายุใน {{expiryMinutes}} นาที',
       'passwordReset_other': 'ส่งอีเมลรีเซ็ตรหัสผ่านไปยัง {{email}} - หมดอายุใน {{expiryMinutes}} นาที',
-      'permissionGranted': 'อนุญาตสิทธิ์ "{{permission}}" ให้ {{userName}}',
+      'permissionGranted': 'อนุญาตสิทธิ์ "{{permission}}" ให้ [{{userName}}]',
       'rateLimitReset': 'รีเซ็ตขีดจำกัดอัตราสำเร็จสำหรับ {{ipAddress}}',
-      'roleAssigned': 'มอบหมายบทบาท {{newRole}} สำเร็จให้ {{userName}} โดย {{assignedBy}}',
+      'roleAssigned': 'มอบหมายบทบาท {{newRole}} สำเร็จให้ [{{userName}}] โดย {{assignedBy}}',
       'sessionCreated': 'สร้างเซสชันผู้ใช้ใหม่ที่มีอายุ {{sessionDuration}} นาที',
       'sessionCreated_other': 'สร้างเซสชันผู้ใช้ใหม่ที่มีอายุ {{sessionDuration}} นาที',
       'sessionExtended': 'ขยายเซสชันผู้ใช้จนถึง {{newExpiry}}',
@@ -821,42 +821,42 @@ export default {
       'operationApproved': 'การดำเนินการทางธุรกิจ "{{operation}}" ได้รับอนุมัติโดย {{approvedBy}}',
       'processAutomated': 'กระบวนการทางธุรกิจถูกทำให้เป็นอัตโนมัติสำเร็จ - {{automatedTasks}} งานถูกทำให้เป็นอัตโนมัติ',
       'processAutomated_other': 'กระบวนการทางธุรกิจถูกทำให้เป็นอัตโนมัติสำเร็จ - {{automatedTasks}} งานถูกทำให้เป็นอัตโนมัติ',
-      'ruleApplied': 'กฎทางธุรกิจ "{{ruleName}}" ถูกนำไปใช้สำเร็จกับ {{affectedRecords}} รายการ',
-      'ruleApplied_other': 'กฎทางธุรกิจ "{{ruleName}}" ถูกนำไปใช้สำเร็จกับ {{affectedRecords}} รายการ',
+      'ruleApplied': 'กฎทางธุรกิจ "[{{ruleName}}]" ถูกนำไปใช้สำเร็จกับ {{affectedRecords}} รายการ',
+      'ruleApplied_other': 'กฎทางธุรกิจ "[{{ruleName}}]" ถูกนำไปใช้สำเร็จกับ {{affectedRecords}} รายการ',
       'validationPassed': 'การตรวจสอบทางธุรกิจผ่านสำหรับ {{entityType}} - การตรวจสอบทั้งหมด {{checkCount}} รายการสำเร็จ',
       'validationPassed_other': 'การตรวจสอบทางธุรกิจผ่านสำหรับ {{entityType}} - การตรวจสอบทั้งหมด {{checkCount}} รายการสำเร็จ',
-      'workflowCompleted': 'Workflow "{{workflowName}}" เสร็จสมบูรณ์ใน {{steps}} ขั้นตอน',
-      'workflowCompleted_other': 'Workflow "{{workflowName}}" เสร็จสมบูรณ์ใน {{steps}} ขั้นตอน'
+      'workflowCompleted': 'Workflow "[{{workflowName}}]" เสร็จสมบูรณ์ใน {{steps}} ขั้นตอน',
+      'workflowCompleted_other': 'Workflow "[{{workflowName}}]" เสร็จสมบูรณ์ใน {{steps}} ขั้นตอน'
     },
     'file': {
-      'backup': 'สร้างสำรองข้อมูลไฟล์สำเร็จสำหรับ "{{filename}}"',
+      'backup': 'สร้างสำรองข้อมูลไฟล์สำเร็จสำหรับ "[{{filename}}]"',
       'compressed': 'บีบอัดไฟล์สำเร็จ - ลดขนาดลง {{compressionRatio, number}}%',
       'converted': 'แปลงไฟล์สำเร็จจาก {{sourceFormat}} เป็น {{targetFormat}}',
       'copied': 'คัดลอกไฟล์สำเร็จไปยัง {{destinationPath}}',
-      'deleted': 'ลบไฟล์ "{{filename}}" สำเร็จ',
-      'downloadCompleted': 'ดาวน์โหลดไฟล์ "{{filename}}" สำเร็จ',
+      'deleted': 'ลบไฟล์ "[{{filename}}]" สำเร็จ',
+      'downloadCompleted': 'ดาวน์โหลดไฟล์ "[{{filename}}]" สำเร็จ',
       'extracted': 'แตกไฟล์บีบอัดสำเร็จ - แตกไฟล์ {{extractedCount}} ไฟล์',
       'extracted_other': 'แตกไฟล์บีบอัดสำเร็จ - แตกไฟล์ {{extractedCount}} ไฟล์',
       'moved': 'ย้ายไฟล์สำเร็จจาก {{sourcePath}} ไปยัง {{destinationPath}}',
-      'processingCompleted': 'ประมวลผลไฟล์เสร็จสิ้นสำหรับ "{{filename}}" - ดำเนินการ {{operationsCount}} การดำเนินการ',
-      'processingCompleted_other': 'ประมวลผลไฟล์เสร็จสิ้นสำหรับ "{{filename}}" - ดำเนินการ {{operationsCount}} การดำเนินการ',
+      'processingCompleted': 'ประมวลผลไฟล์เสร็จสิ้นสำหรับ "[{{filename}}]" - ดำเนินการ {{operationsCount}} การดำเนินการ',
+      'processingCompleted_other': 'ประมวลผลไฟล์เสร็จสิ้นสำหรับ "[{{filename}}]" - ดำเนินการ {{operationsCount}} การดำเนินการ',
       'restored': 'กู้คืนไฟล์สำเร็จจากสำรองข้อมูลที่สร้างเมื่อ {{backupDate, date}}',
-      'uploadCompleted': 'อัพโหลดไฟล์ "{{filename}}" สำเร็จ ({{fileSize}})',
+      'uploadCompleted': 'อัพโหลดไฟล์ "[{{filename}}]" สำเร็จ ({{fileSize}})',
       'uploadsBatch': 'อัพโหลดแบบกลุ่มเสร็จสิ้น: {{successCount}}/{{totalCount}} ไฟล์ประมวลผล',
       'uploadsBatch_other': 'อัพโหลดแบบกลุ่มเสร็จสิ้น: {{successCount}}/{{totalCount}} ไฟล์ประมวลผล',
-      'validated': 'การตรวจสอบไฟล์ผ่านสำหรับ "{{filename}}" - รูปแบบ: {{fileFormat}}'
+      'validated': 'การตรวจสอบไฟล์ผ่านสำหรับ "[{{filename}}]" - รูปแบบ: {{fileFormat}}'
     },
     'integration': {
-      'apiCall': 'การเรียก API ไปยัง {{serviceName}} เสร็จสมบูรณ์ใน {{responseTime, number}}ms',
-      'credentialsValidated': 'ข้อมูลประจำตัว API ได้รับการตรวจสอบสำเร็จสำหรับ {{serviceName}}',
-      'dataSync': 'การซิงโครไนซ์ข้อมูลเสร็จสมบูรณ์กับ {{serviceName}} - ประมวลผล {{syncedRecords}} รายการ',
-      'dataSync_other': 'การซิงโครไนซ์ข้อมูลเสร็จสมบูรณ์กับ {{serviceName}} - ประมวลผล {{syncedRecords}} รายการ',
+      'apiCall': 'การเรียก API ไปยัง [{{serviceName}}] เสร็จสมบูรณ์ใน {{responseTime, number}}ms',
+      'credentialsValidated': 'ข้อมูลประจำตัว API ได้รับการตรวจสอบสำเร็จสำหรับ [{{serviceName}}]',
+      'dataSync': 'การซิงโครไนซ์ข้อมูลเสร็จสมบูรณ์กับ [{{serviceName}}] - ประมวลผล {{syncedRecords}} รายการ',
+      'dataSync_other': 'การซิงโครไนซ์ข้อมูลเสร็จสมบูรณ์กับ [{{serviceName}}] - ประมวลผล {{syncedRecords}} รายการ',
       'dataTransform': 'การแปลงข้อมูลเสร็จสมบูรณ์ - ประมวลผล {{transformedRecords}} รายการ',
       'dataTransform_other': 'การแปลงข้อมูลเสร็จสมบูรณ์ - ประมวลผล {{transformedRecords}} รายการ',
-      'healthCheckPassed': 'การตรวจสอบสถานะบริการภายนอกผ่านสำหรับ {{serviceName}}',
+      'healthCheckPassed': 'การตรวจสอบสถานะบริการภายนอกผ่านสำหรับ [{{serviceName}}]',
       'rateLimit': 'สถานะขีดจำกัดอัตรา API: เหลือ {{usedRequests}}/{{maxRequests}} คำขอ',
-      'serviceConnected': 'เชื่อมต่อกับ {{serviceName}} สำเร็จ - สถานะ: {{serviceStatus}}',
-      'subscriptionActive': 'การสมัครใช้บริการเปิดใช้งานอยู่สำหรับ {{serviceName}} จนถึง {{expiryDate, date}}',
+      'serviceConnected': 'เชื่อมต่อกับ [{{serviceName}}] สำเร็จ - สถานะ: {{serviceStatus}}',
+      'subscriptionActive': 'การสมัครใช้บริการเปิดใช้งานอยู่สำหรับ [{{serviceName}}] จนถึง {{expiryDate, date}}',
       'webhookDelivered': 'Webhook ถูกส่งสำเร็จไปยัง {{webhookUrl}} - สถานะ: {{deliveryStatus}}'
     },
     'kv': {
@@ -903,8 +903,8 @@ export default {
       'batchProcessed': 'การดำเนินการแบบกลุ่มเสร็จสิ้น: ประมวลผล {{successCount}}/{{totalCount}} รายการสำเร็จ',
       'completed': 'การดำเนินการ "{{operationType}}" เสร็จสิ้นสำเร็จใน {{duration}}ms',
       'completed_other': 'การดำเนินการ {{count}} รายการเสร็จสิ้นสำเร็จ - เวลาเฉลี่ย: {{avgDuration}}ms',
-      'taskFinished': 'งาน "{{taskName}}" เสร็จสิ้นสำเร็จด้วย {{resultCount}} ผลลัพธ์',
-      'taskFinished_other': 'งาน "{{taskName}}" เสร็จสิ้นสำเร็จด้วย {{resultCount}} ผลลัพธ์',
+      'taskFinished': 'งาน "[{{taskName}}]" เสร็จสิ้นสำเร็จด้วย {{resultCount}} ผลลัพธ์',
+      'taskFinished_other': 'งาน "[{{taskName}}]" เสร็จสิ้นสำเร็จด้วย {{resultCount}} ผลลัพธ์',
       'workflowCompleted': 'เวิร์กโฟลว์เสร็จสิ้นสำเร็จ - ดำเนินการ {{stepsCount}} ขั้นตอน',
       'workflowCompleted_other': 'เวิร์กโฟลว์เสร็จสิ้นสำเร็จ - ดำเนินการ {{stepsCount}} ขั้นตอน'
     },
@@ -926,7 +926,7 @@ export default {
         'realtimeRetrieved': 'ดึงข้อมูลแดชบอร์ดแบบเรียลไทม์สำเร็จ'
       },
       'incidents': {
-        'created': 'สร้างเหตุการณ์การตรวจสอบแบบเรียลไทม์ {{incidentId}} สำเร็จแล้ว'
+        'created': 'สร้างเหตุการณ์การตรวจสอบแบบเรียลไทม์ [#{{incidentId}}] สำเร็จแล้ว'
       },
       'monitoring': {
         'analysisCompleted': 'การวิเคราะห์การตรวจสอบแบบเรียลไทม์เสร็จสิ้นสำเร็จ',
@@ -934,7 +934,7 @@ export default {
         'eventsRetrieved': 'ดึงเหตุการณ์การตรวจสอบแบบเรียลไทม์สำเร็จ',
         'started': 'เริ่มการตรวจสอบแบบเรียลไทม์สำเร็จแล้ว',
         'stopped': 'หยุดการตรวจสอบแบบเรียลไทม์สำเร็จแล้ว',
-        'threatResolved': 'แก้ไขภัยคุกคามแบบเรียลไทม์ {{threatId}} สำเร็จ',
+        'threatResolved': 'แก้ไขภัยคุกคามแบบเรียลไทม์ [#{{threatId}}] สำเร็จ',
         'threatsRetrieved': 'ดึงสถานะภัยคุกคามแบบเรียลไทม์สำเร็จ'
       }
     },
@@ -944,16 +944,16 @@ export default {
     },
     'security': {
       'incident': {
-        'created': '{{actor}} สร้างเหตุการณ์ความปลอดภัย "{{title}}" ระดับความรุนแรง {{severity}} (ID: {{incidentId}}, ประเภท: {{type}})',
-        'responseExecuted': '{{actor}} ดำเนินการตอบสนอง {{actionCount}} รายการสำหรับเหตุการณ์ {{incidentId}} (ประเภท: {{actionType}}) เมื่อ {{executedAt}}',
-        'retrieved': '{{actor}} ดึงข้อมูลรายละเอียดเหตุการณ์ {{incidentId}} (สถานะ: {{status}}, ความรุนแรง: {{severity}}, สร้างเมื่อ: {{createdAt}})',
-        'statusUpdated': '{{actor}} อัปเดตสถานะเหตุการณ์ {{incidentId}} จาก "{{oldStatus}}" เป็น "{{newStatus}}" เมื่อ {{timestamp}}'
+        'created': '{{actor}} สร้างเหตุการณ์ความปลอดภัย "{{title}}" ระดับความรุนแรง {{severity}} ([#{{incidentId}}], ประเภท: {{type}})',
+        'responseExecuted': '{{actor}} ดำเนินการตอบสนอง {{actionCount}} รายการสำหรับเหตุการณ์ [#{{incidentId}}] (ประเภท: {{actionType}}) เมื่อ {{executedAt}}',
+        'retrieved': '{{actor}} ดึงข้อมูลรายละเอียดเหตุการณ์ [#{{incidentId}}] (สถานะ: {{status}}, ความรุนแรง: {{severity}}, สร้างเมื่อ: {{createdAt}})',
+        'statusUpdated': '{{actor}} อัปเดตสถานะเหตุการณ์ [#{{incidentId}}] จาก "{{oldStatus}}" เป็น "{{newStatus}}" เมื่อ {{timestamp}}'
       },
       'incidents': {
-        'created': '{{actor}} สร้างเหตุการณ์ความปลอดภัย "{{title}}" ระดับความรุนแรง {{severity}} (ID: {{incidentId}}, ประเภท: {{type}})',
-        'responseExecuted': '{{actor}} ดำเนินการตอบสนอง {{actionCount}} รายการสำหรับเหตุการณ์ {{incidentId}} (ประเภท: {{actionType}}) เมื่อ {{executedAt}}',
+        'created': '{{actor}} สร้างเหตุการณ์ความปลอดภัย "{{title}}" ระดับความรุนแรง {{severity}} ([#{{incidentId}}], ประเภท: {{type}})',
+        'responseExecuted': '{{actor}} ดำเนินการตอบสนอง {{actionCount}} รายการสำหรับเหตุการณ์ [#{{incidentId}}] (ประเภท: {{actionType}}) เมื่อ {{executedAt}}',
         'retrieved': '{{actor}} ดึงข้อมูลเหตุการณ์ความปลอดภัย {{incidentCount}} รายการสำเร็จ (หน้า {{page}}, จำกัด {{limit}}, ตัวกรอง: {{filters}})',
-        'statusUpdated': '{{actor}} อัปเดตสถานะเหตุการณ์ {{incidentId}} จาก "{{oldStatus}}" เป็น "{{newStatus}}" เมื่อ {{timestamp}}'
+        'statusUpdated': '{{actor}} อัปเดตสถานะเหตุการณ์ [#{{incidentId}}] จาก "{{oldStatus}}" เป็น "{{newStatus}}" เมื่อ {{timestamp}}'
       },
       'monitoring': {
         'started': 'เริ่มการตรวจสอบแบบเรียลไทม์สำเร็จ'
@@ -962,7 +962,7 @@ export default {
         'statusRetrieved': '{{actor}} ดึงข้อมูลสถานะเซอร์วิส: สุขภาพ {{serviceHealth}}, เวอร์ชัน {{version}}, เวลาทำงาน {{uptime}} (ตรวจสอบเมื่อ: {{checkedAt}})'
       },
       'simulation': {
-        'completed': '{{actor}} จำลองภัยคุกคาม {{threatType}} ระดับความรุนแรง {{severity}} เสร็จสิ้น (ID การจำลอง: {{simulationId}}) เมื่อ {{completedAt}}'
+        'completed': '{{actor}} จำลองภัยคุกคาม {{threatType}} ระดับความรุนแรง {{severity}} เสร็จสิ้น ([#{{simulationId}}]) เมื่อ {{completedAt}}'
       },
       'statistics': {
         'retrieved': '{{actor}} ดึงข้อมูลสถิติความปลอดภัย: ทั้งหมด {{totalIncidents}} รายการ, ใช้งาน {{activeIncidents}} รายการ, แก้ไขแล้ว {{resolvedIncidents}} รายการ (ดึงข้อมูลเมื่อ: {{retrievedAt}})'
@@ -972,8 +972,8 @@ export default {
       'cacheConnected': 'เชื่อมต่อบริการแคชสำเร็จไปยัง {{cacheService}}',
       'configurationLoaded': 'โหลดการกำหนดค่าระบบสำเร็จ - การตั้งค่า {{configCount}} การตั้งค่า',
       'configurationLoaded_other': 'โหลดการกำหนดค่าระบบสำเร็จ - การตั้งค่า {{configCount}} การตั้งค่า',
-      'connectionEstablished': 'สร้างการเชื่อมต่อสำเร็จไปยัง {{serviceName}}',
-      'databaseConnected': 'เชื่อมต่อฐานข้อมูลสำเร็จไปยัง {{databaseName}}',
+      'connectionEstablished': 'สร้างการเชื่อมต่อสำเร็จไปยัง [{{serviceName}}]',
+      'databaseConnected': 'เชื่อมต่อฐานข้อมูลสำเร็จไปยัง [{{databaseName}}]',
       'healthCheckPassed': 'ตรวจสอบสุขภาพระบบผ่าน - คอมโพเนนต์ {{componentCount}} คอมโพเนนต์สุขภาพดี',
       'healthCheckPassed_other': 'ตรวจสอบสุขภาพระบบผ่าน - คอมโพเนนต์ {{componentCount}} คอมโพเนนต์สุขภาพดี',
       'operationCompleted': 'การดำเนินการระบบ "{{operation}}" เสร็จสิ้นใน {{duration, number}}ms',
@@ -982,46 +982,46 @@ export default {
       'resourceAllocated': 'จัดสรรทรัพยากรระบบสำเร็จ: หน่วยความจำ {{allocatedMemory, number}}MB',
       'resourceReleased': 'ปล่อยทรัพยากรระบบสำเร็จ: หน่วยความจำ {{releasedMemory, number}}MB',
       'rollbackCompleted': 'ย้อนกลับระบบเสร็จสิ้นเป็นเวอร์ชัน {{previousVersion}}',
-      'serviceStarted': 'เริ่มบริการระบบ {{serviceName}} สำเร็จบนพอร์ต {{port}}',
-      'serviceStopped': 'หยุดบริการระบบ {{serviceName}} อย่างสง่างาม',
-      'taskCompleted': 'งานเบื้องหลัง {{taskName}} เสร็จสิ้น',
-      'taskScheduled': 'กำหนดเวลางานเบื้องหลัง {{taskName}} สำหรับ {{scheduledTime, datetime}}',
+      'serviceStarted': 'เริ่มบริการระบบ [{{serviceName}}] สำเร็จบนพอร์ต {{port}}',
+      'serviceStopped': 'หยุดบริการระบบ [{{serviceName}}] อย่างสง่างาม',
+      'taskCompleted': 'งานเบื้องหลัง [{{taskName}}] เสร็จสิ้น',
+      'taskScheduled': 'กำหนดเวลางานเบื้องหลัง [{{taskName}}] สำหรับ {{scheduledTime, datetime}}',
       'upgradeCompleted': 'อัพเกรดระบบเสร็จสิ้นเป็นเวอร์ชัน {{newVersion}}'
     },
     'translations': {
       'retrieved': 'ดึงข้อมูลการแปลสำเร็จ'
     },
     'user': {
-      'activated': 'เปิดใช้งานบัญชีผู้ใช้สำเร็จสำหรับ {{userName}}',
+      'activated': 'เปิดใช้งานบัญชีผู้ใช้สำเร็จสำหรับ [{{userName}}]',
       'activated_other': 'เปิดใช้งานบัญชีผู้ใช้ {{count}} บัญชีสำเร็จ',
       'bulkOperationSuccess': 'การดำเนินการแบบกลุ่มเสร็จสมบูรณ์: {{successCount}}/{{totalCount}} สำเร็จ',
-      'created': 'สร้างบัญชีผู้ใช้สำเร็จสำหรับ {{userName}} ({{email}})',
+      'created': 'สร้างบัญชีผู้ใช้สำเร็จสำหรับ [{{userName}}] ({{email}})',
       'created_other': 'สร้างบัญชีผู้ใช้ {{count}} บัญชีสำเร็จ',
-      'dataExported': 'ส่งออกข้อมูลผู้ใช้สำเร็จ ({{fileSize, number}}KB) สำหรับ {{userName}}',
+      'dataExported': 'ส่งออกข้อมูลผู้ใช้สำเร็จ ({{fileSize, number}}KB) สำหรับ [{{userName}}]',
       'dataImported': 'นำเข้าข้อมูลผู้ใช้สำเร็จ - ประมวลผล {{importedCount}} รายการ',
       'dataImported_other': 'นำเข้าข้อมูลผู้ใช้สำเร็จ - ประมวลผล {{importedCount}} รายการ',
-      'deactivated': 'ปิดใช้งานบัญชีผู้ใช้สำเร็จสำหรับ {{userName}}',
+      'deactivated': 'ปิดใช้งานบัญชีผู้ใช้สำเร็จสำหรับ [{{userName}}]',
       'deactivated_other': 'ปิดใช้งานบัญชีผู้ใช้ {{count}} บัญชีสำเร็จ',
-      'deleted': 'ลบบัญชีผู้ใช้สำเร็จสำหรับ {{userName}} โดย {{deletedBy}}',
+      'deleted': 'ลบบัญชีผู้ใช้สำเร็จสำหรับ [{{userName}}] โดย {{deletedBy}}',
       'deleted_other': 'ลบบัญชีผู้ใช้ {{count}} บัญชีสำเร็จ',
-      'emailUpdated': 'อัปเดตที่อยู่อีเมลจาก {{oldEmail}} เป็น {{newEmail}} สำหรับ {{userName}}',
-      'emailVerified': 'ยืนยันที่อยู่อีเมล {{email, lowercase}} สำเร็จสำหรับ {{userName}}',
-      'loginHistory': 'เรียกดูประวัติการเข้าสู่ระบบ: {{entryCount}} รายการสำหรับ {{userName}}',
-      'loginHistory_other': 'เรียกดูประวัติการเข้าสู่ระบบ: {{entryCount}} รายการสำหรับ {{userName}}',
-      'passwordChanged': 'เปลี่ยนรหัสผ่านสำเร็จสำหรับ {{userName}}',
-      'permissionUpdated': 'อัปเดตสิทธิ์ผู้ใช้สำเร็จสำหรับ {{userName}}',
-      'profileCompleted': 'โปรไฟล์ผู้ใช้สมบูรณ์ {{percent, number}}% สำหรับ {{userName}}',
-      'profileRetrieved': 'ดึงโปรไฟล์ผู้ใช้สำเร็จสำหรับ {{userName}} ({{userRole}}) โดย [{{requestedBy}}]',
-      'profileUpdated': 'อัปเดตโปรไฟล์ผู้ใช้สำเร็จสำหรับ {{userName}} - แก้ไข {{fieldsCount}} ฟิลด์',
-      'profileUpdated_other': 'อัปเดตโปรไฟล์ผู้ใช้สำเร็จสำหรับ {{userName}} - แก้ไข {{fieldsCount}} ฟิลด์',
-      'registered': 'ลงทะเบียนผู้ใช้ {{userName}} สำเร็จด้วยบทบาท [{{userRole}}]',
-      'registeredEmailDisabled': 'สร้างบัญชีสำหรับ {{userName}} แล้ว การแจ้งเตือนทางอีเมลถูกปิดใช้งานโดยผู้ดูแลระบบในขณะนี้ โปรดติดต่อฝ่ายสนับสนุนเพื่อเปิดใช้งานบัญชี',
-      'registeredPendingActivation': 'ได้รับคำขอลงทะเบียนของ {{userName}} แล้ว โปรดตรวจสอบอีเมลเพื่อยืนยันและเปิดใช้งานบัญชีก่อนเข้าสู่ระบบ',
-      'roleChanged': 'เปลี่ยนบทบาทผู้ใช้จาก {{oldRole}} เป็น {{newRole}} สำหรับ {{userName}}',
-      'sessionTerminated': 'สิ้นสุดเซสชันทั้งหมดสำเร็จสำหรับ {{userName}}',
-      'suspended': 'ระงับบัญชีผู้ใช้สำเร็จสำหรับ {{userName}} จนถึง {{suspendedUntil, datetime}}',
-      'unsuspended': 'ยกเลิกการระงับบัญชีผู้ใช้สำหรับ {{userName}} โดย {{liftedBy}}',
-      'updated': 'อัพเดทโปรไฟล์ผู้ใช้สำเร็จสำหรับ {{userName}} - ฟิลด์: {{updatedFields}}',
+      'emailUpdated': 'อัปเดตที่อยู่อีเมลจาก {{oldEmail}} เป็น {{newEmail}} สำหรับ [{{userName}}]',
+      'emailVerified': 'ยืนยันที่อยู่อีเมล {{email, lowercase}} สำเร็จสำหรับ [{{userName}}]',
+      'loginHistory': 'เรียกดูประวัติการเข้าสู่ระบบ: {{entryCount}} รายการสำหรับ [{{userName}}]',
+      'loginHistory_other': 'เรียกดูประวัติการเข้าสู่ระบบ: {{entryCount}} รายการสำหรับ [{{userName}}]',
+      'passwordChanged': 'เปลี่ยนรหัสผ่านสำเร็จสำหรับ [{{userName}}]',
+      'permissionUpdated': 'อัปเดตสิทธิ์ผู้ใช้สำเร็จสำหรับ [{{userName}}]',
+      'profileCompleted': 'โปรไฟล์ผู้ใช้สมบูรณ์ {{percent, number}}% สำหรับ [{{userName}}]',
+      'profileRetrieved': 'ดึงโปรไฟล์ผู้ใช้สำเร็จสำหรับ [{{userName}}] ({{userRole}}) โดย [{{requestedBy}}]',
+      'profileUpdated': 'อัปเดตโปรไฟล์ผู้ใช้สำเร็จสำหรับ [{{userName}}] - แก้ไข {{fieldsCount}} ฟิลด์',
+      'profileUpdated_other': 'อัปเดตโปรไฟล์ผู้ใช้สำเร็จสำหรับ [{{userName}}] - แก้ไข {{fieldsCount}} ฟิลด์',
+      'registered': 'ลงทะเบียนผู้ใช้ [{{userName}}] สำเร็จด้วยบทบาท [{{userRole}}]',
+      'registeredEmailDisabled': 'สร้างบัญชีสำหรับ [{{userName}}] แล้ว การแจ้งเตือนทางอีเมลถูกปิดใช้งานโดยผู้ดูแลระบบในขณะนี้ โปรดติดต่อฝ่ายสนับสนุนเพื่อเปิดใช้งานบัญชี',
+      'registeredPendingActivation': 'ได้รับคำขอลงทะเบียนของ [{{userName}}] แล้ว โปรดตรวจสอบอีเมลเพื่อยืนยันและเปิดใช้งานบัญชีก่อนเข้าสู่ระบบ',
+      'roleChanged': 'เปลี่ยนบทบาทผู้ใช้จาก {{oldRole}} เป็น {{newRole}} สำหรับ [{{userName}}]',
+      'sessionTerminated': 'สิ้นสุดเซสชันทั้งหมดสำเร็จสำหรับ [{{userName}}]',
+      'suspended': 'ระงับบัญชีผู้ใช้สำเร็จสำหรับ [{{userName}}] จนถึง {{suspendedUntil, datetime}}',
+      'unsuspended': 'ยกเลิกการระงับบัญชีผู้ใช้สำหรับ [{{userName}}] โดย {{liftedBy}}',
+      'updated': 'อัพเดทโปรไฟล์ผู้ใช้สำเร็จสำหรับ [{{userName}}] - ฟิลด์: {{updatedFields}}',
       'updated_other': 'อัพเดทโปรไฟล์ผู้ใช้ {{count}} โปรไฟล์สำเร็จ',
       'updatedWithEmailVerification': 'อัปเดตโปรไฟล์แล้ว โปรดตรวจสอบที่อยู่อีเมลใหม่ {{newEmail}} เพื่อยืนยันและดำเนินการเปลี่ยนแปลงให้เสร็จสมบูรณ์'
     }
@@ -1494,7 +1494,7 @@ export default {
       'invalid': 'การอัปเดตนโยบายการเก็บรักษาไม่ถูกต้อง'
     },
     'security': {
-      'xssPatternDetected': 'ตรวจพบรูปแบบ XSS ที่อาจเป็นอันตราย: ไม่อนุญาต {{patternName}}'
+      'xssPatternDetected': 'ตรวจพบรูปแบบ XSS ที่อาจเป็นอันตราย: ไม่อนุญาต [{{patternName}}]'
     },
     'structureValidation': {
       'conditions': {
@@ -1547,11 +1547,11 @@ export default {
       'invalid': 'ชื่อผู้ใช้สามารถมีได้เฉพาะตัวอักษร, ตัวเลข และขีดล่างเท่านั้น',
       'invalidCharacters': 'ชื่อผู้ใช้สามารถมีได้เฉพาะตัวอักษร, ตัวเลข และขีดล่างเท่านั้น',
       'required': 'ต้องระบุชื่อผู้ใช้',
-      'reserved': 'ชื่อผู้ใช้ "{{username}}" ถูกจองไว้และไม่สามารถใช้ได้',
+      'reserved': 'ชื่อผู้ใช้ "[{{username}}]" ถูกจองไว้และไม่สามารถใช้ได้',
       'tooLong': 'ชื่อผู้ใช้ต้องไม่เกิน 30 ตัวอักษร',
       'tooShort': 'ชื่อผู้ใช้ต้องมีความยาวอย่างน้อย 3 ตัวอักษร',
       'tooShort_other': 'ชื่อผู้ใช้ต้องมีความยาวอย่างน้อย {{minLength}} ตัวอักษร',
-      'unavailable': 'ชื่อผู้ใช้ "{{username}}" ไม่พร้อมใช้งาน'
+      'unavailable': 'ชื่อผู้ใช้ "[{{username}}]" ไม่พร้อมใช้งาน'
     },
     'filterArrayTooLarge': 'อาร์เรย์ตัวกรองใหญ่เกินไป (สูงสุด 500 รายการ)',
     'filterArrayTooLarge_other': 'อาร์เรย์ตัวกรองที่มี {{count}} รายการเกินค่าสูงสุด {{max}}',

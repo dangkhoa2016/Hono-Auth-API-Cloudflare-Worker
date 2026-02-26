@@ -21,8 +21,8 @@ export default {
       'adminDashboardAccess': 'truy cập dashboard quản trị',
       'adminRoutesAccess': 'truy cập routes quản trị',
       'createUser': 'tạo người dùng',
-      'deleteUser': 'xóa người dùng #{{userId}}',
-      'updateUser': 'cập nhật người dùng #{{userId}}'
+      'deleteUser': 'xóa người dùng [#{{userId}}]',
+      'updateUser': 'cập nhật người dùng [#{{userId}}]'
     },
     'protectionReason': {
       'hierarchy': 'Hệ thống cấp bậc vai trò phải được duy trì',
@@ -38,21 +38,21 @@ export default {
     'accountDeletionSuggestion': 'Liên hệ administrator khác để quản lý tài khoản',
     'activeUsersCount': '{{count}} người dùng hoạt động',
     'activeUsersCount_other': '{{count}} người dùng hoạt động ({{percentage}})',
-    'changedByUser': 'Được thay đổi bởi {{username}} ({{role}})',
-    'checkedByUser': 'Được kiểm tra bởi {{username}} ({{role}})',
-    'createdByUser': 'Được tạo bởi {{username}} ({{role}})',
+    'changedByUser': 'Được thay đổi bởi [{{username}}] ({{role}})',
+    'checkedByUser': 'Được kiểm tra bởi [{{username}}] ({{role}})',
+    'createdByUser': 'Được tạo bởi [{{username}}] ({{role}})',
     'dashboardDataRetrieved': 'Dashboard đã tải với tổng quan {{totalUsers}} hệ thống (quyền truy cập {{accessLevel}}). {{requestedBy}} {{dataFreshness}}',
     'dashboardRetrieved': 'Lấy dữ liệu dashboard thành công',
     'dataFreshness': 'Được tạo lúc {{timestamp}}',
-    'deletedByUser': 'Được xóa bởi {{username}} ({{role}})',
+    'deletedByUser': 'Được xóa bởi [{{username}}] ({{role}})',
     'effectiveImmediately': 'Thay đổi có hiệu lực ngay lập tức',
     'failedLoginAttempts': '{{count}} lần đăng nhập thất bại trong giờ qua',
     'failedLoginAttempts_other': '{{count}} lần đăng nhập thất bại trong giờ qua',
     'performanceGrade': 'Hiệu suất: {{grade}}',
-    'requestedByUser': 'Được yêu cầu bởi {{username}} ({{role}})',
+    'requestedByUser': 'Được yêu cầu bởi [{{username}}] ({{role}})',
     'responseTime': 'Thời gian phản hồi: {{time}}{{unit}}',
     'restrictedRoleAccess': 'Từ chối truy cập: {{currentRole}} không thể xem người dùng {{requestedRole}}',
-    'roleChangedSuccessfully': 'Vai trò đã thay đổi từ {{oldRole}} thành {{newRole}} cho {{targetUserName}}. {{changedBy}} {{timestamp}} {{effectiveImmediately}}',
+    'roleChangedSuccessfully': 'Vai trò đã thay đổi từ {{oldRole}} thành {{newRole}} cho [{{targetUserName}}]. {{changedBy}} {{timestamp}} {{effectiveImmediately}}',
     'routeDiscoverySuccess': 'Lấy routes hệ thống thành công',
     'securityRisk': 'Rủi ro bảo mật: {{level}} ({{failedAttempts}})',
     'statisticsRetrieved': 'Thống kê hệ thống: {{totalUsers}}, người dùng hoạt động: {{activeUsers}} (phạm vi {{dataScope}}). {{requestedBy}}',
@@ -61,13 +61,13 @@ export default {
     'systemHealthRetrievedFailed': 'Không thể truy xuất thông tin sức khỏe hệ thống',
     'totalUsersCount': 'Tổng {{count}} người dùng',
     'totalUsersCount_other': 'Tổng {{count}} người dùng',
-    'updatedByUser': 'Được cập nhật bởi {{username}} ({{role}})',
-    'userCreatedSuccessfully': 'Người dùng mới {{userName}} được tạo với vai trò {{newUserRole}}. {{createdBy}} {{timestamp}}',
+    'updatedByUser': 'Được cập nhật bởi [{{username}}] ({{role}})',
+    'userCreatedSuccessfully': 'Người dùng mới [{{userName}}] được tạo với vai trò {{newUserRole}}. {{createdBy}} {{timestamp}}',
     'userDeletedSuccessfully': 'Tài khoản người dùng đã bị xóa vĩnh viễn. {{deletedBy}} {{timestamp}} Hành động: {{action}}',
-    'userDetailsRetrieved': 'Chi tiết người dùng: {{userName}} ({{userRole}}, {{userStatus}}). {{joinedDate}} {{requestedBy}}',
+    'userDetailsRetrieved': 'Chi tiết người dùng: [{{userName}}] ({{userRole}}, {{userStatus}}). {{joinedDate}} {{requestedBy}}',
     'usersListRetrieved': 'Đã lấy thành công {{count}} người dùng (hiển thị {{displayedCount}} trang {{currentPage}}/{{totalPages}}). {{requestedBy}}',
     'usersListRetrieved_other': 'Đã lấy thành công {{count}} người dùng (hiển thị {{displayedCount}} trang {{currentPage}}/{{totalPages}}). {{requestedBy}}',
-    'userUpdatedSuccessfully': 'Người dùng {{updatedUserName}} đã được cập nhật. {{updatedBy}} {{timestamp}}'
+    'userUpdatedSuccessfully': 'Người dùng [{{updatedUserName}}] đã được cập nhật. {{updatedBy}} {{timestamp}}'
   },
   'api': {
     'databaseError': 'Đã xảy ra lỗi cơ sở dữ liệu',
@@ -134,14 +134,14 @@ export default {
     'cannotAccessOtherUsers': 'Không thể truy cập tài nguyên của người dùng khác',
     'cannotAccessSuperAdmin': 'Không thể truy cập tài nguyên Super Administrator',
     'cannotChangeAdminRole': 'Không thể thay đổi vai trò của administrator khác',
-    'cannotChangeOwnRole': '{{userName}} ({{currentRole}}) không thể thay đổi vai trò của chính mình - {{reason}}',
+    'cannotChangeOwnRole': '[{{userName}}] ({{currentRole}}) không thể thay đổi vai trò của chính mình - {{reason}}',
     'cannotCreateAdmin': 'Không thể tạo tài khoản administrator',
     'cannotCreateHigherRole': '{{currentRole}} không thể tạo tài khoản {{requestedRole}} do hạn chế hệ thống cấp bậc vai trò',
     'cannotCreateSuperAdmin': 'Không thể tạo tài khoản Super Administrator',
-    'cannotDeleteOwnAccount': '{{userName}} ({{role}}) không thể xóa tài khoản của chính mình. {{suggestion}}',
+    'cannotDeleteOwnAccount': '[{{userName}}] ({{role}}) không thể xóa tài khoản của chính mình. {{suggestion}}',
     'cannotDeleteSuperAdmin': 'Không thể xóa tài khoản {{targetRole}} - {{reason}} (được thử bởi {{currentRole}})',
     'cannotDeleteYourself': 'Không thể xóa tài khoản của chính mình',
-    'cannotModifyHigherRoleUser': 'Không thể sửa đổi {{targetUserName}} ({{targetRole}}) - {{currentRole}} {{reason}}',
+    'cannotModifyHigherRoleUser': 'Không thể sửa đổi [{{targetUserName}}] ({{targetRole}}) - {{currentRole}} {{reason}}',
     'cannotModifySuperAdmin': 'Không thể chỉnh sửa tài khoản Super Administrator',
     'cannotPromoteToHigherRole': '{{currentRole}} không thể thăng cấp người dùng lên {{requestedRole}} - {{reason}}',
     'cannotPromoteToSuperAdmin': 'Không thể thăng cấp người dùng lên Super Administrator',
@@ -187,14 +187,14 @@ export default {
       'disclaimer': 'Nếu bạn không tạo tài khoản này, bạn có thể bỏ qua email này. Không cần thực hiện thêm hành động nào.',
       'email': 'Email: {{email}}',
       'expiryWarning': 'Liên kết kích hoạt này sẽ hết hạn sau {{hours}} giờ.',
-      'footer': 'Đây là email tự động từ {{appName}}. Vui lòng không trả lời email này.',
-      'greeting': 'Xin chào {{userName}},',
+      'footer': 'Đây là email tự động từ [{{appName}}]. Vui lòng không trả lời email này.',
+      'greeting': 'Xin chào [{{userName}}],',
       'instructions': 'Để hoàn tất đăng ký và bắt đầu sử dụng tài khoản, vui lòng nhấn vào nút bên dưới:',
-      'intro': 'Chào mừng bạn đến với {{appName}}! Tài khoản của bạn đã được tạo thành công.',
+      'intro': 'Chào mừng bạn đến với [{{appName}}]! Tài khoản của bạn đã được tạo thành công.',
       'ip': 'Địa chỉ IP: {{ip}}',
       'securityNote': 'Vì lý do bảo mật, vui lòng không chia sẻ liên kết này với bất kỳ ai.',
-      'subject': '{{appName}} - Kích hoạt tài khoản của bạn',
-      'thanks': 'Trân trọng,\nĐội ngũ {{appName}}',
+      'subject': '[{{appName}}] - Kích hoạt tài khoản của bạn',
+      'thanks': 'Trân trọng,\nĐội ngũ [{{appName}}]',
       'time': 'Đăng ký lúc: {{time}} ngày {{date}}'
     }
   },
@@ -310,9 +310,9 @@ export default {
     'security_incident': {
       'bulkDelete': 'Xóa hàng loạt {{count}} sự cố bảo mật (yêu cầu quyền admin {{actor}})',
       'create': 'Tạo sự cố bảo mật mới (yêu cầu quyền admin {{actor}}, loại {{type}}, mức độ nghiêm trọng {{severity}})',
-      'deleteById': 'Xóa sự cố bảo mật {{incidentId}} (yêu cầu quyền admin {{actor}})',
+      'deleteById': 'Xóa sự cố bảo mật [#{{incidentId}}] (yêu cầu quyền admin {{actor}})',
       'exportCsv': 'Xuất {{count}} sự cố bảo mật ra CSV (yêu cầu quyền admin {{actor}}, khoảng thời gian: {{dateRange}})',
-      'getById': 'Lấy sự cố bảo mật theo ID {{incidentId}} (yêu cầu quyền admin {{actor}})',
+      'getById': 'Lấy sự cố bảo mật theo [#{{incidentId}}] (yêu cầu quyền admin {{actor}})',
       'getDashboard': 'Lấy dashboard sự cố bảo mật (yêu cầu quyền admin {{actor}}, bộ lọc: {{filters}})',
       'getStatistics': 'Lấy thống kê sự cố bảo mật (yêu cầu quyền admin {{actor}}, thời kỳ: {{period}})',
       'incidentDetails': 'Lấy chi tiết sự cố (yêu cầu quyền admin)',
@@ -325,8 +325,8 @@ export default {
       'serviceStatus': 'Lấy trạng thái dịch vụ (yêu cầu quyền admin)',
       'simulate': 'Mô phỏng sự cố bảo mật (yêu cầu quyền admin)',
       'statistics': 'Lấy thống kê sự cố (yêu cầu quyền admin)',
-      'updateById': 'Cập nhật sự cố bảo mật {{incidentId}} (yêu cầu quyền admin {{actor}}, các trường được cập nhật: {{fields}})',
-      'updateStatus': 'Cập nhật trạng thái sự cố bảo mật {{incidentId}} thành {{status}} (yêu cầu quyền admin {{actor}})'
+      'updateById': 'Cập nhật sự cố bảo mật [#{{incidentId}}] (yêu cầu quyền admin {{actor}}, các trường được cập nhật: {{fields}})',
+      'updateStatus': 'Cập nhật trạng thái sự cố bảo mật [#{{incidentId}}] thành {{status}} (yêu cầu quyền admin {{actor}})'
     },
     'system': {
       'apiInfo': 'Thông tin API toàn diện và endpoints',
@@ -376,7 +376,7 @@ export default {
         'failed': 'Không thể truy xuất phân tích hành vi - {{actor}} không thể hoàn thành {{operation}} cho {{timeframe}} nhắm mục tiêu {{targetRole}}: {{reason}}'
       },
       'compliance': {
-        'customComplianceFailed': 'Không thể tạo báo cáo tuân thủ tùy chỉnh - {{actor}} không thể hoàn thành {{operation}} cho "{{reportName}}" ({{reportType}}): {{reason}}',
+        'customComplianceFailed': 'Không thể tạo báo cáo tuân thủ tùy chỉnh - {{actor}} không thể hoàn thành {{operation}} cho "[{{reportName}}]" ({{reportType}}): {{reason}}',
         'failed': 'Không thể tạo báo cáo tuân thủ - {{actor}} không thể hoàn thành {{operation}} cho {{timeframe}} với định dạng {{format}}: {{reason}}',
         'reportFailed': 'Không thể tạo báo cáo tuân thủ - {{actor}} không thể thực hiện {{operation}} cho báo cáo {{type}}: {{reason}}'
       },
@@ -417,12 +417,12 @@ export default {
       }
     },
     'auth': {
-      'accountDisabled': 'Tài khoản người dùng {{userName}} bị vô hiệu hóa bởi quản trị viên',
+      'accountDisabled': 'Tài khoản người dùng [{{userName}}] bị vô hiệu hóa bởi quản trị viên',
       'accountInactive': 'Tài khoản của bạn chưa được kích hoạt. Vui lòng kích hoạt qua email hoặc liên hệ hỗ trợ.',
       'accountLocked': 'Tài khoản bị khóa trong {{duration, time}} do lần thử đăng nhập thất bại',
-      'accountNotVerified': 'Địa chỉ email cho {{userName}} chưa được xác minh',
+      'accountNotVerified': 'Địa chỉ email cho [{{userName}}] chưa được xác minh',
       'cannotAccessOtherUsers': 'Không thể truy cập tài nguyên của người dùng khác',
-      'cannotChangeOwnRole': '{{userName}} ({{currentRole}}) không thể thay đổi vai trò của chính mình - {{reason}}',
+      'cannotChangeOwnRole': '[{{userName}}] ({{currentRole}}) không thể thay đổi vai trò của chính mình - {{reason}}',
       'cannotCreateHigherRole': 'Không thể tạo người dùng với vai trò cao hơn vai trò hiện tại của bạn',
       'cannotDeleteSuperAdmin': 'Không thể xóa tài khoản Super Administrator',
       'cannotDeleteYourself': 'Không thể xóa tài khoản của chính mình',
@@ -437,8 +437,8 @@ export default {
       'invalidCredentials_context_user': 'Thông tin xác thực không hợp lệ được cung cấp cho đăng nhập tài khoản người dùng',
       'loginFailed': 'Quá trình đăng nhập thất bại cho {{actor}} (Lý do: {{reason}}, Thao tác: {{operation}}, IP: {{ipAddress}})',
       'mfaFailed': 'Xác thực đa yếu tố thất bại: {{reason}}',
-      'mfaRequired': 'Xác thực đa yếu tố là bắt buộc cho {{userName}}',
-      'passwordIncorrect': 'Mật khẩu không chính xác cho người dùng {{userName}}',
+      'mfaRequired': 'Xác thực đa yếu tố là bắt buộc cho [{{userName}}]',
+      'passwordIncorrect': 'Mật khẩu không chính xác cho người dùng [{{userName}}]',
       'permissionDenied': 'Quyền bị từ chối cho hành động: {{action}}',
       'rateLimitExceeded': 'Vượt quá giới hạn tần suất: {{currentRequests}}/{{maxRequests}} yêu cầu mỗi {{timeWindow}}',
       'refreshTokenExpired': 'Refresh token đã hết hạn lúc {{expiredAt, datetime}}',
@@ -471,11 +471,11 @@ export default {
       'workflowViolation': 'Vi phạm luồng công việc: {{step}} không thể thực hiện ở trạng thái hiện tại {{currentState}}'
     },
     'file': {
-      'accessDenied': 'Truy cập bị từ chối đến tệp "{{filename}}": {{reason}}',
+      'accessDenied': 'Truy cập bị từ chối đến tệp "[{{filename}}]": {{reason}}',
       'corrupted': 'Tệp có vẻ bị hỏng hoặc không hoàn chỉnh',
       'formatUnsupported': 'Định dạng tệp không được hỗ trợ cho thao tác: {{operation}}',
       'invalidType': 'Loại tệp "{{fileType}}" không được phép - các loại được hỗ trợ: {{allowedTypes}}',
-      'notFound': 'Không tìm thấy tệp "{{filename}}"',
+      'notFound': 'Không tìm thấy tệp "[{{filename}}]"',
       'processingFailed': 'Xử lý tệp thất bại: {{reason}}',
       'quotaExceeded': 'Vượt quá hạn ngạch lưu trữ: {{used, number}}MB / {{quota, number}}MB',
       'tooLarge': 'Kích thước tệp {{actualSize, number}}MB vượt quá giới hạn {{maxSize, number}}MB',
@@ -498,14 +498,14 @@ export default {
       'translationsFailed': 'Không thể truy xuất thông tin dịch thuật: {{reason}}'
     },
     'integration': {
-      'apiLimitExceeded': 'Vượt quá giới hạn tần suất API cho {{serviceName}}: {{limit}} yêu cầu mỗi {{period}}',
-      'authenticationFailed': 'Xác thực thất bại với {{serviceName}}: {{reason}}',
-      'credentialsExpired': 'Thông tin xác thực API cho {{serviceName}} đã hết hạn vào {{expiredDate, date}}',
-      'dataTransformFailed': 'Chuyển đổi dữ liệu thất bại cho {{serviceName}}: {{reason}}',
-      'invalidResponse': 'Phản hồi không hợp lệ từ {{serviceName}}: {{details}}',
-      'serviceDown': 'Dịch vụ bên ngoài {{serviceName}} hiện đang ngừng hoạt động',
-      'syncFailed': 'Đồng bộ hóa dữ liệu thất bại với {{serviceName}}: {{reason}}',
-      'webhookTimeout': 'Hết thời gian chờ webhook từ {{serviceName}} sau {{timeout, number}}ms'
+      'apiLimitExceeded': 'Vượt quá giới hạn tần suất API cho [{{serviceName}}]: {{limit}} yêu cầu mỗi {{period}}',
+      'authenticationFailed': 'Xác thực thất bại với [{{serviceName}}]: {{reason}}',
+      'credentialsExpired': 'Thông tin xác thực API cho [{{serviceName}}] đã hết hạn vào {{expiredDate, date}}',
+      'dataTransformFailed': 'Chuyển đổi dữ liệu thất bại cho [{{serviceName}}]: {{reason}}',
+      'invalidResponse': 'Phản hồi không hợp lệ từ [{{serviceName}}]: {{details}}',
+      'serviceDown': 'Dịch vụ bên ngoài [{{serviceName}}] hiện đang ngừng hoạt động',
+      'syncFailed': 'Đồng bộ hóa dữ liệu thất bại với [{{serviceName}}]: {{reason}}',
+      'webhookTimeout': 'Hết thời gian chờ webhook từ [{{serviceName}}] sau {{timeout, number}}ms'
     },
     'kv': {
       'accessDenied': 'Truy cập bị từ chối cho khóa cấu hình "{{key}}" - yêu cầu vai trò {{requiredRole}}',
@@ -553,12 +553,12 @@ export default {
       'retentionPoliciesRetrieveFailed': 'Không thể truy xuất chính sách lưu trữ cho {{actor}} (Lý do: {{reason}}, Thao tác: {{operation}})'
     },
     'network': {
-      'apiError': 'Lỗi API bên ngoài từ {{apiName}}: {{error}}',
+      'apiError': 'Lỗi API bên ngoài từ [{{apiName}}]: {{error}}',
       'bandwidthExceeded': 'Vượt quá giới hạn băng thông: {{usage, number}}MB/{{limit, number}}MB',
       'connectionFailed': 'Kết nối thất bại đến {{service, uppercase}}: {{reason}}',
       'connectionRefused': 'Kết nối bị từ chối bởi {{service}} trên cổng {{port}}',
-      'dnsResolutionFailed': 'Phân giải DNS thất bại cho {{hostname}}',
-      'hostUnreachable': 'Máy chủ {{hostname}} không thể truy cập',
+      'dnsResolutionFailed': 'Phân giải DNS thất bại cho [{{hostname}}]',
+      'hostUnreachable': 'Máy chủ [{{hostname}}] không thể truy cập',
       'httpError': 'Lỗi HTTP {{statusCode}}: {{statusMessage}}',
       'protocolError': 'Lỗi giao thức mạng: {{protocol}} - {{details}}',
       'proxyError': 'Lỗi máy chủ proxy: {{proxyAddress}} - {{reason}}',
@@ -578,7 +578,7 @@ export default {
         'sendFailed': 'Không thể gửi cảnh báo thủ công cho {{actor}} (Lý do: {{reason}}, Thao tác: {{operation}})',
         'statusFailed': 'Không thể truy xuất trạng thái hệ thống cảnh báo cho {{actor}} (Lý do: {{reason}}, Thao tác: {{operation}})',
         'testFailed': 'Không thể test hệ thống cảnh báo cho {{actor}} (Lý do: {{reason}}, Thao tác: {{operation}})',
-        'toggleFailed': 'Không thể bật/tắt quy tắc cảnh báo {{ruleId}} cho {{actor}} (Lý do: {{reason}}, Thao tác: {{operation}})'
+        'toggleFailed': 'Không thể bật/tắt quy tắc cảnh báo [#{{ruleId}}] cho {{actor}} (Lý do: {{reason}}, Thao tác: {{operation}})'
       },
       'alertsConfig': {
         'configFailed': 'Không thể cấu hình cảnh báo cho {{actor}} (Lý do: {{reason}}, Thao tác: {{operation}})'
@@ -605,13 +605,13 @@ export default {
       },
       'threats': {
         'analyzeFailed': 'Không thể phân tích mối đe dọa cho {{actor}} (Lý do: {{reason}}, Thao tác: {{operation}})',
-        'resolveFailed': 'Không thể giải quyết mối đe dọa {{threatId}} cho {{actor}} (Lý do: {{reason}}, Thao tác: {{operation}})',
+        'resolveFailed': 'Không thể giải quyết mối đe dọa [#{{threatId}}] cho {{actor}} (Lý do: {{reason}}, Thao tác: {{operation}})',
         'retrieveFailed': 'Không thể truy xuất trạng thái mối đe dọa cho {{actor}} (Lý do: {{reason}}, Thao tác: {{operation}})'
       }
     },
     'security': {
       'incident': {
-        'notFound': 'Không tìm thấy sự cố bảo mật (ID: {{incidentId}}, Thao tác: {{operation}}, Được yêu cầu bởi: {{requestedBy}})'
+        'notFound': 'Không tìm thấy sự cố bảo mật ([#{{incidentId}}], Thao tác: {{operation}}, Được yêu cầu bởi: {{requestedBy}})'
       },
       'incidents': {
         'createFailed': 'Không thể tạo sự cố bảo mật do lỗi máy chủ.',
@@ -653,41 +653,41 @@ export default {
       'workerUnavailable': 'Không có worker khả dụng để xử lý yêu cầu'
     },
     'user': {
-      'accountLocked': 'Tài khoản người dùng {{userName}} bị khóa do {{reason}}',
-      'accountSuspended': 'Tài khoản người dùng {{userName}} bị đình chỉ đến {{suspendedUntil, datetime}}',
-      'activationFailed': 'Không thể kích hoạt tài khoản người dùng cho {{userName}}: {{reason}}',
+      'accountLocked': 'Tài khoản người dùng [{{userName}}] bị khóa do {{reason}}',
+      'accountSuspended': 'Tài khoản người dùng [{{userName}}] bị đình chỉ đến {{suspendedUntil, datetime}}',
+      'activationFailed': 'Không thể kích hoạt tài khoản người dùng cho [{{userName}}]: {{reason}}',
       'bulkOperationFailed': 'Thao tác hàng loạt thất bại cho {{failedCount}} trong số {{totalCount}} người dùng',
       'bulkOperationFailed_other': 'Thao tác hàng loạt thất bại cho {{failedCount}} trong số {{totalCount}} người dùng',
       'createFailed': 'Tạo tài khoản người dùng thất bại cho {{email}}',
-      'deactivationFailed': 'Không thể vô hiệu hóa tài khoản người dùng cho {{userName}}: {{reason}}',
-      'deleteFailed': 'Không thể xóa người dùng {{userName}}: {{reason}}',
+      'deactivationFailed': 'Không thể vô hiệu hóa tài khoản người dùng cho [{{userName}}]: {{reason}}',
+      'deleteFailed': 'Không thể xóa người dùng [{{userName}}]: {{reason}}',
       'emailExists': 'Email {{email}} đã tồn tại trong hệ thống',
       'emailVerificationFailed': 'Xác minh email thất bại: {{reason}}',
       'emailVerificationSystemError': 'Không thể xác minh việc thay đổi email do lỗi hệ thống. Vui lòng thử lại sau.',
-      'inactive': 'Tài khoản người dùng {{userName}} đang ở trạng thái không hoạt động',
-      'insufficientPermissions': 'Không đủ quyền để sửa đổi người dùng {{userName}} ({{userRole}})',
+      'inactive': 'Tài khoản người dùng [{{userName}}] đang ở trạng thái không hoạt động',
+      'insufficientPermissions': 'Không đủ quyền để sửa đổi người dùng [{{userName}}] ({{userRole}})',
       'listFailed': 'Không thể truy xuất danh sách người dùng: {{reason}}',
-      'notFound': 'Không tìm thấy người dùng {{userName}}',
-      'notFoundById': 'Không tìm thấy người dùng có ID {{userId}}',
-      'passwordChangeFailed': 'Thay đổi mật khẩu thất bại cho {{userName}}. {{reason}}',
+      'notFound': 'Không tìm thấy người dùng [{{userName}}]',
+      'notFoundById': 'Không tìm thấy người dùng có [#{{userId}}]',
+      'passwordChangeFailed': 'Thay đổi mật khẩu thất bại cho [{{userName}}]. {{reason}}',
       'passwordIncorrect': 'Mật khẩu hiện tại không chính xác',
-      'profileRetrieveFailed': 'Không thể truy xuất thông tin cá nhân cho {{userName}}. {{reason}}',
+      'profileRetrieveFailed': 'Không thể truy xuất thông tin cá nhân cho [{{userName}}]. {{reason}}',
       'registrationError': 'Đăng ký thất bại do lỗi hệ thống. {{details}}',
       'registrationFailed': 'Đăng ký người dùng thất bại: {{reason}}',
-      'roleChangeFailed': 'Không thể thay đổi vai trò cho {{userName}} từ {{oldRole}} thành {{newRole}}: {{reason}}',
-      'sessionLimitExceeded': 'Người dùng {{userName}} đã vượt quá số phiên đồng thời tối đa ({{currentSessions}}/{{maxSessions}})',
-      'updateFailed': 'Cập nhật thông tin cá nhân thất bại cho {{userName}}. {{reason}}',
-      'usernameExists': 'Tên người dùng "{{username}}" đã được sử dụng'
+      'roleChangeFailed': 'Không thể thay đổi vai trò cho [{{userName}}] từ {{oldRole}} thành {{newRole}}: {{reason}}',
+      'sessionLimitExceeded': 'Người dùng [{{userName}}] đã vượt quá số phiên đồng thời tối đa ({{currentSessions}}/{{maxSessions}})',
+      'updateFailed': 'Cập nhật thông tin cá nhân thất bại cho [{{userName}}]. {{reason}}',
+      'usernameExists': 'Tên người dùng "[{{username}}]" đã được sử dụng'
     },
     'zodDemo': {
       'file': {
-        'uploadFailed': 'Tải file thất bại - {{actor}} không thể hoàn thành {{operation}} cho "{{fileName}}" ({{fileSize}} bytes): {{reason}}'
+        'uploadFailed': 'Tải file thất bại - {{actor}} không thể hoàn thành {{operation}} cho "[{{fileName}}]" ({{fileSize}} bytes): {{reason}}'
       },
       'search': {
         'failed': 'Thao tác tìm kiếm thất bại - {{actor}} không thể hoàn thành {{operation}} cho truy vấn "{{query}}" ({{searchType}}): {{reason}}'
       },
       'user': {
-        'registrationFailed': 'Đăng ký người dùng thất bại - {{actor}} không thể hoàn thành {{operation}} cho {{userName}} ({{email}}): {{reason}}'
+        'registrationFailed': 'Đăng ký người dùng thất bại - {{actor}} không thể hoàn thành {{operation}} cho [{{userName}}] ({{email}}): {{reason}}'
       }
     },
     'businessRuleViolation': 'Vi phạm quy tắc kinh doanh: {{rules}}',
@@ -722,7 +722,7 @@ export default {
   },
   'security': {
     'alerts': {
-      'alertTemplate': 'Cảnh báo: {{name}} - {{eventType}}',
+      'alertTemplate': 'Cảnh báo: [{{name}}] - {{eventType}}',
       'channelCreated': 'Tạo kênh cảnh báo thành công',
       'channelsFailed': 'Không thể truy xuất kênh cảnh báo',
       'createChannelFailed': 'Không thể tạo kênh cảnh báo',
@@ -757,11 +757,11 @@ export default {
       'reportCreated_other': 'Báo cáo quản trị đã được tạo với {{recordCount, number}} bản ghi',
       'securityScanCompleted': 'Quét bảo mật đã hoàn thành - {{threatsFound}} mối đe dọa đã phát hiện',
       'securityScanCompleted_other': 'Quét bảo mật đã hoàn thành - {{threatsFound}} mối đe dọa đã phát hiện',
-      'serviceRestarted': 'Dịch vụ hệ thống {{serviceName}} đã được khởi động lại thành công',
+      'serviceRestarted': 'Dịch vụ hệ thống [{{serviceName}}] đã được khởi động lại thành công',
       'statsGenerated': 'Thống kê hệ thống đã được tạo thành công cho giai đoạn {{period}} - {{dataPoints}} điểm dữ liệu',
       'statsGenerated_other': 'Thống kê hệ thống đã được tạo thành công cho giai đoạn {{period}} - {{dataPoints}} điểm dữ liệu',
       'systemHealthy': 'Kiểm tra sức khỏe hệ thống đã hoàn thành: {{status, uppercase}} ({{uptime, number}}% thời gian hoạt động)',
-      'userDetailsRetrieved': 'Chi tiết người dùng: {{userName}} ({{userRole}}, {{userStatus}}). {{joinedDate}} {{requestedBy}}'
+      'userDetailsRetrieved': 'Chi tiết người dùng: [{{userName}}] ({{userRole}}, {{userStatus}}). {{joinedDate}} {{requestedBy}}'
     },
     'advancedAudit': {
       'analytics': {
@@ -794,19 +794,19 @@ export default {
       'statsRetrieved': 'Lấy thống kê audit thành công'
     },
     'auth': {
-      'accessGranted': 'Quyền truy cập đã được cấp cho {{resource}} cho {{userName}}',
-      'accountUnlocked': 'Tài khoản {{userName}} đã được mở khóa thành công bởi {{unlockedBy}}',
-      'loginSuccess': 'Đăng nhập thành công với tư cách {{userName}} ({{userRole}}) lúc {{loginTime}}',
+      'accessGranted': 'Quyền truy cập đã được cấp cho {{resource}} cho [{{userName}}]',
+      'accountUnlocked': 'Tài khoản [{{userName}}] đã được mở khóa thành công bởi {{unlockedBy}}',
+      'loginSuccess': 'Đăng nhập thành công với tư cách [{{userName}}] ({{userRole}}) lúc {{loginTime}}',
       'logoutAllSuccess': 'Đăng xuất khỏi mọi thiết bị lúc {{logoutTime}}',
       'logoutSuccess': 'Đăng xuất thành công từ {{deviceInfo}} lúc {{logoutTime}}',
-      'mfaEnabled': 'Xác thực đa yếu tố đã được bật thành công cho {{userName}}',
+      'mfaEnabled': 'Xác thực đa yếu tố đã được bật thành công cho [{{userName}}]',
       'mfaVerified': 'Xác thực đa yếu tố đã được xác minh thành công',
-      'passwordChanged': 'Mật khẩu đã được thay đổi thành công cho {{userName}}',
+      'passwordChanged': 'Mật khẩu đã được thay đổi thành công cho [{{userName}}]',
       'passwordReset': 'Email đặt lại mật khẩu đã được gửi đến {{email}} - hết hạn sau {{expiryMinutes}} phút',
       'passwordReset_other': 'Email đặt lại mật khẩu đã được gửi đến {{email}} - hết hạn sau {{expiryMinutes}} phút',
-      'permissionGranted': 'Quyền "{{permission}}" đã được cấp cho {{userName}}',
+      'permissionGranted': 'Quyền "{{permission}}" đã được cấp cho [{{userName}}]',
       'rateLimitReset': 'Giới hạn tần suất đã được đặt lại thành công cho {{ipAddress}}',
-      'roleAssigned': 'Vai trò {{newRole}} đã được gán thành công cho {{userName}} bởi {{assignedBy}}',
+      'roleAssigned': 'Vai trò {{newRole}} đã được gán thành công cho [{{userName}}] bởi {{assignedBy}}',
       'sessionCreated': 'Phiên người dùng mới đã được tạo với thời hạn {{sessionDuration}} phút',
       'sessionCreated_other': 'Phiên người dùng mới đã được tạo với thời hạn {{sessionDuration}} phút',
       'sessionExtended': 'Phiên người dùng đã được gia hạn đến {{newExpiry}}',
@@ -821,42 +821,42 @@ export default {
       'operationApproved': 'Thao tác kinh doanh "{{operation}}" đã được phê duyệt bởi {{approvedBy}}',
       'processAutomated': 'Quy trình kinh doanh đã được tự động hóa thành công - {{automatedTasks}} tác vụ đã tự động hóa',
       'processAutomated_other': 'Quy trình kinh doanh đã được tự động hóa thành công - {{automatedTasks}} tác vụ đã tự động hóa',
-      'ruleApplied': 'Quy tắc kinh doanh "{{ruleName}}" đã được áp dụng thành công cho {{affectedRecords}} bản ghi',
-      'ruleApplied_other': 'Quy tắc kinh doanh "{{ruleName}}" đã được áp dụng thành công cho {{affectedRecords}} bản ghi',
+      'ruleApplied': 'Quy tắc kinh doanh "[{{ruleName}}]" đã được áp dụng thành công cho {{affectedRecords}} bản ghi',
+      'ruleApplied_other': 'Quy tắc kinh doanh "[{{ruleName}}]" đã được áp dụng thành công cho {{affectedRecords}} bản ghi',
       'validationPassed': 'Xác thực kinh doanh đã vượt qua cho {{entityType}} - tất cả {{checkCount}} kiểm tra đều thành công',
       'validationPassed_other': 'Xác thực kinh doanh đã vượt qua cho {{entityType}} - tất cả {{checkCount}} kiểm tra đều thành công',
-      'workflowCompleted': 'Luồng công việc "{{workflowName}}" đã hoàn thành thành công trong {{steps}} bước',
-      'workflowCompleted_other': 'Luồng công việc "{{workflowName}}" đã hoàn thành thành công trong {{steps}} bước'
+      'workflowCompleted': 'Luồng công việc "[{{workflowName}}]" đã hoàn thành thành công trong {{steps}} bước',
+      'workflowCompleted_other': 'Luồng công việc "[{{workflowName}}]" đã hoàn thành thành công trong {{steps}} bước'
     },
     'file': {
-      'backup': 'Sao lưu tệp đã được tạo thành công cho "{{filename}}"',
+      'backup': 'Sao lưu tệp đã được tạo thành công cho "[{{filename}}]"',
       'compressed': 'Tệp đã được nén thành công - kích thước giảm {{compressionRatio, number}}%',
       'converted': 'Tệp đã được chuyển đổi thành công từ {{sourceFormat}} thành {{targetFormat}}',
       'copied': 'Tệp đã được sao chép thành công đến {{destinationPath}}',
-      'deleted': 'Tệp "{{filename}}" đã được xóa thành công',
-      'downloadCompleted': 'Tệp "{{filename}}" đã được tải xuống thành công',
+      'deleted': 'Tệp "[{{filename}}]" đã được xóa thành công',
+      'downloadCompleted': 'Tệp "[{{filename}}]" đã được tải xuống thành công',
       'extracted': 'Kho lưu trữ đã được giải nén thành công - {{extractedCount}} tệp đã giải nén',
       'extracted_other': 'Kho lưu trữ đã được giải nén thành công - {{extractedCount}} tệp đã giải nén',
       'moved': 'Tệp đã được di chuyển thành công từ {{sourcePath}} đến {{destinationPath}}',
-      'processingCompleted': 'Xử lý tệp đã hoàn thành cho "{{filename}}" - {{operationsCount}} thao tác đã thực hiện',
-      'processingCompleted_other': 'Xử lý tệp đã hoàn thành cho "{{filename}}" - {{operationsCount}} thao tác đã thực hiện',
+      'processingCompleted': 'Xử lý tệp đã hoàn thành cho "[{{filename}}]" - {{operationsCount}} thao tác đã thực hiện',
+      'processingCompleted_other': 'Xử lý tệp đã hoàn thành cho "[{{filename}}]" - {{operationsCount}} thao tác đã thực hiện',
       'restored': 'Tệp đã được khôi phục thành công từ bản sao lưu được tạo vào {{backupDate, date}}',
-      'uploadCompleted': 'Tệp "{{filename}}" đã được tải lên thành công ({{fileSize}})',
+      'uploadCompleted': 'Tệp "[{{filename}}]" đã được tải lên thành công ({{fileSize}})',
       'uploadsBatch': 'Tải lên hàng loạt đã hoàn thành: {{successCount}}/{{totalCount}} tệp đã xử lý',
       'uploadsBatch_other': 'Tải lên hàng loạt đã hoàn thành: {{successCount}}/{{totalCount}} tệp đã xử lý',
-      'validated': 'Xác thực tệp đã vượt qua cho "{{filename}}" - định dạng: {{fileFormat}}'
+      'validated': 'Xác thực tệp đã vượt qua cho "[{{filename}}]" - định dạng: {{fileFormat}}'
     },
     'integration': {
-      'apiCall': 'Cuộc gọi API đến {{serviceName}} đã hoàn thành thành công trong {{responseTime, number}}ms',
-      'credentialsValidated': 'Thông tin xác thực API đã được xác thực thành công cho {{serviceName}}',
-      'dataSync': 'Đồng bộ hóa dữ liệu đã hoàn thành với {{serviceName}} - {{syncedRecords}} bản ghi đã xử lý',
-      'dataSync_other': 'Đồng bộ hóa dữ liệu đã hoàn thành với {{serviceName}} - {{syncedRecords}} bản ghi đã xử lý',
+      'apiCall': 'Cuộc gọi API đến [{{serviceName}}] đã hoàn thành thành công trong {{responseTime, number}}ms',
+      'credentialsValidated': 'Thông tin xác thực API đã được xác thực thành công cho [{{serviceName}}]',
+      'dataSync': 'Đồng bộ hóa dữ liệu đã hoàn thành với [{{serviceName}}] - {{syncedRecords}} bản ghi đã xử lý',
+      'dataSync_other': 'Đồng bộ hóa dữ liệu đã hoàn thành với [{{serviceName}}] - {{syncedRecords}} bản ghi đã xử lý',
       'dataTransform': 'Chuyển đổi dữ liệu đã hoàn thành - {{transformedRecords}} bản ghi đã xử lý',
       'dataTransform_other': 'Chuyển đổi dữ liệu đã hoàn thành - {{transformedRecords}} bản ghi đã xử lý',
-      'healthCheckPassed': 'Kiểm tra sức khỏe dịch vụ bên ngoài đã vượt qua cho {{serviceName}}',
+      'healthCheckPassed': 'Kiểm tra sức khỏe dịch vụ bên ngoài đã vượt qua cho [{{serviceName}}]',
       'rateLimit': 'Trạng thái giới hạn tần suất API: {{usedRequests}}/{{maxRequests}} yêu cầu còn lại',
-      'serviceConnected': 'Đã kết nối thành công đến {{serviceName}} - trạng thái: {{serviceStatus}}',
-      'subscriptionActive': 'Đăng ký dịch vụ đang hoạt động cho {{serviceName}} đến {{expiryDate, date}}',
+      'serviceConnected': 'Đã kết nối thành công đến [{{serviceName}}] - trạng thái: {{serviceStatus}}',
+      'subscriptionActive': 'Đăng ký dịch vụ đang hoạt động cho [{{serviceName}}] đến {{expiryDate, date}}',
       'webhookDelivered': 'Webhook đã được gửi thành công đến {{webhookUrl}} - trạng thái: {{deliveryStatus}}'
     },
     'kv': {
@@ -903,13 +903,13 @@ export default {
       'batchProcessed': 'Thao tác hàng loạt đã hoàn thành: {{successCount}}/{{totalCount}} mục đã xử lý thành công',
       'completed': 'Thao tác "{{operationType}}" đã hoàn thành thành công trong {{duration}}ms',
       'completed_other': '{{count}} thao tác đã hoàn thành thành công - thời gian trung bình: {{avgDuration}}ms',
-      'taskFinished': 'Nhiệm vụ "{{taskName}}" đã hoàn thành thành công với {{resultCount}} kết quả',
-      'taskFinished_other': 'Nhiệm vụ "{{taskName}}" đã hoàn thành thành công với {{resultCount}} kết quả',
+      'taskFinished': 'Nhiệm vụ "[{{taskName}}]" đã hoàn thành thành công với {{resultCount}} kết quả',
+      'taskFinished_other': 'Nhiệm vụ "[{{taskName}}]" đã hoàn thành thành công với {{resultCount}} kết quả',
       'workflowCompleted': 'Quy trình làm việc đã hoàn thành thành công - {{stepsCount}} bước đã thực hiện',
       'workflowCompleted_other': 'Quy trình làm việc đã hoàn thành thành công - {{stepsCount}} bước đã thực hiện'
     },
     'realtimeIncidents': {
-      'created': 'Sự cố giám sát thời gian thực {{incidentId}} được tạo thành công'
+      'created': 'Sự cố giám sát thời gian thực [#{{incidentId}}] được tạo thành công'
     },
     'realtimeMonitoring': {
       'alerts': {
@@ -926,7 +926,7 @@ export default {
         'realtimeRetrieved': 'Dữ liệu dashboard thời gian thực được truy xuất thành công'
       },
       'incidents': {
-        'created': 'Đã tạo thành công sự cố giám sát thời gian thực {{incidentId}}'
+        'created': 'Đã tạo thành công sự cố giám sát thời gian thực [#{{incidentId}}]'
       },
       'monitoring': {
         'analysisCompleted': 'Phân tích giám sát thời gian thực hoàn tất thành công',
@@ -934,7 +934,7 @@ export default {
         'eventsRetrieved': 'Sự kiện giám sát gần đây được truy xuất thành công',
         'started': 'Giám sát thời gian thực đã được bắt đầu thành công',
         'stopped': 'Giám sát thời gian thực đã được dừng thành công',
-        'threatResolved': 'Mối đe dọa thời gian thực {{threatId}} đã được xử lý thành công',
+        'threatResolved': 'Mối đe dọa thời gian thực [#{{threatId}}] đã được xử lý thành công',
         'threatsRetrieved': 'Trạng thái mối đe dọa thời gian thực được truy xuất thành công'
       }
     },
@@ -944,16 +944,16 @@ export default {
     },
     'security': {
       'incident': {
-        'created': '{{actor}} đã tạo sự cố bảo mật "{{title}}" với mức độ {{severity}} (ID: {{incidentId}}, Loại: {{type}})',
-        'responseExecuted': '{{actor}} đã thực hiện {{actionCount}} hành động phản hồi cho sự cố {{incidentId}} (Loại: {{actionType}}) lúc {{executedAt}}',
-        'retrieved': '{{actor}} đã lấy chi tiết sự cố {{incidentId}} (Trạng thái: {{status}}, Mức độ: {{severity}}, Tạo lúc: {{createdAt}})',
-        'statusUpdated': '{{actor}} đã cập nhật trạng thái sự cố {{incidentId}} từ "{{oldStatus}}" thành "{{newStatus}}" lúc {{timestamp}}'
+        'created': '{{actor}} đã tạo sự cố bảo mật "{{title}}" với mức độ {{severity}} ([#{{incidentId}}], Loại: {{type}})',
+        'responseExecuted': '{{actor}} đã thực hiện {{actionCount}} hành động phản hồi cho sự cố [#{{incidentId}}] (Loại: {{actionType}}) lúc {{executedAt}}',
+        'retrieved': '{{actor}} đã lấy chi tiết sự cố [#{{incidentId}}] (Trạng thái: {{status}}, Mức độ: {{severity}}, Tạo lúc: {{createdAt}})',
+        'statusUpdated': '{{actor}} đã cập nhật trạng thái sự cố [#{{incidentId}}] từ "{{oldStatus}}" thành "{{newStatus}}" lúc {{timestamp}}'
       },
       'incidents': {
-        'created': '{{actor}} đã tạo sự cố bảo mật "{{title}}" với mức độ {{severity}} (ID: {{incidentId}}, Loại: {{type}})',
-        'responseExecuted': '{{actor}} đã thực hiện {{actionCount}} hành động phản hồi cho sự cố {{incidentId}} (Loại: {{actionType}}) lúc {{executedAt}}',
+        'created': '{{actor}} đã tạo sự cố bảo mật "{{title}}" với mức độ {{severity}} ([#{{incidentId}}], Loại: {{type}})',
+        'responseExecuted': '{{actor}} đã thực hiện {{actionCount}} hành động phản hồi cho sự cố [#{{incidentId}}] (Loại: {{actionType}}) lúc {{executedAt}}',
         'retrieved': '{{actor}} đã lấy thành công {{incidentCount}} sự cố bảo mật (trang {{page}}, giới hạn {{limit}}, bộ lọc: {{filters}})',
-        'statusUpdated': '{{actor}} đã cập nhật trạng thái sự cố {{incidentId}} từ "{{oldStatus}}" thành "{{newStatus}}" lúc {{timestamp}}'
+        'statusUpdated': '{{actor}} đã cập nhật trạng thái sự cố [#{{incidentId}}] từ "{{oldStatus}}" thành "{{newStatus}}" lúc {{timestamp}}'
       },
       'monitoring': {
         'started': 'Bắt đầu giám sát thời gian thực thành công'
@@ -962,7 +962,7 @@ export default {
         'statusRetrieved': '{{actor}} đã lấy trạng thái dịch vụ: sức khỏe {{serviceHealth}}, phiên bản {{version}}, thời gian hoạt động {{uptime}} (Kiểm tra lúc: {{checkedAt}})'
       },
       'simulation': {
-        'completed': '{{actor}} đã hoàn thành mô phỏng {{threatType}} với mức độ {{severity}} (ID Mô phỏng: {{simulationId}}) lúc {{completedAt}}'
+        'completed': '{{actor}} đã hoàn thành mô phỏng {{threatType}} với mức độ {{severity}} ([#{{simulationId}}]) lúc {{completedAt}}'
       },
       'statistics': {
         'retrieved': '{{actor}} đã lấy thống kê bảo mật: {{totalIncidents}} tổng, {{activeIncidents}} đang hoạt động, {{resolvedIncidents}} đã giải quyết (Lấy lúc: {{retrievedAt}})'
@@ -972,8 +972,8 @@ export default {
       'cacheConnected': 'Dịch vụ cache đã kết nối thành công đến {{cacheService}}',
       'configurationLoaded': 'Cấu hình hệ thống đã được tải thành công - {{configCount}} cài đặt',
       'configurationLoaded_other': 'Cấu hình hệ thống đã được tải thành công - {{configCount}} cài đặt',
-      'connectionEstablished': 'Kết nối đã được thiết lập thành công đến {{serviceName}}',
-      'databaseConnected': 'Kết nối cơ sở dữ liệu đã được thiết lập thành công đến {{databaseName}}',
+      'connectionEstablished': 'Kết nối đã được thiết lập thành công đến [{{serviceName}}]',
+      'databaseConnected': 'Kết nối cơ sở dữ liệu đã được thiết lập thành công đến [{{databaseName}}]',
       'healthCheckPassed': 'Kiểm tra sức khỏe hệ thống đã vượt qua - tất cả {{componentCount}} thành phần đều khỏe mạnh',
       'healthCheckPassed_other': 'Kiểm tra sức khỏe hệ thống đã vượt qua - tất cả {{componentCount}} thành phần đều khỏe mạnh',
       'operationCompleted': 'Thao tác hệ thống "{{operation}}" đã hoàn thành thành công trong {{duration, number}}ms',
@@ -982,46 +982,46 @@ export default {
       'resourceAllocated': 'Tài nguyên hệ thống đã được phân bổ thành công: {{allocatedMemory, number}}MB bộ nhớ',
       'resourceReleased': 'Tài nguyên hệ thống đã được giải phóng thành công: {{releasedMemory, number}}MB bộ nhớ',
       'rollbackCompleted': 'Khôi phục hệ thống đã hoàn thành thành công về phiên bản {{previousVersion}}',
-      'serviceStarted': 'Dịch vụ hệ thống {{serviceName}} đã khởi động thành công trên cổng {{port}}',
-      'serviceStopped': 'Dịch vụ hệ thống {{serviceName}} đã dừng một cách êm thấm',
-      'taskCompleted': 'Tác vụ nền {{taskName}} đã hoàn thành thành công',
-      'taskScheduled': 'Tác vụ nền {{taskName}} đã được lên lịch cho {{scheduledTime, datetime}}',
+      'serviceStarted': 'Dịch vụ hệ thống [{{serviceName}}] đã khởi động thành công trên cổng {{port}}',
+      'serviceStopped': 'Dịch vụ hệ thống [{{serviceName}}] đã dừng một cách êm thấm',
+      'taskCompleted': 'Tác vụ nền [{{taskName}}] đã hoàn thành thành công',
+      'taskScheduled': 'Tác vụ nền [{{taskName}}] đã được lên lịch cho {{scheduledTime, datetime}}',
       'upgradeCompleted': 'Nâng cấp hệ thống đã hoàn thành thành công lên phiên bản {{newVersion}}'
     },
     'translations': {
       'retrieved': 'Truy xuất bản dịch thành công'
     },
     'user': {
-      'activated': 'Tài khoản người dùng đã được kích hoạt thành công cho {{userName}}',
+      'activated': 'Tài khoản người dùng đã được kích hoạt thành công cho [{{userName}}]',
       'activated_other': '{{count}} tài khoản người dùng đã được kích hoạt thành công',
       'bulkOperationSuccess': 'Thao tác hàng loạt đã hoàn thành: {{successCount}}/{{totalCount}} thành công',
-      'created': 'Tài khoản người dùng đã được tạo thành công cho {{userName}} ({{email}})',
+      'created': 'Tài khoản người dùng đã được tạo thành công cho [{{userName}}] ({{email}})',
       'created_other': '{{count}} tài khoản người dùng đã được tạo thành công',
-      'dataExported': 'Dữ liệu người dùng đã được xuất thành công ({{fileSize, number}}KB) cho {{userName}}',
+      'dataExported': 'Dữ liệu người dùng đã được xuất thành công ({{fileSize, number}}KB) cho [{{userName}}]',
       'dataImported': 'Dữ liệu người dùng đã được nhập thành công - {{importedCount}} bản ghi đã xử lý',
       'dataImported_other': 'Dữ liệu người dùng đã được nhập thành công - {{importedCount}} bản ghi đã xử lý',
-      'deactivated': 'Tài khoản người dùng đã được vô hiệu hóa thành công cho {{userName}}',
+      'deactivated': 'Tài khoản người dùng đã được vô hiệu hóa thành công cho [{{userName}}]',
       'deactivated_other': '{{count}} tài khoản người dùng đã được vô hiệu hóa thành công',
-      'deleted': 'Tài khoản người dùng đã được xóa thành công cho {{userName}} bởi {{deletedBy}}',
+      'deleted': 'Tài khoản người dùng đã được xóa thành công cho [{{userName}}] bởi {{deletedBy}}',
       'deleted_other': '{{count}} tài khoản người dùng đã được xóa thành công',
-      'emailUpdated': 'Địa chỉ email đã được cập nhật từ {{oldEmail}} thành {{newEmail}} cho {{userName}}',
-      'emailVerified': 'Địa chỉ email {{email, lowercase}} đã được xác minh thành công cho {{userName}}',
-      'loginHistory': 'Lịch sử đăng nhập đã được truy xuất: {{entryCount}} mục cho {{userName}}',
-      'loginHistory_other': 'Lịch sử đăng nhập đã được truy xuất: {{entryCount}} mục cho {{userName}}',
-      'passwordChanged': 'Mật khẩu đã được thay đổi thành công cho {{userName}}. {{changedBy}}',
-      'permissionUpdated': 'Quyền người dùng đã được cập nhật thành công cho {{userName}}',
-      'profileCompleted': 'Hồ sơ người dùng hiện đã hoàn thành {{percent, number}}% cho {{userName}}',
-      'profileRetrieved': 'Thông tin cá nhân đã được truy xuất thành công cho {{userName}} ({{userRole}}) bởi [{{requestedBy}}]',
-      'profileUpdated': 'Hồ sơ người dùng đã được cập nhật thành công cho {{userName}} - {{fieldsCount}} trường đã sửa đổi',
-      'profileUpdated_other': 'Hồ sơ người dùng đã được cập nhật thành công cho {{userName}} - {{fieldsCount}} trường đã sửa đổi',
-      'registered': 'Người dùng {{userName}} đã đăng ký thành công với vai trò [{{userRole}}]',
-      'registeredEmailDisabled': 'Tài khoản {{userName}} đã được tạo. Thông báo email hiện đang bị vô hiệu hóa bởi quản trị viên. Vui lòng liên hệ hỗ trợ để kích hoạt tài khoản.',
-      'registeredPendingActivation': 'Đã nhận đăng ký cho {{userName}}. Vui lòng kiểm tra email để xác nhận và kích hoạt tài khoản trước khi đăng nhập.',
-      'roleChanged': 'Vai trò người dùng đã được thay đổi từ {{oldRole}} thành {{newRole}} cho {{userName}}',
-      'sessionTerminated': 'Tất cả phiên đã được chấm dứt thành công cho {{userName}}',
-      'suspended': 'Tài khoản người dùng đã được đình chỉ thành công cho {{userName}} đến {{suspendedUntil, datetime}}',
-      'unsuspended': 'Việc đình chỉ tài khoản người dùng đã được gỡ bỏ cho {{userName}} bởi {{liftedBy}}',
-      'updated': 'Thông tin cá nhân đã được cập nhật thành công cho {{userName}}. Các trường được cập nhật: {{updatedFields}}',
+      'emailUpdated': 'Địa chỉ email đã được cập nhật từ {{oldEmail}} thành {{newEmail}} cho [{{userName}}]',
+      'emailVerified': 'Địa chỉ email {{email, lowercase}} đã được xác minh thành công cho [{{userName}}]',
+      'loginHistory': 'Lịch sử đăng nhập đã được truy xuất: {{entryCount}} mục cho [{{userName}}]',
+      'loginHistory_other': 'Lịch sử đăng nhập đã được truy xuất: {{entryCount}} mục cho [{{userName}}]',
+      'passwordChanged': 'Mật khẩu đã được thay đổi thành công cho [{{userName}}]. {{changedBy}}',
+      'permissionUpdated': 'Quyền người dùng đã được cập nhật thành công cho [{{userName}}]',
+      'profileCompleted': 'Hồ sơ người dùng hiện đã hoàn thành {{percent, number}}% cho [{{userName}}]',
+      'profileRetrieved': 'Thông tin cá nhân đã được truy xuất thành công cho [{{userName}}] ({{userRole}}) bởi [{{requestedBy}}]',
+      'profileUpdated': 'Hồ sơ người dùng đã được cập nhật thành công cho [{{userName}}] - {{fieldsCount}} trường đã sửa đổi',
+      'profileUpdated_other': 'Hồ sơ người dùng đã được cập nhật thành công cho [{{userName}}] - {{fieldsCount}} trường đã sửa đổi',
+      'registered': 'Người dùng [{{userName}}] đã đăng ký thành công với vai trò [{{userRole}}]',
+      'registeredEmailDisabled': 'Tài khoản [{{userName}}] đã được tạo. Thông báo email hiện đang bị vô hiệu hóa bởi quản trị viên. Vui lòng liên hệ hỗ trợ để kích hoạt tài khoản.',
+      'registeredPendingActivation': 'Đã nhận đăng ký cho [{{userName}}]. Vui lòng kiểm tra email để xác nhận và kích hoạt tài khoản trước khi đăng nhập.',
+      'roleChanged': 'Vai trò người dùng đã được thay đổi từ {{oldRole}} thành {{newRole}} cho [{{userName}}]',
+      'sessionTerminated': 'Tất cả phiên đã được chấm dứt thành công cho [{{userName}}]',
+      'suspended': 'Tài khoản người dùng đã được đình chỉ thành công cho [{{userName}}] đến {{suspendedUntil, datetime}}',
+      'unsuspended': 'Việc đình chỉ tài khoản người dùng đã được gỡ bỏ cho [{{userName}}] bởi {{liftedBy}}',
+      'updated': 'Thông tin cá nhân đã được cập nhật thành công cho [{{userName}}]. Các trường được cập nhật: {{updatedFields}}',
       'updated_other': '{{count}} hồ sơ người dùng đã được cập nhật thành công',
       'updatedWithEmailVerification': 'Hồ sơ đã được cập nhật. Vui lòng kiểm tra địa chỉ email mới {{newEmail}} của bạn để xác minh và hoàn tất thay đổi.'
     }
@@ -1494,7 +1494,7 @@ export default {
       'invalid': 'Cập nhật chính sách lưu giữ không hợp lệ'
     },
     'security': {
-      'xssPatternDetected': 'Phát hiện mẫu XSS tiềm ẩn: {{patternName}} không được phép'
+      'xssPatternDetected': 'Phát hiện mẫu XSS tiềm ẩn: [{{patternName}}] không được phép'
     },
     'structureValidation': {
       'conditions': {
@@ -1547,11 +1547,11 @@ export default {
       'invalid': 'Tên đăng nhập chỉ có thể chứa chữ cái, số và gạch dưới',
       'invalidCharacters': 'Tên đăng nhập chỉ có thể chứa chữ cái, số và gạch dưới',
       'required': 'Tên người dùng là bắt buộc',
-      'reserved': 'Tên người dùng "{{username}}" đã được bảo lưu và không thể sử dụng',
+      'reserved': 'Tên người dùng "[{{username}}]" đã được bảo lưu và không thể sử dụng',
       'tooLong': 'Tên đăng nhập không thể vượt quá 30 ký tự',
       'tooShort': 'Tên đăng nhập phải có ít nhất 3 ký tự',
       'tooShort_other': 'Tên người dùng phải có ít nhất {{minLength}} ký tự',
-      'unavailable': 'Tên người dùng "{{username}}" không khả dụng'
+      'unavailable': 'Tên người dùng "[{{username}}]" không khả dụng'
     },
     'filterArrayTooLarge': 'Mảng filter quá lớn (tối đa 500 items)',
     'filterArrayTooLarge_other': 'Mảng bộ lọc với {{count}} mục vượt quá tối đa {{max}}',

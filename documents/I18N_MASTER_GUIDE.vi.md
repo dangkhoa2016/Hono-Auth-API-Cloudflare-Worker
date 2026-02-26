@@ -445,7 +445,7 @@ const message = t(c, 'auth.loginSuccess');
 const currentLang = getCurrentLanguage(c);
 
 // Với interpolation
-const message = t(c, 'user.welcome', { name: 'John' });
+const message = t(c, 'user.welcome', { userName: 'John' });
 
 // Legacy detection (vẫn hoạt động)
 const lang = detectLang(c);
@@ -617,11 +617,17 @@ Các loại format được hỗ trợ:
 - `datetime`: Định dạng ngày giờ
 - `time`: Định dạng giờ
 
+**Quy ước hiển thị hiện tại (đồng bộ với locale files):**
+
+- Placeholder liên quan đến tên được bọc ngoặc vuông: `[{{userName}}]`
+- Placeholder liên quan đến ID được bọc ngoặc vuông và thêm tiền tố `#`: `[#{{incidentId}}]`
+
 ```javascript
 {
   "success": {
     "user": {
-      "updated": "User {{name, capitalize}} updated successfully",
+      "updated": "User [{{userName, capitalize}}] updated successfully",
+      "incidentResolved": "Incident [#{{incidentId}}] resolved successfully",
       "dataExported": "User data exported ({{size, number}} KB)",
       "emailVerified": "Email {{email, lowercase}} verified successfully"
     }

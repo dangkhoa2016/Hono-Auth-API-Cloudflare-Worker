@@ -314,13 +314,23 @@ class LoginMessageFormatTests {
       const nameMatch = message.match(/as (.+) \(/);
       this.assert.exists(nameMatch, 'Message should contain user name before role');
 
-      const extractedName = nameMatch[1];
+      const extractedName = nameMatch[1].trim();
+      const normalizedName = extractedName.replace(/^\[(.*)\]$/, '$1');
       this.logger.info(`Extracted user name: "${extractedName}"`);
+
+      // Current i18n display convention wraps user names in square brackets.
+      // Keep backward compatibility by normalizing before semantic validation.
+      const isBracketedName = /^\[.*\]$/.test(extractedName);
+      this.assert.assertEqual(
+        isBracketedName || normalizedName === extractedName,
+        true,
+        'Extracted user name should be plain text or bracket-wrapped format'
+      );
 
       // Validate that the name is either the database full_name or email
       // From the actual test results, we see "Test Regular User" is being used
-      const isValidName = extractedName === 'Test Regular User' || extractedName === 'Updated Regular User Name' ||
-                         extractedName === TEST_USERS.valid.email;
+      const isValidName = normalizedName === 'Test Regular User' || normalizedName === 'Updated Regular User Name' ||
+             normalizedName === TEST_USERS.valid.email;
 
       if (!isValidName) {
         throw new Error(`Extracted name should match expected user name. Got: "${extractedName}"`);

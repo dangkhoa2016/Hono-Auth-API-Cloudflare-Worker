@@ -444,7 +444,7 @@ app.get('/api', (c) => {
 const message = t(c, 'auth.loginSuccess');
 
 // With interpolation
-const message = t(c, 'user.welcome', { name: 'John' });
+const message = t(c, 'user.welcome', { userName: 'John' });
 
 // With fallback
 const message = t(c, 'missing.key', { fallback: 'Default text' });
@@ -582,11 +582,17 @@ Supported format types:
 - `datetime`: Format date and time
 - `time`: Format time
 
+**Current display conventions (aligned with locale files):**
+
+- Name-related placeholders are wrapped in square brackets: `[{{userName}}]`
+- ID-related placeholders are wrapped in square brackets and prefixed with `#`: `[#{{incidentId}}]`
+
 ```javascript
 {
   "success": {
     "user": {
-      "updated": "User {{name, capitalize}} updated successfully",
+      "updated": "User [{{userName, capitalize}}] updated successfully",
+      "incidentResolved": "Incident [#{{incidentId}}] resolved successfully",
       "dataExported": "User data exported ({{size, number}} KB)",
       "emailVerified": "Email {{email, lowercase}} verified successfully"
     }
