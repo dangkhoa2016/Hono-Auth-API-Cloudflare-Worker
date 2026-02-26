@@ -593,7 +593,7 @@ kvAdmin.post('/audit/configs/feature/:feature/toggle',
       if (!key || !isValidKVKey(key)) {
         return c.json({
           success: false,
-          error: t(c, 'kv.featureNotFound')
+          error: t(c, 'errors.kv.featureNotFound')
         }, 400);
       }
 
@@ -604,7 +604,7 @@ kvAdmin.post('/audit/configs/feature/:feature/toggle',
       if (typeof enabled !== 'boolean') {
         return c.json({
           success: false,
-          error: t(c, 'kv.invalidFeatureValue')
+          error: t(c, 'errors.kv.invalidFeatureValue')
         }, 400);
       }
 
