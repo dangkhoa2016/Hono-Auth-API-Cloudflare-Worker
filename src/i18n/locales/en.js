@@ -1122,6 +1122,9 @@ export default {
       'category': {
         'invalid': 'Category must be one of: {{allowedValues}}'
       },
+      'categoryFilter': {
+        'invalid': 'Category filter must be one of: {{allowedValues}}'
+      },
       'channelType': {
         'invalid': 'Channel type must be one of: {{allowedValues}}'
       },

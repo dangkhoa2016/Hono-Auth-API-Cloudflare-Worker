@@ -1122,6 +1122,9 @@ export default {
       'category': {
         'invalid': 'Danh mục phải là một trong: {{allowedValues}}'
       },
+      'categoryFilter': {
+        'invalid': 'Bộ lọc danh mục phải là một trong: {{allowedValues}}'
+      },
       'channelType': {
         'invalid': 'Loại kênh phải là một trong: {{allowedValues}}'
       },

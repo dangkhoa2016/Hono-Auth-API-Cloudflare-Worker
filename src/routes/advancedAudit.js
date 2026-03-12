@@ -660,6 +660,7 @@ advancedAudit.post('/archive',
       case 'restore':
         result = await archivalService.restoreArchive({
           archive_id: body.archive_id,
+          date_range: body.date_range,
           restore_location: body.restore_location || 'primary_storage'
         });
         break;
