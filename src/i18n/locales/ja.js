@@ -1166,6 +1166,9 @@ export default {
       },
       'userRole': {
         'invalid': "無効: ユーザーロールは次のいずれかである必要があります: {{allowedValues}}"
+      },
+      'categoryFilter': {
+        'invalid': "Category filter must be one of: {{allowedValues}}"
       }
     },
     'fieldRequired': {

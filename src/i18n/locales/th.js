@@ -1166,6 +1166,9 @@ export default {
       },
       'userRole': {
         'invalid': "บทบาทผู้ใช้ต้องเป็นหนึ่งใน: {{allowedValues}}"
+      },
+      'categoryFilter': {
+        'invalid': "Category filter must be one of: {{allowedValues}}"
       }
     },
     'fieldRequired': {
