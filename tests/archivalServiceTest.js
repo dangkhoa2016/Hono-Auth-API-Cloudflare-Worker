@@ -1053,7 +1053,6 @@ class ArchivalServiceTest {
       dryRun: true,
       batchSize: batchSize,
       categoryFilter: 'general',
-      optimizeStorage: true
     });
 
     const endTime = Date.now();

@@ -56,7 +56,7 @@ export class AuditRetentionService extends BaseService {
       const i18nSchemas = createAuditRetentionI18nSchemas(lang);
       switch (schemaType) {
       case 'retention':
-        schema = i18nSchemas.retentionPolicySchema;
+        schema = i18nSchemas.auditRetentionPolicySchema;
         break;
       case 'cleanup':
         schema = i18nSchemas.cleanupSimulationSchema;
@@ -138,7 +138,7 @@ export class AuditRetentionService extends BaseService {
       if (this.kvConfig) {
         const kvPolicy = await this.kvConfig.get(AUDIT_RETENTION_POLICY_KEY);
         if (kvPolicy) {
-          policy = JSON.parse(kvPolicy);
+          policy = typeof kvPolicy === 'string' ? JSON.parse(kvPolicy) : kvPolicy;
         }
       }
 
@@ -231,7 +231,7 @@ export class AuditRetentionService extends BaseService {
 
       // Save to KV store if available
       if (this.kvConfig) {
-        await this.kvConfig.set(AUDIT_RETENTION_POLICY_KEY, JSON.stringify(finalValidation.data));
+        await this.kvConfig.set(AUDIT_RETENTION_POLICY_KEY, finalValidation.data);
       }
 
       auditRetentionService_log('Retention policy updated successfully');

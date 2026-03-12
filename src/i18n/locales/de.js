@@ -1166,6 +1166,9 @@ export default {
       },
       'userRole': {
         'invalid': "Ungültig: Benutzerrolle muss einer der folgenden sein: {{allowedValues}}"
+      },
+      'categoryFilter': {
+        'invalid': "Category filter must be one of: {{allowedValues}}"
       }
     },
     'fieldRequired': {

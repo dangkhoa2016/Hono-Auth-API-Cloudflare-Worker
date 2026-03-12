@@ -672,42 +672,86 @@ export class AuditArchivalService extends BaseService {
    * @param {Object} options - Restore options
    * @returns {Promise<Object>} Restore result
    */
-  restoreArchive(options = {}) {
+  async restoreArchive(options = {}) {
     try {
-      const { archive_id, restore_location = 'primary_storage' } = options;
+      const { archive_id, date_range, restore_location = 'primary_storage' } = options;
 
       auditArchival_log(`Archive restore requested: ${JSON.stringify(options)}`);
+
+      // If a date range is provided, use the restoreArchivedLogs method
+      if (date_range && date_range.start && date_range.end) {
+        const restoreResult = await this.restoreArchivedLogs({
+          startDate: date_range.start,
+          endDate: date_range.end,
+          dryRun: options.dryRun || false
+        });
+        
+        return {
+          success: true,
+          restore_location,
+          restored_count: restoreResult.restored_count,
+          message: `Successfully restored ${restoreResult.restored_count} logs from ${date_range.start} to ${date_range.end}`
+        };
+      }
 
       if (!archive_id) {
         return {
           success: false,
-          error: 'Archive ID is required',
-          message: 'No archive ID provided'
+          error: 'Archive ID or date_range is required',
+          message: 'No archive criteria provided'
         };
       }
 
-      // In a real implementation, this would find the specific archive
-      // For now, simulate that the archive doesn't exist
-      if (archive_id === 'test_archive_123') {
+      // Restore specific log by its original ID
+      const countQuery = `SELECT COUNT(*) as count FROM audit_logs_archive WHERE original_id = ?`;
+      const countResult = await this.dbService.select(countQuery, [archive_id], true);
+      
+      if (!countResult || countResult.count === 0) {
         return {
           success: false,
           error: 'Archive not found',
           archive_id,
-          message: `Archive ${archive_id} not found in the system`
+          message: `Archive data with ID ${archive_id} not found in the archive table`
         };
       }
 
-      // Simulate successful restore
-      const restoreResult = {
+      // Check if it already exists in hot storage to prevent constraint violations
+      const hotCountQuery = `SELECT COUNT(*) as count FROM audit_logs WHERE id = ?`;
+      const hotCountResult = await this.dbService.select(hotCountQuery, [archive_id], true);
+      
+      if (hotCountResult && hotCountResult.count > 0) {
+        return {
+          success: false,
+          error: 'Already restored',
+          archive_id,
+          message: `Log with ID ${archive_id} already exists in hot storage`
+        };
+      }
+
+      // Perform actual restore
+      const restoreQuery = `
+        INSERT INTO audit_logs (id, actor_id, actor_role, action, target_type, target_id, details, ip_address, user_agent, timestamp)
+        SELECT original_id, actor_id, actor_role, action, target_type, target_id, details, ip_address, user_agent, timestamp
+        FROM audit_logs_archive
+        WHERE original_id = ?
+      `;
+
+      const result = await this.dbService.insert(restoreQuery, [archive_id]);
+      
+      // Optionally clean it up from archive table
+      const deleteQuery = `DELETE FROM audit_logs_archive WHERE original_id = ?`;
+      await this.dbService.update(deleteQuery, [archive_id]);
+
+      const finalResult = {
         success: true,
         archive_id,
         restore_location,
-        restored_count: 150, // Simulated count
+        restored_count: result.changes || 1,
         message: `Successfully restored archive ${archive_id} to ${restore_location}`
       };
 
-      auditArchival_log(`Archive restore completed: ${JSON.stringify(restoreResult)}`);
-      return restoreResult;
+      auditArchival_log(`Archive restore completed: ${JSON.stringify(finalResult)}`);
+      return finalResult;
 
     } catch (error) {
       auditArchival_log(`Error restoring archive: ${error.message}`);
