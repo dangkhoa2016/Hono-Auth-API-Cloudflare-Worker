@@ -49,6 +49,22 @@ tokenBlacklistRoutes.post('/', zValidator('json', createBlacklistSchema), async 
     const data = c.req.valid('json');
     const service = createTokenBlacklistService(c.env);
 
+    if (!data.userId) {
+      // Attempt to auto-detect the user's ID associated with this token from audit logs
+      const auditLog = await service.dbService.select(
+        'SELECT user_id FROM token_audit_logs WHERE token_jti = ? LIMIT 1',
+        [data.jti],
+        true
+      );
+      
+      if (auditLog && auditLog.user_id) {
+        data.userId = auditLog.user_id;
+        adminRoutes_log(`Auto-detected userId=${data.userId} for jti=${data.jti}`);
+      } else {
+        throw new Error('User ID is required. The system could not auto-detect it from the provided JTI.');
+      }
+    }
+
     adminRoutes_log(`Adding jti=${data.jti} to blacklist`);
 
     const success = await service.addToBlacklist(data);
