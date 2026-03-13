@@ -111,4 +111,138 @@ export class TokenAuditService extends BaseService {
       return 0;
     }
   }
+
+  // --- Admin CRUD Methods ---
+
+  async listLogs({ page = 1, limit = 20, search = '' }) {
+    try {
+      const offset = (page - 1) * limit;
+      const searchPattern = search ? `%${search}%` : '%';
+
+      const countResult = await this.dbService.select(
+        `SELECT COUNT(tal.id) as total 
+         FROM token_audit_logs tal
+         LEFT JOIN users u ON tal.user_id = u.id
+         WHERE tal.action LIKE ? OR tal.token_jti LIKE ? OR u.email LIKE ? OR tal.ip_address LIKE ?`,
+        [searchPattern, searchPattern, searchPattern, searchPattern],
+        true
+      );
+      const total = countResult?.total || 0;
+
+      const items = await this.dbService.select(
+        `SELECT tal.*, 
+                u.email as user_email, 
+                u.full_name as user_full_name
+         FROM token_audit_logs tal
+         LEFT JOIN users u ON tal.user_id = u.id
+         WHERE tal.action LIKE ? OR tal.token_jti LIKE ? OR u.email LIKE ? OR tal.ip_address LIKE ?
+         ORDER BY tal.created_at DESC
+         LIMIT ? OFFSET ?`,
+        [searchPattern, searchPattern, searchPattern, searchPattern, limit, offset]
+      );
+
+      return {
+        items,
+        total,
+        page,
+        limit,
+        totalPages: Math.ceil(total / limit)
+      };
+    } catch (error) {
+      error_log(`Failed to list token audit logs: ${error.message}`);
+      throw error;
+    }
+  }
+
+  async getLogDetails(id) {
+    try {
+      const log = await this.dbService.select(
+        `SELECT tal.*, 
+                u.email as user_email, 
+                u.full_name as user_full_name,
+                u.role as user_role
+         FROM token_audit_logs tal
+         LEFT JOIN users u ON tal.user_id = u.id
+         WHERE tal.id = ?`,
+        [id],
+        true
+      );
+      return log || null;
+    } catch (error) {
+      error_log(`Failed to get token audit log ${id}: ${error.message}`);
+      throw error;
+    }
+  }
+
+  async updateLog(id, data) {
+    if (!id || !data) return false;
+
+    try {
+      const { action, success, errorMessage, metadata } = data;
+      
+      const setClauses = [];
+      const params = [];
+      
+      if (action !== undefined) {
+        setClauses.push('action = ?');
+        params.push(action);
+      }
+      if (success !== undefined) {
+        setClauses.push('success = ?');
+        params.push(success ? 1 : 0);
+      }
+      if (errorMessage !== undefined) {
+        setClauses.push('error_message = ?');
+        params.push(errorMessage);
+      }
+      if (metadata !== undefined) {
+        setClauses.push('metadata = ?');
+        params.push(serializeMetadata(metadata));
+      }
+
+      if (setClauses.length === 0) return true; // Nothing to update
+      
+      params.push(id);
+      
+      const result = await this.dbService.update(
+        `UPDATE token_audit_logs 
+         SET ${setClauses.join(', ')}
+         WHERE id = ?`,
+        params
+      );
+      return result?.changes > 0;
+    } catch (error) {
+      error_log(`Failed to update token audit log ${id}: ${error.message}`);
+      throw error;
+    }
+  }
+
+  async deleteLog(id) {
+    try {
+      const result = await this.dbService.delete(
+        'DELETE FROM token_audit_logs WHERE id = ?',
+        [id]
+      );
+      return result?.changes > 0;
+    } catch (error) {
+      error_log(`Failed to delete token audit log ${id}: ${error.message}`);
+      throw error;
+    }
+  }
+
+  async bulkDeleteLogs(ids) {
+    if (!ids || ids.length === 0) return 0;
+
+    try {
+      const placeholders = ids.map(() => '?').join(',');
+      const result = await this.dbService.delete(
+        `DELETE FROM token_audit_logs WHERE id IN (${placeholders})`,
+        ids
+      );
+      return result?.changes || 0;
+    } catch (error) {
+      error_log(`Failed to bulk delete token audit logs: ${error.message}`);
+      throw error;
+    }
+  }
 }
