@@ -9,7 +9,7 @@ export const listQuerySchema = z.object({
 export const createBlacklistSchema = z.object({
   jti: z.string().min(1),
   expiresAt: z.union([z.number(), z.string(), z.date()]),
-  userId: z.number().int().positive(),
+  userId: z.number().int().positive().optional(),
   reason: z.string().optional()
 });
 

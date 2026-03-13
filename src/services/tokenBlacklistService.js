@@ -33,10 +33,21 @@ export class TokenBlacklistService extends BaseService {
       throw new Error('Missing required parameters for blacklist');
     }
 
+    // Verify if userId exists before inserting
+    const userExists = await this.dbService.select(
+      'SELECT id FROM users WHERE id = ? LIMIT 1',
+      [userId],
+      true
+    );
+    
+    if (!userExists) {
+      throw new Error(`User ID ${userId} does not exist in the database.`);
+    }
+
     const expiresIso = toIsoDate(expiresAt);
 
     try {
-      await this.dbService.insert(
+      const result = await this.dbService.insert(
         `INSERT INTO token_blacklist (jti, user_id, expires_at, reason, blacklisted_at, created_at, updated_at)
          VALUES (?, ?, ?, ?, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP)
          ON CONFLICT(jti) DO UPDATE SET
@@ -46,11 +57,16 @@ export class TokenBlacklistService extends BaseService {
            updated_at = CURRENT_TIMESTAMP`,
         [jti, userId, expiresIso, reason]
       );
+
+      if (!result) {
+        throw new Error('Database insertion failed. Please check if userId exists and parameters are valid.');
+      }
+
       tokenBlacklistService_log(`Blacklisted token jti=${jti} until ${expiresIso}`);
       return true;
     } catch (error) {
       error_log(`Failed to blacklist token ${jti}: ${error.message}`);
-      return false;
+      throw error;
     }
   }
 
