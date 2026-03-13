@@ -40,6 +40,9 @@ class TokenBlacklistTests {
 
     try {
       await this.setupAuthentication();
+      await this.testCreateBlacklistEntryAutoDetectFail();
+      await this.testCreateBlacklistEntryInvalidUserId();
+      await this.testCreateBlacklistEntryAutoDetectSuccess();
       await this.testCreateBlacklistEntry();
       await this.testListBlacklistTokens();
       await this.testGetBlacklistEntry();
@@ -80,6 +83,96 @@ class TokenBlacklistTests {
     } catch (error) {
       throw new Error(`Auth setup failed: ${error.message}`);
     }
+  }
+
+  async testCreateBlacklistEntryAutoDetectFail() {
+    this.logger.logSectionHeader('POST /api/admin/token-blacklist - Auto Detect Fails (Missing UserID & Unknown JTI)');
+
+    const dummyJti = `unknown-jti-${Date.now()}`;
+    const expiresAt = new Date(Date.now() + 3600000).toISOString();
+
+    const payload = {
+      jti: dummyJti,
+      expiresAt: expiresAt,
+      reason: 'Should Fail Auto Detect'
+    };
+
+    const res = await this.client.post(API_ENDPOINTS.adminTokenBlacklist, payload);
+
+    this.assert.assertStatus(res.status, 500, 'Should return 500 due to Error thrown in route');
+    this.assert.assertTrue(res.data.success === false, 'Response success should be false');
+    this.assert.assertTrue(res.data.error.includes('User ID is required'), 'Error message should complain about missing User ID');
+
+    this.logger.success('Auto Detect Fail Check passed');
+  }
+
+  async testCreateBlacklistEntryInvalidUserId() {
+    this.logger.logSectionHeader('POST /api/admin/token-blacklist - Invalid User ID');
+
+    const dummyJti = `invalid-user-jti-${Date.now()}`;
+    const expiresAt = new Date(Date.now() + 3600000).toISOString();
+    const invalidUserId = 999999; // Very likely does not exist
+
+    const payload = {
+      jti: dummyJti,
+      expiresAt: expiresAt,
+      userId: invalidUserId,
+      reason: 'Should Fail Invalid User'
+    };
+
+    const res = await this.client.post(API_ENDPOINTS.adminTokenBlacklist, payload);
+
+    this.assert.assertStatus(res.status, 500, 'Should return 500 due to Error thrown in service');
+    this.assert.assertTrue(res.data.success === false, 'Response success should be false');
+    this.assert.assertTrue(res.data.error.includes('does not exist in the database'), 'Error message should mention nonexistent User ID');
+
+    this.logger.success('Invalid User ID Fail Check passed');
+  }
+
+  async testCreateBlacklistEntryAutoDetectSuccess() {
+    this.logger.logSectionHeader('POST /api/admin/token-blacklist - Auto Detect Success');
+
+    // 1. Create a dummy login to get a real token and JTI in the audit logs
+    const loginRes = await this.client.post(API_ENDPOINTS.login, {
+      email: TEST_USERS.admin.email, // using admin just to not log out super_admin
+      password: TEST_USERS.admin.password
+    });
+    
+    if (!loginRes.data.success) {
+      throw new Error('Failed to create dummy login for auto-detect test');
+    }
+
+    const dummyToken = loginRes.data.data.token || loginRes.data.data.access_token;
+    
+    // Parse JWT to extract JTI (naive base64 decode)
+    const payloadBase64 = dummyToken.split('.')[1];
+    const payloadStr = Buffer.from(payloadBase64, 'base64').toString('utf-8');
+    const payloadObj = JSON.parse(payloadStr);
+    const realJti = payloadObj.jti;
+
+    if (!realJti) {
+      throw new Error('No JTI found in the dummy login token');
+    }
+
+    // 2. Blacklist without providing userId
+    const expiresAt = new Date(Date.now() + 3600000).toISOString();
+    const payload = {
+      jti: realJti,
+      expiresAt: expiresAt,
+      reason: 'Auto Detect Test'
+    };
+
+    const res = await this.client.post(API_ENDPOINTS.adminTokenBlacklist, payload);
+
+    if (res.status !== 201) {
+      console.log('Auto Detect Success failed with status:', res.status);
+      console.log('Response body:', res.data);
+    }
+
+    this.assert.assertStatus(res.status, 201, 'Should return 201 Created');
+    this.assert.assertTrue(res.data.success, 'Response success should be true');
+
+    this.logger.success('Auto Detect Success Check passed');
   }
 
   async testCreateBlacklistEntry() {
