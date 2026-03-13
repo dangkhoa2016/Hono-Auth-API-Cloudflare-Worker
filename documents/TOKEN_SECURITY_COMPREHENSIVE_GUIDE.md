@@ -101,3 +101,14 @@ await tokenAuditService.logTokenAction('refresh', user.id, {
 - No dedicated worker/scheduler yet for blacklist/audit cleanup (opportunistic only).
 - No admin/device session management endpoints/UI.
 - No KMS-backed key rotation process yet.
+
+### 8. Admin CRUD APIs for Token Audit (`/api/admin/token-audit`)
+
+Super Admins can manage the security audit logs via the REST API.
+This is meant for emergency rectifications or analyzing specific issues matching JWT records, although editing logs manually is usually discouraged in production environments outside specific needs.
+
+- `GET /api/admin/token-audit` : Retrieve a paginated list of token audits. Accepts `?search=`, `?page=`, `?limit=`.
+- `GET /api/admin/token-audit/:id` : Retrieve details of a specific audit log by its primary ID.
+- `PUT /api/admin/token-audit/:id` : Allows updates to an audit log fields (e.g., `errorMessage`, `action`, `success`, `metadata`).
+- `DELETE /api/admin/token-audit/:id` : Delete a single audit log.
+- `POST /api/admin/token-audit/bulk-delete` : Delete multiple token audit logs simultaneously (Payload: `{ "ids": [1, 2, 3] }`).
