@@ -11,6 +11,7 @@ import userRoutes from '../routes/user.js';
 import adminRoutes from '../routes/admin.js';
 import kvAdminRoutes from '../routes/kvAdmin.js';
 import tokenBlacklistRoutes from '../routes/tokenBlacklist.js';
+import tokenAuditRoutes from '../routes/tokenAudit.js';
 import auditRoutes from '../routes/audit.js';
 import advancedAuditRoutes from '../routes/advancedAudit.js';
 import realtimeMonitoringRoutes from '../routes/realtimeMonitoring.js';
@@ -35,6 +36,7 @@ authSubApp.route('/user', userRoutes);
 export const adminSubApp = new Hono();
 adminSubApp.route('/admin', adminRoutes);
 adminSubApp.route('/admin/token-blacklist', tokenBlacklistRoutes);
+adminSubApp.route('/admin/token-audit', tokenAuditRoutes);
 adminSubApp.route('/kv-admin', kvAdminRoutes);
 
 /**

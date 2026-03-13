@@ -100,3 +100,13 @@ await tokenAuditService.logTokenAction('refresh', user.id, {
 - Chưa có worker/scheduler riêng cho cleanup blacklist/audit (hiện chỉ opportunistic).
 - Chưa có endpoint/UI quản trị thiết bị/phiên đăng nhập.
 - Chưa có quy trình xoay vòng khóa với KMS.
+
+### 8. API Quản lý CRUD dành cho Token Audit (`/api/admin/token-audit`)
+
+Quyền Super Admin có thể sử dụng các REST API để quản lý (xem, sửa, xoá) thông tin rà soát và kiểm toán Token. Mặc dù việc sửa đổi log là không được khuyến khích trong môi trường thật, bộ công cụ này vẫn được cung cấp cho mục đích bảo trì đặc biệt.
+
+- `GET /api/admin/token-audit` : Lấy danh sách phân trang các log Audit. Hỗ trợ query `?search=`, `?page=`, `?limit=`.
+- `GET /api/admin/token-audit/:id` : Lấy thông tin chi tiết một log Audit thông qua ID.
+- `PUT /api/admin/token-audit/:id` : Cập nhật nội dung log (Hỗ trợ cấu trúc Payload JSON để đổi `errorMessage`, `action`, `success`, `metadata`).
+- `DELETE /api/admin/token-audit/:id` : Xoá một log Audit cụ thể.
+- `POST /api/admin/token-audit/bulk-delete` : Xoá hàng loạt log Audit (Payload: `{ "ids": [1, 2, 3] }`).
