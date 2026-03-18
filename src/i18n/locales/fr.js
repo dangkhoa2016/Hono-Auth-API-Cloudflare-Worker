@@ -867,6 +867,7 @@ export default {
         'retrieved': "{{configCount}} configurations récupérées avec succès par {{actor}} ({{allowedKeys}} clés autorisées)"
       },
       'rateLimit': {
+        'listed': "Clés de limite de débit listées : {{count}} clés trouvées",
         'batchDeleteDryRun': "Simulation de suppression par lot de limite de débit : {{count}} clés seront supprimées ({{failed}} échecs)",
         'batchDeleted': "Suppression par lot de limite de débit : {{count}} clés supprimées ({{failed}} échecs)",
         'cleanDryRun': "Simulation de nettoyage de limite de débit : {{count}} clés seront supprimées (préfixe : {{prefix}})",

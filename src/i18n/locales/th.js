@@ -867,6 +867,7 @@ export default {
         'retrieved': "ดึงข้อมูลการกำหนดค่า {{configCount}} รายการสำเร็จโดย {{actor}} ({{allowedKeys}} คีย์ที่อนุญาต)"
       },
       'rateLimit': {
+        'listed': "แสดงรายการคีย์ขีดจำกัดอัตรา: พบ {{count}} คีย์",
         'batchDeleteDryRun': "ทดลองลบขีดจำกัดอัตราแบบกลุ่ม: {{count}} คีย์จะถูกลบ ({{failed}} ล้มเหลว)",
         'batchDeleted': "ลบขีดจำกัดอัตราแบบกลุ่ม: {{count}} คีย์ถูกลบ ({{failed}} ล้มเหลว)",
         'cleanDryRun': "ทดลองทำความสะอาดขีดจำกัดอัตรา: {{count}} คีย์จะถูกลบ (คำนำหน้า: {{prefix}})",

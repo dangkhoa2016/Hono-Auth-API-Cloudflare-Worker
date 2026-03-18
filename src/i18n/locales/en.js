@@ -867,6 +867,7 @@ export default {
         'retrieved': 'Successfully retrieved {{configCount}} configurations by {{actor}} ({{allowedKeys}} allowed keys)'
       },
       'rateLimit': {
+        'listed': 'Rate limit keys listed: {{count}} keys found',
         'batchDeleteDryRun': 'Rate limit batch delete dry run: {{count}} keys would be deleted ({{failed}} failed)',
         'batchDeleted': 'Rate limit batch delete: {{count}} keys deleted ({{failed}} failed)',
         'cleanDryRun': 'Rate limit clean dry run: {{count}} keys would be deleted (prefix: {{prefix}})',

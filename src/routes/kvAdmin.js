@@ -651,6 +651,67 @@ kvAdmin.post('/audit/configs/feature/:feature/toggle',
 // ==========================================================================
 
 /**
+ * GET /api/kv-admin/rate-limits - List rate limit keys
+ */
+kvAdmin.get('/rate-limits', async (c) => {
+  try {
+    const prefix = c.req.query('prefix') || '';
+    const limit = parseInt(c.req.query('limit') || '100', 10);
+    const cursor = c.req.query('cursor');
+
+    const kvService = c.kvConfig;
+    
+    const options = { limit };
+    if (prefix) options.prefix = prefix;
+    if (cursor) options.cursor = cursor;
+
+    const list = await kvService.listRaw(options);
+    
+    const keysInfo = await Promise.all(list.keys.map(async (key) => {
+      try {
+        const valueStr = await kvService.getRaw(key.name);
+        let value = valueStr;
+        try {
+          if (valueStr && typeof valueStr === 'string' && (valueStr.startsWith('{') || valueStr.startsWith('['))) {
+            value = JSON.parse(valueStr);
+          }
+        } catch (e) {
+          // Keep as string if parsing fails
+        }
+        
+        return {
+          name: key.name,
+          expiration: key.expiration,
+          metadata: key.metadata,
+          value: value
+        };
+      } catch (e) {
+        return {
+          name: key.name,
+          error: 'Failed to retrieve value'
+        };
+      }
+    }));
+    
+    kvAdminRoutes_log(`Listed rate limits: ${list.keys.length} keys`);
+
+    return c.json({
+      success: true,
+      data: {
+        keys: keysInfo,
+        list_complete: list.list_complete,
+        cursor: list.cursor
+      },
+      message: tSuccess(c, 'kv.rateLimit.listed', {
+        count: keysInfo.length
+      }) || 'Listed rate limit keys successfully'
+    });
+  } catch (error) {
+    return await handleStandardError(c, error, 'Failed to list rate limits', kvAdminRoutes_log, 'kvAdmin.rateLimitListFailed');
+  }
+});
+
+/**
  * POST /api/kv-admin/rate-limits/clean - Clean rate limit keys
  */
 kvAdmin.post('/rate-limits/clean', async (c) => {
