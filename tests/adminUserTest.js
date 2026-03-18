@@ -447,6 +447,14 @@ class AdminUserTests {
       this.assert.assertEqual(response.data.success, true, 'System health check should be successful');
       this.assert.exists(response.data.data.status, 'Should return health status');
 
+      // Verify new security metrics are included in the results
+      const systemSecurity = response.data.data.system?.security;
+      this.assert.exists(systemSecurity, 'Should return system security object');
+      // Using typeof check or inequality to undefined because values could be 0, which is falsy 
+      this.assert.assertTrue(systemSecurity.recentFailedLogins !== undefined, 'Should include recentFailedLogins');
+      this.assert.assertTrue(systemSecurity.totalFailedAttempts !== undefined, 'Should include totalFailedAttempts');
+      this.assert.assertTrue(systemSecurity.uniqueIpsWithFailures !== undefined, 'Should include uniqueIpsWithFailures');
+
       this.logger.success('System health test completed successfully');
     } catch (error) {
       this.logger.error(`[testSystemHealth] System health test failed: ${error.message}`);

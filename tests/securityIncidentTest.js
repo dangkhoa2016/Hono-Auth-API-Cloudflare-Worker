@@ -280,9 +280,13 @@ class SecurityIncidentResponseTests {
       this.assert.assertSuccess(response.data, 'Failed to get statistics');
       this.assert.assertHasField(response.data.data, 'total', 'Statistics should have total count');
       this.assert.assertHasField(response.data.data, 'byStatus', 'Statistics should have status breakdown');
+      this.assert.assertHasField(response.data.data.byStatus, 'detected', 'Status breakdown should have detected count');
+      this.assert.assertHasField(response.data.data.byStatus, 'resolved', 'Status breakdown should have resolved count');
       this.assert.assertHasField(response.data.data, 'bySeverity', 'Statistics should have severity breakdown');
+      this.assert.assertHasField(response.data.data.bySeverity, 'critical', 'Severity breakdown should have critical count');
       this.assert.assertHasField(response.data.data, 'recent', 'Statistics should have recent counts');
       this.assert.assertHasField(response.data.data, 'openIncidents', 'Statistics should have open incidents count');
+      this.assert.assertHasField(response.data.data, 'avgResolutionTime', 'Statistics should have average resolution time');
 
       this.logger.success(`Statistics: ${response.data.data.total} total incidents, ${response.data.data.openIncidents} open`);
       this.logger.success('Statistics retrieval completed successfully');

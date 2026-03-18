@@ -38,13 +38,13 @@ export class AuditAnalyticsService extends BaseService {
         this.dbService.select(`
           SELECT 
             COUNT(*) as count,
-            details->>'$.ipAddress' as ip_address,
+            ip_address,
             COUNT(DISTINCT actor_id) as affected_users,
             MAX(timestamp) as last_attempt
           FROM audit_logs 
-          WHERE action = 'login_failed' 
+          WHERE (LOWER(action) LIKE '%login%' OR target_identifier LIKE '%/auth/login%') AND status != 'SUCCESS'
             AND timestamp >= ${timeframeSql}
-          GROUP BY details->>'$.ipAddress'
+          GROUP BY ip_address
           ORDER BY count DESC
           LIMIT 10
         `, []),
@@ -52,7 +52,7 @@ export class AuditAnalyticsService extends BaseService {
         // Suspicious IP activity
         this.dbService.select(`
           SELECT 
-            details->>'$.ipAddress' as ip_address,
+            ip_address,
             COUNT(*) as total_requests,
             COUNT(DISTINCT action) as unique_actions,
             COUNT(DISTINCT actor_id) as unique_users,
@@ -60,8 +60,8 @@ export class AuditAnalyticsService extends BaseService {
             MAX(timestamp) as last_seen
           FROM audit_logs 
           WHERE timestamp >= ${timeframeSql}
-            AND details->>'$.ipAddress' IS NOT NULL
-          GROUP BY details->>'$.ipAddress'
+            AND ip_address IS NOT NULL
+          GROUP BY ip_address
           HAVING total_requests > 100 OR unique_users > 10
           ORDER BY total_requests DESC
           LIMIT 20
@@ -85,13 +85,13 @@ export class AuditAnalyticsService extends BaseService {
         this.dbService.select(`
           SELECT 
             COUNT(*) as rate_limit_events,
-            COUNT(DISTINCT details->>'$.ipAddress') as blocked_ips,
-            details->>'$.ipAddress' as ip_address,
+            COUNT(DISTINCT ip_address) as blocked_ips,
+            ip_address,
             COUNT(*) as blocks_per_ip
           FROM audit_logs 
           WHERE action LIKE '%rate_limit%' 
             AND timestamp >= ${timeframeSql}
-          GROUP BY details->>'$.ipAddress'
+          GROUP BY ip_address
           ORDER BY blocks_per_ip DESC
           LIMIT 10
         `, [])

@@ -671,17 +671,24 @@ class IncidentManager {
     const last7dRow = await this.db.select('SELECT COUNT(*) as count FROM security_incidents WHERE detected_at >= datetime("now", "-7 days")', [], true);
     // Open incidents
     const openRow = await this.db.select('SELECT COUNT(*) as count FROM security_incidents WHERE status NOT IN (?, ?)', [INCIDENT_STATUS.RESOLVED, INCIDENT_STATUS.FALSE_POSITIVE], true);
+    // Calculate average resolution time (in hours)
+    const avgResTimeRow = await this.db.select('SELECT AVG(CAST(strftime(\'%s\', resolved_at) - strftime(\'%s\', detected_at) AS REAL)) / 3600 as avg_time FROM security_incidents WHERE resolved_at IS NOT NULL', [], true);
+
     // Compose stats
     const stats = {
       total: totalRow?.total || 0,
-      byStatus: {},
-      bySeverity: {},
+      byStatus: { 
+        detected: 0, investigating: 0, contained: 0, resolved: 0, false_positive: 0 
+      },
+      bySeverity: { 
+        low: 0, medium: 0, high: 0, critical: 0 
+      },
       byType: {},
       recent: {
         last24h: last24hRow?.count || 0,
         last7d: last7dRow?.count || 0
       },
-      avgResolutionTime: 0, // TODO: calculate from resolved_at - detected_at
+      avgResolutionTime: avgResTimeRow?.avg_time ? Math.round(avgResTimeRow.avg_time * 10) / 10 : 0,
       openIncidents: openRow?.count || 0
     };
     for (const row of byStatusRows) stats.byStatus[row.status] = row.count;
