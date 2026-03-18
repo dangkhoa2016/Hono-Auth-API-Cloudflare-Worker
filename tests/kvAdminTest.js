@@ -97,6 +97,7 @@ class KVAdminTests {
       this.testEdgeCases,
       this.testSecurityScenarios,
       this.testDataConsistency,
+      this.testListRateLimits,
       this.testRateLimitClean,
       this.testRateLimitSeed,
       this.testRateLimitPruneTime,
@@ -805,6 +806,47 @@ class KVAdminTests {
       this.logger.success('Data consistency test completed successfully');
     } catch (error) {
       this.logger.error(`[testDataConsistency] Data consistency test failed: ${error.message}`);
+      throw error;
+    }
+  }
+
+  /**
+   * Test Rate Limit List
+   */
+  async testListRateLimits() {
+    this.logger.info('Testing Rate Limit List...');
+
+    try {
+      // Seed some rate limits first to ensure we have something to list
+      const prefix = 'test:list:';
+      await this.client.post(API_ENDPOINTS.kvAdminRateLimitSeed,
+        { prefix, count: 3 },
+        { 'Authorization': `Bearer ${this.superAdminToken}` }
+      );
+
+      // Test listing rate limits directly
+      const response = await this.client.get(`${API_ENDPOINTS.kvAdminRateLimitList}?prefix=${prefix}&limit=10`, {
+        'Authorization': `Bearer ${this.superAdminToken}`
+      });
+
+      this.assert.assertSuccess(response, 'Rate limit list');
+      this.assert.assertHasFields(response.data.data, ['keys', 'list_complete'], 'Rate limit list response');
+      this.assert.assertTrue(Array.isArray(response.data.data.keys), 'Keys should be an array');
+      this.assert.assertTrue(response.data.data.keys.length >= 3, 'Should list at least the seeded keys');
+
+      const firstKey = response.data.data.keys[0];
+      this.assert.assertHasFields(firstKey, ['name', 'value'], 'Key info should have name and value');
+      this.assert.assertTrue(firstKey.name.startsWith(prefix), 'Key name should start with the prefix');
+
+      // Cleanup
+      await this.client.post(API_ENDPOINTS.kvAdminRateLimitClean,
+        { prefix, dryRun: false },
+        { 'Authorization': `Bearer ${this.superAdminToken}` }
+      );
+
+      this.logger.success('Rate Limit List test completed successfully');
+    } catch (error) {
+      this.logger.error(`[testListRateLimits] Rate Limit List test failed: ${error.message}`);
       throw error;
     }
   }

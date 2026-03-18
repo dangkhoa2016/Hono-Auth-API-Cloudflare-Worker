@@ -148,6 +148,7 @@ export const API_ENDPOINTS = {
   kvAdminAuditFeatureToggle: '/api/kv-admin/audit/configs/feature/:feature/toggle',
 
   // KV Admin - Rate Limit Management
+  kvAdminRateLimitList: '/api/kv-admin/rate-limits',
   kvAdminRateLimitClean: '/api/kv-admin/rate-limits/clean',
   kvAdminRateLimitSeed: '/api/kv-admin/rate-limits/seed',
   kvAdminRateLimitPruneTime: '/api/kv-admin/rate-limits/prune-time',
