@@ -617,6 +617,9 @@ kvAdmin.post('/audit/configs/feature/:feature/toggle',
       // Set new value
       await c.kvConfig.set(key, enabled.toString());
 
+      // Auto-clear service caches to ensure new value is used immediately
+      clearServiceCaches();
+
       kvAdminRoutes_log(`Set audit feature ${feature}: ${currentBool} -> ${enabled}`);
 
       return c.json({
