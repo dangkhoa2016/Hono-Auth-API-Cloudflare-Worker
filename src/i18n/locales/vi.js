@@ -867,6 +867,7 @@ export default {
         'retrieved': 'Đã truy xuất thành công {{configCount}} cấu hình bởi {{actor}} ({{allowedKeys}} khóa được phép)'
       },
       'rateLimit': {
+        'listed': 'Đã lấy danh sách giới hạn tần suất: tìm thấy {{count}} khóa',
         'batchDeleteDryRun': 'Chạy thử xóa hàng loạt giới hạn tần suất: {{count}} khóa sẽ bị xóa ({{failed}} thất bại)',
         'batchDeleted': 'Xóa hàng loạt giới hạn tần suất: {{count}} khóa đã bị xóa ({{failed}} thất bại)',
         'cleanDryRun': 'Chạy thử dọn dẹp giới hạn tần suất: {{count}} khóa sẽ bị xóa (tiền tố: {{prefix}})',

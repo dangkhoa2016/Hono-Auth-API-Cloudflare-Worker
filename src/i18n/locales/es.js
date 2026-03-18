@@ -867,6 +867,7 @@ export default {
         'retrieved': "{{configCount}} configuraciones recuperadas exitosamente por {{actor}} ({{allowedKeys}} claves permitidas)"
       },
       'rateLimit': {
+        'listed': "Claves de límite de tasa listadas: se encontraron {{count}} claves",
         'batchDeleteDryRun': "Simulacro de eliminación por lotes de límite de tasa: {{count}} claves serán eliminadas ({{failed}} fallidas)",
         'batchDeleted': "Eliminación por lotes de límite de tasa: {{count}} claves eliminadas ({{failed}} fallidas)",
         'cleanDryRun': "Simulacro de limpieza de límite de tasa: {{count}} claves serán eliminadas (prefijo: {{prefix}})",

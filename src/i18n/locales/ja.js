@@ -867,6 +867,7 @@ export default {
         'retrieved': "{{actor}}によって{{configCount}}個の設定が正常に取得されました（{{allowedKeys}}個の許可されたキー）"
       },
       'rateLimit': {
+        'listed': "一覧表示されたレート制限キー: {{count}}個のキーが見つかりました",
         'batchDeleteDryRun': "レート制限の一括削除ドライラン: {{count}} 個のキーが削除されます ({{failed}} 失敗)",
         'batchDeleted': "レート制限の一括削除: {{count}} 個のキーが削除されました ({{failed}} 失敗)",
         'cleanDryRun': "レート制限のクリーニングドライラン: {{count}} 個のキーが削除されます (プレフィックス: {{prefix}})",

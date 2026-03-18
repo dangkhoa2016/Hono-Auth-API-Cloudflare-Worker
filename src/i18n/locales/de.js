@@ -867,6 +867,7 @@ export default {
         'retrieved': "{{configCount}} Konfigurationen erfolgreich von {{actor}} abgerufen ({{allowedKeys}} erlaubte Schlüssel)"
       },
       'rateLimit': {
+        'listed': "Aufgelistete Ratenbegrenzungsschlüssel: {{count}} Schlüssel gefunden",
         'batchDeleteDryRun': "Testlauf für Batch-Löschung der Ratenbegrenzung: {{count}} Schlüssel werden gelöscht ({{failed}} fehlgeschlagen)",
         'batchDeleted': "Batch-Löschung der Ratenbegrenzung: {{count}} Schlüssel gelöscht ({{failed}} fehlgeschlagen)",
         'cleanDryRun': "Testlauf für Bereinigung der Ratenbegrenzung: {{count}} Schlüssel werden gelöscht (Präfix: {{prefix}})",
