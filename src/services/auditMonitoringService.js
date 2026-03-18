@@ -188,8 +188,7 @@ class ThreatDetectionEngine {
       threshold: 5,
       condition: (events) => {
         const failedLogins = events.filter(e =>
-          e.action === 'login' &&
-          e.details?.success === false
+          (e.action?.toLowerCase().includes('login') || (typeof e.target_identifier === 'string' && e.target_identifier.includes('/auth/login'))) && e.status !== 'SUCCESS'
         );
 
         const ipGroups = failedLogins.reduce((groups, event) => {
@@ -625,8 +624,13 @@ export class AuditMonitoringService extends BaseService {
 
     score += actionScores[event.action] || 10;
 
+    // Increase score for failed logns based on action or status
+    if (event.status !== 'SUCCESS' && (event.action?.toLowerCase().includes('login') || (typeof event.target_identifier === 'string' && event.target_identifier.includes('/auth/login')))) {
+      score += 20;
+    }
+
     // Increase score for failed actions
-    if (event.details?.success === false) {
+    if (event.status !== 'SUCCESS' || event.details?.success === false) {
       score += 15;
     }
 

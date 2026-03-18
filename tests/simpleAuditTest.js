@@ -342,19 +342,19 @@ class SimpleAuditTest {
         this.logger.info('Actions generate audit logs');
       });
 
-      await this.runTest('Audit Logs Filter by actor_role (snake_case)', async () => {
+      await this.runTest('Audit Logs Filter by actorRole (camelCase)', async () => {
         await this.setupAuth('superAdmin');
 
-        const filteredResponse = await this.client.get(`${API_ENDPOINTS.auditLogs}?actor_role=super_admin&all=true&limit=20`);
-        this.assert.assertEqual(filteredResponse.status, 200, 'Audit logs filter by actor_role should succeed');
+        const filteredResponse = await this.client.get(`${API_ENDPOINTS.auditLogs}?actorRole=super_admin&all=true&limit=20`);
+        this.assert.assertEqual(filteredResponse.status, 200, 'Audit logs filter by actorRole should succeed');
         this.assert.assertTrue(filteredResponse.data.success, 'Filtered audit logs response should be successful');
 
         const filteredLogs = filteredResponse.data?.data?.logs || [];
         filteredLogs.forEach(log => {
-          this.assert.assertEqual(log.actor_role, 'super_admin', 'Every returned log should match actor_role=super_admin');
+          this.assert.assertEqual(log.actor_role, 'super_admin', 'Every returned log should match actorRole=super_admin');
         });
 
-        this.logger.info(`actor_role filter returned ${filteredLogs.length} log(s)`);
+        this.logger.info(`actorRole filter returned ${filteredLogs.length} log(s)`);
       });
 
       this.logger.success('Core audit functionality tests completed successfully');

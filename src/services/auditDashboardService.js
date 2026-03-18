@@ -84,7 +84,7 @@ class DashboardDataAggregator {
       const uniqueUsersToday = uniqueUsersTodayResult?.[0] || { count: 0 };
 
       // Failed actions today
-      const failedActionsTodayResult = await this.db.select('SELECT COUNT(*) as count FROM audit_logs WHERE timestamp >= ? AND details LIKE ?', [today.toISOString(), '%"success":false%']);
+      const failedActionsTodayResult = await this.db.select('SELECT COUNT(*) as count FROM audit_logs WHERE timestamp >= ? AND (status != \'SUCCESS\' OR details LIKE ?)', [today.toISOString(), '%"success":false%']);
       const failedActionsToday = failedActionsTodayResult?.[0] || { count: 0 };
 
       // Top actions today
@@ -133,7 +133,7 @@ class DashboardDataAggregator {
         SELECT 
           strftime('%Y-%m-%d %H:00:00', timestamp) as hour,
           COUNT(*) as total_events,
-          COUNT(CASE WHEN details LIKE '%"success":false%' THEN 1 END) as failed_events,
+          COUNT(CASE WHEN status != 'SUCCESS' OR details LIKE '%"success":false%' THEN 1 END) as failed_events,
           COUNT(DISTINCT actor_id) as unique_users,
           COUNT(CASE WHEN actor_role IN (?, ?) THEN 1 END) as admin_events
         FROM audit_logs 
@@ -188,7 +188,7 @@ class DashboardDataAggregator {
           actor_role as role,
           COUNT(*) as event_count,
           COUNT(DISTINCT actor_id) as user_count,
-          AVG(CASE WHEN details LIKE '%"success":false%' THEN 1.0 ELSE 0.0 END) as failure_rate
+          AVG(CASE WHEN status != 'SUCCESS' OR details LIKE '%"success":false%' THEN 1.0 ELSE 0.0 END) as failure_rate
         FROM audit_logs 
         WHERE timestamp >= ? 
         GROUP BY actor_role 
@@ -215,10 +215,13 @@ class DashboardDataAggregator {
         SELECT 
           action,
           COUNT(*) as count,
-          COUNT(CASE WHEN details LIKE '%"success":false%' THEN 1 END) as failures,
+          COUNT(CASE WHEN status != 'SUCCESS' OR details LIKE '%"success":false%' THEN 1 END) as failures,
           COUNT(DISTINCT actor_id) as unique_users
         FROM audit_logs 
-        WHERE timestamp >= ? 
+        WHERE timestamp >= ?
+        GROUP BY action 
+        ORDER BY count DESC 
+        LIMIT 15 
         GROUP BY action 
         ORDER BY count DESC
       `, [last24h.toISOString()]);
@@ -306,7 +309,7 @@ class DashboardDataAggregator {
       // Additional security-specific queries
       const suspiciousActivity = await this.db.select(`
         SELECT 
-          COUNT(CASE WHEN action = 'login' AND details LIKE '%"success":false%' THEN 1 END) as failed_logins,
+          COUNT(CASE WHEN (LOWER(action) LIKE '%login%' OR target_identifier LIKE '%/auth/login%') AND status != 'SUCCESS' THEN 1 END) as failed_logins,
           COUNT(CASE WHEN action = 'role_change' THEN 1 END) as role_changes,
           COUNT(CASE WHEN actor_role = ? OR actor_role = ? THEN 1 END) as admin_actions,
           COUNT(DISTINCT ip_address) as unique_ips
@@ -320,7 +323,7 @@ class DashboardDataAggregator {
         FROM audit_logs 
         WHERE timestamp >= ? 
         AND (
-          (action = 'login' AND details LIKE '%"success":false%') OR
+          ((LOWER(action) LIKE '%login%' OR target_identifier LIKE '%/auth/login%') AND status != 'SUCCESS') OR
           action = 'role_change' OR
           action IN ('user_delete', 'admin_access')
         )
