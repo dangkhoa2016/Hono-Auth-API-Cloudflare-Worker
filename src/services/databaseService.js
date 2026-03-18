@@ -329,11 +329,11 @@ export class DatabaseService {
       // Get failed login attempts statistics (configurable time range)
       const securityStats = await this.select(`
         SELECT 
-          COALESCE(SUM(attempts_count), 0) as total_failed_attempts,
-          COALESCE(SUM(CASE WHEN last_attempt_at >= datetime('now', '-${recentHours} hours') THEN attempts_count ELSE 0 END), 0) as recent_failures,
-          COALESCE(COUNT(DISTINCT CASE WHEN context LIKE 'auth:ip%' THEN identifier END), 0) as unique_ips_with_failures
-        FROM rate_limit_counters
-        WHERE context LIKE 'auth:%'
+          COUNT(*) as total_failed_attempts,
+          COUNT(CASE WHEN timestamp >= datetime('now', '-${recentHours} hours') THEN 1 END) as recent_failures,
+          COUNT(DISTINCT ip_address) as unique_ips_with_failures
+        FROM audit_logs
+        WHERE (LOWER(action) LIKE '%login%' OR target_identifier LIKE '%/auth/login%') AND status != 'SUCCESS'
       `, [], true);
       const metrics = {
         performance: {

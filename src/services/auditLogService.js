@@ -400,9 +400,9 @@ export class AuditLogService extends BaseService {
       const recentActivity = await this.dbService.select(`
         SELECT
           COUNT(*) as events_24h,
-          COUNT(CASE WHEN action LIKE 'LOGIN_%' THEN 1 END) as login_events_24h,
-          COUNT(CASE WHEN action LIKE 'ADMIN_%' THEN 1 END) as admin_events_24h,
-          COUNT(CASE WHEN action LIKE 'KV_CONFIG_%' THEN 1 END) as kv_events_24h
+          COUNT(CASE WHEN LOWER(action) LIKE '%login%' THEN 1 END) as login_events_24h,
+          COUNT(CASE WHEN target_type = 'admin' OR LOWER(action) LIKE '%admin%' THEN 1 END) as admin_events_24h,
+          COUNT(CASE WHEN target_identifier LIKE '%/kv-admin/%' OR LOWER(action) LIKE '%kv%' THEN 1 END) as kv_events_24h
         FROM audit_logs
         WHERE timestamp >= datetime('now', '-24 hours') ${exclude_super_admin ? 'AND actor_role != \'super_admin\'' : ''}
       `, [], true);
@@ -451,13 +451,13 @@ export class AuditLogService extends BaseService {
       const failedLoginsQuery = `
         SELECT
           COUNT(*) as count,
-          details->>'$.ipAddress' as ip_address,
+          ip_address,
           COUNT(DISTINCT actor_id) as affected_users,
           MAX(timestamp) as last_attempt
         FROM audit_logs
-        WHERE action = 'login_failed'
+        WHERE (LOWER(action) LIKE '%login%' OR target_identifier LIKE '%/auth/login%') AND status != 'SUCCESS'
           AND timestamp >= ${timeframeSql}
-        GROUP BY details->>'$.ipAddress'
+        GROUP BY ip_address
         ORDER BY count DESC
         LIMIT 10
       `;
@@ -467,7 +467,7 @@ export class AuditLogService extends BaseService {
       // Suspicious IP activity
       const suspiciousIpQuery = `
         SELECT
-          details->>'$.ipAddress' as ip_address,
+          ip_address,
           COUNT(*) as total_requests,
           COUNT(DISTINCT action) as unique_actions,
           COUNT(DISTINCT actor_id) as unique_users,
@@ -475,8 +475,8 @@ export class AuditLogService extends BaseService {
           MAX(timestamp) as last_seen
         FROM audit_logs
         WHERE timestamp >= ${timeframeSql}
-          AND details->>'$.ipAddress' IS NOT NULL
-        GROUP BY details->>'$.ipAddress'
+          AND ip_address IS NOT NULL
+        GROUP BY ip_address
         HAVING total_requests > 100 OR unique_users > 10
         ORDER BY total_requests DESC
         LIMIT 20
@@ -504,13 +504,13 @@ export class AuditLogService extends BaseService {
       const rateLimitQuery = `
         SELECT
           COUNT(*) as rate_limit_events,
-          COUNT(DISTINCT details->>'$.ipAddress') as blocked_ips,
-          details->>'$.ipAddress' as ip_address,
+          COUNT(DISTINCT ip_address) as blocked_ips,
+          ip_address,
           COUNT(*) as blocks_per_ip
         FROM audit_logs
         WHERE action LIKE '%rate_limit%'
           AND timestamp >= ${timeframeSql}
-        GROUP BY details->>'$.ipAddress'
+        GROUP BY ip_address
         ORDER BY blocks_per_ip DESC
         LIMIT 10
       `;
