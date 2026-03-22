@@ -6,6 +6,8 @@
 
 Dự án đã được tích hợp với **Zod** - một thư viện validation schema ưu tiên TypeScript để cung cấp validation mạnh mẽ và type-safe cho tất cả API endpoints, bao gồm **Hệ Thống Kiểm Toán Doanh Nghiệp** toàn diện với 49+ endpoint qua 4 nhóm route.
 
+Tài liệu này tập trung vào kiến trúc validation, thiết kế schema và cách tích hợp vào route. Với ma trận lệnh test validation đầy đủ và các flow tự động hóa, dùng [TEST_GUIDE_vi.md](./TEST_GUIDE_vi.md) và [TEST_SCRIPTS_vi.md](./TEST_SCRIPTS_vi.md).
+
 ## 🎯 Tại sao Sử dụng Zod?
 
 ### ✅ **Lợi ích So với Manual Validation:**
@@ -967,5 +969,20 @@ Tích hợp Zod cung cấp **Validation Cấp Doanh Nghiệp** với:
 🌍 **Hỗ trợ Quốc tế**: Tích hợp i18n đầy đủ với hỗ trợ 7+ ngôn ngữ  
 📊 **Business Intelligence**: Validation nâng cao cho truy vấn doanh nghiệp phức tạp và báo cáo  
 ⚡ **Hiệu năng Cao**: Được tối ưu cho quy mô doanh nghiệp với caching và pre-compilation  
+
+### **Điểm vào kiểm tra validation nhanh**
+
+Dùng các lệnh dưới đây khi cần kiểm tra nhanh một thay đổi liên quan đến Zod:
+
+```bash
+# Kiểm tra tập trung vào schema Zod
+npm run test:zod_validation
+
+# Kiểm tra hành vi validation tổng quát
+npm run test:validation
+npm run test:multilang_validation
+```
+
+Với ma trận lệnh đầy đủ, coverage theo endpoint và workflow xử lý sự cố, dùng [TEST_GUIDE_vi.md](./TEST_GUIDE_vi.md) và [TEST_SCRIPTS_vi.md](./TEST_SCRIPTS_vi.md). Tài liệu này giữ vai trò nguồn tham chiếu cho kiến trúc schema và các pattern tích hợp vào route.
 
 Hệ thống validation hiện đã **sẵn sàng production** với comprehensive testing, documentation, và các tính năng bảo mật cấp doanh nghiệp. Tất cả endpoints mới nên sử dụng Zod schemas để có validation nhất quán, dễ bảo trì, và an toàn trên toàn bộ hệ sinh thái ứng dụng.

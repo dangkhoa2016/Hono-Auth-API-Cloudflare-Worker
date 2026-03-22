@@ -1559,7 +1559,7 @@ Khi update database schema, thực hiện các bước sau:
 
 1. **Tạo Migration File**
 ```sql
--- migrations/001_add_user_preferences.sql
+-- migrations/0001_initial.sql
 CREATE TABLE user_preferences (
   id INTEGER PRIMARY KEY AUTOINCREMENT,
   user_id INTEGER NOT NULL,

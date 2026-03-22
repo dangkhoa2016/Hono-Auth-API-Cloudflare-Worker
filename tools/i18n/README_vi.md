@@ -478,7 +478,7 @@ node tools/i18n/master.js analyze
 ## 📁 Cấu trúc Tệp
 
 ```
-/user_demo_hono_worker/
+hono-auth-api-cloudflare-worker/
 ├── tools/
 │   └── i18n/                              # Thư mục công cụ i18n
 │       ├── master.js                      # 🆕 Công cụ tổng hợp mới

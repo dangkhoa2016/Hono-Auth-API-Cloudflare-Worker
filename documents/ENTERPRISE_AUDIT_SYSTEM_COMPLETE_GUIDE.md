@@ -39,7 +39,7 @@ The **Hono Auth Worker** project now features a complete **ENTERPRISE-GRADE AUDI
 ### **🔧 Core Architecture Overview**
 ```
 Enterprise Audit System (50+ Endpoints)
-├── 📋 Phase 1: Core Audit (/api/audit/*) - 5 endpoints
+├── 📋 Phase 1: Core Audit (/api/audit/*) - 6 endpoints
 │   ├── Database Schema (5 migrations)
 │   ├── AuditLogService with BaseService inheritance
 │   ├── Role-based filtering and pagination
@@ -84,7 +84,7 @@ Enterprise Audit System (50+ Endpoints)
 
 ## 🗺️ **4 MAIN AUDIT ROUTE GROUPS - COMPLETE DETAILS**
 
-### **📊 1. Core Audit Routes (`/api/audit/*`) - 5 Endpoints**
+### **📊 1. Core Audit Routes (`/api/audit/*`) - 6 Endpoints**
 **File**: `src/routes/audit.js`  
 **Purpose**: Foundational audit log access and system health monitoring  
 **Authorization**: Admin (filtered data) | Super Admin (all data)  
@@ -96,6 +96,7 @@ Enterprise Audit System (50+ Endpoints)
 - **GET `/stats`** - Comprehensive statistics and metrics with performance insights
 - **GET `/export`** - Export audit data in multiple formats (CSV, JSON) with filtering
 - **GET `/system-health`** - System health monitoring with detailed performance metrics
+- **DELETE `/logs/:id`** - Delete a specific audit log entry by numeric ID
 
 #### **🎯 Special Features:**
 - **Role-based Data Filtering**: Admin sees non-super_admin logs only, super_admin sees all
@@ -104,7 +105,7 @@ Enterprise Audit System (50+ Endpoints)
 - **Advanced Search Capabilities**: Full-text search with date ranges, actions, and entity filters
 - **Real-time Health Monitoring**: Continuous system health checks with performance metrics
 
-### **🚀 2. Advanced Audit Routes (`/api/advanced-audit/*`) - 14 Endpoints**  
+### **🚀 2. Advanced Audit Routes (`/api/advanced-audit/*`) - 15 Endpoints**  
 **File**: `src/routes/advancedAudit.js`  
 **Purpose**: Enterprise analytics, compliance reporting, and data archival management  
 **Authorization**: Admin (limited analytics) | Super Admin (full access)  
@@ -117,7 +118,7 @@ Enterprise Audit System (50+ Endpoints)
 - **GET `/analytics/performance`** - System performance analytics and optimization insights
 
 #### **🗄️ Data Management Group (4 endpoints):**
-- **GET `/archival`** - Archive management interface with retention policy status
+- **GET `/archive`** - Archive management interface with retention policy status
 - **GET `/archival/stats`** - Detailed archival statistics and storage utilization
 - **POST `/archival/run`** - Execute automated data archival with compression
 - **POST `/archival/restore`** - Restore archived data with selective recovery options
@@ -126,7 +127,7 @@ Enterprise Audit System (50+ Endpoints)
 - **GET `/compliance`** - Compliance overview with multi-standard support
 - **GET `/compliance/report`** - Generate compliance reports (GDPR, SOX, ISO27001)
 - **GET `/middleware/stats`** - Audit middleware performance statistics and optimization
-- **GET `/export/advanced`** - Advanced export with analytics and compliance data
+- **POST `/export-advanced`** - Advanced export with analytics and compliance data
 
 #### **💡 Enterprise Features:**
 - **Multi-Standard Compliance**: GDPR, SOX, ISO27001 reporting with automated validation
@@ -330,7 +331,7 @@ export class AuditLogService extends BaseService {
 
 #### **Middleware Integration**
 ```javascript
-// src/middleware/audit.js
+// src/middleware/unifiedRequestMiddleware.js
 export const auditMiddleware = (options = {}) => {
   return async (c, next) => {
     const startTime = Date.now();
@@ -383,6 +384,7 @@ Before diving into test cases details, let's understand the structure of **40+ A
 - 📊 **GET /api/audit/stats** - Statistics and metrics by period/groupBy
 - 📤 **GET /api/audit/export** - Export CSV (super admin only)
 - 🏥 **GET /api/audit/system-health** - Health check and performance metrics
+- 🗑️ **DELETE /api/audit/logs/:id** - Delete a single audit log by numeric ID
 
 #### **📈 2. Advanced Audit Routes** (`/api/advanced-audit/*`)
 - 📊 **Analytics Group**:
@@ -457,101 +459,30 @@ Our enterprise audit system includes a comprehensive test suite that validates a
 
 ### **🚀 Quick Start Testing**
 
-#### **1. Run All Tests**
 ```bash
-# Complete test suite with unified script
-bash tests/scripts/unified-audit-test.sh full
-
-# Or using npm script
-npm run test:audit
-```
-
-#### **2. Run Specific Tests**
-```bash
-# Quick functionality test
-bash tests/scripts/unified-audit-test.sh quick
+# Recommended audit entry points
+npm run test:audit:system
 npm run test:audit:quick
-
-# Core audit functionality (curl endpoints)
-bash tests/scripts/unified-audit-test.sh core
-npm run test:audit:core
-
-# Advanced audit features (curl endpoints)
-bash tests/scripts/unified-audit-test.sh advanced
-npm run test:audit:advanced
-
-# Real-time monitoring (curl endpoints)
-bash tests/scripts/unified-audit-test.sh realtime
-npm run test:audit:realtime
-
-# Security incident management (curl endpoints)
-bash tests/scripts/unified-audit-test.sh security
-npm run test:audit:security
-
-# All endpoint testing with curl
-bash tests/scripts/unified-audit-test.sh endpoints
-npm run test:audit:endpoints
-
-# Performance analysis
-bash tests/scripts/unified-audit-test.sh performance
-npm run test:audit:performance
-
-# Comprehensive test suite
-bash tests/scripts/unified-audit-test.sh comprehensive
 npm run test:audit:comprehensive
+bash tests/scripts/unified-audit-test.sh endpoints
 ```
 
-#### **3. Run Individual Test Files**
-```bash
-# Direct execution
-node tests/quickAuditTest.js           # Quick validation
-node tests/advancedAuditComprehensiveTest.js        # Advanced audit (/api/advanced-audit/*)
-node tests/realtimeMonitoringTest.js   # Real-time monitoring (/api/realtime-monitoring/*)
-node tests/securityIncidentTest.js     # Security incident management (/api/security-incident/*)
-node tests/auditSystemTest.js          # Comprehensive system test
-node tests/auditPerformanceTest.js     # Performance analysis
-node tests/auditEndpointsCompleteTest.js # Complete endpoint coverage test
-```
-
-#### **4. NPM Test Scripts (Updated)**
-```bash
-# Core audit functionality tests
-npm run test:audit:core            # Core audit endpoints (/api/audit/*)
-npm run test:audit:advanced        # Advanced audit features (/api/advanced-audit/*)
-npm run test:audit:realtime         # Real-time monitoring (/api/realtime-monitoring/*)
-npm run test:audit:archival         # Archival service testing
-npm run test:audit:monitoring       # Real-time monitoring tests
-
-# Complete endpoint coverage
-npm run test:audit:endpoints:complete  # Test ALL audit endpoints
-npm run test:audit:endpoints           # Test core + advanced + realtime
-
-# Performance and system tests
-npm run test:audit:perf             # Performance analysis
-npm run test:audit:system           # Complete system testing
-npm run test:audit:full             # Full comprehensive suite
-
-# Quick and convenience tests
-npm run test:audit                  # Full audit test suite
-npm run test:audit:quick            # Quick smoke tests
-npm run test:audit:simple           # Simple audit functionality
-npm run test:security:incident      # Security incident management
-```
+Use [TEST_GUIDE.md](./TEST_GUIDE.md) as the canonical command matrix for all audit test modes, npm scripts, and role-based coverage. Use [TEST_SCRIPTS.md](./TEST_SCRIPTS.md) for runner details and [AUDIT_API_REFERENCE.md](./AUDIT_API_REFERENCE.md) for endpoint-specific curl workflows.
 
 ### **📁 Test Files Structure**
 
 #### **Core Test Files**
 
-**`auditEndpointsCompleteTest.js`** - Complete endpoint coverage (3-5 minutes)
+**`unified-audit-test.sh (mode: endpoints)`** - Complete endpoint coverage (3-5 minutes)
 - ✅ ALL audit endpoints across 4 route groups
-- ✅ Core audit: 5 endpoints (/api/audit/*)
-- ✅ Advanced audit: 14 endpoints (/api/advanced-audit/*)
-- ✅ Real-time monitoring: 22 endpoints (/api/realtime-monitoring/*)
+- ✅ Core audit: 6 endpoints (/api/audit/*)
+- ✅ Advanced audit: 15 endpoints (/api/advanced-audit/*)
+- ✅ Real-time monitoring: 28 endpoints (/api/realtime-monitoring/*)
 - ✅ Security incident: 8 endpoints (/api/security-incident/*)
 - ✅ Authentication and authorization testing
 - ✅ Comprehensive response validation
 
-**`quickAuditTest.js`** - Fast validation (30 seconds)
+**`quickTest.js`** - Fast validation (30 seconds)
 - ✅ Basic audit flow (login → audit log → search)
 - ✅ Role-based access control validation
 - ✅ Real-time monitoring availability check
@@ -789,14 +720,15 @@ await this.testIncidentManagement();    // Incident response
 
 ### **🌐 API Routes Ecosystem**
 
-#### **📋 Core Audit API: `/api/audit/*` (5 endpoints)**
+#### **📋 Core Audit API: `/api/audit/*` (6 endpoints)**
 - **GET `/api/audit/logs`**: Main audit log retrieval với role-based filtering
 - **GET `/api/audit/search`**: Advanced search với full-text capabilities  
 - **GET `/api/audit/stats`**: Audit statistics (role-filtered)
 - **GET `/api/audit/export`**: Data export với security restrictions
 - **GET `/api/audit/system-health`**: Audit system health monitoring
+- **DELETE `/api/audit/logs/:id`**: Delete a specific audit log by numeric ID
 
-#### **📊 Advanced Audit API: `/api/advanced-audit/*` (14 endpoints)**
+#### **📊 Advanced Audit API: `/api/advanced-audit/*` (15 endpoints)**
 - **GET `/api/advanced-audit/analytics`**: General analytics overview
 - **GET `/api/advanced-audit/analytics/security`**: Security-focused analytics
 - **GET `/api/advanced-audit/analytics/behavior`**: User behavior analytics
@@ -812,7 +744,7 @@ await this.testIncidentManagement();    // Incident response
 - **POST `/api/advanced-audit/export-advanced`**: Advanced export functionality
 - **GET `/api/advanced-audit/middleware/stats`**: Middleware performance statistics
 
-#### **🚀 Real-time Monitoring API: `/api/realtime-monitoring/*` (22 endpoints)**
+#### **🚀 Real-time Monitoring API: `/api/realtime-monitoring/*` (28 endpoints)**
 
 **Monitoring Control (7 endpoints):**
 - **GET `/monitoring/status`**: Get current monitoring status and statistics
@@ -852,13 +784,13 @@ await this.testIncidentManagement();    // Incident response
 - **GET `/api/security-incident/status`**: Get service status and configuration
 - **POST `/api/security-incident/simulate`**: Simulate security threats (development only)
 
-**📊 Total API Coverage: 49+ Endpoints**
+**📊 Total API Coverage: 57+ Endpoints**
 
 ### **🔄 Middleware & Integration**
 
 #### **Auto Audit Middleware**
 ```javascript
-// src/middleware/audit.js
+// src/middleware/unifiedRequestMiddleware.js
 export const auditMiddleware = (options = {}) => {
   return async (c, next) => {
     const startTime = Date.now();
@@ -1173,7 +1105,7 @@ npm run test:audit:realtime    # Real-time monitoring
 npm run test:audit:perf        # Performance analysis
 
 # Direct test execution
-node tests/quickAuditTest.js            # Quick validation
+node tests/quickTest.js            # Quick validation
 node tests/auditSystemTest.js           # Comprehensive test
 node tests/auditPerformanceTest.js      # Performance analysis
 

@@ -265,7 +265,7 @@ chmod +x tests/scripts/*.sh
 ### Script Execution Issues
 ```bash
 # Nếu scripts fail để start server hoặc find paths
-cd /user_demo_hono_worker
+cd hono-auth-api-cloudflare-worker
 npm run dev:test  # Start test server
 ```
 
@@ -424,10 +424,10 @@ Comprehensive shell scripts để manual testing của role-based permissions s�
 |--------|----------|-------|
 | `unified-audit-test.sh` | **Complete Audit System** | Comprehensive enterprise audit system testing |
 
-**Audit Endpoint Coverage (49+ endpoints):**
-- **Core Audit** (`/api/audit/*`) - 5 endpoints: logs, search, stats, export, health
-- **Advanced Audit** (`/api/advanced-audit/*`) - 14 endpoints: analytics, archival, compliance
-- **Real-time Monitoring** (`/api/realtime-monitoring/*`) - 22 endpoints: monitoring, alerts, metrics
+**Audit Endpoint Coverage (51+ endpoints):**
+- **Core Audit** (`/api/audit/*`) - 6 endpoints: logs, search, stats, export, system-health, delete-log-by-id
+- **Advanced Audit** (`/api/advanced-audit/*`) - 15 endpoints: analytics, archival, compliance
+- **Real-time Monitoring** (`/api/realtime-monitoring/*`) - 28 endpoints: monitoring, alerts, metrics
 - **Security Incidents** (`/api/security-incident/*`) - 8 endpoints: incident management, response
 
 ### Audit Script Usage Options
@@ -453,7 +453,7 @@ bash tests/scripts/unified-audit-test.sh full
 ### 1. Environment Preparation
 ```bash
 # Navigate đến project directory
-cd /user_demo_hono_worker
+cd hono-auth-api-cloudflare-worker
 
 # Start development server (test environment)
 npm run dev:test
@@ -527,7 +527,7 @@ bash tests/scripts/all-roles-comparison.sh
 - **Complete User Management**: TẤT CẢ roles (`user`, `admin`, `super_admin`)
 - **Full Role Control**: Create, modify, delete users với BẤT KỲ role nào
 - **System Administration**: Tất cả admin endpoints plus exclusive super admin features
-- **Enterprise Audit System**: Complete access đến tất cả 49+ audit endpoints
+- **Enterprise Audit System**: Complete access đến tất cả 57+ audit endpoints
 - **KV Store Management**: Full KV configuration và audit settings
 - **Security Management**: Security incident management và response
 - **System Monitoring**: Complete system health, performance, và monitoring

@@ -989,18 +989,14 @@ node tests/mainMenu.js         # Direct access
 
 ### 4. Shell Test Scripts
 
-In addition to JavaScript tests, there are shell scripts for CURL-based testing:
+In addition to JavaScript tests, there are shell scripts for CURL-based testing.
+
+Use [TEST_GUIDE.md](./TEST_GUIDE.md) as the canonical source for the full RBAC test matrix. Use [TEST_SCRIPTS.md](./TEST_SCRIPTS.md) for shell runners and [../tests/scripts/CURL_COMMANDS.md](../tests/scripts/CURL_COMMANDS.md) for complete request examples.
 
 ```bash
-# Shell script tests
-bash tests/scripts/regular_user.sh      # Test Regular User Role via CURL
-bash tests/scripts/admin_user.sh        # Test Admin User Role via CURL  
-bash tests/scripts/super_admin_user.sh  # Test Super Admin User Role via CURL
-bash tests/scripts/test-kv-admin.sh     # Test KV Admin functionality (super_admin only)
-
-# Compare all roles
-bash tests/scripts/all-roles-comparison.sh   # Compare dashboard access
-bash tests/scripts/test_all_roles.sh         # Test all roles sequentially
+# Recommended RBAC runners
+bash tests/scripts/test_all_roles.sh
+bash tests/scripts/test-kv-admin.sh
 ```
 
 ## V. KV Configuration Management (Super Admin Only)
@@ -1079,7 +1075,9 @@ kvAdminRoutes_log(`Config updated: ${key} = ${value} (was: ${oldValue})`);
 - Cannot break application by misconfiguration
 - Reset functionality to restore defaults
 
-### 📊 **Example Usage**
+### 📊 **Representative Usage**
+
+This guide keeps only a few representative KV Admin examples. For the complete curl workflow and test-oriented command list, refer to [TEST_SCRIPTS.md](./TEST_SCRIPTS.md) and [../tests/scripts/CURL_COMMANDS.md](../tests/scripts/CURL_COMMANDS.md).
 
 #### **Get All Configurations**
 ```bash
@@ -1103,33 +1101,15 @@ curl -X POST -H "Authorization: Bearer <super_admin_token>" \
      http://localhost:8787/api/kv-admin/configs/batch
 ```
 
-#### **Compare ENV vs KV Values**
-```bash
-curl -H "Authorization: Bearer <super_admin_token>" \
-     http://localhost:8787/api/kv-admin/configs/env-comparison
-```
-
 ### 🧪 **Testing KV Admin**
 
-**JavaScript Tests**:
-```bash
-npm run test:kv_admin        # Run KV Admin test suite
-node tests/kvAdminTest.js    # Direct test execution
-```
+Use [TEST_GUIDE.md](./TEST_GUIDE.md) for the complete RBAC and KV Admin test matrix, and [TEST_SCRIPTS.md](./TEST_SCRIPTS.md) for automation details.
 
-**Shell Script Tests**:
+**Quick entry points**:
 ```bash
-bash tests/scripts/test-kv-admin.sh  # CURL-based testing
+npm run test:kv_admin
+bash tests/scripts/test-kv-admin.sh
 ```
-
-**Test Coverage**:
-- ✅ Authentication & authorization
-- ✅ CRUD operations for all config keys
-- ✅ Batch update functionality
-- ✅ Environment comparison
-- ✅ Cache management
-- ✅ Input validation & error handling
-- ✅ Role-based access control
 
 ### 📋 **Integration with Admin Role System**
 

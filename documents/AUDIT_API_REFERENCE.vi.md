@@ -106,6 +106,7 @@ Lấy audit logs phân trang với tùy chọn lọc.
   action?: string;      // Lọc theo loại hành động
   userId?: string;      // Lọc theo ID người dùng
   entityType?: string;  // Lọc theo loại entity
+  actorRole?: string;   // Lọc theo vai trò người thực hiện (query key camelCase)
   startDate?: string;   // Lọc theo ngày bắt đầu (định dạng ISO)
   endDate?: string;     // Lọc theo ngày kết thúc (định dạng ISO)
 }
@@ -154,7 +155,10 @@ Tìm kiếm full-text nâng cao trong audit logs.
   query: string;        // Chuỗi tìm kiếm (bắt buộc)
   page?: number;        // Số trang (mặc định: 1)
   limit?: number;       // Kết quả mỗi trang (mặc định: 10)
+  userId?: string;      // Lọc theo ID người dùng
   action?: string;      // Lọc theo loại hành động
+  entityType?: string;  // Lọc theo loại entity
+  actorRole?: string;   // Lọc theo vai trò người thực hiện (query key camelCase)
   startDate?: string;   // Lọc theo ngày bắt đầu
   endDate?: string;     // Lọc theo ngày kết thúc
 }
@@ -202,9 +206,10 @@ Xuất audit logs trong các định dạng khác nhau.
 **Query Parameters**:
 ```typescript
 {
-  format: 'csv' | 'json'; // Định dạng xuất (bắt buộc)
-  limit?: number;         // Số bản ghi tối đa (mặc định: 1000)
-  action?: string;        // Lọc theo hành động
+  format?: 'csv' | 'json' | 'xlsx'; // Định dạng xuất (mặc định: json)
+  maxRecords?: number;              // Số bản ghi tối đa (mặc định: 1000)
+  includeDetails?: boolean;         // Bao gồm payload chi tiết (mặc định: true)
+  filters?: object;                 // Bộ lọc dạng object (tùy chọn)
   startDate?: string;     // Lọc theo ngày bắt đầu
   endDate?: string;       // Lọc theo ngày kết thúc
 }
@@ -226,6 +231,18 @@ Lấy trạng thái sức khỏe hệ thống audit.
     "storageUsage": "45%",
     "lastLogTime": "2025-07-21T10:30:00Z"
   }
+}
+```
+
+### **🗑️ DELETE /api/audit/logs/:id**
+Xóa một bản ghi audit theo ID dạng số.
+
+**Quyền truy cập**: Admin, Super Admin
+
+**Path Parameters**:
+```typescript
+{
+  id: number; // Bắt buộc, phải > 0
 }
 ```
 
@@ -284,7 +301,7 @@ Phân tích hiệu suất hệ thống.
 
 **Quyền truy cập**: Admin, Super Admin
 
-### **� GET /api/advanced-audit/middleware/stats**
+### **📈 GET /api/advanced-audit/middleware/stats**
 Lấy thống kê sử dụng middleware.
 
 **Quyền truy cập**: Chỉ Super Admin
@@ -765,8 +782,8 @@ API Hệ thống Audit cung cấp **hỗ trợ đa ngôn ngữ toàn diện** v�
 ### **🔍 Các API Endpoints với Hỗ trợ Đa ngôn ngữ**
 
 **Tất cả endpoints của Hệ thống Audit đều hỗ trợ thông báo lỗi đa ngôn ngữ**:
-- **Core Audit Routes** (`/api/audit/*`) - 5+ endpoints với hỗ trợ i18n đầy đủ
-- **Advanced Audit Routes** (`/api/advanced-audit/*`) - 10+ endpoints với hỗ trợ i18n đầy đủ  
+- **Core Audit Routes** (`/api/audit/*`) - 6 endpoints với hỗ trợ i18n đầy đủ
+- **Advanced Audit Routes** (`/api/advanced-audit/*`) - 15 endpoints với hỗ trợ i18n đầy đủ
 - **Real-time Monitoring Routes** (`/api/realtime-monitoring/*`) - 15+ endpoints với hỗ trợ i18n đầy đủ
 - **Security Incident Routes** (`/api/security-incident/*`) - 10+ endpoints với hỗ trợ i18n đầy đủ
 
@@ -792,28 +809,17 @@ curl -X GET "http://localhost:8788/api/audit/logs?invalid_param=test" \
 
 ## 🔧 **KIỂM THỬ & XÁC THỰC**
 
-### **Lệnh Test có sẵn**
+### **Quick Start kiểm thử**
 
 ```bash
-# Test tất cả audit endpoints
-npm run test:audit:comprehensive
-
-# Test từng nhóm route cụ thể
-npm run test:audit:core          # Core audit routes
-npm run test:audit:advanced      # Advanced audit routes
-npm run test:audit:realtime      # Real-time monitoring
-npm run test:audit:security      # Security incident routes
-
-# Test hệ thống xác thực i18n
-npm run test:i18n:validator      # Test phần mở rộng xác thực i18n
-npm run test:validation:multilang # Test thông báo lỗi xác thực đa ngôn ngữ
-
-# Performance testing
-npm run test:audit:performance
-
-# Xác thực nhanh
+# Các entry point audit nên dùng
+npm run test:audit:system
 npm run test:audit:quick
+npm run test:audit:comprehensive
+npm run test:multilang_validation
 ```
+
+Để xem đầy đủ ma trận kiểm thử audit, runner theo mode và hướng dẫn xử lý sự cố, dùng [TEST_GUIDE_vi.md](./TEST_GUIDE_vi.md) và [TEST_SCRIPTS_vi.md](./TEST_SCRIPTS_vi.md).
 
 ### **Test thủ công với cURL**
 

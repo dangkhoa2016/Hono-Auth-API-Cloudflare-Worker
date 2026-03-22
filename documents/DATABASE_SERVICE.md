@@ -1038,7 +1038,7 @@ When updating database schema, follow these steps:
 
 1. **Create Migration File**
 ```sql
--- migrations/001_add_user_preferences.sql
+-- migrations/0001_initial.sql
 CREATE TABLE user_preferences (
   id INTEGER PRIMARY KEY AUTOINCREMENT,
   user_id INTEGER NOT NULL,
