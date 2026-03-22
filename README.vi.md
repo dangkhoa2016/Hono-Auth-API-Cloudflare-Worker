@@ -117,171 +117,51 @@ Tất cả tài liệu nằm trong thư mục [documents](documents) với cặp
   - **utils/**: dynamic config, debug, helper, audit helper, jwt helper, route scanner, service config/context/factory, i18n demo
   - **assets/**: favicon và biểu tượng ứng dụng
 - **tests/**: menu tương tác (`mainMenu.js`), bộ hợp nhất, bộ RBAC, bộ audit, bộ i18n/validation/security/performance, `tokenSecurityTest.js`, kiểm thử email, định dạng thông báo đăng nhập, phát hiện route, thư mục `init/`, `scripts/`, `utils/`, `config/`
-- **tools/**: script vận hành (`generate-password-hashes.js`, `clear-cache.js`, `reset-rate-limits.js`, `test-curl.sh`, `change-commit-author.sh`, `schema-registry-demo.js`) và các thư mục con D1, KV, i18n, debug log, database usage, metadata vai trò, tiện ích email
-- **migrations/**: `0001_initial.sql` đến `0009_user_activation_token.sql`, bao gồm bảng audit, archive, security incident, token security
+- **tools/**: script vận hành (`generate-password-hashes.js`, `clear-cache.js`, `reset-rate-limits.js`, `test-curl.sh`, `schema-registry-demo.js`) và các thư mục con D1, KV, i18n, debug log, database usage, metadata vai trò, tiện ích email
+- **migrations/**: `0001_initial.sql` đến `0010_add_email_verification.sql`, bao gồm bảng audit, archive, security incident, token security, activation và email verification
 - **scripts/**: script thiết lập môi trường (dev/test/staging) và debug
-- **documents/**: 34 tài liệu Markdown (EN/VI) liệt kê ở phần trên
+- **documents/**: 40 tài liệu Markdown (EN/VI) liệt kê ở phần trên
 - **cấu hình mẫu**: `.dev.vars.*.example`, `wrangler.toml.example`; các file `.dev.vars.*` và `wrangler.toml` thật không commit
-## 🧪 **Framework kiểm thử toàn diện (40+ Bộ kiểm thử)**
+## 🧪 Framework kiểm thử
 
-### 🎯 **Bộ kiểm thử chuyên biệt**
+README chỉ giữ các điểm vào kiểm thử đã xác nhận. Toàn bộ ma trận lệnh, coverage theo nhóm, bộ kiểm thử theo vai trò, audit suites, troubleshooting và script tự động hóa được duy trì tập trung trong [documents/TEST_GUIDE_vi.md](./documents/TEST_GUIDE_vi.md) và [documents/TEST_SCRIPTS_vi.md](./documents/TEST_SCRIPTS_vi.md).
 
-**Kiểm thử cốt lõi hệ thống:**
-- `systemTest.js` - Kiểm thử chức năng hệ thống cốt lõi
-- `authTest.js` - Kiểm thử xác thực JWT hoàn chỉnh
-- `validationTest.js` - Kiểm thử xác thực Zod
-- `securityTest.js` - Kiểm thử bảo mật toàn diện
-- `performanceTest.js` - Kiểm thử hiệu suất & tải
-
-**Kiểm thử vai trò cụ thể:**
-- `regularUserTest.js` - Kiểm thử vai trò người dùng thường
-- `adminUserTest.js` - Kiểm thử vai trò quản trị viên
-- `superAdminUserTest.js` - Kiểm thử vai trò siêu quản trị
-- `roleTest.js` - Kiểm thử RBAC hoàn chỉnh
-- `kvAdminTest.js` - Kiểm thử quản trị KV Store (chỉ super_admin)
-
-**Kiểm thử tính năng nâng cao:**
-- `comprehensiveI18nTest.js` - Kiểm thử i18n & dịch thuật toàn diện
-- `integrationTest.js` - Kiểm thử tích hợp
-- `i18nValidatorExtensionTest.js` - Kiểm thử hệ thống xác thực i18n
-- `multiLanguageValidationErrorTest.js` - Kiểm thử thông báo lỗi đa ngôn ngữ
-
-**Kiểm thử hệ thống audit doanh nghiệp:**
-- `auditSystemTest.js` - Chức năng hệ thống kiểm toán cốt lõi
-- `advancedAuditComprehensiveTest.js` - Tính năng kiểm toán nâng cao
-- `realtimeMonitoringTest.js` - Hệ thống giám sát thời gian thực
-- `securityIncidentTest.js` - Quản lý sự cố bảo mật
-- `auditPerformanceTest.js` - Hiệu năng hệ thống kiểm toán
-- `archivalServiceTest.js` - Chức năng lưu trữ dữ liệu
-
-**Kiểm thử bảo mật chuyên sâu:**
-- `xssSecurityTest.js` - Kiểm thử bảo vệ XSS
-- `errorHandlingTest.js` - Kiểm thử xử lý lỗi toàn diện
-
-### 📋 **Menu kiểm thử tương tác**
-
-### 🚀 **Bắt đầu nhanh**
+### 🎯 Bắt đầu nhanh
 
 ```bash
-# Menu kiểm thử tương tác (khuyến nghị)
+# Khuyến nghị: menu kiểm thử tương tác
 npm run test
-# hoặc
-node tests/mainMenu.js
 
-# Kiểm thử nhanh (smoke tests)
+# Smoke test nhanh
 npm run test:quick
 
-# Bộ kiểm thử toàn diện
-npm run test:unified               # Bộ kiểm thử hợp nhất tất cả
-bash tests/scripts/run-all-tests.sh     # Chi tiết đầy đủ
-bash tests/scripts/run-all-tests-quick.sh # Đầu ra tối thiểu
+# Bộ kiểm thử tự động đầy đủ
+bash tests/scripts/run-all-tests.sh
 
-# Kiểm thử theo vai trò
-npm run test:regular_user         # Kiểm thử người dùng thường
-npm run test:admin_user           # Kiểm thử admin
-npm run test:super_admin_user     # Kiểm thử super admin
-bash tests/scripts/test_all_roles.sh    # Tất cả vai trò
+# Bộ kiểm thử audit doanh nghiệp
+npm run test:audit:system
 
-# Kiểm thử hệ thống cốt lõi
-npm run test:system               # Chức năng hệ thống
-npm run test:auth                 # Xác thực
-npm run test:security             # Bảo mật
-npm run test:role                 # RBAC
-npm run test:validation           # Xác thực Zod
-npm run test:performance          # Hiệu suất
-npm run test:integration          # Tích hợp
+# Kiểm tra hồi quy RBAC
+bash tests/scripts/test_all_roles.sh
 
-# Kiểm thử hệ thống audit doanh nghiệp
-npm run test:audit                # Kiểm toán cốt lõi
-npm run test:audit:advanced       # Tính năng nâng cao
-npm run test:audit:realtime       # Giám sát thời gian thực
-npm run test:audit:security       # Sự cố bảo mật
-npm run test:audit:performance    # Hiệu suất audit
+# i18n và xác thực đa ngôn ngữ
+npm run test:i18n
+npm run test:multilang_validation
 
-# Kiểm thử i18n & xác thực đa ngôn ngữ
-npm run test:i18n                # Hệ thống i18n
-npm run test:i18n:validator       # Xác thực i18n
-npm run test:validation:multilang # Lỗi xác thực đa ngôn ngữ
-
-# Kiểm thử Email & Kích hoạt tài khoản
-npm run test:activation          # Kiểm thử luồng kích hoạt tài khoản
-npm run test:email:content       # Kiểm thử bản địa hóa nội dung email
-npm run test:email:provider      # Kiểm thử header nhà cung cấp email
-
-# Kiểm thử quản lý Schema Registry
-npm run test:schema:registry      # Kiểm thử tích hợp schema registry
+# Validation và integration cốt lõi
+npm run test:validation
+npm run test:integration
 ```
 
-### 🔧 **Công cụ quản lý Schema Registry**
+### 🔧 Tài liệu chuẩn
 
-Dự án bao gồm các công cụ quản lý schema registry toàn diện để xử lý 46 schemas trên 10 categories:
-
-```bash
-# Công cụ Schema Registry - Lệnh chính
-npm run tool:schema               # Công cụ quản lý schema tương tác
-npm run tool:schema:help          # Hiển thị trợ giúp và lệnh có sẵn
-npm run tool:schema:list          # Liệt kê tất cả 46 schemas với chi tiết
-npm run tool:schema:categories    # Hiển thị tất cả 10 schema categories
-npm run tool:schema:validators    # Liệt kê tất cả 46 validator functions được xây dựng sẵn
-npm run tool:schema:docs          # Tạo tài liệu toàn diện
-npm run tool:schema:validate      # Xác thực tính nhất quán registry
-npm run tool:schema:demo          # Demo và kiểm thử tương tác
-
-# Lệnh trực tiếp (Thay thế)
-node tools/schema-registry-demo.js help        # Hiển thị trợ giúp
-node tools/schema-registry-demo.js list        # Liệt kê tất cả schemas
-node tools/schema-registry-demo.js categories  # Hiển thị categories
-node tools/schema-registry-demo.js category auth # Hiển thị auth schemas
-node tools/schema-registry-demo.js validator login # Hiển thị login validator
-node tools/schema-registry-demo.js validators  # Liệt kê tất cả validators
-node tools/schema-registry-demo.js docs       # Tạo tài liệu
-node tools/schema-registry-demo.js validate   # Xác thực registry
-node tools/schema-registry-demo.js demo       # Demo tương tác
-```
-
-**🎯 Tính năng Schema Registry:**
-- **46 Schemas tổng cộng** trên 10 categories chức năng
-- **46 Validator Functions được xây dựng sẵn** tự động tạo
-- **Hệ thống Caching thông minh** với cải thiện hiệu suất 90%
-- **Hỗ trợ đa ngôn ngữ** với tạo i18n schema hiệu quả
-- **Công cụ quản lý Command-line** cho các hoạt động schema toàn diện
-- **Xác thực Registry** với kiểm tra tính nhất quán và phát hiện lỗi
-- **Hệ thống Demo tương tác** cho khám phá và kiểm thử
-- **Tài liệu tự động tạo** từ định nghĩa schema
-
-**Tham khảo chi tiết**: [TEST_GUIDE_vi.md](./documents/TEST_GUIDE_vi.md) | [TEST_SCRIPTS_vi.md](./documents/TEST_SCRIPTS_vi.md)
-- **🎭 Kiểm thử dựa trên vai trò**: Các tệp cụ thể để kiểm thử các vai trò người dùng khác nhau
-- **📜 Script Shell**: Các script tự động hóa cho CI/CD và kiểm thử thủ công
-- **🛠️ Tiện ích kiểm thử**: Các tiện ích và hàm trợ giúp dùng chung
-- **🔗 Tích hợp**: Kiểm thử tích hợp end-to-end và thành phần
-- **✅ Xác thực**: Xác thực schema và kiểm thử đầu vào
-- **🔍 Kiểm thử kiểm toán doanh nghiệp**: Bộ kiểm thử hệ thống kiểm toán hoàn chỉnh với kiểm thử hiệu năng
-- **🌍 Kiểm thử xác thực i18n**: Kiểm thử thông báo lỗi xác thực đa ngôn ngữ trên tất cả các điểm cuối API
-
-### 🎭 Kiểm thử dựa trên vai trò
-
-Bộ khung hỗ trợ kiểm thử kiểm soát truy cập dựa trên vai trò toàn diện:
-
-| Vai trò | Tệp kiểm thử | Script Shell | Khả năng |
-|---|---|---|---|
-| **Người dùng thông thường** | `regularUserTest.js` | `regular_user.sh` | Chỉ truy cập hồ sơ cá nhân, thay đổi mật khẩu, không có quyền admin |
-| **Người dùng Admin** | `adminUserTest.js` | `admin_user.sh` | Quản lý người dùng & dashboard, tạo/xóa người dùng/admin, KHÔNG có quyền truy cập Super Admin |
-| **Người dùng Super Admin** | `superAdminUserTest.js` | `super_admin_user.sh` | Toàn quyền truy cập hệ thống, quản lý tất cả người dùng, tạo Super Admin |
-| **Quản lý KV** | `kvAdminTest.js` | `test-kv-admin.sh` | Quản lý cấu hình KV (chỉ super_admin), CRUD cấu hình |
-
-### 📊 Phạm vi kiểm thử
-
-- ✅ **Xác thực**: Đăng nhập, đăng xuất, xác thực JWT, bảo mật mật khẩu
-- ✅ **Quản lý người dùng**: Các hoạt động CRUD, quản lý hồ sơ, thay đổi vai trò
-- ✅ **Hoạt động Admin**: Quản trị người dùng, thống kê hệ thống
-- ✅ **Cấu hình KV**: Quản lý cấu hình động, hoạt động CRUD, quyền super_admin
-- ✅ **Bảo mật**: Giới hạn truy cập, xác thực đầu vào, phòng chống SQL injection
-- ✅ **Quốc tế hóa**: Phát hiện ngôn ngữ, dịch vụ dịch thuật
-- ✅ **Hiệu năng**: Kiểm thử tải, xác thực thời gian phản hồi
-- ✅ **Tích hợp**: Quy trình làm việc end-to-end, tương tác thành phần
-- ✅ **Xác thực**: Xác thực schema Zod, xử lý lỗi
+- Dùng [documents/TEST_GUIDE_vi.md](./documents/TEST_GUIDE_vi.md) làm nguồn chuẩn cho toàn bộ lệnh test và chi tiết coverage.
+- Dùng [documents/TEST_SCRIPTS_vi.md](./documents/TEST_SCRIPTS_vi.md) cho shell runner, curl workflow và hướng dẫn xử lý sự cố.
+- Dùng [documents/SCHEMAS_GUIDE_vi.md](./documents/SCHEMAS_GUIDE_vi.md) cho schema registry và validator tooling.
 
 ## Lược đồ cơ sở dữ liệu
+
+Phần này chỉ tóm tắt các bảng cốt lõi cho user/auth. Để xem đầy đủ schema gồm audit, token security, activation và email verification, xem [documents/DATABASE_SERVICE_vi.md](./documents/DATABASE_SERVICE_vi.md) và [documents/EMAIL_CHANGE_VERIFICATION_GUIDE_vi.md](./documents/EMAIL_CHANGE_VERIFICATION_GUIDE_vi.md).
 
 ### Bảng `users`
 - `id` - Khóa chính (INTEGER)
@@ -292,6 +172,9 @@ Bộ khung hỗ trợ kiểm thử kiểm soát truy cập dựa trên vai trò 
 - `status` - Trạng thái: `active`, `inactive`, `suspended` (TEXT, mặc định: 'active')
 - `created_at` - Thời gian tạo (DATETIME)
 - `updated_at` - Thời gian cập nhật (DATETIME)
+- `new_email` - Email mới đang chờ xác minh trước khi áp dụng (TEXT, có thể null)
+- `email_verification_token` - Token xác minh cho luồng đổi email (TEXT, có thể null)
+- `email_verification_expires_at` - Thời điểm hết hạn của token xác minh đổi email (TEXT, có thể null)
 
 ### Bảng `failed_login_limits`
 - `id` - Khóa chính (INTEGER)

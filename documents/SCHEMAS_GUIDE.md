@@ -231,16 +231,22 @@ import { createAuthI18nSchemas } from '../schemas/auth.js';
 - **Cache monitoring** for optimization insights
 - **Schema registry tools** for management tasks
 
-### 6. **Schema Registry Tools**
+### 6. **Schema Registry Quick Start**
 ```bash
-# Schema management
-npm run tool:schema:list                # List all
-npm run tool:schema:category auth       # Show category
-npm run tool:schema:validator login     # Show validator
-npm run tool:schema:docs               # Generate docs
-npm run tool:schema:demo               # Interactive demo
-npm run test:schema:registry           # Test registry
+# Day-to-day schema inspection
+npm run tool:schema:list
+
+# Validate registry consistency
+npm run tool:schema:validate
+
+# Inspect one category directly
+node tools/schema-registry-demo.js category auth
+
+# Run schema registry integration coverage
+node tests/i18nValidatorExtensionTest.js
 ```
+
+For the full test command matrix and automation flows, use [TEST_GUIDE.md](./TEST_GUIDE.md) and [TEST_SCRIPTS.md](./TEST_SCRIPTS.md). This guide remains focused on schema architecture and usage patterns.
 
 ## Schema Architecture
 
@@ -520,35 +526,18 @@ app.get('/users', i18nValidatorsMiddleware.userListQuery('query'), async (c) => 
 - `fileUpload()` - JSON target
 - `advancedValidation()` - JSON target
 
-### Schema Registry Tools
+### Schema Registry Tooling References
 
-Use command-line tools to manage schemas:
+Use these entry points for day-to-day work:
 
 ```bash
-# NPM Scripts - Recommended Method
-npm run tool:schema               # Interactive schema management tool
-npm run tool:schema:help          # Show help and available commands
-npm run tool:schema:list          # List all 46 schemas with details
-npm run tool:schema:categories    # Show all 10 schema categories
-npm run tool:schema:validators    # List all 46 pre-built validator functions
-npm run tool:schema:docs          # Generate comprehensive documentation
-npm run tool:schema:validate      # Validate registry consistency
-npm run tool:schema:demo          # Interactive demo and testing
-
-# Direct Commands (Alternative)
-node tools/schema-registry-demo.js help        # Show help
-node tools/schema-registry-demo.js list        # List all schemas
-node tools/schema-registry-demo.js categories  # Show categories
-node tools/schema-registry-demo.js category auth # Show auth schemas
-node tools/schema-registry-demo.js validator login # Show login validator
-node tools/schema-registry-demo.js validators  # List all validators
-node tools/schema-registry-demo.js docs       # Generate docs
-node tools/schema-registry-demo.js validate   # Validate registry
-node tools/schema-registry-demo.js demo       # Interactive demo
-
-# Test Schema Registry
-npm run test:schema:registry      # Run comprehensive schema registry tests
+npm run tool:schema:list
+npm run tool:schema:validate
+node tools/schema-registry-demo.js category auth
+node tests/i18nValidatorExtensionTest.js
 ```
+
+For the complete command matrix, advanced automation, and testing workflows, refer to [TEST_GUIDE.md](./TEST_GUIDE.md) and [TEST_SCRIPTS.md](./TEST_SCRIPTS.md).
 
 ## Practical Usage Guide
 

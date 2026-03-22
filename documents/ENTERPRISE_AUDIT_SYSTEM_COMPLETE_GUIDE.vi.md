@@ -39,7 +39,7 @@ Dự án **Hono Auth Worker** giờ đây đã có một **HỆ THỐNG AUDIT C�
 ### **🔧 Tổng Quan Kiến Trúc Cốt Lõi**
 ```
 Hệ Thống Audit Doanh Nghiệp (50+ Endpoints)
-├── 📋 Giai đoạn 1: Core Audit (/api/audit/*) - 5 endpoints
+├── 📋 Giai đoạn 1: Core Audit (/api/audit/*) - 6 endpoints
 │   ├── Lược đồ cơ sở dữ liệu (5 migrations)
 │   ├── AuditLogService với kế thừa BaseService
 │   ├── Lọc dựa trên vai trò và phân trang
@@ -84,7 +84,7 @@ Hệ Thống Audit Doanh Nghiệp (50+ Endpoints)
 
 ## 🗺️ **4 NHÓM ROUTE AUDIT CHÍNH - CHI TIẾT HOÀN CHỈNH**
 
-### **📊 1. Core Audit Routes (`/api/audit/*`) - 5 Endpoints**
+### **📊 1. Core Audit Routes (`/api/audit/*`) - 6 Endpoints**
 **File**: `src/routes/audit.js`  
 **Mục đích**: Truy cập log audit cơ bản và giám sát sức khỏe hệ thống  
 **Phân quyền**: Admin (dữ liệu đã lọc) | Super Admin (tất cả dữ liệu)  
@@ -96,6 +96,7 @@ Hệ Thống Audit Doanh Nghiệp (50+ Endpoints)
 - **GET `/stats`** - Thống kê toàn diện và metrics với insights hiệu năng
 - **GET `/export`** - Xuất dữ liệu audit ở nhiều định dạng (CSV, JSON) với lọc
 - **GET `/system-health`** - Giám sát sức khỏe hệ thống với metrics hiệu năng chi tiết
+- **DELETE `/logs/:id`** - Xóa một bản ghi audit theo ID dạng số
 
 #### **🎯 Các Tính Năng Đặc Biệt:**
 - **Lọc Dữ Liệu Dựa Trên Vai Trò**: Admin chỉ thấy log không phải super_admin, super_admin thấy tất cả
@@ -104,7 +105,7 @@ Hệ Thống Audit Doanh Nghiệp (50+ Endpoints)
 - **Khả Năng Tìm Kiếm Nâng Cao**: Tìm kiếm toàn văn với phạm vi ngày, hành động, và bộ lọc thực thể
 - **Giám Sát Sức Khỏe Thời Gian Thực**: Kiểm tra sức khỏe hệ thống liên tục với metrics hiệu năng
 
-### **🚀 2. Advanced Audit Routes (`/api/advanced-audit/*`) - 14 Endpoints**  
+### **🚀 2. Advanced Audit Routes (`/api/advanced-audit/*`) - 15 Endpoints**  
 **File**: `src/routes/advancedAudit.js`  
 **Mục đích**: Phân tích doanh nghiệp, báo cáo tuân thủ, và quản lý lưu trữ dữ liệu  
 **Phân quyền**: Admin (phân tích hạn chế) | Super Admin (toàn quyền truy cập)  
@@ -117,7 +118,7 @@ Hệ Thống Audit Doanh Nghiệp (50+ Endpoints)
 - **GET `/analytics/performance`** - Phân tích hiệu năng hệ thống và insights tối ưu hóa
 
 #### **🗄️ Nhóm Quản Lý Dữ Liệu (4 endpoints):**
-- **GET `/archival`** - Giao diện quản lý lưu trữ với trạng thái chính sách giữ lại
+- **GET `/archive`** - Giao diện quản lý lưu trữ với trạng thái chính sách giữ lại
 - **GET `/archival/stats`** - Thống kê lưu trữ chi tiết và sử dụng bộ nhớ
 - **POST `/archival/run`** - Thực hiện lưu trữ dữ liệu tự động với nén
 - **POST `/archival/restore`** - Khôi phục dữ liệu đã lưu trữ với tùy chọn phục hồi có chọn lọc
@@ -126,7 +127,7 @@ Hệ Thống Audit Doanh Nghiệp (50+ Endpoints)
 - **GET `/compliance`** - Tổng quan tuân thủ với hỗ trợ đa tiêu chuẩn
 - **GET `/compliance/report`** - Tạo báo cáo tuân thủ (GDPR, SOX, ISO27001)
 - **GET `/middleware/stats`** - Thống kê hiệu năng middleware audit và tối ưu hóa
-- **GET `/export/advanced`** - Xuất nâng cao với dữ liệu phân tích và tuân thủ
+- **POST `/export-advanced`** - Xuất nâng cao với dữ liệu phân tích và tuân thủ
 
 #### **💡 Các Tính Năng Doanh Nghiệp:**
 - **Tuân Thủ Đa Tiêu Chuẩn**: Báo cáo GDPR, SOX, ISO27001 với xác thực tự động
@@ -330,7 +331,7 @@ export class AuditLogService extends BaseService {
 
 #### **Tích Hợp Middleware**
 ```javascript
-// src/middleware/audit.js
+// src/middleware/unifiedRequestMiddleware.js
 export const auditMiddleware = (options = {}) => {
   return async (c, next) => {
     const startTime = Date.now();
@@ -383,6 +384,7 @@ Trước khi đi sâu vào chi tiết các trường hợp kiểm thử, hãy hi
 - 📊 **GET /api/audit/stats** - Thống kê và các chỉ số theo khoảng thời gian/nhóm
 - 📤 **GET /api/audit/export** - Xuất CSV (chỉ super admin)
 - 🏥 **GET /api/audit/system-health** - Kiểm tra tình trạng và các chỉ số hiệu suất
+- 🗑️ **DELETE /api/audit/logs/:id** - Xóa một bản ghi audit theo ID dạng số
 
 #### **📈 2. Advanced Audit Routes (`/api/advanced-audit/*`)**
 - 📊 **Nhóm Phân Tích**:
@@ -457,101 +459,30 @@ Hệ thống audit doanh nghiệp của chúng tôi bao gồm một bộ kiểm 
 
 ### **🚀 Bắt Đầu Kiểm Thử Nhanh**
 
-#### **1. Chạy Tất Cả Các Bài Test**
 ```bash
-# Bộ kiểm thử hoàn chỉnh với script thống nhất
-bash tests/scripts/unified-audit-test.sh full
-
-# Hoặc sử dụng npm script
-npm run test:audit
-```
-
-#### **2. Chạy Các Bài Test Cụ Thể**
-```bash
-# Kiểm tra chức năng nhanh
-bash tests/scripts/unified-audit-test.sh quick
+# Các entry point audit nên dùng
+npm run test:audit:system
 npm run test:audit:quick
-
-# Chức năng audit cốt lõi (curl endpoints)
-bash tests/scripts/unified-audit-test.sh core
-npm run test:audit:core
-
-# Các tính năng audit nâng cao (curl endpoints)
-bash tests/scripts/unified-audit-test.sh advanced
-npm run test:audit:advanced
-
-# Giám sát thời gian thực (curl endpoints)
-bash tests/scripts/unified-audit-test.sh realtime
-npm run test:audit:realtime
-
-# Quản lý sự cố bảo mật (curl endpoints)
-bash tests/scripts/unified-audit-test.sh security
-npm run test:audit:security
-
-# Kiểm thử tất cả endpoints với curl
-bash tests/scripts/unified-audit-test.sh endpoints
-npm run test:audit:endpoints
-
-# Phân tích hiệu năng
-bash tests/scripts/unified-audit-test.sh performance
-npm run test:audit:performance
-
-# Bộ kiểm thử toàn diện
-bash tests/scripts/unified-audit-test.sh comprehensive
 npm run test:audit:comprehensive
+bash tests/scripts/unified-audit-test.sh endpoints
 ```
 
-#### **3. Chạy Các File Test Riêng Lẻ**
-```bash
-# Thực thi trực tiếp
-node tests/quickAuditTest.js           # Xác thực nhanh
-node tests/advancedAuditComprehensiveTest.js        # Audit nâng cao (/api/advanced-audit/*)
-node tests/realtimeMonitoringTest.js   # Giám sát thời gian thực (/api/realtime-monitoring/*)
-node tests/securityIncidentTest.js     # Quản lý sự cố bảo mật (/api/security-incident/*)
-node tests/auditSystemTest.js          # Kiểm thử hệ thống toàn diện
-node tests/auditPerformanceTest.js     # Phân tích hiệu năng
-node tests/auditEndpointsCompleteTest.js # Kiểm thử độ bao phủ endpoint hoàn chỉnh
-```
-
-#### **4. NPM Test Scripts (Đã cập nhật)**
-```bash
-# Các bài test chức năng audit cốt lõi
-npm run test:audit:core            # Endpoints audit cốt lõi (/api/audit/*)
-npm run test:audit:advanced        # Các tính năng audit nâng cao (/api/advanced-audit/*)
-npm run test:audit:realtime         # Giám sát thời gian thực (/api/realtime-monitoring/*)
-npm run test:audit:archival         # Kiểm thử dịch vụ lưu trữ
-npm run test:audit:monitoring       # Các bài test giám sát thời gian thực
-
-# Độ bao phủ endpoint hoàn chỉnh
-npm run test:audit:endpoints:complete  # Kiểm thử TẤT CẢ endpoints audit
-npm run test:audit:endpoints           # Kiểm thử cốt lõi + nâng cao + thời gian thực
-
-# Các bài test hiệu năng và hệ thống
-npm run test:audit:perf             # Phân tích hiệu năng
-npm run test:audit:system           # Kiểm thử hệ thống hoàn chỉnh
-npm run test:audit:full             # Bộ kiểm thử toàn diện đầy đủ
-
-# Các bài test nhanh và tiện lợi
-npm run test:audit                  # Bộ kiểm thử audit đầy đủ
-npm run test:audit:quick            # Các bài test smoke nhanh
-npm run test:audit:simple           # Chức năng audit đơn giản
-npm run test:security:incident      # Quản lý sự cố bảo mật
-```
+Dùng [TEST_GUIDE_vi.md](./TEST_GUIDE_vi.md) làm nguồn chuẩn cho toàn bộ ma trận lệnh audit, mode test, và coverage theo vai trò. Dùng [TEST_SCRIPTS_vi.md](./TEST_SCRIPTS_vi.md) cho chi tiết runner và [AUDIT_API_REFERENCE_vi.md](./AUDIT_API_REFERENCE_vi.md) cho curl workflow theo endpoint.
 
 ### **📁 Cấu Trúc File Test**
 
 #### **Các File Test Cốt Lõi**
 
-**`auditEndpointsCompleteTest.js`** - Độ bao phủ endpoint hoàn chỉnh (3-5 phút)
+**`unified-audit-test.sh (mode: endpoints)`** - Độ bao phủ endpoint hoàn chỉnh (3-5 phút)
 - ✅ TẤT CẢ endpoints audit trên 4 nhóm route
-- ✅ Audit cốt lõi: 5 endpoints (/api/audit/*)
-- ✅ Audit nâng cao: 14 endpoints (/api/advanced-audit/*)
-- ✅ Giám sát thời gian thực: 22 endpoints (/api/realtime-monitoring/*)
+- ✅ Audit cốt lõi: 6 endpoints (/api/audit/*)
+- ✅ Audit nâng cao: 15 endpoints (/api/advanced-audit/*)
+- ✅ Giám sát thời gian thực: 28 endpoints (/api/realtime-monitoring/*)
 - ✅ Sự cố bảo mật: 8 endpoints (/api/security-incident/*)
 - ✅ Kiểm thử xác thực và phân quyền
 - ✅ Xác thực phản hồi toàn diện
 
-**`quickAuditTest.js`** - Xác thực nhanh (30 giây)
+**`quickTest.js`** - Xác thực nhanh (30 giây)
 - ✅ Luồng audit cơ bản (đăng nhập → log audit → tìm kiếm)
 - ✅ Xác thực kiểm soát truy cập dựa trên vai trò
 - ✅ Kiểm tra tính khả dụng của giám sát thời gian thực
@@ -789,14 +720,15 @@ await this.testIncidentManagement();    // Phản hồi sự cố
 
 ### **🌐 Hệ Sinh Thái API Routes**
 
-#### **📋 API Audit Cốt Lõi: `/api/audit/*` (5 endpoints)**
+#### **📋 API Audit Cốt Lõi: `/api/audit/*` (6 endpoints)**
 - **GET `/api/audit/logs`**: Lấy log audit chính với lọc dựa trên vai trò
 - **GET `/api/audit/search`**: Tìm kiếm nâng cao với khả năng toàn văn  
 - **GET `/api/audit/stats`**: Thống kê audit (đã lọc theo vai trò)
 - **GET `/api/audit/export`**: Xuất dữ liệu với các hạn chế bảo mật
 - **GET `/api/audit/system-health`**: Giám sát tình trạng hệ thống audit
+- **DELETE `/api/audit/logs/:id`**: Xóa một bản ghi audit theo ID dạng số
 
-#### **📊 API Audit Nâng Cao: `/api/advanced-audit/*` (14 endpoints)**
+#### **📊 API Audit Nâng Cao: `/api/advanced-audit/*` (15 endpoints)**
 - **GET `/api/advanced-audit/analytics`**: Tổng quan phân tích chung
 - **GET `/api/advanced-audit/analytics/security`**: Phân tích tập trung vào bảo mật
 - **GET `/api/advanced-audit/analytics/behavior`**: Phân tích hành vi người dùng
@@ -812,7 +744,7 @@ await this.testIncidentManagement();    // Phản hồi sự cố
 - **POST `/api/advanced-audit/export-advanced`**: Chức năng xuất nâng cao
 - **GET `/api/advanced-audit/middleware/stats`**: Thống kê hiệu suất middleware
 
-#### **🚀 API Giám Sát Thời Gian Thực: `/api/realtime-monitoring/*` (22 endpoints)**
+#### **🚀 API Giám Sát Thời Gian Thực: `/api/realtime-monitoring/*` (28 endpoints)**
 
 **Kiểm Soát Giám Sát (7 endpoints):**
 - **GET `/monitoring/status`**: Lấy trạng thái và thống kê giám sát hiện tại
@@ -852,13 +784,13 @@ await this.testIncidentManagement();    // Phản hồi sự cố
 - **GET `/api/security-incident/status`**: Lấy trạng thái dịch vụ và cấu hình
 - **POST `/api/security-incident/simulate`**: Mô phỏng các mối đe dọa bảo mật (chỉ dành cho phát triển)
 
-**📊 Tổng Độ Bao Phủ API: 49+ Endpoints**
+**📊 Tổng Độ Bao Phủ API: 57+ Endpoints**
 
 ### **🔄 Middleware & Tích Hợp**
 
 #### **Middleware Audit Tự Động**
 ```javascript
-// src/middleware/audit.js
+// src/middleware/unifiedRequestMiddleware.js
 export const auditMiddleware = (options = {}) => {
   return async (c, next) => {
     const startTime = Date.now();
@@ -1173,7 +1105,7 @@ npm run test:audit:realtime    # Giám sát thời gian thực
 npm run test:audit:perf        # Phân tích hiệu năng
 
 # Thực thi test trực tiếp
-node tests/quickAuditTest.js            # Xác thực nhanh
+node tests/quickTest.js            # Xác thực nhanh
 node tests/auditSystemTest.js           # Kiểm thử toàn diện
 node tests/auditPerformanceTest.js      # Phân tích hiệu năng
 

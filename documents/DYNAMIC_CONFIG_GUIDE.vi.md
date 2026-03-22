@@ -10,6 +10,8 @@
 
 Hướng dẫn này bao gồm **Hệ thống Quản lý Cấu hình Động** được triển khai trong dự án Hono Auth Worker. Hệ thống này loại bỏ việc phải truyền tham số cấu hình qua các lớp service bằng cách cung cấp truy cập cấu hình tập trung và có cache với các tính năng cấp doanh nghiệp.
 
+Tài liệu này tập trung vào mô hình cấu hình, helper API và cách tích hợp trong code. Với lệnh test và runner vận hành, dùng [TEST_GUIDE_vi.md](./TEST_GUIDE_vi.md) và [TEST_SCRIPTS_vi.md](./TEST_SCRIPTS_vi.md). Với workflow endpoint KV Admin có phân quyền, dùng [ROLE_COMPLETE_GUIDE_vi.md](./ROLE_COMPLETE_GUIDE_vi.md).
+
 ## 🎯 Lợi ích chính
 
 - **🔧 Quản lý Tập trung**: Tất cả cấu hình được xử lý thông qua `src/utils/dynamicConfig.js`
@@ -682,7 +684,7 @@ Hệ thống cấu hình sử dụng phương pháp fallback ba tầng:
 Cấu hình động hoạt động mượt mà trong môi trường test:
 
 ```javascript
-// tests/config/testEnv.js
+// tests/config/testConfig.js
 export const testEnv = {
   JWT_SECRET: 'test-jwt-secret',
   RATE_LIMIT_DISABLED: 'true',
@@ -809,24 +811,14 @@ export const securityMiddleware = async (c, next) => {
 Super admin có thể tùy chỉnh security headers thông qua KV Admin API:
 
 ```bash
-# Cập nhật Content Security Policy
+# Ví dụ: cập nhật Content Security Policy
 curl -X PUT "/api/kv-admin/configs/SECURITY_CSP" \
   -H "Authorization: Bearer $SUPER_ADMIN_TOKEN" \
   -H "Content-Type: application/json" \
   -d '{"value":"default-src '\''self'\''; script-src '\''self'\''"}' 
-
-# Cập nhật X-Frame-Options
-curl -X PUT "/api/kv-admin/configs/SECURITY_X_FRAME_OPTIONS" \
-  -H "Authorization: Bearer $SUPER_ADMIN_TOKEN" \
-  -H "Content-Type: application/json" \
-  -d '{"value":"SAMEORIGIN"}'
-
-# Cập nhật Permissions Policy
-curl -X PUT "/api/kv-admin/configs/SECURITY_PERMISSIONS_POLICY" \
-  -H "Authorization: Bearer $SUPER_ADMIN_TOKEN" \
-  -H "Content-Type: application/json" \
-  -d '{"value":"camera=(), microphone=(), geolocation=()"}'
 ```
+
+Để xem thêm ví dụ request KV Admin và workflow có phân quyền, xem [ROLE_COMPLETE_GUIDE_vi.md](./ROLE_COMPLETE_GUIDE_vi.md) và [TEST_SCRIPTS_vi.md](./TEST_SCRIPTS_vi.md).
 
 ### Tích hợp vào ứng dụng
 

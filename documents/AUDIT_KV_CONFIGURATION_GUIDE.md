@@ -460,6 +460,8 @@ const AUDIT_CONFIG_VALIDATION = {
 
 The audit system includes comprehensive i18n configuration options to support multilingual deployments and localized error messages.
 
+Use [TEST_GUIDE.md](./TEST_GUIDE.md) as the canonical source for test commands, [TEST_SCRIPTS.md](./TEST_SCRIPTS.md) for automation flows, and [../tests/scripts/CURL_COMMANDS.md](../tests/scripts/CURL_COMMANDS.md) for broader curl examples. This guide keeps only representative KV Admin configuration examples.
+
 ### **🌐 Proposed i18n Configuration Keys**
 
 | Key | Purpose | Default Value | Type | Description |
@@ -474,7 +476,7 @@ The audit system includes comprehensive i18n configuration options to support mu
 
 ### **🔧 i18n Configuration Examples**
 
-**Enable Japanese and German Support**:
+**Representative example: update supported languages**:
 ```bash
 curl -X PUT "http://localhost:8787/api/kv-admin/configs/AUDIT_SUPPORTED_LANGUAGES" \
   -H "Authorization: Bearer <super_admin_token>" \
@@ -482,32 +484,11 @@ curl -X PUT "http://localhost:8787/api/kv-admin/configs/AUDIT_SUPPORTED_LANGUAGE
   -d '{"value": "en,vi,fr,es,de,ja,th"}'
 ```
 
-**Set Vietnamese as Default for Asian Markets**:
-```bash
-curl -X PUT "http://localhost:8787/api/kv-admin/configs/AUDIT_DEFAULT_LANGUAGE" \
-  -H "Authorization: Bearer <super_admin_token>" \
-  -H "Content-Type: application/json" \
-  -d '{"value": "vi"}'
-```
-
-**Batch Configure i18n Settings**:
-```bash
-curl -X POST "http://localhost:8787/api/kv-admin/configs/batch" \
-  -H "Authorization: Bearer <super_admin_token>" \
-  -H "Content-Type: application/json" \
-  -d '{
-    "configs": {
-      "AUDIT_DEFAULT_LANGUAGE": "fr",
-      "AUDIT_AUTO_DETECT_LANGUAGE": true,
-      "AUDIT_LOCALIZE_ERROR_MESSAGES": true,
-      "AUDIT_TRANSLATION_CACHE_TTL": 7200
-    }
-  }'
-```
+For additional per-key and batch-update request samples, refer to [TEST_SCRIPTS.md](./TEST_SCRIPTS.md) and [../tests/scripts/CURL_COMMANDS.md](../tests/scripts/CURL_COMMANDS.md).
 
 ### **🌐 i18n Service Integration**
 
-**File**: `src/services/auditI18nService.js` (Proposed)
+**File**: `src/i18n/service.js` (Proposed)
 
 ```javascript
 export class AuditI18nService {
