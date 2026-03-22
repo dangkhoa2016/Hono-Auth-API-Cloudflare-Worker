@@ -166,7 +166,7 @@ tools/i18n/                   # Management tools
 ├── demo-i18n.sh             # Interactive i18n demo
 └── demo-endpoints-i18n.sh   # Endpoints testing demo
 
-tools/i18n.js                # Main management tool (tools/ directory)
+tools/i18n/master.js                # Main management tool (tools/ directory)
 ```
 
 ### 🔧 **Core Components:**
@@ -186,7 +186,7 @@ export async function loadTranslation(language) {
 }
 ```
 
-#### **2. Language Management (`src/i18n/languages.js`)**
+#### **2. Language Management (`src/i18n/locales/en.js (and other locale files)`)**
 ```javascript
 // Async: Full discovery
 export async function getSupportedLanguages() {
@@ -244,7 +244,9 @@ const initI18n = async () => {
 
 ## 3. i18n MANAGEMENT TOOLS
 
-### 🛠️ **Main Tool (`tools/i18n.js`)**
+This guide focuses on i18n architecture, integration patterns, and operational workflow. Keep detailed tool command reference in [tools/i18n/README.md](../tools/i18n/README.md). Keep test execution matrices in [TEST_GUIDE.md](./TEST_GUIDE.md) and [TEST_SCRIPTS.md](./TEST_SCRIPTS.md).
+
+### 🛠️ **Main Tool (`tools/i18n/master.js`)**
 
 Unified management tool providing simple interface for all i18n operations.
 
@@ -252,74 +254,30 @@ Unified management tool providing simple interface for all i18n operations.
 
 ```bash
 # Show all available commands
-node tools/i18n.js help
+node tools/i18n/master.js help
 
 # Add a new language
-node tools/i18n.js add de "German"
+node tools/i18n/master.js add de "German"
 
 # Test the system
-node tools/i18n.js test
+node tools/i18n/master.js test
 
 # Quick verification
-node tools/i18n.js verify
+node tools/i18n/master.js verify
 ```
 
-#### **📋 Available Commands:**
+#### **Daily Entry Points:**
 
-**Core Commands:**
-- `test, t` - Run comprehensive i18n system test
-- `add, a <code> [name]` - Add new language
-- `verify, v` - Quick system verification
-- `help, h` - Show help information
+- `node tools/i18n/master.js help` for the full CLI surface.
+- `node tools/i18n/master.js test` for end-to-end i18n verification.
+- `node tools/i18n/master.js compare` and `node tools/i18n/master.js fix` for translation-key maintenance.
+- `node tools/i18n/master.js add <code> "<name>"` when onboarding a new locale.
 
-**Diagnostic Commands:**
-- `analyze, an` - Analyze all i18n files
-- `check, c` - Check system integrity
-- `endpoints, e` - Test API endpoint localization
-- `legacy, l` - Test Cloudflare Workers compatibility
+### 🛠️ **Detailed Tool References**
 
-**Demo Commands:**
-- `demo, d` - Run interactive i18n demo
-- `demo-endpoints, de` - Run endpoints testing demo
-
-#### **💡 Command Examples:**
-
-```bash
-# Basic operations
-node tools/i18n.js add ja "Japanese"
-node tools/i18n.js test
-node tools/i18n.js verify
-
-# Diagnostic operations
-node tools/i18n.js analyze
-node tools/i18n.js check
-node tools/i18n.js endpoints
-
-# Demo operations
-node tools/i18n.js demo
-node tools/i18n.js demo-endpoints
-```
-
-### 🛠️ **Direct Tool Access:**
-
-All tools are located in `tools/i18n/` directory and can be called directly:
-
-```bash
-# Language management
-node tools/i18n/add-language-demo.js es "Spanish"
-node tools/i18n/check-i18n.js
-
-# Testing tools
-node tools/i18n/test-dynamic-i18n.js
-node tools/i18n/test-endpoints-i18n.js
-node tools/i18n/test-workers-i18n.js
-
-# Verification tools
-node tools/i18n/final-verification.js
-
-# Analysis tools
-node tools/i18n/analyze-i18n-files.js
-```
+- Use [tools/i18n/README.md](../tools/i18n/README.md) for the complete command reference, workflow commands, and direct-tool entry points.
+- Use [TEST_GUIDE.md](./TEST_GUIDE.md) when the i18n task is part of broader API validation or multilingual test execution.
+- Use [TEST_SCRIPTS.md](./TEST_SCRIPTS.md) for shell automation and troubleshooting flows.
 
 ### 📚 **Tool Documentation:**
 
@@ -351,30 +309,16 @@ Automatically add missing keys from `en.js` to other locale files.
 - Update all locale files simultaneously
 - Detailed result reporting
 
-#### **3. `i18n-manager.js` - Comprehensive Management Tool**
+#### **3. `master.js` - Comprehensive Management Tool**
 CLI tool with multiple translation key management features.
 
-**Commands:**
-- `compare` - Compare all locales
-- `fix` - Auto-fix missing keys
-- `details <locale>` - View missing key details for specific locale
-- `add <key> <value>` - Add new key to all locales
+**Common entry points:**
+- `node tools/i18n/master.js compare`
+- `node tools/i18n/master.js fix`
+- `node tools/i18n/master.js details <locale>`
+- `node tools/i18n/master.js add "<key>" "<value>"`
 
-**Usage Examples:**
-```bash
-# Compare all locales
-node tools/i18n/i18n-manager.js compare
-
-# Auto-fix missing keys
-node tools/i18n/i18n-manager.js fix
-
-# View missing keys for specific locale
-node tools/i18n/i18n-manager.js details vi
-node tools/i18n/i18n-manager.js details fr
-
-# Add new key to all locales
-node tools/i18n/i18n-manager.js add "validation.newField.required" "New field is required"
-```
+For the full command catalog and examples, refer to [tools/i18n/README.md](../tools/i18n/README.md).
 
 ### 🔄 **Translation Key Management Workflow**
 
@@ -689,13 +633,13 @@ const successMessage = tSuccess(c, 'operation.completed', {
 
 ```bash
 # Add German language
-node tools/i18n.js add de "German"
+node tools/i18n/master.js add de "German"
 
 # Add Japanese language  
-node tools/i18n.js add ja "Japanese"
+node tools/i18n/master.js add ja "Japanese"
 
 # Add Thai language
-node tools/i18n.js add th "Thai"
+node tools/i18n/master.js add th "Thai"
 ```
 
 ### 🎯 **Method 2: Using Direct Tool**
@@ -777,7 +721,7 @@ export default {
 #### **Step 3: Test New Language**
 ```bash
 # Test using main tool
-node tools/i18n.js test
+node tools/i18n/master.js test
 
 # Or test directly
 node tools/i18n/test-dynamic-i18n.js
@@ -1403,7 +1347,7 @@ async function discoverAvailableLanguages() {
 // 5. Update API endpoints
 
 // NEW: Single file creation + single command
-// 1. node tools/i18n.js add [code] "[name]"
+// 1. node tools/i18n/master.js add [code] "[name]"
 // → System automatically detects and includes it!
 ```
 
@@ -1452,19 +1396,19 @@ async function discoverAvailableLanguages() {
 #### **Main Tool Testing:**
 ```bash
 # Test entire system through main tool
-node tools/i18n.js test
+node tools/i18n/master.js test
 
 # Quick verification
-node tools/i18n.js verify
+node tools/i18n/master.js verify
 
 # Test endpoints
-node tools/i18n.js endpoints
+node tools/i18n/master.js endpoints
 
 # Analyze system
-node tools/i18n.js analyze
+node tools/i18n/master.js analyze
 
 # Check system integrity  
-node tools/i18n.js check
+node tools/i18n/master.js check
 ```
 
 #### **Direct Tool Testing:**
@@ -1688,10 +1632,10 @@ curl "http://localhost:8788/api/translations/vi/validate"
 #### **Test New Language Addition:**
 ```bash
 # Add new language using main tool
-node tools/i18n.js add it "Italian"
+node tools/i18n/master.js add it "Italian"
 
 # Verify auto-detection
-node tools/i18n.js test | grep "Discovered languages"
+node tools/i18n/master.js test | grep "Discovered languages"
 
 # Test API with new language
 curl "http://localhost:8788/?lang=it"
@@ -1760,7 +1704,7 @@ node -e "import('./src/i18n/loader.js').then(m => m.clearCache())"
 npm run dev
 
 # 4. Test with tool
-node tools/i18n.js test
+node tools/i18n/master.js test
 ```
 
 #### **🔴 Problem: "Translation shows 'undefined' or missing"**
@@ -1786,7 +1730,7 @@ export default {
 curl "http://localhost:8788/api" | grep supported_languages
 
 # 2. Check translation file exists and valid
-node tools/i18n.js test
+node tools/i18n/master.js test
 
 # 3. Check language detection logic
 curl -v "http://localhost:8788/api?lang=vi" # Check logs
@@ -1806,7 +1750,7 @@ node -p "import('./src/i18n/locales/[lang].js')"
 **Solution:**
 ```bash
 # 1. Check if main tool exists
-ls -la tools/i18n.js
+ls -la tools/i18n/master.js
 
 # 2. Check if tools directory exists
 ls -la tools/i18n/
@@ -1815,7 +1759,7 @@ ls -la tools/i18n/
 node tools/i18n/test-dynamic-i18n.js
 
 # 4. Check permissions
-chmod +x tools/i18n.js
+chmod +x tools/i18n/master.js
 ```
 
 ### 🛠️ **Advanced Debugging:**
@@ -1854,7 +1798,7 @@ if (!isI18nInitialized()) {
 
 ### 📞 **Getting Help:**
 
-1. **Use main tool first**: `node tools/i18n.js test`
+1. **Use main tool first**: `node tools/i18n/master.js test`
 2. **Check test scripts**: All tools have comprehensive testing
 3. **Verify file structure**: Translation files have correct format
 4. **Clear cache**: `clearCache()` if there are caching issues
@@ -1885,9 +1829,9 @@ if (!isI18nInitialized()) {
 #### **To use i18n tools:**
 ```bash
 # Main tool (recommended):
-node tools/i18n.js help
-node tools/i18n.js add [code] "[Name]"
-node tools/i18n.js test
+node tools/i18n/master.js help
+node tools/i18n/master.js add [code] "[Name]"
+node tools/i18n/master.js test
 
 # Direct tool access:
 node tools/i18n/add-language-demo.js [code] "[Name]"
@@ -1897,13 +1841,13 @@ node tools/i18n/test-dynamic-i18n.js
 #### **To verify system health:**
 ```bash
 # Quick verification:
-node tools/i18n.js verify
+node tools/i18n/master.js verify
 
 # Complete test:
-node tools/i18n.js test
+node tools/i18n/master.js test
 
 # Comprehensive analysis:
-node tools/i18n.js analyze
+node tools/i18n/master.js analyze
 ```
 
 ---
@@ -1919,7 +1863,7 @@ The Hono Auth Worker now has a fully dynamic, production-ready internationalizat
 - ✅ Production-ready error handling
 
 **Next Steps:**
-1. Use `node tools/i18n.js help` to explore all features
-2. Add new languages with `node tools/i18n.js add [code] "[name]"`
-3. Test system regularly with `node tools/i18n.js test`
+1. Use `node tools/i18n/master.js help` to explore all features
+2. Add new languages with `node tools/i18n/master.js add [code] "[name]"`
+3. Test system regularly with `node tools/i18n/master.js test`
 4. Refer to this master guide for all i18n needs

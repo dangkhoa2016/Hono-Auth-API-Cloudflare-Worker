@@ -10,6 +10,8 @@
 
 This guide covers the **Dynamic Configuration Management System** implemented in the Hono Auth Worker project. This system eliminates the need to pass configuration parameters through service layers by providing centralized, cached configuration access with enterprise-grade features.
 
+This guide focuses on configuration model, helper APIs, and integration patterns. For test commands and operational runners, use [TEST_GUIDE.md](./TEST_GUIDE.md) and [TEST_SCRIPTS.md](./TEST_SCRIPTS.md). For role-restricted KV Admin endpoint workflows, use [ROLE_COMPLETE_GUIDE.md](./ROLE_COMPLETE_GUIDE.md).
+
 ## 🎯 Key Benefits
 
 - **🔧 Centralized Management**: All configuration handled through `src/utils/dynamicConfig.js`
@@ -682,7 +684,7 @@ The configuration system uses a three-tier fallback approach:
 Dynamic configuration works seamlessly in test environments:
 
 ```javascript
-// tests/config/testEnv.js
+// tests/config/testConfig.js
 export const testEnv = {
   JWT_SECRET: 'test-jwt-secret',
   RATE_LIMIT_DISABLED: 'true',
@@ -809,24 +811,14 @@ export const securityMiddleware = async (c, next) => {
 Super admins can customize security headers through the KV Admin API:
 
 ```bash
-# Update Content Security Policy
+# Example: update Content Security Policy
 curl -X PUT "/api/kv-admin/configs/SECURITY_CSP" \
   -H "Authorization: Bearer $SUPER_ADMIN_TOKEN" \
   -H "Content-Type: application/json" \
   -d '{"value":"default-src '\''self'\''; script-src '\''self'\''"}' 
-
-# Update X-Frame-Options
-curl -X PUT "/api/kv-admin/configs/SECURITY_X_FRAME_OPTIONS" \
-  -H "Authorization: Bearer $SUPER_ADMIN_TOKEN" \
-  -H "Content-Type: application/json" \
-  -d '{"value":"SAMEORIGIN"}'
-
-# Update Permissions Policy
-curl -X PUT "/api/kv-admin/configs/SECURITY_PERMISSIONS_POLICY" \
-  -H "Authorization: Bearer $SUPER_ADMIN_TOKEN" \
-  -H "Content-Type: application/json" \
-  -d '{"value":"camera=(), microphone=(), geolocation=()"}'
 ```
+
+For additional KV Admin request examples and permission-aware workflows, refer to [ROLE_COMPLETE_GUIDE.md](./ROLE_COMPLETE_GUIDE.md) and [TEST_SCRIPTS.md](./TEST_SCRIPTS.md).
 
 ### Application Integration
 

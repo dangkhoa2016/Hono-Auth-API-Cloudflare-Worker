@@ -478,7 +478,7 @@ node tools/i18n/master.js analyze
 ## 📁 File Structure
 
 ```
-/user_demo_hono_worker/
+hono-auth-api-cloudflare-worker/
 ├── tools/
 │   └── i18n/                              # i18n tools directory
 │       ├── master.js                      # 🆕 Main i18n tool

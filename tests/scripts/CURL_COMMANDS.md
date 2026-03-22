@@ -894,8 +894,8 @@ bash tests/scripts/super_admin_user.sh
 bash tests/scripts/test_all_roles.sh
 
 # Security testing
-bash tests/scripts/test-rbac.sh
-bash tests/scripts/test-debug.sh
+bash tests/scripts/test-rbac-comprehensive.sh
+npm run dev:test:debug
 ```
 
 ### Individual Test Suite Commands
@@ -1260,13 +1260,13 @@ npm run test:super_admin_user
 bash tests/scripts/test_all_roles.sh
 
 # RBAC-specific testing
-bash tests/scripts/test-rbac.sh
+bash tests/scripts/test-rbac-comprehensive.sh
 ```
 
 #### Debug and Monitoring Issues
 ```bash
 # Enable debug mode
-bash tests/scripts/test-debug.sh
+npm run dev:test:debug
 
 # Check KV configuration
 npm run test:kv_admin

@@ -231,16 +231,22 @@ import { createAuthI18nSchemas } from '../schemas/auth.js';
 - Theo dõi cache để có thông tin tối ưu
 - Dùng công cụ registry cho các tác vụ quản lý
 
-### 6. Công cụ Schema Registry
+### 6. Quick Start cho Schema Registry
 ```bash
-# Quản lý schema
-npm run tool:schema:list                # Liệt kê tất cả
-npm run tool:schema:category auth       # Hiển thị danh mục
-npm run tool:schema:validator login     # Hiển thị validator
-npm run tool:schema:docs                # Tạo tài liệu
-npm run tool:schema:demo                # Demo tương tác
-npm run test:schema:registry            # Kiểm thử registry
+# Tra cứu schema hằng ngày
+npm run tool:schema:list
+
+# Xác thực tính nhất quán registry
+npm run tool:schema:validate
+
+# Xem riêng một category
+node tools/schema-registry-demo.js category auth
+
+# Chạy coverage tích hợp schema registry
+node tests/i18nValidatorExtensionTest.js
 ```
+
+Để xem đầy đủ ma trận lệnh test và workflow tự động hóa, dùng [TEST_GUIDE_vi.md](./TEST_GUIDE_vi.md) và [TEST_SCRIPTS_vi.md](./TEST_SCRIPTS_vi.md). Tài liệu này tập trung vào kiến trúc schema và cách sử dụng.
 
 ## Kiến trúc schema
 
@@ -520,35 +526,18 @@ app.get('/users', i18nValidatorsMiddleware.userListQuery('query'), async (c) => 
 - `fileUpload()` - Mục tiêu JSON
 - `advancedValidation()` - Mục tiêu JSON
 
-### Công cụ Schema Registry
+### Tài liệu tham chiếu cho Schema Registry
 
-Dùng công cụ dòng lệnh để quản lý schema:
+Dùng các entry point này cho công việc hằng ngày:
 
 ```bash
-# NPM Scripts - Phương pháp khuyến nghị
-npm run tool:schema               # Công cụ quản lý schema tương tác
-npm run tool:schema:help          # Hiển thị trợ giúp và lệnh có sẵn
-npm run tool:schema:list          # Liệt kê 46 schema với chi tiết
-npm run tool:schema:categories    # Hiển thị 10 danh mục schema
-npm run tool:schema:validators    # Liệt kê 46 hàm validator dựng sẵn
-npm run tool:schema:docs          # Tạo tài liệu toàn diện
-npm run tool:schema:validate      # Xác thực tính nhất quán của registry
-npm run tool:schema:demo          # Demo và kiểm thử tương tác
-
-# Lệnh trực tiếp (Thay thế)
-node tools/schema-registry-demo.js help        # Hiển thị trợ giúp
-node tools/schema-registry-demo.js list        # Liệt kê tất cả schema
-node tools/schema-registry-demo.js categories  # Hiển thị danh mục
-node tools/schema-registry-demo.js category auth # Hiển thị schema auth
-node tools/schema-registry-demo.js validator login # Hiển thị validator login
-node tools/schema-registry-demo.js validators  # Liệt kê tất cả validator
-node tools/schema-registry-demo.js docs       # Tạo tài liệu
-node tools/schema-registry-demo.js validate   # Xác thực registry
-node tools/schema-registry-demo.js demo       # Demo tương tác
-
-# Kiểm thử Schema Registry
-npm run test:schema:registry      # Chạy bộ kiểm thử registry toàn diện
+npm run tool:schema:list
+npm run tool:schema:validate
+node tools/schema-registry-demo.js category auth
+node tests/i18nValidatorExtensionTest.js
 ```
+
+Để xem ma trận lệnh đầy đủ, workflow tự động hóa, và các luồng test chi tiết, xem [TEST_GUIDE_vi.md](./TEST_GUIDE_vi.md) và [TEST_SCRIPTS_vi.md](./TEST_SCRIPTS_vi.md).
 
 ## Hướng dẫn sử dụng thực tế
 

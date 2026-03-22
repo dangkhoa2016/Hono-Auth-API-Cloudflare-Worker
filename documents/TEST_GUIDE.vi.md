@@ -7,7 +7,7 @@
 > 📅 **Cập nhật lần cuối**: 4 tháng 8, 2025
 > 📊 **Trạng thái**: ✅ Sẵn sàng cho Production - Hệ Thống Kiểm Toán Doanh Nghiệp với Admin Message Translation Testing
 > 🔄 **Bảo trì**: Đang hoạt động & Cập nhật
-> 🏢 **Phạm vi**: Hệ thống kiểm toán doanh nghiệp với 49+ endpoint qua 4 nhóm route
+> 🏢 **Phạm vi**: Hệ thống kiểm toán doanh nghiệp với 57+ endpoint qua 4 nhóm route
 
 ---
 
@@ -35,11 +35,13 @@
 
 ## 🎯 Tổng Quan
 
+Tài liệu này là nguồn chuẩn duy nhất cho các lệnh kiểm thử trong repository. Các guide khác chỉ nên giữ quick start ngắn gọn và trỏ về đây khi cần ma trận lệnh đầy đủ, coverage theo vai trò, audit suites và hướng dẫn xử lý sự cố.
+
 ### Bộ Kiểm Thử Này Là Gì?
 
 Bộ kiểm thử Hệ Thống Kiểm Toán Doanh Nghiệp Hono là một framework kiểm thử toàn diện được thiết kế cho:
 
--   ✅ **Hệ Thống Kiểm Toán Doanh Nghiệp** - 49+ endpoint qua 4 nhóm route chính
+-   ✅ **Hệ Thống Kiểm Toán Doanh Nghiệp** - 57+ endpoint qua 4 nhóm route chính
 -   ✅ **Nhiều Cấu Trúc Kiểm Thử** - Các phương pháp tiếp cận mới có cấu trúc, hợp nhất và kế thừa
 -   ✅ **Kiểm Soát Truy Cập Dựa Trên Vai Trò** - Kiểm thử RBAC toàn diện
 -   ✅ **Giám Sát Thời Gian Thực** - Hệ thống giám sát và cảnh báo trực tiếp
@@ -54,7 +56,7 @@ Bộ kiểm thử Hệ Thống Kiểm Toán Doanh Nghiệp Hono là một framew
 
 | Tính Năng | Giá Trị | Cải Tiến |
 | :--- | :--- | :--- |
-| **Hệ Thống Kiểm Toán Doanh Nghiệp** | 49+ endpoint kiểm toán | 4 nhóm route chuyên biệt |
+| **Hệ Thống Kiểm Toán Doanh Nghiệp** | 57+ endpoint kiểm toán | 4 nhóm route chuyên biệt |
 | **Giám Sát Thời Gian Thực** | 22+ endpoint giám sát | Cảnh báo và dashboard trực tiếp |
 | **Quản Lý Sự Cố Bảo Mật** | 8+ endpoint bảo mật | Phản ứng tự động với mối đe dọa |
 | **Phân Tích Nâng Cao** | 14+ endpoint phân tích | Business intelligence & tuân thủ |
@@ -112,7 +114,7 @@ npm run test:audit:advanced    # Advanced analytics (/api/advanced-audit/*)
 npm run test:audit:realtime    # Real-time monitoring (/api/realtime-monitoring/*)  
 npm run test:audit:security    # Security incident management (/api/security-incident/*)
 
-# Kiểm thử tự động toàn diện (49+ endpoints)
+# Kiểm thử tự động toàn diện (57+ endpoints)
 bash tests/scripts/unified-audit-test.sh comprehensive
 ```
 
@@ -144,7 +146,7 @@ npm run test:unified:quick
 **Hỗ Trợ Môi Trường**: 3 môi trường (dev, test, staging)
 **Phạm Vi Vai Trò**: 3 vai trò (user, admin, super_admin)
 **Menu Tương Tác**: 15+ ngữ cảnh kiểm thử + hệ thống kiểm toán doanh nghiệp
-**Hệ Thống Kiểm Toán**: 49+ endpoint qua 4 nhóm route chính
+**Hệ Thống Kiểm Toán**: 57+ endpoint qua 4 nhóm route chính
 
 ### ✅ Chỉ Số Chất Lượng & Phân Tích Coverage Routes
 
@@ -168,11 +170,11 @@ npm run test:unified:quick
 
 #### **4 NHÓM ROUTE KIỂM TOÁN CHÍNH**
 
-1. **Core Audit Routes** (`/api/audit/*`) - 5 endpoint
+1. **Core Audit Routes** (`/api/audit/*`) - 6 endpoint
    - Ghi nhật ký kiểm toán cơ bản và hoạt động cốt lõi
    - Yêu cầu quyền Admin+ 
 
-2. **Advanced Analytics Routes** (`/api/advanced-audit/*`) - 14+ endpoint  
+2. **Advanced Analytics Routes** (`/api/advanced-audit/*`) - 15 endpoint  
    - Phân tích nâng cao, lưu trữ và báo cáo tuân thủ
    - Yêu cầu quyền Super Admin
 
@@ -188,14 +190,14 @@ npm run test:unified:quick
 
 #### ✅ Hệ Thống Kiểm Toán Doanh Nghiệp Hoàn Chỉnh
 
--   49+ endpoint kiểm toán qua 4 nhóm route chuyên biệt
+-   57+ endpoint kiểm toán qua 4 nhóm route chuyên biệt
 -   Kiểm thử 4 giai đoạn toàn diện
 -   Giám sát thời gian thực và quản lý sự cố bảo mật
 -   Phân tích nâng cao và báo cáo tuân thủ
 
 #### ✅ Lợi Ích Đạt Được
 
-1.  **Hệ Thống Kiểm Toán Doanh Nghiệp**: 49+ endpoint với phạm vi toàn diện
+1.  **Hệ Thống Kiểm Toán Doanh Nghiệp**: 57+ endpoint với phạm vi toàn diện
 2.  **Giám Sát Thời Gian Thực**: 22+ endpoint cho giám sát trực tiếp
 3.  **Quản Lý Sự Cố Bảo Mật**: 8+ endpoint cho phản ứng với mối đe dọa
 4.  **Phân Tích Nâng Cao**: 14+ endpoint cho business intelligence
@@ -294,7 +296,7 @@ tests/
 ├── 🔗 integrationTest.js       # Kiểm thử Tích hợp từ đầu đến cuối
 ├── ✅ validationTest.js        # Kiểm thử Xác thực chung
 ├── ✅ zodValidationTest.js     # Kiểm thử schema Zod
-├── 🔧 schemaRegistryIntegrationTest.js # Kiểm thử hệ thống schema registry
+├── 🔧 i18nValidatorExtensionTest.js # Kiểm thử tích hợp schema registry + i18n validator
 ├── ⚡ quickTest.js             # Kiểm thử nhanh (smoke test)
 └── 🎭 roleTest.js              # Kiểm thử kiểm soát truy cập dựa trên vai trò
 ```
@@ -355,7 +357,7 @@ Hệ Thống Kiểm Toán Doanh Nghiệp được tổ chức thành **4 nhóm r
 - **Route Prefix**: `/api/audit/`
 - **Phân quyền**: Yêu cầu vai trò Admin+  
 - **Tính năng chính**: Ghi nhật ký cơ bản, tìm kiếm, thống kê, xuất dữ liệu, sức khỏe hệ thống
-- **Endpoints**: 5 endpoint cốt lõi cho hoạt động kiểm toán cơ bản
+- **Endpoints**: 6 endpoint cốt lõi cho hoạt động kiểm toán cơ bản
 - **Sử dụng**: Giao diện ghi nhật ký kiểm toán chính cho tất cả hoạt động hệ thống
 
 #### **2. Advanced Analytics Routes** (`src/routes/advancedAudit.js`)
@@ -384,16 +386,16 @@ Hệ Thống Kiểm Toán Doanh Nghiệp được tổ chức thành **4 nhóm r
 
 ### Phạm Vi Kiểm Thử Toàn Diện
 
-Hệ thống kiểm toán doanh nghiệp của chúng tôi bao gồm kiểm thử toàn diện qua 4 nhóm route chính với 49+ API endpoint:
+Hệ thống kiểm toán doanh nghiệp của chúng tôi bao gồm kiểm thử toàn diện qua 4 nhóm route chính với 57+ API endpoint:
 
-#### Core Audit System (`/api/audit/*` - 5 endpoints)
+#### Core Audit System (`/api/audit/*` - 6 endpoints)
 - Tạo và truy xuất nhật ký kiểm toán cơ bản
 - Theo dõi hoạt động người dùng
 - Ghi nhật ký sự kiện hệ thống  
 - Xuất dữ liệu kiểm toán
 - Quản lý cấu hình
 
-#### Advanced Audit Analytics (`/api/advanced-audit/*` - 14+ endpoints)
+#### Advanced Audit Analytics (`/api/advanced-audit/*` - 15 endpoints)
 - Phân tích và báo cáo nâng cao
 - Phân tích xu hướng và phát hiện mẫu
 - Báo cáo tuân thủ
@@ -532,7 +534,7 @@ npm run test:quick             # Kiểm thử smoke nhanh
 
 # Kiểm thử xác thực chuyên biệt
 npm run test:zod_validation    # Kiểm thử xác thực Zod
-npm run test:schema:registry   # Kiểm thử tích hợp schema registry
+node tests/i18nValidatorExtensionTest.js # Kiểm thử tích hợp schema registry
 
 # Kiểm thử Bảo mật XSS
 npm run test:xss:all           # Kiểm thử Bảo mật XSS
@@ -546,7 +548,7 @@ npm run test:audit:security    # Security incident management (/api/security-inc
 npm run test:audit:performance # Audit system performance benchmarking
 npm run test:audit:integration # Audit log service integration
 npm run test:audit:archival    # Data archival and retention testing
-npm run test:audit:endpoints   # Complete audit endpoint coverage (49+ endpoints)
+npm run test:audit:endpoints   # Complete audit endpoint coverage (57+ endpoints)
 npm run test:audit:quick       # Quick audit validation
 npm run test:audit:comprehensive # Comprehensive audit system testing
 ```
@@ -554,7 +556,7 @@ npm run test:audit:comprehensive # Comprehensive audit system testing
 ### Phương Pháp 3: Tự Động Hóa Hệ Thống Kiểm Toán Doanh Nghiệp
 
 ```bash
-# Kiểm thử hệ thống kiểm toán toàn diện (49+ endpoints)
+# Kiểm thử hệ thống kiểm toán toàn diện (57+ endpoints)
 bash tests/scripts/unified-audit-test.sh comprehensive
 
 # Xác thực kiểm toán nhanh
@@ -677,7 +679,7 @@ npm run test  # Chọn option multi-language validation
 
 ### 🔧 **Kiểm Thử Tích Hợp Schema Registry**
 
-**Kiểm thử Tích hợp Schema Registry** (`schemaRegistryIntegrationTest.js`) cung cấp kiểm thử toàn diện cho hệ thống schema registry tập trung quản lý 46 schemas trên 10 categories:
+**Kiểm thử Tích hợp Schema Registry** (`i18nValidatorExtensionTest.js`) cung cấp kiểm thử toàn diện cho hệ thống schema registry tập trung quản lý 46 schemas trên 10 categories:
 
 #### **📋 Phạm Vi Kiểm Thử**
 - **Hệ thống Schema Registry**: Chức năng registry cốt lõi và caching
@@ -706,10 +708,7 @@ npm run test  # Chọn option multi-language validation
 #### **💡 Sử dụng**
 ```bash
 # Thực thi trực tiếp
-node tests/schemaRegistryIntegrationTest.js
-
-# Qua npm script
-npm run test:schema:registry
+node tests/i18nValidatorExtensionTest.js
 
 # Qua test menu
 npm run test  # Chọn schema registry option
@@ -993,12 +992,12 @@ bash tests/scripts/test-rbac-comprehensive.sh  # Kiểm thử RBAC toàn diện
 bash tests/scripts/test-system-health.sh       # Kiểm thử sức khỏe hệ thống
 
 # Script Tự động hóa Hệ thống Kiểm toán
-bash tests/scripts/audit-core-test.sh          # Kiểm thử chức năng kiểm toán cốt lõi
-bash tests/scripts/audit-advanced-test.sh      # Kiểm thử phân tích nâng cao
-bash tests/scripts/audit-realtime-test.sh      # Kiểm thử giám sát thời gian thực
-bash tests/scripts/audit-security-test.sh      # Kiểm thử sự cố bảo mật
-bash tests/scripts/audit-performance-test.sh   # Điểm chuẩn hiệu năng kiểm toán
-bash tests/scripts/audit-complete-test.sh      # Kiểm thử hệ thống kiểm toán hoàn chỉnh
+bash tests/scripts/unified-audit-test.sh core          # Kiểm thử chức năng kiểm toán cốt lõi
+bash tests/scripts/unified-audit-test.sh advanced      # Kiểm thử phân tích nâng cao
+bash tests/scripts/unified-audit-test.sh realtime      # Kiểm thử giám sát thời gian thực
+bash tests/scripts/unified-audit-test.sh security      # Kiểm thử sự cố bảo mật
+bash tests/scripts/unified-audit-test.sh performance   # Điểm chuẩn hiệu năng kiểm toán
+bash tests/scripts/unified-audit-test.sh comprehensive      # Kiểm thử hệ thống kiểm toán hoàn chỉnh
 bash tests/scripts/test_all_roles.sh       # Kiểm thử curl tất cả các vai trò
 
 # Script kiểm thử chuyên biệt
@@ -1153,7 +1152,7 @@ Tất cả các tệp kiểm thử đã được cập nhật để tuân theo m
 -   `tests/validationTest.js`
 -   `tests/securityIncidentTest.js`
 -   `tests/comprehensiveI18nTest.js` (kiểm thử i18n tổng hợp)
--   `tests/quickAuditTest.js`
+-   `tests/quickTest.js`
 -   `tests/auditPerformanceTest.js`
 -   `tests/integrationTest.js`
 
@@ -1211,7 +1210,7 @@ Tất cả các tệp kiểm thử đã được cập nhật để tuân theo m
 | Endpoint | Phương thức | Phạm vi | Tệp kiểm thử |
 | :--- | :--- | :--- | :--- |
 | `/health` | GET | ✅ Hoàn thành | systemTest.js, quickTest.js |
-| `/favicon.ico` | GET | ✅ Hoàn thành | systemTest.js, scripts/test-favicon.sh |
+| `/favicon.ico` | GET | ✅ Hoàn thành | systemTest.js, tests/scripts/test-favicon.sh |
 | `/api` | GET | ✅ Hoàn thành | systemTest.js, integrationTest.js |
 
 ### 🛡️ Phạm Vi Kiểm Thử Bảo Mật
@@ -1526,17 +1525,17 @@ Dựa trên phân tích hệ thống chi tiết, bộ kiểm thử của chúng 
 
 ### 🎯 **Coverage Hệ Thống Kiểm Toán Doanh Nghiệp**
 
-#### **4 Nhóm Route Chính - Coverage Hoàn Chỉnh (35 endpoints)**
+#### **4 Nhóm Route Chính - Coverage Hoàn Chỉnh (57 endpoints)**
 
-1. **Core Audit Routes** (`/api/audit/*`) - **5 endpoints** ✅
+1. **Core Audit Routes** (`/api/audit/*`) - **6 endpoints** ✅
    - Chức năng ghi nhật ký và tìm kiếm kiểm toán cơ bản
   - Test Coverage: `auditSystemTest.js` (đã gộp core), `simpleAuditTest.js`
 
-2. **Advanced Analytics Routes** (`/api/advanced-audit/*`) - **11 endpoints** ✅
+2. **Advanced Analytics Routes** (`/api/advanced-audit/*`) - **15 endpoints** ✅
    - Phân tích nâng cao, lưu trữ và báo cáo tuân thủ
    - Test Coverage: `advancedAuditComprehensiveTest.js`, `auditPerformanceTest.js`
 
-3. **Real-time Monitoring Routes** (`/api/realtime-monitoring/*`) - **12 endpoints** ✅
+3. **Real-time Monitoring Routes** (`/api/realtime-monitoring/*`) - **28 endpoints** ✅
    - Giám sát hệ thống trực tiếp, cảnh báo và phát hiện mối đe dọa
    - Test Coverage: `realtimeMonitoringTest.js`, `alertSystemConfigIntegrationTest.js`
 

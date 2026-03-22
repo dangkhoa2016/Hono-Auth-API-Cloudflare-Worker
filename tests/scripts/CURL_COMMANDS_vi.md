@@ -892,8 +892,8 @@ bash tests/scripts/super_admin_user.sh
 bash tests/scripts/test_all_roles.sh
 
 # Kiểm thử bảo mật
-bash tests/scripts/test-rbac.sh
-bash tests/scripts/test-debug.sh
+bash tests/scripts/test-rbac-comprehensive.sh
+npm run dev:test:debug
 ```
 
 ### Lệnh Bộ Kiểm Thử Riêng Lẻ
@@ -1258,13 +1258,13 @@ npm run test:super_admin_user
 bash tests/scripts/test_all_roles.sh
 
 # Kiểm thử RBAC cụ thể
-bash tests/scripts/test-rbac.sh
+bash tests/scripts/test-rbac-comprehensive.sh
 ```
 
 #### Vấn Đề Debug và Giám Sát
 ```bash
 # Bật chế độ debug
-bash tests/scripts/test-debug.sh
+npm run dev:test:debug
 
 # Kiểm tra cấu hình KV
 npm run test:kv_admin

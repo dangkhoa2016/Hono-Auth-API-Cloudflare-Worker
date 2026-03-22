@@ -871,18 +871,14 @@ node tests/mainMenu.js         # Trực tiếp
 
 ### 4. Script Test Shell
 
-Ngoài JavaScript tests, còn có shell scripts để test qua CURL:
+Ngoài JavaScript tests, còn có shell scripts để test qua CURL.
+
+Dùng [TEST_GUIDE_vi.md](./TEST_GUIDE_vi.md) làm nguồn chuẩn cho ma trận RBAC test đầy đủ. Dùng [TEST_SCRIPTS_vi.md](./TEST_SCRIPTS_vi.md) cho shell runner và [../tests/scripts/CURL_COMMANDS_vi.md](../tests/scripts/CURL_COMMANDS_vi.md) cho ví dụ request đầy đủ.
 
 ```bash
-# Shell script tests
-bash tests/scripts/regular_user.sh      # Test vai trò người dùng thường bằng CURL
-bash tests/scripts/admin_user.sh        # Test vai trò người dùng admin bằng CURL  
-bash tests/scripts/super_admin_user.sh  # Test vai trò người dùng super admin bằng CURL
-bash tests/scripts/test-kv-admin.sh     # Test chức năng KV Admin (chỉ super_admin)
-
-# So sánh tất cả roles
-bash tests/scripts/all-roles-comparison.sh   # So sánh dashboard access
-bash tests/scripts/test_all_roles.sh         # Test tất cả roles tuần tự
+# Các runner RBAC nên dùng
+bash tests/scripts/test_all_roles.sh
+bash tests/scripts/test-kv-admin.sh
 ```
 
 ## V. Quản lý Cấu hình KV (Chỉ Super Admin)
@@ -961,7 +957,9 @@ kvAdminRoutes_log(`Config updated: ${key} = ${value} (was: ${oldValue})`);
 - Không thể làm hỏng ứng dụng bằng cấu hình sai
 - Chức năng reset để khôi phục defaults
 
-### 📊 **Ví dụ Sử dụng**
+### 📊 **Ví dụ đại diện**
+
+Guide này chỉ giữ lại một vài ví dụ KV Admin đại diện. Để xem curl workflow đầy đủ và danh sách lệnh theo hướng test, xem [TEST_SCRIPTS_vi.md](./TEST_SCRIPTS_vi.md) và [../tests/scripts/CURL_COMMANDS_vi.md](../tests/scripts/CURL_COMMANDS_vi.md).
 
 #### **Lấy Tất cả Cấu hình**
 ```bash
@@ -985,33 +983,15 @@ curl -X POST -H "Authorization: Bearer <super_admin_token>" \
      http://localhost:8787/api/kv-admin/configs/batch
 ```
 
-#### **So sánh Giá trị ENV vs KV**
-```bash
-curl -H "Authorization: Bearer <super_admin_token>" \
-     http://localhost:8787/api/kv-admin/configs/env-comparison
-```
-
 ### 🧪 **Testing KV Admin**
 
-**JavaScript Tests**:
-```bash
-npm run test:kv_admin        # Chạy bộ test KV Admin
-node tests/kvAdminTest.js    # Chạy test trực tiếp
-```
+Dùng [TEST_GUIDE_vi.md](./TEST_GUIDE_vi.md) cho ma trận kiểm thử RBAC và KV Admin đầy đủ, và [TEST_SCRIPTS_vi.md](./TEST_SCRIPTS_vi.md) cho chi tiết tự động hóa.
 
-**Shell Script Tests**:
+**Các entry point nhanh**:
 ```bash
-bash tests/scripts/test-kv-admin.sh  # Testing dựa trên CURL
+npm run test:kv_admin
+bash tests/scripts/test-kv-admin.sh
 ```
-
-**Test Coverage**:
-- ✅ Authentication & authorization
-- ✅ CRUD operations cho tất cả config keys
-- ✅ Chức năng batch update
-- ✅ So sánh environment
-- ✅ Quản lý cache
-- ✅ Validation đầu vào & xử lý lỗi
-- ✅ Kiểm soát truy cập dựa trên vai trò
 
 ### 📋 **Tích hợp với Hệ thống Admin Role**
 

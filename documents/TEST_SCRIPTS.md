@@ -291,7 +291,7 @@ chmod +x tests/scripts/*.sh
 ### Script Execution Issues
 ```bash
 # If scripts fail to start server or find paths
-cd /user_demo_hono_worker
+cd hono-auth-api-cloudflare-worker
 npm run dev:test  # Start test server
 ```
 
@@ -402,10 +402,10 @@ Comprehensive shell scripts for manual testing of role-based permissions using c
 |--------|----------|-------------|
 | `unified-audit-test.sh` | **Complete Audit System** | Comprehensive enterprise audit system testing |
 
-**Audit Endpoint Coverage (49+ endpoints):**
-- **Core Audit** (`/api/audit/*`) - 5 endpoints: logs, search, stats, export, health
-- **Advanced Audit** (`/api/advanced-audit/*`) - 14 endpoints: analytics, archival, compliance
-- **Real-time Monitoring** (`/api/realtime-monitoring/*`) - 22 endpoints: monitoring, alerts, metrics
+**Audit Endpoint Coverage (51+ endpoints):**
+- **Core Audit** (`/api/audit/*`) - 6 endpoints: logs, search, stats, export, system-health, delete-log-by-id
+- **Advanced Audit** (`/api/advanced-audit/*`) - 15 endpoints: analytics, archival, compliance
+- **Real-time Monitoring** (`/api/realtime-monitoring/*`) - 28 endpoints: monitoring, alerts, metrics
 - **Security Incidents** (`/api/security-incident/*`) - 8 endpoints: incident management, response
 
 ### Audit Script Usage Options
@@ -431,7 +431,7 @@ bash tests/scripts/unified-audit-test.sh full
 ### 1. Environment Preparation
 ```bash
 # Navigate to project directory
-cd /user_demo_hono_worker
+cd hono-auth-api-cloudflare-worker
 
 # Start development server (test environment)
 npm run dev:test
@@ -505,7 +505,7 @@ bash tests/scripts/all-roles-comparison.sh
 - **Complete User Management**: ALL roles (`user`, `admin`, `super_admin`)
 - **Full Role Control**: Create, modify, delete users with ANY role
 - **System Administration**: All admin endpoints plus exclusive super admin features
-- **Enterprise Audit System**: Complete access to all 49+ audit endpoints
+- **Enterprise Audit System**: Complete access to all 57+ audit endpoints
 - **KV Store Management**: Full KV configuration and audit settings
 - **Security Management**: Security incident management and response
 - **System Monitoring**: Complete system health, performance, and monitoring

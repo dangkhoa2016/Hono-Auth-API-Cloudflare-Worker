@@ -4,7 +4,9 @@
 
 ## 📋 Overview
 
-The project has been integrated with **Zod** - a TypeScript-first schema validation library to provide powerful and type-safe validation for all API endpoints, including the comprehensive **Enterprise Audit System** with 49+ endpoints across 4 route groups.
+The project has been integrated with **Zod** - a TypeScript-first schema validation library to provide powerful and type-safe validation for all API endpoints, including the comprehensive **Enterprise Audit System** with 57+ endpoints across 4 route groups.
+
+This guide focuses on validation architecture, schema design, and integration patterns. For the full validation test command matrix and automation flows, use [TEST_GUIDE.md](./TEST_GUIDE.md) and [TEST_SCRIPTS.md](./TEST_SCRIPTS.md).
 
 ## 🎯 Why Use Zod?
 
@@ -1195,22 +1197,20 @@ const auditQuerySchema = getSchema('audit.query', 'vi');
 // - monitoring.* (alert, dashboard, metrics)
 ```
 
-### **Quick Reference Commands**
+### **Quick Validation Entry Points**
+
+Use the validation commands below as the shortest path when checking a Zod change locally:
 
 ```bash
-# Test validation systems
-npm run test:zod_validation        # Zod-specific tests
-npm run test:validation           # General validation tests
-npm run test:multilang_validation # Multi-language validation
+# Schema-focused validation
+npm run test:zod_validation
 
-# Run validation demos
-curl http://localhost:8788/api/zod_demo
-curl http://localhost:8788/api/zod_demo/register
-curl http://localhost:8788/api/audit/logs
-
-# Debug validation issues
-DEBUG=hono-auth-api:validation:* npm run dev
+# Cross-cutting validation behavior
+npm run test:validation
+npm run test:multilang_validation
 ```
+
+For the complete command matrix, endpoint-by-endpoint coverage, and troubleshooting workflows, use [TEST_GUIDE.md](./TEST_GUIDE.md) and [TEST_SCRIPTS.md](./TEST_SCRIPTS.md). Keep this guide as the reference for schema architecture and route integration patterns.
 
 ---
 
@@ -1222,7 +1222,7 @@ Zod integration provides **Enterprise-Grade Validation** with:
 ✅ **Centralized schemas** organized by domain and functionality  
 ✅ **Multi-language error messages** (English, Vietnamese, French, Spanish, German, Japanese, Thai)  
 ✅ **Automatic data transformation** and coercion with XSS protection  
-✅ **Enterprise audit system validation** for 49+ endpoints across 4 route groups  
+✅ **Enterprise audit system validation** for 57+ endpoints across 4 route groups  
 ✅ **Built-in input sanitization** protecting against XSS and injection attacks  
 ✅ **Role-based schema creation** for different user permission levels  
 ✅ **Comprehensive testing framework** with 30+ validation test scenarios  

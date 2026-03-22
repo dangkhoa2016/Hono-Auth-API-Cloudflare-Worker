@@ -64,211 +64,52 @@ All guides live in [documents](./documents) with English and Vietnamese pairs (4
   - **utils/**: dynamic config helpers, debug utilities, audit helpers, jwt helpers, route scanner, service config/context/factory utilities, i18n demo helpers
   - **assets/**: favicon and app icons
 - **tests/**: interactive menu (`mainMenu.js`), unified suite, RBAC suites, audit suites, i18n/validation/security/performance suites, token security tests, **account activation test suite (`activationTest.js`)**, email content/provider header tests (`emailContentTest.js`, `emailProviderHeaderTest.js`), login message format, route detection, plus `init/` data, `scripts/`, `utils/`, `config/`
-- **tools/**: operational scripts (`generate-password-hashes.js`, `clear-cache.js`, `reset-rate-limits.js`, `test-curl.sh`, `change-commit-author.sh`, `schema-registry-demo.js`) and subfolders for D1 management (`tools/d1`), KV config (`tools/kv`), i18n tooling, debug log harness, database usage examples, role metadata, and email utilities
-- **migrations/**: `0001_initial.sql` through `0009_user_activation_token.sql`, including audit/archive, security incident, token security tables
+- **tools/**: operational scripts (`generate-password-hashes.js`, `clear-cache.js`, `reset-rate-limits.js`, `test-curl.sh`, `schema-registry-demo.js`) and subfolders for D1 management (`tools/d1`), KV config (`tools/kv`), i18n tooling, debug log harness, database usage examples, role metadata, and email utilities
+- **migrations/**: `0001_initial.sql` through `0010_add_email_verification.sql`, including audit/archive, security incident, token security, activation, and email verification tables
 - **scripts/**: environment setup scripts (dev/test/staging) and debug helpers
-- **documents/**: 34 Markdown guides (EN/VI) referenced above
+- **documents/**: 40 Markdown guides (EN/VI) referenced above
 - **config templates**: `.dev.vars.*.example`, `wrangler.toml.example`; local `.dev.vars.*` and `wrangler.toml` stay untracked
 
 ## 🧪 Testing Framework
 
-For complete testing documentation, please refer to **[documents/TEST_GUIDE.md](./documents/TEST_GUIDE.md)**.
+The README keeps only the verified entry points below. The complete command matrix, test categories, role-by-role coverage, audit suites, troubleshooting, and automation scripts are maintained in [documents/TEST_GUIDE.md](./documents/TEST_GUIDE.md) and [documents/TEST_SCRIPTS.md](./documents/TEST_SCRIPTS.md).
 
 ### 🎯 Quick Start
 
 ```bash
-# Interactive test menu with 30+ test suites (recommended)
+# Recommended: interactive test menu
 npm run test
 
-# Quick smoke tests for development
+# Fast smoke check
 npm run test:quick
 
-# Complete automated test suite (40+ tests)
+# Full automated suite
 bash tests/scripts/run-all-tests.sh
 
-# Quick automated test runner (minimal output)
-bash tests/scripts/run-all-tests-quick.sh
+# Enterprise audit suite
+npm run test:audit:system
 
-# Enterprise Audit System Tests
-npm run test:audit:system       # Core audit system functionality
-npm run test:audit:simple       # Basic audit tests
-npm run test:audit:advanced     # Advanced audit analytics
-npm run test:audit:perf         # Audit performance testing
-npm run test:audit:integration  # Audit integration tests
+# RBAC regression checks
+bash tests/scripts/test_all_roles.sh
 
-# Role-based Access Control Tests
-npm run test:regular_user       # Regular user functionality tests
-npm run test:admin_user         # Admin user management tests
-npm run test:super_admin_user   # Super admin full control tests
-bash tests/scripts/test_all_roles.sh  # Complete RBAC testing
+# i18n and multilingual validation
+npm run test:i18n
+npm run test:multilang_validation
 
-# i18n & Multilingual Validation Tests
-npm run test:i18n              # i18n system tests
-npm run test:multilang_validation # Multilingual validation error tests
-npm run test:i18n:validator     # i18n validator extension tests
-npm run test:comprehensive:i18n  # Comprehensive i18n functionality tests
-
-# Email & Account Activation Tests
-npm run test:activation        # Account activation flow tests
-npm run test:email:content     # Email content localization tests
-npm run test:email:provider    # Email provider header tests
-
-# Security & Performance Tests
-npm run test:security           # Security and rate limiting tests
-npm run test:xss:all           # XSS protection tests
-npm run test:performance       # Load and performance tests
-npm run test:security:incident # Security incident management tests
-
-# Configuration & System Tests
-npm run test:kv_admin          # KV configuration management tests
-npm run test:system            # System health and environment tests
-npm run test:validation        # Zod schema validation tests
-npm run test:integration       # End-to-end integration tests
-
-# Schema Registry Management Tests
-npm run test:schema:registry   # Schema registry integration tests
+# Core validation and integration
+npm run test:validation
+npm run test:integration
 ```
 
-### 🔧 **Schema Registry Management Tools**
+### 🔧 Canonical References
 
-The project includes comprehensive schema registry management tools for handling 46 schemas across 10 categories:
-
-```bash
-# Schema Registry Tools - Main Commands
-npm run tool:schema            # Interactive schema management tool
-npm run tool:schema:help       # Show help and available commands
-npm run tool:schema:list       # List all 46 schemas with details
-npm run tool:schema:categories # Show all 10 schema categories
-npm run tool:schema:validators # List all 46 pre-built validator functions
-npm run tool:schema:docs       # Generate comprehensive documentation
-npm run tool:schema:validate   # Validate registry consistency
-npm run tool:schema:demo       # Interactive demo and testing
-
-# Direct Commands (Alternative)
-node tools/schema-registry-demo.js help        # Show help
-node tools/schema-registry-demo.js list        # List all schemas  
-node tools/schema-registry-demo.js categories  # Show categories
-node tools/schema-registry-demo.js category auth # Show auth schemas
-node tools/schema-registry-demo.js validator login # Show login validator
-node tools/schema-registry-demo.js validators  # List all validators
-node tools/schema-registry-demo.js docs       # Generate documentation
-node tools/schema-registry-demo.js validate   # Validate registry
-node tools/schema-registry-demo.js demo       # Interactive demo
-```
-
-**🎯 Schema Registry Features:**
-- **46 Total Schemas** across 10 functional categories
-- **46 Pre-built Validator Functions** automatically generated
-- **Intelligent Caching System** with 90% performance improvement
-- **Multi-language Support** with efficient i18n schema generation
-- **Command-line Management Tools** for comprehensive schema operations
-- **Registry Validation** with consistency checks and error detection
-- **Interactive Demo System** for exploration and testing
-- **Auto-generated Documentation** from schema definitions
-
-### 📊 **Comprehensive Test Coverage**
-
-Our testing framework provides extensive coverage across all system components:
-
-**🎭 Role-based Testing** (4 test suites):
-- **Regular User Tests**: Personal profile management, limited access validation
-- **Admin User Tests**: User management, dashboard access, role hierarchy enforcement
-- **Super Admin Tests**: Full system control, all user management, KV configuration access
-- **RBAC Integration**: Complete role-based access control validation
-
-**🔍 Enterprise Audit Testing** (10+ test suites):
-- **Core Audit System**: Basic audit logging, search, filtering, and export
-- **Advanced Audit Analytics**: Performance metrics, user activity analysis, security analysis
-- **Real-time Monitoring**: Live monitoring, threat detection, alert systems
-- **Security Incident Management**: Incident creation, tracking, and response workflows
-- **Audit Performance**: Load testing, archival services, data retention
-- **KV Audit Configuration**: Audit system configuration management
-
-**🌍 Multilingual & Validation Testing** (8+ test suites):
-- **i18n System Tests**: Language detection, translation services, dynamic language support
-- **Multilingual Validation**: Error messages in 7 languages (EN, VI, FR, ES, DE, JA, TH)
-- **Zod Schema Validation**: Comprehensive input validation, type safety, error handling
-- **XSS Security Testing**: Cross-site scripting protection, input sanitization
-
-**📧 Email & Account Activation Testing** (4+ test suites):
-- **Account Activation Tests**: Complete activation flow with token validation and expiry
-- **Email Content Localization**: Multilingual email templates (7 languages)
-- **Email Provider Integration**: Brevo API integration and configuration testing
-- **Activation Security**: Token generation, expiry handling, admin disable checks
-
-**⚡ Performance & Security Testing** (6+ test suites):
-- **Load Testing**: Concurrent requests, response time validation, system limits
-- **Security Testing**: Rate limiting, authentication bypass attempts, input validation
-- **Integration Testing**: End-to-end workflows, component interactions
-- **Error Handling**: Comprehensive error scenarios, recovery mechanisms
-
-**🔧 System & Configuration Testing** (12+ test suites):
-- **KV Configuration Management**: Dynamic configuration, CRUD operations, validation
-- **Database Services**: Health checks, migration testing, query optimization
-- **Environment Testing**: Multi-environment support (dev, test, staging, production)
-- **Debug System Testing**: Granular debug controls, logging validation
-
-### 🛠️ **Test Automation & Scripts**
-
-**Interactive Testing**:
-```bash
-npm run test                    # Interactive menu with 30+ test options
-node tests/mainMenu.js          # Direct access to test menu
-```
-
-**Automated Test Runners**:
-```bash
-bash tests/scripts/run-all-tests.sh        # Complete test suite (detailed output)
-bash tests/scripts/run-all-tests-quick.sh  # Quick test runner (minimal output)
-bash tests/scripts/test_all_roles.sh       # Comprehensive RBAC testing
-bash tests/scripts/test-rbac.sh           # Role-based access control tests
-bash tests/scripts/test-debug.sh          # Debug system validation
-```
-
-**Individual Test Categories**:
-- **Core Functionality**: `npm run test:system`, `npm run test:auth`, `npm run test:security`
-- **Role Management**: `npm run test:admin_user`, `npm run test:super_admin_user`, `npm run test:regular_user`
-- **Enterprise Features**: `npm run test:audit:*`, `npm run test:kv_admin`, `npm run test:security:incident`
-- **Internationalization**: `npm run test:i18n`, `npm run test:multilang_validation`
-- **Quality Assurance**: `npm run test:validation`, `npm run test:performance`, `npm run test:integration`
-
-For complete testing documentation, comprehensive test suite details, and advanced testing strategies, please refer to **[documents/TEST_GUIDE.md](./documents/TEST_GUIDE.md)** and **[documents/TEST_SCRIPTS.md](./documents/TEST_SCRIPTS.md)**.
-
-**Key Testing Features:**
-- **🎭 Role-based Testing**: Comprehensive RBAC validation with 4 role levels
-- **📜 Shell Script Automation**: Complete CI/CD integration with bash scripts
-- **🛠️ Test Utilities**: Shared utilities, helpers, and setup functions
-- **🔗 Integration Testing**: End-to-end workflows and component interactions
-- **✅ Validation Testing**: Zod schema validation and multilingual error handling
-- **🔍 Enterprise Audit Testing**: Complete audit system validation with 40+ endpoints
-- **🌍 Multilingual Testing**: i18n validation across 7 languages with localized error messages
-- **⚡ Performance Testing**: Load testing, concurrent requests, and response time validation
-- **🛡️ Security Testing**: XSS protection, rate limiting, and authentication bypass prevention
-
-### 🎭 Role-based Testing
-
-Framework supports comprehensive role-based access control testing:
-
-| Role | Test File | Shell Script | Capabilities |
-|------|-----------|--------------|--------------|
-| **Regular User** | `regularUserTest.js` | `regular_user.sh` | Personal profile access only, password change, no admin rights |
-| **Admin User** | `adminUserTest.js` | `admin_user.sh` | User & dashboard management, create/delete user/admin, NO Super Admin access |
-| **Super Admin User** | `superAdminUserTest.js` | `super_admin_user.sh` | Full system access, manage all users, create Super Admin |
-| **KV Management** | `kvAdminTest.js` | `test-kv-admin.sh` | KV configuration management (super_admin only), CRUD configurations |
-
-### 📊 Test Coverage
-
-- ✅ **Authentication**: Login, logout, JWT validation, password security
-- ✅ **User Management**: CRUD operations, profile management, role changes
-- ✅ **Admin Operations**: User administration, system statistics
-- ✅ **KV Configuration**: Dynamic configuration management, CRUD operations, super_admin permissions
-- ✅ **Security**: Rate limiting, input validation, SQL injection prevention
-- ✅ **Internationalization**: Language detection, translation services
-- ✅ **Performance**: Load testing, response time validation
-- ✅ **Integration**: End-to-end workflows, component interactions
-- ✅ **Validation**: Zod schema validation, error handling
+- Use [documents/TEST_GUIDE.md](./documents/TEST_GUIDE.md) as the source of truth for all test commands and coverage details.
+- Use [documents/TEST_SCRIPTS.md](./documents/TEST_SCRIPTS.md) for shell runners, curl workflows, and troubleshooting.
+- Use [documents/SCHEMAS_GUIDE.md](./documents/SCHEMAS_GUIDE.md) for schema registry and validator tooling.
 
 ## Database Schema
+
+This section summarizes the core user/auth tables. For the full schema, including audit, token security, activation, and email verification tables, see [documents/DATABASE_SERVICE.md](./documents/DATABASE_SERVICE.md) and [documents/EMAIL_CHANGE_VERIFICATION_GUIDE.md](./documents/EMAIL_CHANGE_VERIFICATION_GUIDE.md).
 
 ### `users` Table
 - `id` - Primary key (INTEGER)
@@ -279,6 +120,9 @@ Framework supports comprehensive role-based access control testing:
 - `status` - Status: `active`, `inactive`, `suspended` (TEXT, default: 'active')
 - `created_at` - Creation time (DATETIME)
 - `updated_at` - Update time (DATETIME)
+- `new_email` - Pending email change awaiting verification (TEXT, nullable)
+- `email_verification_token` - Verification token for email change confirmation (TEXT, nullable)
+- `email_verification_expires_at` - Expiry timestamp for email change verification (TEXT, nullable)
 
 ### `failed_login_limits` Table
 - `id` - Primary key (INTEGER)

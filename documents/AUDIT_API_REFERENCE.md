@@ -106,6 +106,7 @@ Get paginated audit logs with filtering options.
   action?: string;      // Filter by action type
   userId?: string;      // Filter by user ID
   entityType?: string;  // Filter by entity type
+  actorRole?: string;   // Filter by actor role (camelCase query key)
   startDate?: string;   // Filter by start date (ISO format)
   endDate?: string;     // Filter by end date (ISO format)
 }
@@ -154,7 +155,10 @@ Advanced full-text search in audit logs.
   query: string;        // Search query (required)
   page?: number;        // Page number (default: 1)
   limit?: number;       // Results per page (default: 10)
+  userId?: string;      // Filter by user ID
   action?: string;      // Filter by action type
+  entityType?: string;  // Filter by entity type
+  actorRole?: string;   // Filter by actor role (camelCase query key)
   startDate?: string;   // Filter by start date
   endDate?: string;     // Filter by end date
 }
@@ -202,9 +206,10 @@ Export audit logs in various formats.
 **Query Parameters**:
 ```typescript
 {
-  format: 'csv' | 'json'; // Export format (required)
-  limit?: number;         // Max records (default: 1000)
-  action?: string;        // Filter by action
+  format?: 'csv' | 'json' | 'xlsx'; // Export format (default: json)
+  maxRecords?: number;              // Max records (default: 1000)
+  includeDetails?: boolean;         // Include detail payloads (default: true)
+  filters?: object;                 // Optional structured filters object
   startDate?: string;     // Filter by start date
   endDate?: string;       // Filter by end date
 }
@@ -226,6 +231,18 @@ Get audit system health status.
     "storageUsage": "45%",
     "lastLogTime": "2025-07-21T10:30:00Z"
   }
+}
+```
+
+### **🗑️ DELETE /api/audit/logs/:id**
+Delete a single audit log by numeric ID.
+
+**Access**: Admin, Super Admin
+
+**Path Parameters**:
+```typescript
+{
+  id: number; // Required, must be > 0
 }
 ```
 
@@ -284,7 +301,7 @@ System performance analytics.
 
 **Access**: Admin, Super Admin
 
-### **� GET /api/advanced-audit/middleware/stats**
+### **📈 GET /api/advanced-audit/middleware/stats**
 Get middleware usage statistics.
 
 **Access**: Super Admin only
@@ -765,8 +782,8 @@ The Audit System API provides comprehensive **multilingual support** with locali
 ### **🔍 API Endpoints with Multilingual Support**
 
 **All Audit System endpoints support multilingual error messages**:
-- **Core Audit Routes** (`/api/audit/*`) - 5+ endpoints with full i18n
-- **Advanced Audit Routes** (`/api/advanced-audit/*`) - 10+ endpoints with full i18n  
+- **Core Audit Routes** (`/api/audit/*`) - 6 endpoints with full i18n
+- **Advanced Audit Routes** (`/api/advanced-audit/*`) - 15 endpoints with full i18n
 - **Real-time Monitoring Routes** (`/api/realtime-monitoring/*`) - 15+ endpoints with full i18n
 - **Security Incident Routes** (`/api/security-incident/*`) - 10+ endpoints with full i18n
 
@@ -792,28 +809,17 @@ curl -X GET "http://localhost:8788/api/audit/logs?invalid_param=test" \
 
 ## 🔧 **TESTING & VALIDATION**
 
-### **Available Test Commands**
+### **Quick Test Entry Points**
 
 ```bash
-# Test all audit endpoints
-npm run test:audit:comprehensive
-
-# Test specific route groups
-npm run test:audit:core          # Core audit routes
-npm run test:audit:advanced      # Advanced audit routes
-npm run test:audit:realtime      # Real-time monitoring
-npm run test:audit:security      # Security incident routes
-
-# Test i18n validation system
-npm run test:i18n:validator      # i18n validator extension tests
-npm run test:validation:multilang # Multilingual validation error tests
-
-# Performance testing
-npm run test:audit:performance
-
-# Quick validation
+# Recommended audit entry points
+npm run test:audit:system
 npm run test:audit:quick
+npm run test:audit:comprehensive
+npm run test:multilang_validation
 ```
+
+For the complete audit test matrix, mode-by-mode runners, and troubleshooting, use [TEST_GUIDE.md](./TEST_GUIDE.md) and [TEST_SCRIPTS.md](./TEST_SCRIPTS.md).
 
 ### **Manual Testing with cURL**
 

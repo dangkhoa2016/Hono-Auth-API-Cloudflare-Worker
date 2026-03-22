@@ -159,7 +159,7 @@ tools/i18n/                   # Công cụ quản lý
 ├── demo-i18n.sh             # Demo i18n tương tác
 └── demo-endpoints-i18n.sh   # Demo testing endpoints
 
-tools/i18n.js                # Công cụ quản lý chính (thư mục tools/)
+tools/i18n/master.js                # Công cụ quản lý chính (thư mục tools/)
 ```
 
 ### 🔧 **Thành phần Cốt lõi:**
@@ -179,7 +179,7 @@ export async function loadTranslation(language) {
 }
 ```
 
-#### **2. Quản lý Ngôn ngữ (`src/i18n/languages.js`)**
+#### **2. Quản lý Ngôn ngữ (`src/i18n/locales/en.js (and other locale files)`)**
 ```javascript
 // Async: Discovery đầy đủ
 export async function getSupportedLanguages() {
@@ -237,7 +237,9 @@ const initI18n = async () => {
 
 ## 3. CÔNG CỤ QUẢN LÝ i18n
 
-### 🛠️ **Công cụ Chính (`tools/i18n.js`)**
+Tài liệu này tập trung vào kiến trúc i18n, cách tích hợp và workflow vận hành. Phần tham chiếu đầy đủ cho lệnh tool được duy trì trong [tools/i18n/README_vi.md](../tools/i18n/README_vi.md). Phần ma trận test được duy trì trong [TEST_GUIDE_vi.md](./TEST_GUIDE_vi.md) và [TEST_SCRIPTS_vi.md](./TEST_SCRIPTS_vi.md).
+
+### 🛠️ **Công cụ Chính (`tools/i18n/master.js`)**
 
 Công cụ quản lý thống nhất cung cấp giao diện đơn giản cho tất cả operations i18n.
 
@@ -245,74 +247,30 @@ Công cụ quản lý thống nhất cung cấp giao diện đơn giản cho t�
 
 ```bash
 # Hiển thị tất cả commands có sẵn
-node tools/i18n.js help
+node tools/i18n/master.js help
 
 # Thêm ngôn ngữ mới
-node tools/i18n.js add de "German"
+node tools/i18n/master.js add de "German"
 
 # Test hệ thống
-node tools/i18n.js test
+node tools/i18n/master.js test
 
 # Verification nhanh
-node tools/i18n.js verify
+node tools/i18n/master.js verify
 ```
 
-#### **📋 Commands Có sẵn:**
+#### **Các entry point dùng hằng ngày:**
 
-**Commands Cốt lõi:**
-- `test, t` - Chạy test i18n system toàn diện
-- `add, a <code> [name]` - Thêm ngôn ngữ mới
-- `verify, v` - Verification hệ thống nhanh
-- `help, h` - Hiển thị thông tin help
+- `node tools/i18n/master.js help` để xem toàn bộ CLI.
+- `node tools/i18n/master.js test` để xác minh i18n end-to-end.
+- `node tools/i18n/master.js compare` và `node tools/i18n/master.js fix` để bảo trì translation key.
+- `node tools/i18n/master.js add <code> "<name>"` khi thêm locale mới.
 
-**Commands Chẩn đoán:**
-- `analyze, an` - Phân tích tất cả file i18n
-- `check, c` - Kiểm tra tính toàn vẹn hệ thống
-- `endpoints, e` - Test API endpoint localization
-- `legacy, l` - Test tương thích Cloudflare Workers
+### 🛠️ **Tài liệu tham chiếu chi tiết cho tool**
 
-**Commands Demo:**
-- `demo, d` - Chạy demo i18n tương tác
-- `demo-endpoints, de` - Chạy demo testing endpoints
-
-#### **💡 Ví dụ Commands:**
-
-```bash
-# Operations cơ bản
-node tools/i18n.js add ja "Japanese"
-node tools/i18n.js test
-node tools/i18n.js verify
-
-# Operations chẩn đoán
-node tools/i18n.js analyze
-node tools/i18n.js check
-node tools/i18n.js endpoints
-
-# Operations demo
-node tools/i18n.js demo
-node tools/i18n.js demo-endpoints
-```
-
-### 🛠️ **Truy cập Công cụ Trực tiếp:**
-
-Tất cả công cụ nằm trong thư mục `tools/i18n/` và có thể được gọi trực tiếp:
-
-```bash
-# Quản lý ngôn ngữ
-node tools/i18n/add-language-demo.js es "Spanish"
-node tools/i18n/check-i18n.js
-
-# Công cụ testing
-node tools/i18n/test-dynamic-i18n.js
-node tools/i18n/test-endpoints-i18n.js
-node tools/i18n/test-workers-i18n.js
-
-# Công cụ verification
-node tools/i18n/final-verification.js
-
-# Công cụ analysis
-node tools/i18n/analyze-i18n-files.js
-```
+- Dùng [tools/i18n/README_vi.md](../tools/i18n/README_vi.md) cho toàn bộ command reference, workflow commands và direct-tool entry points.
+- Dùng [TEST_GUIDE_vi.md](./TEST_GUIDE_vi.md) khi tác vụ i18n gắn với API validation hoặc bộ test đa ngôn ngữ.
+- Dùng [TEST_SCRIPTS_vi.md](./TEST_SCRIPTS_vi.md) cho shell automation và hướng dẫn xử lý sự cố.
 
 ### 📚 **Tài liệu Công cụ:**
 
@@ -344,30 +302,16 @@ Tự động thêm các key còn thiếu từ `en.js` vào các file locale khá
 - Cập nhật tất cả file locale cùng lúc
 - Báo cáo kết quả chi tiết
 
-#### **3. `i18n-manager.js` - Tool quản lý toàn diện**
+#### **3. `master.js` - Tool quản lý toàn diện**
 Tool CLI với nhiều tính năng quản lý translation keys.
 
-**Lệnh:**
-- `compare` - So sánh tất cả locales
-- `fix` - Auto-fix missing keys
-- `details <locale>` - Xem chi tiết key thiếu cho locale cụ thể
-- `add <key> <value>` - Thêm key mới vào tất cả locales
+**Các entry point thường dùng:**
+- `node tools/i18n/master.js compare`
+- `node tools/i18n/master.js fix`
+- `node tools/i18n/master.js details <locale>`
+- `node tools/i18n/master.js add "<key>" "<value>"`
 
-**Ví dụ sử dụng:**
-```bash
-# So sánh tất cả locales
-node tools/i18n/i18n-manager.js compare
-
-# Auto-fix missing keys
-node tools/i18n/i18n-manager.js fix
-
-# Xem chi tiết key thiếu cho locale cụ thể
-node tools/i18n/i18n-manager.js details vi
-node tools/i18n/i18n-manager.js details fr
-
-# Thêm key mới vào tất cả locales
-node tools/i18n/i18n-manager.js add "validation.newField.required" "Trường mới là bắt buộc"
-```
+Để xem đầy đủ catalog lệnh và ví dụ chi tiết, xem [tools/i18n/README_vi.md](../tools/i18n/README_vi.md).
 
 ### 🔄 **Quy trình làm việc với Translation Keys**
 
@@ -724,13 +668,13 @@ const successMessage = tSuccess(c, 'operation.completed', {
 
 ```bash
 # Thêm ngôn ngữ Đức
-node tools/i18n.js add de "German"
+node tools/i18n/master.js add de "German"
 
 # Thêm ngôn ngữ Nhật
-node tools/i18n.js add ja "Japanese"
+node tools/i18n/master.js add ja "Japanese"
 
 # Thêm ngôn ngữ Thái
-node tools/i18n.js add th "Thai"
+node tools/i18n/master.js add th "Thai"
 ```
 
 ### 🎯 **Phương pháp 2: Sử dụng Công cụ Trực tiếp**
@@ -812,7 +756,7 @@ export default {
 #### **Bước 3: Test Ngôn ngữ Mới**
 ```bash
 # Test sử dụng công cụ chính
-node tools/i18n.js test
+node tools/i18n/master.js test
 
 # Hoặc test trực tiếp
 node tools/i18n/test-dynamic-i18n.js
@@ -1465,7 +1409,7 @@ const lang = getCurrentLanguage(c); // From cached middleware result
 // 5. Update API endpoints
 
 // MỚI: Tạo single file + single command
-// 1. node tools/i18n.js add [code] "[name]"
+// 1. node tools/i18n/master.js add [code] "[name]"
 // → Hệ thống tự động phát hiện và bao gồm!
 ```
 
@@ -1514,7 +1458,7 @@ const lang = getCurrentLanguage(c); // From cached middleware result
 #### **🆕 Testing Enhanced Middleware (V2.0):**
 ```bash
 # Test enhanced i18n middleware
-node tests/i18nMiddlewareTest.js
+node tests/i18nValidatorExtensionTest.js
 
 # Test scenarios:
 # - Query parameter detection
@@ -1527,19 +1471,19 @@ node tests/i18nMiddlewareTest.js
 #### **Testing Công cụ Chính:**
 ```bash
 # Test toàn bộ hệ thống thông qua công cụ chính
-node tools/i18n.js test
+node tools/i18n/master.js test
 
 # Verification nhanh
-node tools/i18n.js verify
+node tools/i18n/master.js verify
 
 # Test endpoints
-node tools/i18n.js endpoints
+node tools/i18n/master.js endpoints
 
 # Analyze hệ thống
-node tools/i18n.js analyze
+node tools/i18n/master.js analyze
 
 # Kiểm tra tính toàn vẹn hệ thống  
-node tools/i18n.js check
+node tools/i18n/master.js check
 ```
 
 #### **Testing Công cụ Trực tiếp:**
@@ -1763,10 +1707,10 @@ curl "http://localhost:8788/api/translations/vi/validate"
 #### **Test New Language Addition:**
 ```bash
 # Thêm ngôn ngữ mới sử dụng main tool
-node tools/i18n.js add it "Italian"
+node tools/i18n/master.js add it "Italian"
 
 # Verify auto-detection
-node tools/i18n.js test | grep "Discovered languages"
+node tools/i18n/master.js test | grep "Discovered languages"
 
 # Test API với ngôn ngữ mới
 curl "http://localhost:8788/?lang=it"
@@ -1835,7 +1779,7 @@ node -e "import('./src/i18n/loader.js').then(m => m.clearCache())"
 npm run dev
 
 # 4. Test với tool
-node tools/i18n.js test
+node tools/i18n/master.js test
 ```
 
 #### **🔴 Vấn đề: "Translation hiển thị 'undefined' hoặc missing"**
@@ -1861,7 +1805,7 @@ export default {
 curl "http://localhost:8788/api" | grep supported_languages
 
 # 2. Kiểm tra translation file tồn tại và hợp lệ
-node tools/i18n.js test
+node tools/i18n/master.js test
 
 # 3. Kiểm tra language detection logic
 curl -v "http://localhost:8788/api?lang=vi" # Kiểm tra logs
@@ -1881,7 +1825,7 @@ node -p "import('./src/i18n/locales/[lang].js')"
 **Giải pháp:**
 ```bash
 # 1. Kiểm tra nếu main tool tồn tại
-ls -la tools/i18n.js
+ls -la tools/i18n/master.js
 
 # 2. Kiểm tra nếu tools directory tồn tại
 ls -la tools/i18n/
@@ -1890,7 +1834,7 @@ ls -la tools/i18n/
 node tools/i18n/test-dynamic-i18n.js
 
 # 4. Kiểm tra permissions
-chmod +x tools/i18n.js
+chmod +x tools/i18n/master.js
 ```
 
 ### 🛠️ **Advanced Debugging:**
@@ -1929,7 +1873,7 @@ if (!isI18nInitialized()) {
 
 ### 📞 **Nhận Trợ giúp:**
 
-1. **Sử dụng main tool trước**: `node tools/i18n.js test`
+1. **Sử dụng main tool trước**: `node tools/i18n/master.js test`
 2. **Kiểm tra test scripts**: Tất cả tools có testing toàn diện
 3. **Verify file structure**: Translation files có định dạng đúng
 4. **Clear cache**: `clearCache()` nếu có vấn đề caching
@@ -1961,9 +1905,9 @@ if (!isI18nInitialized()) {
 #### **Để sử dụng i18n tools:**
 ```bash
 # Main tool (khuyến nghị):
-node tools/i18n.js help
-node tools/i18n.js add [code] "[Tên]"
-node tools/i18n.js test
+node tools/i18n/master.js help
+node tools/i18n/master.js add [code] "[Tên]"
+node tools/i18n/master.js test
 
 # Direct tool access:
 node tools/i18n/add-language-demo.js [code] "[Tên]"
@@ -1973,13 +1917,13 @@ node tools/i18n/test-dynamic-i18n.js
 #### **Để verify system health:**
 ```bash
 # Verification nhanh:
-node tools/i18n.js verify
+node tools/i18n/master.js verify
 
 # Test hoàn chỉnh:
-node tools/i18n.js test
+node tools/i18n/master.js test
 
 # Analysis toàn diện:
-node tools/i18n.js analyze
+node tools/i18n/master.js analyze
 ```
 
 ---
@@ -2015,7 +1959,7 @@ const message = t(c, 'auth.loginSuccess'); // Tự động dùng middleware resu
 ✅ src/i18n/service.js             - 🔄 Middleware-aware  
 ✅ src/i18n/index.js               - 🔄 Export getCurrentLanguage
 ✅ src/index.js                    - 🔄 Apply global middleware
-✅ tests/i18nMiddlewareTest.js     - 🆕 Middleware testing
+✅ tests/i18nValidatorExtensionTest.js     - 🆕 Middleware testing
 ✅ documents/I18N_HONO_MIDDLEWARE_GUIDE.md - 🆕 Migration guide
 ```
 
@@ -2024,7 +1968,7 @@ const message = t(c, 'auth.loginSuccess'); // Tự động dùng middleware resu
 - [ ] ✅ **Không cần action** - Code cũ vẫn hoạt động
 - [ ] 🔄 **Optional**: Sử dụng `getCurrentLanguage(c)` thay vì `detectLanguage(c)`  
 - [ ] 🔄 **Optional**: Middleware đã được apply tự động trong `src/index.js`
-- [ ] 🧪 **Test**: Chạy `node tests/i18nMiddlewareTest.js` để verify
+- [ ] 🧪 **Test**: Chạy `node tests/i18nValidatorExtensionTest.js` để verify
 
 ---
 
@@ -2044,7 +1988,7 @@ Hono Auth Worker hiện có hệ thống đa ngôn ngữ nâng cấp với:
 - ✅ **Xử lý lỗi sẵn sàng production**
 
 **Bước tiếp theo:**
-1. Sử dụng `node tools/i18n.js help` để khám phá tất cả tính năng
-2. Thêm ngôn ngữ mới với `node tools/i18n.js add [code] "[tên]"`
-3. Test hệ thống thường xuyên với `node tools/i18n.js test`
+1. Sử dụng `node tools/i18n/master.js help` để khám phá tất cả tính năng
+2. Thêm ngôn ngữ mới với `node tools/i18n/master.js add [code] "[tên]"`
+3. Test hệ thống thường xuyên với `node tools/i18n/master.js test`
 4. Tham khảo master guide này cho tất cả nhu cầu i18n

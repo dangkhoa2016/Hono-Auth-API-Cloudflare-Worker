@@ -6,6 +6,8 @@
 
 File `wrangler.toml` là file cấu hình chính cho Cloudflare Workers, chứa thông tin về databases, environments, và các settings khác. Trong project này, file được quản lý đặc biệt để đảm bảo bảo mật.
 
+Tài liệu này tập trung vào cấu trúc cấu hình Wrangler và cách từng environment ánh xạ tới tài nguyên local hoặc remote. Với quy trình setup đầy đủ, workflow test và lệnh debug thường dùng, hãy dùng [SETUP_GUIDE_vi.md](./SETUP_GUIDE_vi.md), [TEST_GUIDE_vi.md](./TEST_GUIDE_vi.md) và [DEBUG_DEVELOPMENT_GUIDE_vi.md](./DEBUG_DEVELOPMENT_GUIDE_vi.md).
+
 ## 🔒 Mô Hình Bảo Mật
 
 ### Template vs File Thực Tế
@@ -36,21 +38,15 @@ File `wrangler.toml` đã được thêm vào `.gitignore` để:
 
 ## 🚀 Hướng Dẫn Thiết Lập
 
-### 1. Thiết Lập Ban Đầu
+### 1. Thiết Lập Nhanh Cấu Hình
 ```bash
-# Copy template để tạo actual config
 cp wrangler.toml.example wrangler.toml
-
-# Copy environment variable templates
 cp .dev.vars.development.example .dev.vars.development
-cp .dev.vars.test.example .dev.vars.test  
+cp .dev.vars.test.example .dev.vars.test
 cp .dev.vars.staging.example .dev.vars.staging
-
-# Chỉnh sửa files với values thật (JWT_SECRET, DEBUG settings, etc.)
-nano .dev.vars.development
-nano .dev.vars.test
-nano .dev.vars.staging
 ```
+
+Sau khi copy template, điền secret thật cho environment bạn đang dùng. Nếu cần checklist onboarding đầy đủ, cách xử lý secret và bootstrap cho developer mới, dùng [SETUP_GUIDE_vi.md](./SETUP_GUIDE_vi.md).
 
 ### 2. Cấu Hình Theo Environment
 
@@ -112,53 +108,36 @@ directory = "./src/assets"
 binding = "ASSETS"
 ```
 
-### Local Development (Khuyến nghị)
+### Tóm Tắt Vận Hành Theo Environment
+
+Giữ mô hình Wrangler ở mức đơn giản:
+
+- **Development** và **Test** dùng D1 local.
+- **Staging** chạy với database remote qua `--remote`.
+- **Production** nên dùng secret cho các giá trị nhạy cảm và migrate D1 remote.
+
+Các lệnh đại diện:
+
 ```bash
-# Development & Test environments tự động dùng local database
-npm run dev          # Port 8787 - Development  
-npm run dev:test     # Port 8788 - Test
-```
+# Local development
+npm run dev
+npm run dev:test
 
-### Remote Staging/Production
-```bash
-# Staging environment - đã có database ID
-npm run dev:staging     # Port 8789 - Staging (remote)
+# Remote staging
+npm run dev:staging
 
-# Tạo production database (nếu chưa có)
-npm run db:create:prod
-
-# Copy database ID từ output và paste vào wrangler.toml
-# [production]
-# database_id = "your-production-database-id"
-
-# Hoặc set production database ID via secret (khuyến nghị)
-wrangler secret put DATABASE_ID
-```
-
-### Lệnh npm Có Sẵn
-```bash
-# Development servers
-npm run dev                    # Development (port 8787, local DB)
-npm run dev:test              # Test (port 8788, local DB) 
-npm run dev:staging           # Staging (port 8789, remote DB)
-
-# Debug modes
-npm run dev:debug             # Development với debug logging
-npm run dev:staging:debug     # Staging với debug logging
-
-# Database operations
-npm run db:create:staging     # Tạo staging database
-npm run db:create:prod        # Tạo production database
-npm run db:migrate            # Migrate development DB
-npm run db:migrate:test       # Migrate test DB
-npm run db:migrate:staging    # Migrate staging DB
-npm run db:migrate:prod       # Migrate production DB
+# Migrations
+npm run db:migrate
+npm run db:migrate:test
+npm run db:migrate:staging
+npm run db:migrate:prod
 
 # Deployment
-npm run deploy:staging        # Deploy to staging
-npm run deploy               # Deploy to production
-npm run deploy:prod          # Deploy to production (alias)
+npm run deploy:staging
+npm run deploy
 ```
+
+Dùng [SETUP_GUIDE_vi.md](./SETUP_GUIDE_vi.md) cho bootstrap môi trường, [TEST_GUIDE_vi.md](./TEST_GUIDE_vi.md) cho ma trận lệnh đã được chuẩn hóa, và [DEBUG_DEVELOPMENT_GUIDE_vi.md](./DEBUG_DEVELOPMENT_GUIDE_vi.md) cho workflow debug.
 
 ## 🛠️ Tác Vụ Thường Gặp
 
@@ -170,72 +149,40 @@ npx wrangler d1 list
 ```
 
 ### Xác Minh Environment Setup
+
+Sau khi thay đổi cấu hình Wrangler, dùng vòng kiểm tra ngắn sau:
+
 ```bash
-# Test development environment (local DB)
+wrangler whoami
+npx wrangler d1 list
 npm run dev
-curl http://localhost:8787/
-
-# Test test environment (local DB)
-npm run dev:test  
-curl http://localhost:8788/
-
-# Test staging environment (remote DB)
-npm run dev:staging
-curl http://localhost:8789/
 ```
 
-### Thao Tác Database
-```bash
-# Local database migrations
-npm run db:migrate          # Development
-npm run db:migrate:test     # Test
-
-# Remote database migrations
-npm run db:migrate:staging  # Staging
-npm run db:migrate:prod     # Production
-```
+Nếu worker khởi động được và D1 binding mong đợi xuất hiện, cấu hình thường là đúng. Với smoke test rộng hơn và xác minh API, tiếp tục ở [TEST_GUIDE_vi.md](./TEST_GUIDE_vi.md).
 
 ## 🚨 Khắc Phục Sự Cố
 
 ### File Đã Được Commit vào Git
-```bash
-# Remove khỏi git tracking nhưng giữ local file
-git rm --cached wrangler.toml
 
-# Commit việc removal
-git commit -m "Remove wrangler.toml from git tracking"
-
-# Xác minh .gitignore chứa wrangler.toml
-grep "wrangler.toml" .gitignore
-```
+Nếu `wrangler.toml` từng bị track nhầm, hãy bỏ file này khỏi Git nhưng giữ bản local, sau đó xác minh `.gitignore` vẫn loại trừ nó. Đây là thao tác vệ sinh repository một lần, không phải bước vận hành thường ngày.
 
 ### Vấn Đề Database Connection
-```bash
-# Kiểm tra database tồn tại
-npx wrangler d1 list
 
-# Xác minh database ID trong wrangler.toml khớp
-npx wrangler d1 info <database-id>
+Kiểm tra theo thứ tự sau:
 
-# Test database connection
-npm run dev
-# Kiểm tra logs để tìm D1 binding errors
-```
+1. Xác nhận database đích tồn tại bằng `npx wrangler d1 list`.
+2. Xác nhận đúng section environment đang được sử dụng.
+3. Khởi động worker bằng đúng lệnh `npm run dev...` tương ứng và kiểm tra lỗi D1 binding.
+
+Với các pattern debug sâu hơn trong runtime, tiếp tục ở [DEBUG_DEVELOPMENT_GUIDE_vi.md](./DEBUG_DEVELOPMENT_GUIDE_vi.md).
 
 ### Environment Không Load Đúng
-```bash
-# Xác minh environment name trong wrangler.toml
-# Nên khớp: hono-auth-api-cloudflare-worker-{environment}
 
-# Kiểm tra dev command sử dụng đúng environment
-npm run dev          # Nên sử dụng [env.development] 
-npm run dev:test     # Nên sử dụng [env.test]
-npm run dev:staging  # Nên sử dụng [env.staging] --remote
+Thường rơi vào một trong ba nguyên nhân:
 
-# Kiểm tra nếu .dev.vars files tồn tại cho environment settings
-ls -la .dev.vars*
-# Nên có: .dev.vars.development, .dev.vars.test, .dev.vars.staging
-```
+1. Tên environment trong `wrangler.toml` không khớp với lệnh đã chạy.
+2. File `.dev.vars.*` tương ứng bị thiếu hoặc thiếu biến quan trọng.
+3. Bạn đang mong đợi môi trường remote nhưng lại khởi động local, hoặc ngược lại.
 
 ## ✅ Best Practices
 
@@ -255,13 +202,8 @@ ls -la .dev.vars*
 - ✅ Sử dụng quy ước đặt tên nhất quán
 
 ### 4. Chiến Lược Backup
-```bash
-# Backup staging database (có database ID thật)
-npx wrangler d1 export hono-auth-api-db-staging --env staging --output staging-backup.sql
 
-# Backup cấu trúc production database
-npx wrangler d1 export hono-auth-api-db --output production-backup.sql
-```
+Trước khi thay đổi một environment remote, hãy export D1 staging hoặc production ra file SQL cục bộ. Dùng quy trình Wrangler D1 export chuẩn khớp với environment đang thao tác.
 
 ## 📚 Tài Liệu Liên Quan
 
@@ -286,25 +228,12 @@ npx wrangler d1 export hono-auth-api-db --output production-backup.sql
 - **Production**: Deployed URL
 
 ### Hiện Đang Chạy:
-```bash
-# Server hiện tại đang chạy trên port 8788 (test environment)
-# Có thể test endpoints tại: http://localhost:8788/api/
-```
+
+Tại thời điểm tài liệu này được viết, môi trường test local thường dùng port `8788`. Xem đây là ví dụ minh họa, không phải trạng thái runtime cố định.
 
 ## 🔗 Liên Kết Nhanh
 
-```bash
-# Lệnh setup
-cp wrangler.toml.example wrangler.toml
-npm run setup:dev
-npm run db:migrate
-
-# Development workflow
-npm run dev              # Khởi động development server
-npm run test            # Chạy test suite
-npm run lint:check      # Kiểm tra code quality
-
-# Deployment workflow  
-npm run deploy:staging  # Deploy to staging
-npm run deploy         # Deploy to production
-```
+- [SETUP_GUIDE_vi.md](./SETUP_GUIDE_vi.md) - Quy trình bootstrap và thiết lập môi trường đầy đủ
+- [TEST_GUIDE_vi.md](./TEST_GUIDE_vi.md) - Nguồn chuẩn cho ma trận lệnh xác minh và test
+- [DEBUG_DEVELOPMENT_GUIDE_vi.md](./DEBUG_DEVELOPMENT_GUIDE_vi.md) - Workflow debug và khắc phục sự cố local
+- [README_vi.md](../README_vi.md) - Tổng quan dự án và quick-start tối giản

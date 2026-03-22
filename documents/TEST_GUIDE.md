@@ -33,11 +33,13 @@
 
 ## 🎯 Overview
 
+This document is the canonical source of truth for test commands in this repository. Other guides should keep only quick-start entry points and link back here for the full command matrix, role-specific coverage, audit suites, and troubleshooting.
+
 ### What is this Test Suite?
 
 The Hono Auth API test suite is a comprehensive testing framework designed for enterprise-grade applications with:
 
-- ✅ **Enterprise Audit System** - Complete 4-phase audit logging with 49+ endpoints
+- ✅ **Enterprise Audit System** - Complete 4-phase audit logging with 57+ endpoints
 - ✅ **Multiple Test Structures** - Interactive, unified, and automated approaches
 - ✅ **Role-Based Access Control** - Comprehensive RBAC testing with 3-tier hierarchy
 - ✅ **Multi-Environment Support** - Dev, test, staging, production environments
@@ -51,7 +53,7 @@ The Hono Auth API test suite is a comprehensive testing framework designed for e
 
 | Feature | Value | Improvement |
 |---------|-------|-------------|
-| **Enterprise Audit System** | 49+ audit endpoints across 4 route groups | Complete audit coverage |
+| **Enterprise Audit System** | 57+ audit endpoints across 4 route groups | Complete audit coverage |
 | **Test Organization** | Multiple execution approaches available | Maximum flexibility |
 | **Code Maintenance** | Modular and unified options | Easy to maintain |
 | **Test Coverage** | Comprehensive | 100% API + audit coverage |
@@ -132,7 +134,7 @@ npm run test:audit:quick
 **Environment Support**: 3 environments (dev, test, staging)  
 **Role Coverage**: 3 roles (user, admin, super_admin) with audit access control  
 **Interactive Menu**: 15+ test contexts + audit system integration  
-**Audit Endpoints**: 49+ endpoints across 4 main route groups
+**Audit Endpoints**: 57+ endpoints across 4 main route groups
 
 ### ✅ Quality Metrics & Route Coverage Analysis
 - **Test Categories Coverage**: 25+ categories - ✅ Complete (including enterprise audit system)
@@ -154,7 +156,7 @@ npm run test:audit:quick
 ### 🎯 Recent Improvements (July 31, 2025)
 
 #### ✅ Enterprise Audit System Integration Successfully Completed
-- **49+ Audit Endpoints**: Complete coverage across 4 main route groups
+- **57+ Audit Endpoints**: Complete coverage across 4 main route groups
 - **4-Phase Audit Testing**: Comprehensive audit system validation
 - **Advanced Analytics**: Business intelligence and compliance reporting
 - **Real-time Monitoring**: Live system monitoring and threat detection
@@ -162,8 +164,8 @@ npm run test:audit:quick
 - **Performance Optimization**: Audit system performance benchmarking
 
 #### ✅ Audit Route Groups Coverage
-1. **Core Audit Routes** (`/api/audit/*`) - 5 endpoints for essential audit logging
-2. **Advanced Analytics Routes** (`/api/advanced-audit/*`) - 14+ endpoints for analytics & compliance
+1. **Core Audit Routes** (`/api/audit/*`) - 6 endpoints for essential audit logging
+2. **Advanced Analytics Routes** (`/api/advanced-audit/*`) - 15 endpoints for analytics & compliance
 3. **Real-time Monitoring Routes** (`/api/realtime-monitoring/*`) - 22+ endpoints for live monitoring
 4. **Security Incident Routes** (`/api/security-incident/*`) - 8+ endpoints for incident management
 
@@ -211,7 +213,7 @@ tests/
 │   │   └── emailProviderHeaderTest.js   # Email provider integration (Brevo API)
 │   └── 📊 ENTERPRISE AUDIT SYSTEM TESTS - Complete Coverage (15+ files)
 │       ├── auditSystemTest.js           # Complete audit system test (4-phase comprehensive testing)
-│       ├── advancedAuditComprehensiveTest.js # Advanced analytics (/api/advanced-audit/* - 14+ endpoints)
+│       ├── advancedAuditComprehensiveTest.js # Advanced analytics (/api/advanced-audit/* - 15 endpoints)
 │       ├── auditPerformanceTest.js      # Audit system performance benchmarks and analysis
 │       ├── realtimeMonitoringTest.js    # Real-time monitoring (/api/realtime-monitoring/* - 22+ endpoints)
 │       ├── securityIncidentTest.js      # Security incident management (/api/security-incident/* - 8+ endpoints)
@@ -221,8 +223,8 @@ tests/
 │       ├── auditLogServiceIntegrationTest.js # Audit log service integration testing
 │       ├── alertSystemConfigIntegrationTest.js # Alert system configuration testing
 │       ├── i18nValidatorExtensionTest.js # i18n validator extension testing
-│       ├── auditEndpointsCompleteTest.js # Complete endpoint coverage testing (49+ endpoints)
-│       ├── quickAuditTest.js            # Quick audit validation and smoke testing
+│       ├── unified-audit-test.sh (mode: endpoints) # Complete endpoint coverage testing (57+ endpoints)
+│       ├── quickTest.js            # Quick audit validation and smoke testing
 │       └── ... (additional specialized audit tests)
 ├── 🛠️ Test Utilities (8+ files)
 │   ├── createTestAdminUsers.js      # Test admin user creation
@@ -249,13 +251,13 @@ tests/
     ├── test-kv-admin.sh             # KV administration testing
     ├── test-kv-audit-config.sh      # KV audit configuration testing
     └── 📊 ENTERPRISE AUDIT AUTOMATION SCRIPTS (10+ files)
-        ├── unified-audit-test.sh        # Comprehensive enterprise audit system testing (49+ endpoints)
-        ├── audit-core-test.sh           # Core audit functionality tests
-        ├── audit-advanced-test.sh       # Advanced analytics tests
-        ├── audit-realtime-test.sh       # Real-time monitoring tests
-        ├── audit-security-test.sh       # Security incident tests
-        ├── audit-performance-test.sh    # Audit performance analysis
-        ├── audit-complete-test.sh       # Complete audit system test
+        ├── unified-audit-test.sh        # Comprehensive enterprise audit system testing (57+ endpoints)
+        ├── unified-audit-test.sh core           # Core audit functionality tests
+        ├── unified-audit-test.sh advanced       # Advanced analytics tests
+        ├── unified-audit-test.sh realtime       # Real-time monitoring tests
+        ├── unified-audit-test.sh security       # Security incident tests
+        ├── unified-audit-test.sh performance    # Audit performance analysis
+        ├── unified-audit-test.sh comprehensive       # Complete audit system test
         └── ... (additional specialized audit automation)
 ```
 
@@ -301,12 +303,12 @@ tests/
 ├── 🔗 integrationTest.js       # End-to-end integration tests
 ├── ✅ validationTest.js        # General validation tests
 ├── ✅ zodValidationTest.js     # Zod schema validation tests
-├── 🔧 schemaRegistryIntegrationTest.js # Schema registry system tests
+├── 🔧 i18nValidatorExtensionTest.js # Schema registry + i18n validator integration tests
 ├── ⚡ quickTest.js             # Quick smoke tests
 ├── 🎭 roleTest.js              # Role-based access control tests
 └── 📊 ENTERPRISE AUDIT SYSTEM TESTS (15+ files)
     ├── 🔍 auditSystemTest.js           # Complete audit system test
-    ├── 📊 advancedAuditComprehensiveTest.js # Advanced analytics (/api/advanced-audit/* - 14+ endpoints)
+    ├── 📊 advancedAuditComprehensiveTest.js # Advanced analytics (/api/advanced-audit/* - 15 endpoints)
     ├── ⚡ auditPerformanceTest.js      # Audit system performance benchmarks
     ├── 🚀 realtimeMonitoringTest.js    # Real-time monitoring (/api/realtime-monitoring/* - 22+ endpoints)
     ├── 🔒 securityIncidentTest.js      # Security incident management (/api/security-incident/* - 8+ endpoints)
@@ -316,8 +318,8 @@ tests/
     ├── 🔗 auditLogServiceIntegrationTest.js # Audit log service integration
     ├── 🚨 alertSystemConfigIntegrationTest.js # Alert system configuration
     ├── 🌐 i18nValidatorExtensionTest.js # i18n validator extension
-    ├── 📋 auditEndpointsCompleteTest.js # Complete endpoint coverage (49+ endpoints)
-    ├── ⚡ quickAuditTest.js            # Quick audit validation and smoke testing
+    ├── 📋 unified-audit-test.sh (mode: endpoints) # Complete endpoint coverage (57+ endpoints)
+    ├── ⚡ quickTest.js            # Quick audit validation and smoke testing
     └── ... (additional specialized audit tests)
 ```
 
@@ -342,13 +344,13 @@ tests/scripts/
 ├── test-kv-audit-config.sh      # KV audit configuration testing
 ├── test-admin-messages.sh       # Admin message translation testing
 └── 📊 COMPREHENSIVE AUDIT AUTOMATION (10+ scripts)
-    ├── unified-audit-test.sh        # Complete enterprise audit system testing (49+ endpoints)
+    ├── unified-audit-test.sh        # Complete enterprise audit system testing (57+ endpoints)
     │                                # Supports: quick, core, advanced, realtime, security, endpoints, comprehensive
-    ├── audit-core-test.sh           # Core audit functionality automation
-    ├── audit-advanced-test.sh       # Advanced analytics automation
-    ├── audit-realtime-test.sh       # Real-time monitoring automation
-    ├── audit-security-test.sh       # Security incident automation
-    ├── audit-performance-test.sh    # Audit performance benchmarking
+    ├── unified-audit-test.sh core           # Core audit functionality automation
+    ├── unified-audit-test.sh advanced       # Advanced analytics automation
+    ├── unified-audit-test.sh realtime       # Real-time monitoring automation
+    ├── unified-audit-test.sh security       # Security incident automation
+    ├── unified-audit-test.sh performance    # Audit performance benchmarking
     └── ... (additional specialized audit automation scripts)
 ```
 
@@ -494,7 +496,7 @@ npm run test:quick             # Quick smoke tests
 
 # Specialized validation tests
 npm run test:zod_validation    # Zod validation tests
-npm run test:schema:registry   # Schema registry integration tests
+node tests/i18nValidatorExtensionTest.js # Schema registry integration tests
 
 # XSS Security tests
 npm run test:xss:all           # XSS Security tests
@@ -508,7 +510,7 @@ npm run test:audit:security    # Security incident management (/api/security-inc
 npm run test:audit:performance # Audit system performance benchmarking
 npm run test:audit:integration # Audit log service integration
 npm run test:audit:archival    # Data archival and retention testing
-npm run test:audit:endpoints   # Complete audit endpoint coverage (49+ endpoints)
+npm run test:audit:endpoints   # Complete audit endpoint coverage (57+ endpoints)
 npm run test:audit:quick       # Quick audit validation
 npm run test:audit:comprehensive # Comprehensive audit system testing
 ```
@@ -516,7 +518,7 @@ npm run test:audit:comprehensive # Comprehensive audit system testing
 ### Method 3: Enterprise Audit System Automation
 
 ```bash
-# Comprehensive audit system testing (49+ endpoints)
+# Comprehensive audit system testing (57+ endpoints)
 bash tests/scripts/unified-audit-test.sh comprehensive
 
 # Quick audit validation
@@ -583,7 +585,7 @@ npm run test  # Select multi-language validation option
 
 ### 🔧 **Schema Registry Integration Testing**
 
-The **Schema Registry Integration Test** (`schemaRegistryIntegrationTest.js`) provides comprehensive testing of the centralized schema registry system that manages 46 schemas across 10 categories:
+The **Schema Registry Integration Test** (`i18nValidatorExtensionTest.js`) provides comprehensive testing of the centralized schema registry system that manages 46 schemas across 10 categories:
 
 #### **📋 Test Coverage**
 - **Schema Registry System**: Core registry functionality and caching
@@ -612,10 +614,7 @@ The **Schema Registry Integration Test** (`schemaRegistryIntegrationTest.js`) pr
 #### **💡 Usage**
 ```bash
 # Direct execution
-node tests/schemaRegistryIntegrationTest.js
-
-# Via npm script
-npm run test:schema:registry
+node tests/i18nValidatorExtensionTest.js
 
 # Via test menu
 npm run test  # Select schema registry option
@@ -895,12 +894,12 @@ bash tests/scripts/test-rbac-comprehensive.sh  # RBAC comprehensive testing
 bash tests/scripts/test-system-health.sh       # System health testing
 
 # Audit System Automation Scripts
-bash tests/scripts/audit-core-test.sh          # Core audit functionality tests
-bash tests/scripts/audit-advanced-test.sh      # Advanced analytics tests  
-bash tests/scripts/audit-realtime-test.sh      # Real-time monitoring tests
-bash tests/scripts/audit-security-test.sh      # Security incident tests
-bash tests/scripts/audit-performance-test.sh   # Audit performance benchmarks
-bash tests/scripts/audit-complete-test.sh      # Complete audit system test
+bash tests/scripts/unified-audit-test.sh core          # Core audit functionality tests
+bash tests/scripts/unified-audit-test.sh advanced      # Advanced analytics tests  
+bash tests/scripts/unified-audit-test.sh realtime      # Real-time monitoring tests
+bash tests/scripts/unified-audit-test.sh security      # Security incident tests
+bash tests/scripts/unified-audit-test.sh performance   # Audit performance benchmarks
+bash tests/scripts/unified-audit-test.sh comprehensive      # Complete audit system test
 bash tests/scripts/test_all_roles.sh       # All roles curl tests
 
 # Specialized test scripts
@@ -1051,7 +1050,7 @@ All test files have been updated to follow the new pattern:
 - `tests/validationTest.js`
 - `tests/securityIncidentTest.js`
 - `tests/comprehensiveI18nTest.js` (i18n testing)
-- `tests/quickAuditTest.js`
+- `tests/quickTest.js`
 - `tests/auditPerformanceTest.js`
 - `tests/integrationTest.js`
 
@@ -1108,7 +1107,7 @@ All test files have been updated to follow the new pattern:
 | Endpoint | Method | Coverage | Test Files |
 |----------|--------|----------|------------|
 | `/health` | GET | ✅ Complete | systemTest.js, quickTest.js |
-| `/favicon.ico` | GET | ✅ Complete | systemTest.js, scripts/test-favicon.sh |
+| `/favicon.ico` | GET | ✅ Complete | systemTest.js, tests/scripts/test-favicon.sh |
 | `/api` | GET | ✅ Complete | systemTest.js, integrationTest.js |
 
 ### 🛡️ Security Testing Coverage
@@ -1411,17 +1410,17 @@ Based on detailed system analysis, our test suite achieves **complete coverage**
 
 ### 🎯 **Enterprise Audit System Coverage**
 
-#### **4 Main Route Groups - Complete Coverage (35 endpoints)**
+#### **4 Main Route Groups - Complete Coverage (57 endpoints)**
 
-1. **Core Audit Routes** (`/api/audit/*`) - **5 endpoints** ✅
+1. **Core Audit Routes** (`/api/audit/*`) - **6 endpoints** ✅
    - Basic audit logging and search functionality
   - Test Coverage: `auditSystemTest.js` (merged core tests), `simpleAuditTest.js`
 
-2. **Advanced Analytics Routes** (`/api/advanced-audit/*`) - **11 endpoints** ✅
+2. **Advanced Analytics Routes** (`/api/advanced-audit/*`) - **15 endpoints** ✅
    - Advanced analytics, archival, and compliance reporting
    - Test Coverage: `advancedAuditComprehensiveTest.js`, `auditPerformanceTest.js`
 
-3. **Real-time Monitoring Routes** (`/api/realtime-monitoring/*`) - **12 endpoints** ✅
+3. **Real-time Monitoring Routes** (`/api/realtime-monitoring/*`) - **28 endpoints** ✅
    - Live system monitoring, alerts, and threat detection
    - Test Coverage: `realtimeMonitoringTest.js`, `alertSystemConfigIntegrationTest.js`
 

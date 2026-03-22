@@ -6,6 +6,8 @@
 
 The `wrangler.toml` file is the main configuration file for Cloudflare Workers, containing information about databases, environments, and other settings. In this project, the file is managed specially to ensure security.
 
+This guide focuses on how the Wrangler configuration is structured and how environments map to local or remote resources. For full project setup, test workflows, and day-to-day debugging commands, use [SETUP_GUIDE.md](./SETUP_GUIDE.md), [TEST_GUIDE.md](./TEST_GUIDE.md), and [DEBUG_DEVELOPMENT_GUIDE.md](./DEBUG_DEVELOPMENT_GUIDE.md).
+
 ## 🔒 Security Model
 
 ### Template vs Actual File
@@ -36,21 +38,15 @@ The `wrangler.toml` file has been added to `.gitignore` to:
 
 ## 🚀 Setup Instructions
 
-### 1. Initial Setup
+### 1. Configuration Quick Start
 ```bash
-# Copy template to create actual config
 cp wrangler.toml.example wrangler.toml
-
-# Copy environment variable templates
 cp .dev.vars.development.example .dev.vars.development
-cp .dev.vars.test.example .dev.vars.test  
+cp .dev.vars.test.example .dev.vars.test
 cp .dev.vars.staging.example .dev.vars.staging
-
-# Edit files with real values (JWT_SECRET, DEBUG settings, etc.)
-nano .dev.vars.development
-nano .dev.vars.test
-nano .dev.vars.staging
 ```
+
+After copying the templates, fill in the real secrets for the environment you are working on. If you want the full onboarding workflow, secret handling checklist, or developer bootstrap steps, use [SETUP_GUIDE.md](./SETUP_GUIDE.md).
 
 ### 2. Environment-Specific Configuration
 
@@ -112,53 +108,36 @@ directory = "./src/assets"
 binding = "ASSETS"
 ```
 
-### Local Development (Recommended)
+### Environment Operation Quick Start
+
+Keep the Wrangler mental model simple:
+
+- **Development** and **Test** use local D1 databases.
+- **Staging** runs against the remote database with `--remote`.
+- **Production** should use secrets for sensitive values and remote D1 migrations.
+
+Representative commands:
+
 ```bash
-# Development & Test environments automatically use local database
-npm run dev          # Port 8787 - Development  
-npm run dev:test     # Port 8788 - Test
-```
+# Local development
+npm run dev
+npm run dev:test
 
-### Remote Staging/Production
-```bash
-# Staging environment - already has database ID
-npm run dev:staging     # Port 8789 - Staging (remote)
+# Remote staging
+npm run dev:staging
 
-# Create production database (if not exists)
-npm run db:create:prod
-
-# Copy database ID from output and paste into wrangler.toml
-# [production]
-# database_id = "your-production-database-id"
-
-# Or set production database ID via secret (recommended)
-wrangler secret put DATABASE_ID
-```
-
-### Available npm Commands
-```bash
-# Development servers
-npm run dev                    # Development (port 8787, local DB)
-npm run dev:test              # Test (port 8788, local DB) 
-npm run dev:staging           # Staging (port 8789, remote DB)
-
-# Debug modes
-npm run dev:debug             # Development with debug logging
-npm run dev:staging:debug     # Staging with debug logging
-
-# Database operations
-npm run db:create:staging     # Create staging database
-npm run db:create:prod        # Create production database
-npm run db:migrate            # Migrate development DB
-npm run db:migrate:test       # Migrate test DB
-npm run db:migrate:staging    # Migrate staging DB
-npm run db:migrate:prod       # Migrate production DB
+# Migrations
+npm run db:migrate
+npm run db:migrate:test
+npm run db:migrate:staging
+npm run db:migrate:prod
 
 # Deployment
-npm run deploy:staging        # Deploy to staging
-npm run deploy               # Deploy to production
-npm run deploy:prod          # Deploy to production (alias)
+npm run deploy:staging
+npm run deploy
 ```
+
+Use [SETUP_GUIDE.md](./SETUP_GUIDE.md) for environment bootstrapping, [TEST_GUIDE.md](./TEST_GUIDE.md) for verified command coverage, and [DEBUG_DEVELOPMENT_GUIDE.md](./DEBUG_DEVELOPMENT_GUIDE.md) for debug-oriented workflows.
 
 ## 🛠️ Common Tasks
 
@@ -170,72 +149,40 @@ npx wrangler d1 list
 ```
 
 ### Verify Environment Setup
+
+Use a short verification loop after changing Wrangler config:
+
 ```bash
-# Test development environment (local DB)
+wrangler whoami
+npx wrangler d1 list
 npm run dev
-curl http://localhost:8787/
-
-# Test test environment (local DB)
-npm run dev:test  
-curl http://localhost:8788/
-
-# Test staging environment (remote DB)
-npm run dev:staging
-curl http://localhost:8789/
 ```
 
-### Database Operations
-```bash
-# Local database migrations
-npm run db:migrate          # Development
-npm run db:migrate:test     # Test
-
-# Remote database migrations
-npm run db:migrate:staging  # Staging
-npm run db:migrate:prod     # Production
-```
+If the worker starts and the expected D1 binding is available, the configuration is usually correct. For broader smoke tests and API verification, continue in [TEST_GUIDE.md](./TEST_GUIDE.md).
 
 ## 🚨 Troubleshooting
 
 ### File Already Committed to Git
-```bash
-# Remove from git tracking but keep local file
-git rm --cached wrangler.toml
 
-# Commit the removal
-git commit -m "Remove wrangler.toml from git tracking"
-
-# Verify .gitignore contains wrangler.toml
-grep "wrangler.toml" .gitignore
-```
+If `wrangler.toml` was accidentally tracked, remove it from Git while keeping the local file, then confirm `.gitignore` still excludes it. This is a one-time repository hygiene fix rather than part of the normal setup flow.
 
 ### Database Connection Issues
-```bash
-# Check database exists
-npx wrangler d1 list
 
-# Verify database ID in wrangler.toml matches
-npx wrangler d1 info <database-id>
+Check the problem in this order:
 
-# Test database connection
-npm run dev
-# Check logs for D1 binding errors
-```
+1. Confirm the target database exists with `npx wrangler d1 list`.
+2. Confirm the expected environment section is being used.
+3. Start the worker with the matching `npm run dev...` command and inspect D1 binding errors.
+
+For deeper runtime debugging patterns, continue in [DEBUG_DEVELOPMENT_GUIDE.md](./DEBUG_DEVELOPMENT_GUIDE.md).
 
 ### Environment Not Loading Correctly
-```bash
-# Verify environment name in wrangler.toml
-# Should match: hono-auth-api-cloudflare-worker-{environment}
 
-# Check dev command uses correct environment
-npm run dev          # Should use [env.development] 
-npm run dev:test     # Should use [env.test]
-npm run dev:staging  # Should use [env.staging] --remote
+Usually this means one of three things:
 
-# Check if .dev.vars files exist for environment settings
-ls -la .dev.vars*
-# Should have: .dev.vars.development, .dev.vars.test, .dev.vars.staging
-```
+1. The environment name in `wrangler.toml` does not match the command you ran.
+2. The matching `.dev.vars.*` file is missing or incomplete.
+3. You expected a remote environment but started a local one, or the reverse.
 
 ## ✅ Best Practices
 
@@ -255,13 +202,8 @@ ls -la .dev.vars*
 - ✅ Use consistent naming conventions
 
 ### 4. Backup Strategy
-```bash
-# Backup staging database (has real database ID)
-npx wrangler d1 export hono-auth-api-db-staging --env staging --output staging-backup.sql
 
-# Backup production database structure
-npx wrangler d1 export hono-auth-api-db --output production-backup.sql
-```
+Before modifying a remote environment, export the staging or production D1 database to a local SQL backup. Use the standard Wrangler D1 export workflow that matches the environment you are operating on.
 
 ## 📚 Related Documentation
 
@@ -286,25 +228,12 @@ npx wrangler d1 export hono-auth-api-db --output production-backup.sql
 - **Production**: Deployed URL
 
 ### Currently Running:
-```bash
-# Server currently running on port 8788 (test environment)
-# Can test endpoints at: http://localhost:8788/api/
-```
+
+At the time this guide was written, the actively used local test environment was port `8788`. Treat that as an example, not a guaranteed runtime state.
 
 ## 🔗 Quick Links
 
-```bash
-# Setup commands
-cp wrangler.toml.example wrangler.toml
-npm run setup:dev
-npm run db:migrate
-
-# Development workflow
-npm run dev              # Start development server
-npm run test            # Run test suite
-npm run lint:check      # Check code quality
-
-# Deployment workflow  
-npm run deploy:staging  # Deploy to staging
-npm run deploy         # Deploy to production
-```
+- [SETUP_GUIDE.md](./SETUP_GUIDE.md) - Full environment bootstrap and setup flow
+- [TEST_GUIDE.md](./TEST_GUIDE.md) - Canonical command matrix for verification and test runs
+- [DEBUG_DEVELOPMENT_GUIDE.md](./DEBUG_DEVELOPMENT_GUIDE.md) - Debug workflows and local troubleshooting
+- [README.md](../README.md) - Project overview and minimal quick-start

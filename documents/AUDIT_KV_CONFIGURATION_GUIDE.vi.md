@@ -460,6 +460,8 @@ const AUDIT_CONFIG_VALIDATION = {
 
 Hệ thống audit bao gồm các tùy chọn cấu hình i18n toàn diện để hỗ trợ triển khai đa ngôn ngữ và thông báo lỗi được bản địa hóa.
 
+Dùng [TEST_GUIDE_vi.md](./TEST_GUIDE_vi.md) làm nguồn chuẩn cho lệnh test, [TEST_SCRIPTS_vi.md](./TEST_SCRIPTS_vi.md) cho flow tự động hóa, và [../tests/scripts/CURL_COMMANDS_vi.md](../tests/scripts/CURL_COMMANDS_vi.md) cho các ví dụ curl rộng hơn. Guide này chỉ giữ lại các ví dụ KV Admin mang tính đại diện.
+
 ### **🌐 Các Khóa Cấu Hình i18n Được Đề Xuất**
 
 | Khóa | Mục Đích | Giá Trị Mặc Định | Kiểu | Mô Tả |
@@ -474,7 +476,7 @@ Hệ thống audit bao gồm các tùy chọn cấu hình i18n toàn diện đ�
 
 ### **🔧 Ví dụ Cấu hình i18n**
 
-**Bật hỗ trợ tiếng Nhật và tiếng Đức**:
+**Ví dụ đại diện: cập nhật danh sách ngôn ngữ hỗ trợ**:
 ```bash
 curl -X PUT "http://localhost:8787/api/kv-admin/configs/AUDIT_SUPPORTED_LANGUAGES" \
   -H "Authorization: Bearer <super_admin_token>" \
@@ -482,32 +484,11 @@ curl -X PUT "http://localhost:8787/api/kv-admin/configs/AUDIT_SUPPORTED_LANGUAGE
   -d '{"value": "en,vi,fr,es,de,ja,th"}'
 ```
 
-**Đặt tiếng Việt làm mặc định cho thị trường Việt Nam**:
-```bash
-curl -X PUT "http://localhost:8787/api/kv-admin/configs/AUDIT_DEFAULT_LANGUAGE" \
-  -H "Authorization: Bearer <super_admin_token>" \
-  -H "Content-Type: application/json" \
-  -d '{"value": "vi"}'
-```
-
-**Cấu hình hàng loạt i18n**:
-```bash
-curl -X POST "http://localhost:8787/api/kv-admin/configs/batch" \
-  -H "Authorization: Bearer <super_admin_token>" \
-  -H "Content-Type: application/json" \
-  -d '{
-    "configs": {
-      "AUDIT_DEFAULT_LANGUAGE": "vi",
-      "AUDIT_AUTO_DETECT_LANGUAGE": true,
-      "AUDIT_LOCALIZE_ERROR_MESSAGES": true,
-      "AUDIT_TRANSLATION_CACHE_TTL": 7200
-    }
-  }'
-```
+Để xem thêm ví dụ request theo từng khóa hoặc batch update, xem [TEST_SCRIPTS_vi.md](./TEST_SCRIPTS_vi.md) và [../tests/scripts/CURL_COMMANDS_vi.md](../tests/scripts/CURL_COMMANDS_vi.md).
 
 ### **🌐 Tích hợp Dịch vụ i18n**
 
-**File**: `src/services/auditI18nService.js` (Đề xuất)
+**File**: `src/i18n/service.js` (Đề xuất)
 
 ```javascript
 export class AuditI18nService {
@@ -587,7 +568,7 @@ Response: {
 3. **`auditMonitoringService.js`** - Cài đặt giám sát real-time
 4. **`alertSystemService.js`** - Cấu hình cảnh báo và kênh
 5. **`auditExportService.js`** - Định dạng export và giới hạn kích thước
-6. **`auditI18nService.js`** - Dịch vụ bản địa hóa và đa ngôn ngữ
+6. **`i18n/service.js`** - Dịch vụ bản địa hóa và đa ngôn ngữ
 7. **`securityIncidentService.js`** - Phản hồi sự cố có thể cấu hình
 
 ### **Cập Nhật Route**
