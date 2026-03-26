@@ -183,6 +183,58 @@ const KV_ADMIN_ROUTES = [
       permissions: PERMISSION_PRESETS.SUPER_ADMIN,
       description: 'Toggle an audit feature flag'
     }
+  },
+
+  // Rate limit KV management
+  {
+    method: 'GET',
+    path: '/api/kv-admin/rate-limits',
+    metadata: {
+      category: 'kv_admin',
+      i18nKey: 'endpoints.kv_admin.rateLimits',
+      permissions: PERMISSION_PRESETS.SUPER_ADMIN,
+      description: 'List KV-backed rate limit keys and metadata'
+    }
+  },
+  {
+    method: 'POST',
+    path: '/api/kv-admin/rate-limits/clean',
+    metadata: {
+      category: 'kv_admin',
+      i18nKey: 'endpoints.kv_admin.rateLimitsClean',
+      permissions: PERMISSION_PRESETS.SUPER_ADMIN,
+      description: 'Delete rate limit keys by prefix'
+    }
+  },
+  {
+    method: 'POST',
+    path: '/api/kv-admin/rate-limits/seed',
+    metadata: {
+      category: 'kv_admin',
+      i18nKey: 'endpoints.kv_admin.rateLimitsSeed',
+      permissions: PERMISSION_PRESETS.SUPER_ADMIN,
+      description: 'Seed KV rate limit keys for testing'
+    }
+  },
+  {
+    method: 'POST',
+    path: '/api/kv-admin/rate-limits/prune-time',
+    metadata: {
+      category: 'kv_admin',
+      i18nKey: 'endpoints.kv_admin.rateLimitsPruneTime',
+      permissions: PERMISSION_PRESETS.SUPER_ADMIN,
+      description: 'Delete rate limit keys within a time range'
+    }
+  },
+  {
+    method: 'POST',
+    path: '/api/kv-admin/rate-limits/batch-delete',
+    metadata: {
+      category: 'kv_admin',
+      i18nKey: 'endpoints.kv_admin.rateLimitsBatchDelete',
+      permissions: PERMISSION_PRESETS.SUPER_ADMIN,
+      description: 'Batch delete specific rate limit keys'
+    }
   }
 ];
 
