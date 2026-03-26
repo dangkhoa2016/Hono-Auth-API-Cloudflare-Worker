@@ -532,7 +532,7 @@ Lấy dashboard metrics hiệu năng.
 ### **🏥 GET /dashboard/health**
 Lấy sức khỏe hệ thống dashboard.
 
-**Quyền truy cập**: Chỉ Super Admin
+**Quyền truy cập**: Admin và Super Admin
 
 ### **📤 POST /dashboard/export**
 Xuất dữ liệu dashboard.

@@ -337,8 +337,17 @@ class RealtimeMonitoringTest {
         Authorization: `Bearer ${this.tokens.superAdmin}`
       });
 
-      this.assert.assertTrue(healthResponse.status === 200 || healthResponse.status === 403,
+      this.assert.assertEqual(healthResponse.status, 200,
         'Should perform health check');
+
+      if (this.tokens.admin) {
+        const adminHealthResponse = await this.client.get(API_ENDPOINTS.realtimeMonitoringDashboardHealth, {
+          Authorization: `Bearer ${this.tokens.admin}`
+        });
+
+        this.assert.assertEqual(adminHealthResponse.status, 200,
+          'Admin should be able to access dashboard health');
+      }
 
       this.logger.success('Incident Management completed successfully');
     } catch (error) {
