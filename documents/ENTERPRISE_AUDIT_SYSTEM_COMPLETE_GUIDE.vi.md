@@ -136,12 +136,13 @@ Hệ Thống Audit Doanh Nghiệp (50+ Endpoints)
 - **Khả Năng Xuất CSV**: Xuất có định dạng cho tất cả phân tích với lọc dựa trên vai trò
 - **Tối Ưu Hóa Hiệu Năng**: Thống kê middleware cho cải thiện hệ thống liên tục
 
-### **🔴 3. Real-time Monitoring Routes (`/api/realtime-monitoring/*`) - 15 Endpoints**
+### **🔴 3. Real-time Monitoring Routes (`/api/realtime-monitoring/*`) - 28 Endpoints**
 **File**: `src/routes/realtimeMonitoring.js`  
 **Mục đích**: Giám sát trực tiếp, phát hiện mối đe dọa, và hệ thống cảnh báo tự động  
-**Phân quyền**: Chỉ Super Admin (các tính năng bảo mật cao)  
+**Phân quyền**: Admin cho endpoint đọc/xuất, Super Admin cho endpoint điều khiển/thay đổi trạng thái  
 **Dịch vụ**: `AuditMonitoringService`, `AlertSystemService`, `AuditDashboardService`
-**Phân Quyền**: Chỉ dành cho Siêu Quản Trị Viên
+
+Admin có thể xem trạng thái monitoring, tóm tắt threat, dữ liệu alert ở chế độ đọc, các dashboard và thao tác export dashboard. Super Admin vẫn là vai trò bắt buộc cho điều khiển vòng đời monitoring, mô phỏng, thay đổi cấu hình alert, xóa cache và tạo incident.
 
 #### **🎛️ Kiểm Soát Giám Sát (3 endpoints):**
 - **GET `/monitoring/status`** - Trạng thái hệ thống giám sát hiện tại với metrics hiệu năng
@@ -407,6 +408,8 @@ Trước khi đi sâu vào chi tiết các trường hợp kiểm thử, hãy hi
   - `POST /export-advanced` - Xuất dữ liệu nâng cao
 
 #### **📡 3. Real-time Monitoring Routes (`/api/realtime-monitoring/*`)**
+- Các endpoint đọc/xuất (`GET` status, threats, events, alert reads, dashboard reads, `POST /dashboard/export`) mở cho cả Admin và Super Admin.
+- Các endpoint điều khiển và thay đổi trạng thái (`start`, `stop`, `analyze`, `simulate`, thay đổi alert, xóa cache, tạo incident) vẫn chỉ dành cho Super Admin.
 - 🎛️ **Kiểm Soát Giám Sát**:
   - `GET /monitoring/status` - Trạng thái giám sát hiện tại
   - `POST /monitoring/start` - Bắt đầu phiên giám sát
@@ -829,8 +832,10 @@ export const auditMiddleware = (options = {}) => {
 | `unifiedMiddlewares.auto()` | Được gắn một lần cho mỗi router: `router.use('*', unifiedMiddlewares.auto())` |
 | `middleware/routeDetector.js` | Phát hiện route động (exact + tham số) từ registry |
 | `constants/routeCategoryMappings.js` | Map nhóm route → `routeType` chuẩn hóa |
-| `routeDefinitions.js` | Nguồn sự thật: method, path, metadata |
+| `routeDefinitions.js` | Nguồn sự thật cho method, path, metadata của system, auth, user, admin, kv_admin, token blacklist, token audit, audit, realtime monitoring, security incident, translation và demo routes |
 | Cờ idempotent `__unifiedApplied` | Ngăn thực thi/ghi log trùng lặp |
+
+Đợt mở rộng metadata tháng 03/2026 đã bổ sung registry rõ ràng cho auth, user, KV admin, token audit và translation/demo routes, giúp unified auditing không còn phải dựa vào các fallback thủ công cho các nhóm route này.
 
 ### Luồng Phát Hiện
 1. Nạp danh sách route đã đăng ký
