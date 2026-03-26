@@ -213,7 +213,28 @@ GET /configs/env-comparison
 
 // Get defaults
 GET /configs/defaults
+
+// Inspect KV-backed rate limit keys (includes per-key metadata)
+GET /rate-limits?prefix=ratelimit:auth:ip:&limit=10
+
+// Seed synthetic rate limit keys for testing
+POST /rate-limits/seed
+Body: { "prefix": "ratelimit:test:", "count": 10, "attempts": 1 }
+
+// Dry-run or delete rate limit keys by prefix
+POST /rate-limits/clean
+Body: { "prefix": "ratelimit:test:", "dryRun": true }
+
+// Delete keys in a time range
+POST /rate-limits/prune-time
+Body: { "prefix": "ratelimit:test:", "start": 1711430000000, "end": 1711433600000 }
+
+// Delete specific rate limit keys
+POST /rate-limits/batch-delete
+Body: { "keys": ["ratelimit:auth:ip:203.0.113.10"] }
 ```
+
+`GET /api/kv-admin/rate-limits` now returns `keys[].metadata` so super admins can inspect rate-limit context without decoding the raw value manually. Typical metadata fields include `type`, `context`, `source`, `attempts`, `firstAttempt`, `lastAttempt`, and `reason`.
 
 ### **Proposed Audit-Specific Endpoints**
 

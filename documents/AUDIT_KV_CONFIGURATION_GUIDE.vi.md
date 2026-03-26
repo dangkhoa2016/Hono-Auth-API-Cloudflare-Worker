@@ -213,7 +213,28 @@ GET /configs/env-comparison
 
 // Lấy giá trị mặc định
 GET /configs/defaults
+
+// Kiểm tra các key rate limit lưu trong KV (bao gồm metadata từng key)
+GET /rate-limits?prefix=ratelimit:auth:ip:&limit=10
+
+// Seed key rate limit giả lập cho mục đích test
+POST /rate-limits/seed
+Body: { "prefix": "ratelimit:test:", "count": 10, "attempts": 1 }
+
+// Dry-run hoặc xóa các key rate limit theo prefix
+POST /rate-limits/clean
+Body: { "prefix": "ratelimit:test:", "dryRun": true }
+
+// Xóa key trong một khoảng thời gian
+POST /rate-limits/prune-time
+Body: { "prefix": "ratelimit:test:", "start": 1711430000000, "end": 1711433600000 }
+
+// Xóa một danh sách key rate limit cụ thể
+POST /rate-limits/batch-delete
+Body: { "keys": ["ratelimit:auth:ip:203.0.113.10"] }
 ```
+
+`GET /api/kv-admin/rate-limits` hiện trả về `keys[].metadata` để super admin có thể kiểm tra ngữ cảnh rate-limit mà không cần tự giải mã raw value. Các trường metadata thường gặp gồm `type`, `context`, `source`, `attempts`, `firstAttempt`, `lastAttempt`, và `reason`.
 
 ### **Endpoints Cụ Thể Cho Audit Được Đề Xuất**
 
