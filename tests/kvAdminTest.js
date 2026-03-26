@@ -835,8 +835,11 @@ class KVAdminTests {
       this.assert.assertTrue(response.data.data.keys.length >= 3, 'Should list at least the seeded keys');
 
       const firstKey = response.data.data.keys[0];
-      this.assert.assertHasFields(firstKey, ['name', 'value'], 'Key info should have name and value');
+      this.assert.assertHasFields(firstKey, ['name', 'value', 'metadata'], 'Key info should have name, value, and metadata');
       this.assert.assertTrue(firstKey.name.startsWith(prefix), 'Key name should start with the prefix');
+      this.assert.assertTrue(!!firstKey.metadata, 'Seeded rate limit key should include metadata');
+      this.assert.assertEqual(firstKey.metadata.type, 'rate_limit', 'Seeded rate limit metadata should be typed');
+      this.assert.assertEqual(firstKey.metadata.reason, 'seed_api', 'Seeded rate limit metadata should include reason');
 
       // Cleanup
       await this.client.post(API_ENDPOINTS.kvAdminRateLimitClean,
@@ -892,6 +895,16 @@ class KVAdminTests {
       this.assert.assertSuccess(response, 'Rate limit seed');
       this.assert.assertEqual(response.data.data.count, count, 'Should seed correct count');
       this.assert.assertTrue(response.data.data.createdKeys.length > 0, 'Should return created keys');
+
+      const listResponse = await this.client.get(`${API_ENDPOINTS.kvAdminRateLimitList}?prefix=${prefix}&limit=10`, {
+        'Authorization': `Bearer ${this.superAdminToken}`
+      });
+
+      this.assert.assertSuccess(listResponse, 'Rate limit seed list verification');
+      const seededKey = listResponse.data.data.keys.find(keyInfo => keyInfo.name.startsWith(prefix));
+      this.assert.assertTrue(!!seededKey, 'Seeded key should be listed');
+      this.assert.assertTrue(!!seededKey.metadata, 'Seeded key should persist KV metadata');
+      this.assert.assertEqual(seededKey.metadata.source, 'seed_api', 'Seeded key metadata should capture source');
 
       this.logger.success('Rate Limit Seed test completed successfully');
     } catch (error) {

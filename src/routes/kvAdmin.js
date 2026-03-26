@@ -10,6 +10,30 @@ import { handleStandardError } from '../utils/errorHandler.js';
 import { t, tError, tSuccess } from '../i18n/index.js';
 import { clearServiceCaches } from '../utils/serviceFactory.js';
 
+function buildRateLimitMetadataFromValue(value) {
+  if (!value || typeof value !== 'object' || Array.isArray(value)) {
+    return null;
+  }
+
+  const embeddedMetadata = value.metadata && typeof value.metadata === 'object' && !Array.isArray(value.metadata)
+    ? value.metadata
+    : {};
+
+  const rateLimitMetadata = {
+    type: 'rate_limit',
+    attempts: value.attempts,
+    firstAttempt: value.firstAttempt,
+    lastAttempt: value.lastAttempt,
+    ...embeddedMetadata
+  };
+
+  const normalizedMetadata = Object.fromEntries(
+    Object.entries(rateLimitMetadata).filter(([, fieldValue]) => fieldValue !== undefined && fieldValue !== null)
+  );
+
+  return Object.keys(normalizedMetadata).length > 0 ? normalizedMetadata : null;
+}
+
 const kvAdmin = new Hono();
 
 // Middleware: only super_admin can access
@@ -660,13 +684,17 @@ kvAdmin.get('/rate-limits', async (c) => {
     const cursor = c.req.query('cursor');
 
     const kvService = c.kvConfig;
-    
+
     const options = { limit };
-    if (prefix) options.prefix = prefix;
-    if (cursor) options.cursor = cursor;
+    if (prefix) {
+      options.prefix = prefix;
+    }
+    if (cursor) {
+      options.cursor = cursor;
+    }
 
     const list = await kvService.listRaw(options);
-    
+
     const keysInfo = await Promise.all(list.keys.map(async (key) => {
       try {
         const valueStr = await kvService.getRaw(key.name);
@@ -678,11 +706,11 @@ kvAdmin.get('/rate-limits', async (c) => {
         } catch (e) {
           // Keep as string if parsing fails
         }
-        
+
         return {
           name: key.name,
           expiration: key.expiration,
-          metadata: key.metadata,
+          metadata: key.metadata || buildRateLimitMetadataFromValue(value),
           value: value
         };
       } catch (e) {
@@ -692,7 +720,7 @@ kvAdmin.get('/rate-limits', async (c) => {
         };
       }
     }));
-    
+
     kvAdminRoutes_log(`Listed rate limits: ${list.keys.length} keys`);
 
     return c.json({
@@ -786,7 +814,19 @@ kvAdmin.post('/rate-limits/seed', async (c) => {
         metadata: { reason: 'seed_api', index: i }
       };
 
-      await kvService.putRaw(key, JSON.stringify(value), { expirationTtl: 86400 });
+      await kvService.putRaw(key, JSON.stringify(value), {
+        expirationTtl: 86400,
+        metadata: {
+          type: 'rate_limit',
+          source: 'seed_api',
+          prefix,
+          index: i,
+          attempts,
+          firstAttempt: timestamp,
+          lastAttempt: timestamp,
+          reason: 'seed_api'
+        }
+      });
       createdKeys.push(key);
     }
 
