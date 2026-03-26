@@ -1027,6 +1027,13 @@ kvAdmin.use('*', requireRole(ROLES.SUPER_ADMIN));
 | `/api/kv-admin/configs/batch` | POST | Batch update configurations | ✅ |
 | `/api/kv-admin/configs/:key` | DELETE | Reset to default value | ✅ |
 | `/api/kv-admin/configs/cache/clear` | POST | Clear configuration cache | ✅ |
+| `/api/kv-admin/rate-limits` | GET | List KV-backed rate limit keys with metadata | ✅ |
+| `/api/kv-admin/rate-limits/seed` | POST | Seed rate limit keys for testing | ✅ |
+| `/api/kv-admin/rate-limits/clean` | POST | Dry-run or delete rate limit keys by prefix | ✅ |
+| `/api/kv-admin/rate-limits/prune-time` | POST | Delete rate limit keys within a time range | ✅ |
+| `/api/kv-admin/rate-limits/batch-delete` | POST | Delete specific rate limit keys in bulk | ✅ |
+
+The rate-limit list endpoint returns `metadata` for each key so Super Admin can inspect context such as `type`, `context`, `reason`, and attempt timestamps directly from the admin API.
 
 ### 🔧 **Manageable Configuration Keys**
 

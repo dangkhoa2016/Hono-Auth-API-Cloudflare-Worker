@@ -78,7 +78,7 @@ Accept-Language: vi (tùy chọn, cho i18n - hỗ trợ en, vi, fr, es, de, ja, 
 ### **Cấp độ Quyền**
 | Vai trò | Core Audit | Advanced Audit | Real-time Monitoring | Security Incident |
 |---------|------------|----------------|---------------------|-------------------|
-| **Admin** | ✅ Hạn chế | ✅ Hạn chế | ❌ Không truy cập | ✅ Có |
+| **Admin** | ✅ Hạn chế | ✅ Hạn chế | ✅ Chỉ đọc/xuất | ✅ Có |
 | **Super Admin** | ✅ Toàn bộ | ✅ Toàn bộ | ✅ Toàn bộ | ✅ Toàn bộ |
 
 ### **Lọc Dữ liệu theo Vai trò**
@@ -381,13 +381,15 @@ Xuất dữ liệu nâng cao với nhiều tùy chọn hơn.
 ## 🔴 **ROUTES GIÁM SÁT THỜI GIAN THỰC (/api/realtime-monitoring/)**
 
 **Base URL**: `/api/realtime-monitoring/`  
-**Xác thực**: Bắt buộc (Chỉ Super Admin)  
+**Xác thực**: Bắt buộc (`admin` cho endpoint đọc/xuất, `super_admin` cho endpoint điều khiển và thay đổi trạng thái)  
 **File**: `src/routes/realtimeMonitoring.js`
+
+Các endpoint chỉ đọc phục vụ quan sát hệ thống được mở cho cả Admin và Super Admin. Các thao tác điều khiển monitoring, mô phỏng, thay đổi alert, xóa cache và tạo incident vẫn chỉ dành cho Super Admin.
 
 ### **🔍 GET /monitoring/status**
 Lấy trạng thái hiện tại của hệ thống giám sát.
 
-**Quyền truy cập**: Chỉ Super Admin
+**Quyền truy cập**: Admin, Super Admin
 
 **Response**:
 ```json
@@ -444,15 +446,15 @@ Mô phỏng sự kiện để kiểm thử.
 
 **Quyền truy cập**: Chỉ Super Admin
 
-### **� GET /events/recent**
+### **📡 GET /events/recent**
 Lấy các sự kiện giám sát gần đây.
 
-**Quyền truy cập**: Chỉ Super Admin
+**Quyền truy cập**: Admin, Super Admin
 
 ### **🔔 GET /alerts/status**
 Lấy trạng thái hệ thống cảnh báo.
 
-**Quyền truy cập**: Chỉ Super Admin
+**Quyền truy cập**: Admin, Super Admin
 
 ### **⚙️ POST /alerts/configure**
 Cấu hình cài đặt hệ thống cảnh báo.
@@ -462,7 +464,7 @@ Cấu hình cài đặt hệ thống cảnh báo.
 ### **📜 GET /alerts/history**
 Lấy lịch sử cảnh báo.
 
-**Quyền truy cập**: Chỉ Super Admin
+**Quyền truy cập**: Admin, Super Admin
 
 ### **📨 POST /alerts/send**
 Gửi cảnh báo thủ công.
@@ -472,7 +474,7 @@ Gửi cảnh báo thủ công.
 ### **📏 GET /alerts/rules**
 Lấy danh sách quy tắc cảnh báo.
 
-**Quyền truy cập**: Chỉ Super Admin
+**Quyền truy cập**: Admin, Super Admin
 
 ### **➕ POST /alerts/rules**
 Tạo quy tắc cảnh báo mới.
@@ -487,7 +489,7 @@ Bật/tắt quy tắc cảnh báo.
 ### **📢 GET /alerts/channels**
 Lấy danh sách kênh thông báo.
 
-**Quyền truy cập**: Chỉ Super Admin
+**Quyền truy cập**: Admin, Super Admin
 
 ### **🔧 POST /alerts/channels**
 Cấu hình kênh thông báo.
@@ -502,32 +504,32 @@ Kiểm tra hệ thống cảnh báo.
 ### **📊 GET /dashboard/overview**
 Lấy tổng quan dashboard.
 
-**Quyền truy cập**: Chỉ Super Admin
+**Quyền truy cập**: Admin, Super Admin
 
 ### **📈 GET /dashboard/realtime**
 Lấy dữ liệu dashboard trực tiếp.
 
-**Quyền truy cập**: Chỉ Super Admin
+**Quyền truy cập**: Admin, Super Admin
 
 ### **🔴 GET /dashboard/live**
 Lấy chế độ xem giám sát trực tiếp.
 
-**Quyền truy cập**: Chỉ Super Admin
+**Quyền truy cập**: Admin, Super Admin
 
 ### **⏱️ GET /dashboard/timeline**
 Lấy dữ liệu dòng thời gian lịch sử.
 
-**Quyền truy cập**: Chỉ Super Admin
+**Quyền truy cập**: Admin, Super Admin
 
 ### **🛡️ GET /dashboard/security**
 Lấy dashboard metrics bảo mật.
 
-**Quyền truy cập**: Chỉ Super Admin
+**Quyền truy cập**: Admin, Super Admin
 
 ### **🚀 GET /dashboard/performance**
 Lấy dashboard metrics hiệu năng.
 
-**Quyền truy cập**: Chỉ Super Admin
+**Quyền truy cập**: Admin, Super Admin
 
 ### **🏥 GET /dashboard/health**
 Lấy sức khỏe hệ thống dashboard.
@@ -537,7 +539,7 @@ Lấy sức khỏe hệ thống dashboard.
 ### **📤 POST /dashboard/export**
 Xuất dữ liệu dashboard.
 
-**Quyền truy cập**: Chỉ Super Admin
+**Quyền truy cập**: Admin, Super Admin
 
 ### **🧹 DELETE /dashboard/cache**
 Xóa cache dashboard.

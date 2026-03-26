@@ -78,7 +78,7 @@ Accept-Language: en (optional, for i18n - supports en, vi, fr, es, de, ja, th)
 ### **Permission Levels**
 | Role | Core Audit | Advanced Audit | Real-time Monitoring | Security Incident |
 |------|------------|----------------|---------------------|-------------------|
-| **Admin** | ✅ Limited | ✅ Limited | ❌ No Access | ✅ Yes |
+| **Admin** | ✅ Limited | ✅ Limited | ✅ Read/export only | ✅ Yes |
 | **Super Admin** | ✅ Full Access | ✅ Full Access | ✅ Full Access | ✅ Full Access |
 
 ### **Data Filtering by Role**
@@ -381,13 +381,15 @@ Advanced data export with more options.
 ## 🔴 **REAL-TIME MONITORING ROUTES (/api/realtime-monitoring/)**
 
 **Base URL**: `/api/realtime-monitoring/`  
-**Authentication**: Required (Super Admin only)  
+**Authentication**: Required (`admin` for read/export endpoints, `super_admin` for control and mutation endpoints)  
 **File**: `src/routes/realtimeMonitoring.js`
+
+Read-only visibility endpoints are available to both Admin and Super Admin. Monitoring control, simulations, alert mutations, cache invalidation, and incident creation remain Super Admin only.
 
 ### **🔍 GET /monitoring/status**
 Get current monitoring system status.
 
-**Access**: Super Admin only
+**Access**: Admin, Super Admin
 
 **Response**:
 ```json
@@ -444,15 +446,15 @@ Simulate events for testing purposes.
 
 **Access**: Super Admin only
 
-### **� GET /events/recent**
+### **📡 GET /events/recent**
 Get recent monitoring events.
 
-**Access**: Super Admin only
+**Access**: Admin, Super Admin
 
 ### **🔔 GET /alerts/status**
 Get alert system status.
 
-**Access**: Super Admin only
+**Access**: Admin, Super Admin
 
 ### **⚙️ POST /alerts/configure**
 Configure alert system settings.
@@ -462,7 +464,7 @@ Configure alert system settings.
 ### **📜 GET /alerts/history**
 Get alert history.
 
-**Access**: Super Admin only
+**Access**: Admin, Super Admin
 
 ### **📨 POST /alerts/send**
 Send a manual alert.
@@ -472,7 +474,7 @@ Send a manual alert.
 ### **📏 GET /alerts/rules**
 Get alert rules.
 
-**Access**: Super Admin only
+**Access**: Admin, Super Admin
 
 ### **➕ POST /alerts/rules**
 Create a new alert rule.
@@ -487,7 +489,7 @@ Toggle an alert rule on/off.
 ### **📢 GET /alerts/channels**
 Get notification channels.
 
-**Access**: Super Admin only
+**Access**: Admin, Super Admin
 
 ### **🔧 POST /alerts/channels**
 Configure notification channels.
@@ -502,32 +504,32 @@ Test alert system.
 ### **📊 GET /dashboard/overview**
 Get dashboard overview.
 
-**Access**: Super Admin only
+**Access**: Admin, Super Admin
 
 ### **📈 GET /dashboard/realtime**
 Get live dashboard data.
 
-**Access**: Super Admin only
+**Access**: Admin, Super Admin
 
 ### **🔴 GET /dashboard/live**
 Get live monitoring view.
 
-**Access**: Super Admin only
+**Access**: Admin, Super Admin
 
 ### **⏱️ GET /dashboard/timeline**
 Get historical timeline data.
 
-**Access**: Super Admin only
+**Access**: Admin, Super Admin
 
 ### **🛡️ GET /dashboard/security**
 Get security metrics dashboard.
 
-**Access**: Super Admin only
+**Access**: Admin, Super Admin
 
 ### **🚀 GET /dashboard/performance**
 Get performance metrics dashboard.
 
-**Access**: Super Admin only
+**Access**: Admin, Super Admin
 
 ### **🏥 GET /dashboard/health**
 Get dashboard system health.
@@ -537,7 +539,7 @@ Get dashboard system health.
 ### **📤 POST /dashboard/export**
 Export dashboard data.
 
-**Access**: Super Admin only
+**Access**: Admin, Super Admin
 
 ### **🧹 DELETE /dashboard/cache**
 Clear dashboard cache.

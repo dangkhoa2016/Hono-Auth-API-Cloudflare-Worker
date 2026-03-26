@@ -136,12 +136,13 @@ Enterprise Audit System (50+ Endpoints)
 - **CSV Export Capabilities**: Formatted exports for all analytics with role-based filtering
 - **Performance Optimization**: Middleware statistics for continuous system improvement
 
-### **🔴 3. Real-time Monitoring Routes (`/api/realtime-monitoring/*`) - 15 Endpoints**
+### **🔴 3. Real-time Monitoring Routes (`/api/realtime-monitoring/*`) - 28 Endpoints**
 **File**: `src/routes/realtimeMonitoring.js`  
 **Purpose**: Live monitoring, threat detection, and automated alerting system  
-**Authorization**: Super Admin only (high-security features)  
+**Authorization**: Admin for read/export endpoints, Super Admin for control/mutation endpoints  
 **Services**: `AuditMonitoringService`, `AlertSystemService`, `AuditDashboardService`  
-**Authorization**: Super Admin only
+
+Admin can inspect monitoring status, threat summaries, alert reads, dashboard views, and dashboard exports. Super Admin is still required for monitoring lifecycle control, simulations, alert configuration changes, cache clears, and incident creation.
 
 #### **🎛️ Monitoring Control (3 endpoints):**
 - **GET `/monitoring/status`** - Current monitoring system status with performance metrics
@@ -407,6 +408,8 @@ Before diving into test cases details, let's understand the structure of **40+ A
   - `POST /export-advanced` - Advanced data export
 
 #### **📡 3. Real-time Monitoring Routes** (`/api/realtime-monitoring/*`)
+- Read/export endpoints (`GET` status, threats, events, alert reads, dashboard reads, `POST /dashboard/export`) are available to Admin and Super Admin.
+- Control and mutation endpoints (`start`, `stop`, `analyze`, `simulate`, alert mutations, cache clear, incident creation) remain Super Admin only.
 - 🎛️ **Monitoring Control**:
   - `GET /monitoring/status` - Current monitoring status
   - `POST /monitoring/start` - Start monitoring session
@@ -829,8 +832,10 @@ export const auditMiddleware = (options = {}) => {
 | `unifiedMiddlewares.auto()` | One global application per router: `router.use('*', unifiedMiddlewares.auto())` |
 | `middleware/routeDetector.js` | Dynamic detection (exact + param) from registry |
 | `constants/routeCategoryMappings.js` | Maps route category → normalized routeType |
-| `routeDefinitions.js` | Registry source of truth for method, path, metadata |
+| `routeDefinitions.js` | Registry source of truth for method, path, metadata across system, auth, user, admin, kv_admin, token blacklist, token audit, audit, realtime monitoring, security incident, translation, and demo routes |
 | Idempotent flag `__unifiedApplied` | Stops double execution/logging |
+
+The March 2026 metadata expansion added explicit registry coverage for auth, user, KV admin, token audit, and translation/demo routes so unified auditing no longer depends on ad-hoc route fallbacks for those categories.
 
 #### Detection Flow
 1. Load registered routes

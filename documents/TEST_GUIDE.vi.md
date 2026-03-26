@@ -371,10 +371,11 @@ Hệ Thống Kiểm Toán Doanh Nghiệp được tổ chức thành **4 nhóm r
 #### **3. Real-time Monitoring Routes** (`src/routes/realtimeMonitoring.js`)
 **Mục đích**: Giám sát hệ thống thời gian thực và khả năng phát hiện mối đe dọa
 - **Route Prefix**: `/api/realtime-monitoring/`
-- **Phân quyền**: Yêu cầu vai trò Super Admin (quan trọng về bảo mật)
+- **Phân quyền**: Admin cho endpoint đọc/xuất, Super Admin cho endpoint điều khiển/thay đổi trạng thái
 - **Tính năng chính**: Giám sát trực tiếp, cảnh báo thời gian thực, streaming dashboard, phát hiện mối đe dọa
 - **Endpoints**: 22+ endpoint giám sát cho giám sát hệ thống toàn diện
 - **Sử dụng**: Giám sát hệ thống trực tiếp, phát hiện mối đe dọa bảo mật, cảnh báo thời gian thực
+- **Ghi chú coverage**: Admin hiện được kiểm thử với status, danh sách threat, các API alert ở chế độ đọc, dashboard ở chế độ đọc và dashboard export; Super Admin vẫn được kiểm thử cho lifecycle control, mô phỏng, thay đổi alert, xóa cache và tạo incident.
 
 #### **4. Security Incident Routes** (`src/routes/securityIncident.js`)
 **Mục đích**: Quản lý sự cố bảo mật và điều phối phản ứng
@@ -831,10 +832,15 @@ Hệ Thống Kiểm Toán Doanh Nghiệp được tổ chức thành **4 nhóm r
 
 **Mục đích**: Khả năng giám sát hệ thống và phát hiện mối đe dọa trong thời gian thực
 -   **Tiền tố Route**: `/api/realtime-monitoring/`
--   **Phân quyền**: Yêu cầu vai trò Super Admin (quan trọng về bảo mật)
+-   **Phân quyền**: Admin cho endpoint đọc/xuất, Super Admin cho endpoint điều khiển/thay đổi trạng thái
 -   **Tính năng chính**: Luồng hoạt động trực tiếp, phiên hoạt động, cảnh báo hệ thống, giám sát hiệu năng
 -   **Endpoint**: 12+ endpoint giám sát cho khả năng hiển thị hệ thống trong thời gian thực
 -   **Sử dụng**: Bảng điều khiển trực tiếp, giám sát bảo mật, theo dõi hiệu năng
+-   **Ghi chú coverage**: `realtimeMonitoringTest.js` hiện kiểm tra rõ ràng phần quyền đọc của Admin và phần quyền điều khiển của Super Admin.
+
+#### **Kiểm Tra Metadata Cho Rate Limit Dựa Trên KV**
+- `authTest.js` kiểm tra rằng các entry rate-limit phát sinh từ đăng nhập thất bại có thể được truy xuất qua `/api/kv-admin/rate-limits`.
+- `kvAdminTest.js` kiểm tra rằng phản hồi danh sách chứa `metadata` cho các key được seed, bao gồm `type` và `reason`.
 
 #### **4. Route Sự Cố Bảo Mật** (`src/routes/securityIncident.js`)
 

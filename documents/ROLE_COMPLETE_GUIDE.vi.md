@@ -909,6 +909,13 @@ kvAdmin.use('*', requireRole(ROLES.SUPER_ADMIN));
 | `/api/kv-admin/configs/batch` | POST | Cập nhật hàng loạt cấu hình | ✅ |
 | `/api/kv-admin/configs/:key` | DELETE | Reset về giá trị mặc định | ✅ |
 | `/api/kv-admin/configs/cache/clear` | POST | Xóa cache cấu hình | ✅ |
+| `/api/kv-admin/rate-limits` | GET | Liệt kê key rate limit lưu trong KV kèm metadata | ✅ |
+| `/api/kv-admin/rate-limits/seed` | POST | Seed key rate limit để test | ✅ |
+| `/api/kv-admin/rate-limits/clean` | POST | Dry-run hoặc xóa key rate limit theo prefix | ✅ |
+| `/api/kv-admin/rate-limits/prune-time` | POST | Xóa key rate limit trong khoảng thời gian | ✅ |
+| `/api/kv-admin/rate-limits/batch-delete` | POST | Xóa hàng loạt các key rate limit chỉ định | ✅ |
+
+Endpoint liệt kê rate limit hiện trả về `metadata` cho từng key để Super Admin có thể xem trực tiếp `type`, `context`, `reason` và các mốc thời gian attempt ngay từ admin API.
 
 ### 🔧 **Khóa Cấu hình Có thể Quản lý**
 

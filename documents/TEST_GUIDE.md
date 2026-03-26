@@ -402,10 +402,11 @@ The Enterprise Audit System is organized into **4 main route groups** (`src/rout
 #### **3. Real-time Monitoring Routes** (`src/routes/realtimeMonitoring.js`)
 **Purpose**: Real-time system monitoring and threat detection capabilities
 - **Route Prefix**: `/api/realtime-monitoring/`
-- **Authorization**: Super Admin role required (security critical)
+- **Authorization**: Admin for read/export endpoints, Super Admin for control/mutation endpoints
 - **Key Features**: Live monitoring, real-time alerts, dashboard streaming, threat detection
 - **Endpoints**: 22+ monitoring endpoints for comprehensive system oversight
 - **Usage**: Live system monitoring, security threat detection, real-time alerting
+- **Coverage Note**: Admin coverage now includes status, threat list, alert read APIs, dashboard read APIs, and dashboard export; Super Admin coverage remains for lifecycle control, simulations, alert mutations, cache clear, and incident creation.
 
 #### **4. Security Incident Routes** (`src/routes/securityIncident.js`)
 **Purpose**: Security incident management and response coordination
@@ -732,10 +733,15 @@ The Enterprise Audit System is organized into **4 main route groups** (`src/rout
 #### **3. Real-time Monitoring Routes** (`src/routes/realtimeMonitoring.js`)
 **Purpose**: Real-time system monitoring and threat detection capabilities
 - **Route Prefix**: `/api/realtime-monitoring/`
-- **Authorization**: Super Admin role required (security critical)
+- **Authorization**: Admin for read/export endpoints, Super Admin for control/mutation endpoints
 - **Key Features**: Live activity feeds, active sessions, system alerts, performance monitoring
 - **Endpoints**: 12+ monitoring endpoints for real-time system visibility
 - **Usage**: Live dashboards, security monitoring, performance tracking
+- **Coverage Note**: `realtimeMonitoringTest.js` now validates the split between Admin read access and Super Admin control actions.
+
+#### **KV-backed Rate Limit Metadata Checks**
+- `authTest.js` verifies that failed auth rate-limit entries become discoverable through `/api/kv-admin/rate-limits`.
+- `kvAdminTest.js` verifies list responses include `metadata` for seeded keys, including `type` and `reason`.
 
 #### **4. Security Incident Routes** (`src/routes/securityIncident.js`)
 **Purpose**: Security incident management and automated response system
