@@ -532,7 +532,7 @@ Get performance metrics dashboard.
 ### **🏥 GET /dashboard/health**
 Get dashboard system health.
 
-**Access**: Super Admin only
+**Access**: Admin and Super Admin
 
 ### **📤 POST /dashboard/export**
 Export dashboard data.
