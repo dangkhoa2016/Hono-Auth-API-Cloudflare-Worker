@@ -8,7 +8,7 @@ import { realtimeMonitoringRoutes_log } from '../utils/debug.js';
 import { createAuditMonitoringService, createAlertSystemService, createAuditDashboardService } from '../utils/serviceFactory.js';
 import { authMiddleware } from '../middleware/auth.js';
 import { i18nValidatorsMiddleware } from '../middleware/i18nValidator.js';
-import { requireSuperAdmin } from '../middleware/authorization.js';
+import { requireAdmin, requireSuperAdmin } from '../middleware/authorization.js';
 import { unifiedMiddlewares } from '../middleware/unifiedRequestMiddleware.js';
 import { handleStandardError } from '../utils/errorHandler.js';
 import { t, tError, tSuccess } from '../i18n/index.js';
@@ -921,7 +921,7 @@ realtimeMonitoring.delete('/dashboard/cache', unifiedMiddlewares.superAdmin('Cle
  * GET /dashboard/health
  * Dashboard health check
 */
-realtimeMonitoring.get('/dashboard/health', unifiedMiddlewares.superAdmin('Dashboard Health', 'GET /dashboard/health'), requireSuperAdmin, async (c) => {
+realtimeMonitoring.get('/dashboard/health', unifiedMiddlewares.admin('Dashboard Health', 'GET /dashboard/health'), requireAdmin, async (c) => {
   try {
     const dashboardService = createAuditDashboardService(c.env);
     const health = await dashboardService.healthCheck();
