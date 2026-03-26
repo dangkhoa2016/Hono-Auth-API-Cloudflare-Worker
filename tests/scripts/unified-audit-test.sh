@@ -186,7 +186,7 @@ get_test_data() {
             echo '{"real_time": true, "buffer_size": 100}'
             ;;
         *"/monitoring/analyze")
-            echo '{"start_time": "2024-01-01T00:00:00Z", "end_time": "2024-01-02T00:00:00Z"}'
+            echo '{"hours": 24}'
             ;;
         *"/threats/"*"/resolve")
             echo '{"resolution": "manual", "notes": "Resolved during testing"}'
@@ -200,9 +200,9 @@ get_test_data() {
         *"/alerts/rules" | *"/alerts/channels")
             if [[ "$method" == "POST" ]]; then
                 if [[ "$path" == *"/rules" ]]; then
-                    echo '{"name": "Test Rule", "description": "Test alert rule description", "severity": "medium", "condition": "return event.action === '\''login'\''", "cooldown": 60000, "channels": ["console"]}'
+                    echo '{"name": "Test Rule", "description": "Test alert rule description", "severity": "medium", "conditions": {"eventType": "login", "source": "script"}, "actions": ["notify_admins"], "enabled": true}'
                 else
-                    echo '{"name": "Test Channel", "type": "console", "config": {}}'
+                    echo '{"name": "Test Channel", "type": "email", "config": {"recipients": ["test-admin@example.com"]}, "enabled": true}'
                 fi
             fi
             ;;
@@ -379,7 +379,7 @@ test_realtime_monitoring_endpoints() {
         -X POST "$BASE_URL/api/realtime-monitoring/alerts/rules" \
         -H "Content-Type: application/json" \
         -H "Authorization: Bearer $SUPERADMIN_TOKEN" \
-        -d '{"name": "Sequential Test Rule", "description": "Rule for testing toggle", "severity": "medium", "condition": "return event.action === '\''login'\''", "cooldown": 60000, "channels": ["console"]}' \
+        -d '{"name": "Sequential Test Rule", "description": "Rule for testing toggle", "severity": "medium", "conditions": {"eventType": "login", "source": "sequential-script"}, "actions": ["notify_admins"], "enabled": true}' \
         --connect-timeout 30 --max-time 30)
     
     local create_status="${create_rule_response##*HTTPSTATUS:}"
