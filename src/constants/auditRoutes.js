@@ -51,6 +51,16 @@ const AUDIT_ROUTES = [
     }
   },
   {
+    method: 'GET',
+    path: '/api/audit/system-health',
+    metadata: {
+      category: 'audit',
+      i18nKey: 'endpoints.audit.systemHealth',
+      permissions: PERMISSION_PRESETS.ADMIN,
+      description: 'Audit subsystem health and availability check'
+    }
+  },
+  {
     method: 'DELETE',
     path: '/api/audit/logs/:id',
     metadata: {
@@ -117,6 +127,16 @@ const ADVANCED_AUDIT_ROUTES = [
     }
   },
   {
+    method: 'POST',
+    path: '/api/advanced-audit/compliance',
+    metadata: {
+      category: 'advanced_audit',
+      i18nKey: 'endpoints.advanced_audit.complianceRun',
+      permissions: PERMISSION_PRESETS.ADMIN,
+      description: 'Run a compliance validation or compliance workflow'
+    }
+  },
+  {
     method: 'GET',
     path: '/api/advanced-audit/compliance/report',
     metadata: {
@@ -128,12 +148,22 @@ const ADVANCED_AUDIT_ROUTES = [
   },
   {
     method: 'GET',
-    path: '/api/advanced-audit/archival',
+    path: '/api/advanced-audit/archive',
     metadata: {
       category: 'advanced_audit',
-      i18nKey: 'endpoints.advanced_audit.archival',
+      i18nKey: 'endpoints.advanced_audit.archive',
       permissions: PERMISSION_PRESETS.ADMIN,
-      description: 'Audit data archival management'
+      description: 'Audit archive management and archive status operations'
+    }
+  },
+  {
+    method: 'POST',
+    path: '/api/advanced-audit/archive',
+    metadata: {
+      category: 'advanced_audit',
+      i18nKey: 'endpoints.advanced_audit.archiveAction',
+      permissions: PERMISSION_PRESETS.ADMIN,
+      description: 'Execute archive maintenance operations'
     }
   },
   {
@@ -167,6 +197,16 @@ const ADVANCED_AUDIT_ROUTES = [
     }
   },
   {
+    method: 'POST',
+    path: '/api/advanced-audit/export-advanced',
+    metadata: {
+      category: 'advanced_audit',
+      i18nKey: 'endpoints.advanced_audit.exportAdvanced',
+      permissions: PERMISSION_PRESETS.ADMIN,
+      description: 'Export advanced audit data with extended options'
+    }
+  },
+  {
     method: 'GET',
     path: '/api/advanced-audit/middleware/stats',
     metadata: {
@@ -174,6 +214,16 @@ const ADVANCED_AUDIT_ROUTES = [
       i18nKey: 'endpoints.advanced_audit.middlewareStats',
       permissions: PERMISSION_PRESETS.ADMIN,
       description: 'Audit middleware performance statistics'
+    }
+  },
+  {
+    method: 'POST',
+    path: '/api/advanced-audit/retention',
+    metadata: {
+      category: 'advanced_audit',
+      i18nKey: 'endpoints.advanced_audit.retention',
+      permissions: PERMISSION_PRESETS.ADMIN,
+      description: 'Run or update audit retention operations'
     }
   }
 ];

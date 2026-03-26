@@ -49,6 +49,96 @@ const TRANSLATION_ROUTES = [
       permissions: PERMISSION_PRESETS.PUBLIC,
       description: 'Get specific section of translations for language'
     }
+  },
+  {
+    method: 'GET',
+    path: '/api/translations/demo/enhanced',
+    metadata: {
+      category: 'i18n',
+      i18nKey: 'endpoints.translations.demoEnhanced',
+      permissions: PERMISSION_PRESETS.PUBLIC,
+      description: 'Demonstrate enhanced i18n capabilities'
+    }
+  },
+  {
+    method: 'GET',
+    path: '/api/translations/demo/plurals',
+    metadata: {
+      category: 'i18n',
+      i18nKey: 'endpoints.translations.demoPlurals',
+      permissions: PERMISSION_PRESETS.PUBLIC,
+      description: 'Demonstrate pluralization behavior'
+    }
+  },
+  {
+    method: 'GET',
+    path: '/api/translations/demo/formatting',
+    metadata: {
+      category: 'i18n',
+      i18nKey: 'endpoints.translations.demoFormatting',
+      permissions: PERMISSION_PRESETS.PUBLIC,
+      description: 'Demonstrate formatting behavior'
+    }
+  },
+  {
+    method: 'GET',
+    path: '/api/translations/demo/context',
+    metadata: {
+      category: 'i18n',
+      i18nKey: 'endpoints.translations.demoContext',
+      permissions: PERMISSION_PRESETS.PUBLIC,
+      description: 'Demonstrate contextual translations'
+    }
+  },
+  {
+    method: 'GET',
+    path: '/api/translations/demo/errors',
+    metadata: {
+      category: 'i18n',
+      i18nKey: 'endpoints.translations.demoErrors',
+      permissions: PERMISSION_PRESETS.PUBLIC,
+      description: 'Demonstrate translated error messaging'
+    }
+  },
+  {
+    method: 'GET',
+    path: '/api/translations/demo/success',
+    metadata: {
+      category: 'i18n',
+      i18nKey: 'endpoints.translations.demoSuccess',
+      permissions: PERMISSION_PRESETS.PUBLIC,
+      description: 'Demonstrate translated success messaging'
+    }
+  },
+  {
+    method: 'POST',
+    path: '/api/translations/test/plurals',
+    metadata: {
+      category: 'i18n',
+      i18nKey: 'endpoints.translations.testPlurals',
+      permissions: PERMISSION_PRESETS.PUBLIC,
+      description: 'Test pluralization with custom payloads'
+    }
+  },
+  {
+    method: 'POST',
+    path: '/api/translations/test/formatting',
+    metadata: {
+      category: 'i18n',
+      i18nKey: 'endpoints.translations.testFormatting',
+      permissions: PERMISSION_PRESETS.PUBLIC,
+      description: 'Test formatting with custom payloads'
+    }
+  },
+  {
+    method: 'POST',
+    path: '/api/translations/test/context',
+    metadata: {
+      category: 'i18n',
+      i18nKey: 'endpoints.translations.testContext',
+      permissions: PERMISSION_PRESETS.PUBLIC,
+      description: 'Test contextual translations with custom payloads'
+    }
   }
 ];
 

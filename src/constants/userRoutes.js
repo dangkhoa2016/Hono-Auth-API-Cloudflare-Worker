@@ -51,6 +51,36 @@ const USER_ROUTES = [
     }
   },
   {
+    method: 'PUT',
+    path: '/api/user/me',
+    metadata: {
+      category: 'user',
+      i18nKey: 'endpoints.user.updateProfile',
+      permissions: PERMISSION_PRESETS.AUTHENTICATED,
+      description: 'Update current user profile information via alias endpoint'
+    }
+  },
+  {
+    method: 'GET',
+    path: '/api/user/verify-email',
+    metadata: {
+      category: 'user',
+      i18nKey: 'endpoints.user.verifyEmail',
+      permissions: PERMISSION_PRESETS.PUBLIC,
+      description: 'Verify pending email change using tokenized link'
+    }
+  },
+  {
+    method: 'DELETE',
+    path: '/api/user/pending-email',
+    metadata: {
+      category: 'user',
+      i18nKey: 'endpoints.user.clearPendingEmail',
+      permissions: PERMISSION_PRESETS.AUTHENTICATED,
+      description: 'Clear pending unverified email change for current user'
+    }
+  },
+  {
     method: 'POST',
     path: '/api/user/change-password',
     metadata: {
@@ -58,6 +88,16 @@ const USER_ROUTES = [
       i18nKey: 'endpoints.user.updatePassword',
       permissions: PERMISSION_PRESETS.AUTHENTICATED,
       description: 'Change user password'
+    }
+  },
+  {
+    method: 'PUT',
+    path: '/api/user/change-password',
+    metadata: {
+      category: 'user',
+      i18nKey: 'endpoints.user.updatePassword',
+      permissions: PERMISSION_PRESETS.AUTHENTICATED,
+      description: 'Change user password via PUT alias'
     }
   }
 ];
