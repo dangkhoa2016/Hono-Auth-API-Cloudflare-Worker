@@ -49,6 +49,16 @@ const AUTH_ROUTES = [
       permissions: PERMISSION_PRESETS.AUTHENTICATED,
       description: 'Logout from all devices and revoke tokens'
     }
+  },
+  {
+    method: 'GET',
+    path: '/api/auth/activate',
+    metadata: {
+      category: 'auth',
+      i18nKey: 'endpoints.auth.activate',
+      permissions: PERMISSION_PRESETS.PUBLIC,
+      description: 'Activate user account from emailed activation token'
+    }
   }
 ];
 

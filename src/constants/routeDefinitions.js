@@ -10,6 +10,7 @@ import './userRoutes.js';
 import './adminRoutes.js';
 import './kvAdminRoutes.js';
 import './tokenBlacklistRoutes.js';
+import './tokenAuditRoutes.js';
 import './auditRoutes.js';
 import './realtimeMonitoringRoutes.js';
 import './securityIncidentRoutes.js';
