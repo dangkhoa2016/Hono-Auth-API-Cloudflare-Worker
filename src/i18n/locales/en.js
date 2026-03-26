@@ -917,7 +917,9 @@ export default {
         'configUpdated': 'Alert configuration updated successfully',
         'historyRetrieved': 'Alert history retrieved successfully',
         'manualSent': 'Manual alert sent successfully',
+        'ruleCreated': 'Alert rule created successfully',
         'rulesRetrieved': 'Alert rules retrieved successfully',
+        'ruleToggled': 'Alert rule toggled successfully',
         'statusRetrieved': 'Alert system status retrieved successfully'
       },
       'dashboard': {

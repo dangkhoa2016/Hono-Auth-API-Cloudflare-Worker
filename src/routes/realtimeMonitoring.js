@@ -28,7 +28,7 @@ realtimeMonitoring.use('*', unifiedMiddlewares.auto());
  * GET /events/recent
  * Provide recent monitoring/threat events (test endpoint)
  */
-realtimeMonitoring.get('/events/recent', requireSuperAdmin, async (c) => {
+realtimeMonitoring.get('/events/recent', requireAdmin, async (c) => {
   try {
     const monitoringService = createAuditMonitoringService(c.env);
     const stats = monitoringService.getMonitoringStats();
@@ -59,7 +59,7 @@ realtimeMonitoring.get('/events/recent', requireSuperAdmin, async (c) => {
  * Get current monitoring status and statistics
 */
 
-realtimeMonitoring.get('/monitoring/status', requireSuperAdmin, async (c) => {
+realtimeMonitoring.get('/monitoring/status', requireAdmin, async (c) => {
   try {
     const monitoringService = createAuditMonitoringService(c.env);
     const stats = monitoringService.getMonitoringStats();
@@ -169,7 +169,7 @@ realtimeMonitoring.post('/monitoring/stop', requireSuperAdmin, async (c) => {
  * GET /monitoring/threats
  * Get current threat status and detected threats
 */
-realtimeMonitoring.get('/monitoring/threats', requireSuperAdmin, async (c) => {
+realtimeMonitoring.get('/monitoring/threats', requireAdmin, async (c) => {
   try {
     const monitoringService = createAuditMonitoringService(c.env);
     const threatDetection = monitoringService.getThreatDetection();
@@ -348,7 +348,7 @@ realtimeMonitoring.post('/monitoring/simulate', requireSuperAdmin, async (c) => 
  * GET /alerts/status
  * Get alert system status and statistics
 */
-realtimeMonitoring.get('/alerts/status', requireSuperAdmin, async (c) => {
+realtimeMonitoring.get('/alerts/status', requireAdmin, async (c) => {
   try {
     const alertService = createAlertSystemService(c.env);
     const status = alertService.getSystemStatus();
@@ -407,7 +407,7 @@ realtimeMonitoring.post('/alerts/configure', requireSuperAdmin, async (c) => {
  * GET /alerts/history
  * Get alert history with optional filters
 */
-realtimeMonitoring.get('/alerts/history', requireSuperAdmin, async (c) => {
+realtimeMonitoring.get('/alerts/history', requireAdmin, async (c) => {
   try {
     const query = c.req.query();
     const filters = {
@@ -479,7 +479,7 @@ realtimeMonitoring.post('/alerts/send',
  * GET /alerts/rules
  * Get all alert rules
 */
-realtimeMonitoring.get('/alerts/rules', requireSuperAdmin, async (c) => {
+realtimeMonitoring.get('/alerts/rules', requireAdmin, async (c) => {
   try {
     const alertService = createAlertSystemService(c.env);
     const ruleEngine = alertService.getRuleEngine();
@@ -573,7 +573,13 @@ realtimeMonitoring.post('/alerts/rules',
 realtimeMonitoring.put('/alerts/rules/:ruleId/toggle', requireSuperAdmin, async (c) => {
   try {
     const ruleId = c.req.param('ruleId');
-    const { enabled } = await c.req.json().catch(() => ({ enabled: false }));
+    let body;
+    try {
+      body = await c.req.json();
+    } catch (_error) {
+      body = {};
+    }
+    const enabled = Boolean(body?.enabled);
 
     const alertService = createAlertSystemService(c.env);
     const ruleEngine = alertService.getRuleEngine();
@@ -620,7 +626,7 @@ realtimeMonitoring.put('/alerts/rules/:ruleId/toggle', requireSuperAdmin, async 
  * GET /alerts/channels
  * Get all alert channels
 */
-realtimeMonitoring.get('/alerts/channels', requireSuperAdmin, async (c) => {
+realtimeMonitoring.get('/alerts/channels', requireAdmin, async (c) => {
   try {
     const alertService = createAlertSystemService(c.env);
     const channelManager = alertService.getChannelManager();
@@ -713,7 +719,7 @@ realtimeMonitoring.post('/alerts/test', requireSuperAdmin, async (c) => {
  * GET /dashboard/overview
  * Get dashboard overview statistics
 */
-realtimeMonitoring.get('/dashboard/overview', requireSuperAdmin, async (c) => {
+realtimeMonitoring.get('/dashboard/overview', requireAdmin, async (c) => {
   try {
     realtimeMonitoringRoutes_log('Creating dashboard service...');
     const dashboardService = createAuditDashboardService(c.env);
@@ -744,7 +750,7 @@ realtimeMonitoring.get('/dashboard/overview', requireSuperAdmin, async (c) => {
  * GET /dashboard/realtime
  * Get complete real-time dashboard data
 */
-realtimeMonitoring.get('/dashboard/realtime', requireSuperAdmin, async (c) => {
+realtimeMonitoring.get('/dashboard/realtime', requireAdmin, async (c) => {
   try {
     const dashboardService = createAuditDashboardService(c.env);
     const dashboard = await dashboardService.getRealTimeDashboard();
@@ -771,7 +777,7 @@ realtimeMonitoring.get('/dashboard/realtime', requireSuperAdmin, async (c) => {
  * GET /dashboard/live
  * Alias live snapshot endpoint required by tests
  */
-realtimeMonitoring.get('/dashboard/live', requireSuperAdmin, async (c) => {
+realtimeMonitoring.get('/dashboard/live', requireAdmin, async (c) => {
   try {
     const dashboardService = createAuditDashboardService(c.env);
     const snapshot = await dashboardService.getRealTimeDashboard();
@@ -795,7 +801,7 @@ realtimeMonitoring.get('/dashboard/live', requireSuperAdmin, async (c) => {
  * GET /dashboard/timeline
  * Get activity timeline data
 */
-realtimeMonitoring.get('/dashboard/timeline', requireSuperAdmin, async (c) => {
+realtimeMonitoring.get('/dashboard/timeline', requireAdmin, async (c) => {
   try {
     const hours = parseInt(c.req.query('hours')) || 24;
     const dashboardService = createAuditDashboardService(c.env);
@@ -819,7 +825,7 @@ realtimeMonitoring.get('/dashboard/timeline', requireSuperAdmin, async (c) => {
  * GET /dashboard/security
  * Get security dashboard data
 */
-realtimeMonitoring.get('/dashboard/security', requireSuperAdmin, async (c) => {
+realtimeMonitoring.get('/dashboard/security', requireAdmin, async (c) => {
   try {
     const dashboardService = createAuditDashboardService(c.env);
     const security = await dashboardService.getSecurityDashboard();
@@ -842,7 +848,7 @@ realtimeMonitoring.get('/dashboard/security', requireSuperAdmin, async (c) => {
  * GET /dashboard/performance
  * Get performance dashboard data
 */
-realtimeMonitoring.get('/dashboard/performance', unifiedMiddlewares.superAdmin('Dashboard Performance', 'GET /dashboard/performance'), requireSuperAdmin, async (c) => {
+realtimeMonitoring.get('/dashboard/performance', unifiedMiddlewares.admin('Dashboard Performance', 'GET /dashboard/performance'), requireAdmin, async (c) => {
   try {
     const dashboardService = createAuditDashboardService(c.env);
     const performance = await dashboardService.getPerformanceDashboard();
@@ -861,7 +867,7 @@ realtimeMonitoring.get('/dashboard/performance', unifiedMiddlewares.superAdmin('
  * POST /dashboard/export
  * Export dashboard data
 */
-realtimeMonitoring.post('/dashboard/export', unifiedMiddlewares.superAdmin('Dashboard Export', 'POST /dashboard/export'), requireSuperAdmin, i18nValidatorsMiddleware.dashboardExport('json'), async (c) => {
+realtimeMonitoring.post('/dashboard/export', unifiedMiddlewares.admin('Dashboard Export', 'POST /dashboard/export'), requireAdmin, i18nValidatorsMiddleware.dashboardExport('json'), async (c) => {
   try {
     const { format, timeRange, includeCharts, compression } = c.req.valid('json');
 
