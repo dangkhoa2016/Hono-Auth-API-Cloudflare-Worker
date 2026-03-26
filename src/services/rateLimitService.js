@@ -18,6 +18,15 @@ function normalizeIdentifier(identifier) {
   return String(identifier).trim().toLowerCase().slice(0, 255);
 }
 
+function pickFirstDefined(...values) {
+  for (const value of values) {
+    if (value !== undefined && value !== null) {
+      return value;
+    }
+  }
+  return undefined;
+}
+
 /**
  * Service for managing rate limiting
  * Inherits optimized config management from BaseService
@@ -291,7 +300,10 @@ export class RateLimitService extends BaseService {
 
       // Calculate TTL: Max of window or block duration
       const ttl = Math.max(resolved.windowSeconds, resolved.blockDurationSeconds, 60); // Min 60s
-      await this.kvService.putRaw(key, JSON.stringify(record), { expirationTtl: ttl });
+      await this.kvService.putRaw(key, JSON.stringify(record), {
+        expirationTtl: ttl,
+        metadata: this._buildKvMetadata(normalized, resolved, record)
+      });
       return true;
     } catch (e) {
       dbError_log(`Failed to record rate limit attempt (KV): ${e.message}`);
@@ -417,5 +429,25 @@ export class RateLimitService extends BaseService {
       disabled: config.disabled,
       isDisabled: config.disabled
     };
+  }
+
+  _buildKvMetadata(normalized, resolved, record) {
+    const sourceMetadata = record?.metadata || resolved.metadata || {};
+    const kvMetadata = {
+      type: 'rate_limit',
+      context: resolved.context,
+      identifier: normalized,
+      attempts: record?.attempts || 0,
+      firstAttempt: record?.firstAttempt || null,
+      lastAttempt: record?.lastAttempt || null,
+      reason: pickFirstDefined(sourceMetadata.reason),
+      userId: pickFirstDefined(sourceMetadata.userId),
+      email: pickFirstDefined(sourceMetadata.email),
+      method: pickFirstDefined(sourceMetadata.method)
+    };
+
+    return Object.fromEntries(
+      Object.entries(kvMetadata).filter(([, value]) => value !== undefined && value !== null)
+    );
   }
 }

@@ -680,6 +680,20 @@ class AuthTests {
       this.assert.exists(blockedResponse.headers['x-ratelimit-limit'], 'Rate limited response should include limit header');
       this.assert.exists(blockedResponse.headers['x-ratelimit-remaining'], 'Rate limited response should include remaining header');
 
+      const adminClient = await this._getSuperAdminClient();
+      const rateLimitKeyPrefix = `ratelimit:auth:ip:${randomizedIp}`;
+      const kvListResponse = await adminClient.get(`${API_ENDPOINTS.kvAdminRateLimitList}?prefix=${encodeURIComponent(rateLimitKeyPrefix)}&limit=10`);
+
+      this.assert.assertEqual(kvListResponse.status, 200, 'KV admin rate limit list should succeed');
+      this.assert.assertEqual(kvListResponse.data?.success, true, 'KV admin rate limit list should indicate success');
+
+      const ipKey = kvListResponse.data?.data?.keys?.find(keyInfo => keyInfo.name === rateLimitKeyPrefix);
+      this.assert.assertTrue(!!ipKey, 'Auth rate limit key should be discoverable in KV admin list');
+      this.assert.assertTrue(!!ipKey.metadata, 'Auth rate limit key should include KV metadata');
+      this.assert.assertEqual(ipKey.metadata.type, 'rate_limit', 'Auth rate limit key metadata should be typed');
+      this.assert.assertEqual(ipKey.metadata.context, 'auth:ip', 'Auth rate limit key metadata should include context');
+      this.assert.assertEqual(ipKey.metadata.reason, 'user_not_found', 'Auth rate limit key metadata should preserve failure reason');
+
       this.logger.success('Adaptive rate limiting test completed successfully');
     } catch (error) {
       this.logger.error(`[testRateLimiting] Rate limiting test failed: ${error.message}`);
