@@ -39,7 +39,7 @@ const REALTIME_MONITORING_ROUTES = [
     metadata: {
       category: 'realtime_monitoring',
       i18nKey: 'endpoints.realtime_monitoring.start',
-      permissions: PERMISSION_PRESETS.ADMIN,
+      permissions: PERMISSION_PRESETS.SUPER_ADMIN,
       description: 'Start real-time monitoring services'
     }
   },
@@ -49,7 +49,7 @@ const REALTIME_MONITORING_ROUTES = [
     metadata: {
       category: 'realtime_monitoring',
       i18nKey: 'endpoints.realtime_monitoring.stop',
-      permissions: PERMISSION_PRESETS.ADMIN,
+      permissions: PERMISSION_PRESETS.SUPER_ADMIN,
       description: 'Stop real-time monitoring services'
     }
   },
@@ -69,7 +69,7 @@ const REALTIME_MONITORING_ROUTES = [
     metadata: {
       category: 'realtime_monitoring',
       i18nKey: 'endpoints.realtime_monitoring.resolveThreat',
-      permissions: PERMISSION_PRESETS.ADMIN,
+      permissions: PERMISSION_PRESETS.SUPER_ADMIN,
       description: 'Resolve a detected threat'
     }
   },
@@ -79,7 +79,7 @@ const REALTIME_MONITORING_ROUTES = [
     metadata: {
       category: 'realtime_monitoring',
       i18nKey: 'endpoints.realtime_monitoring.analyze',
-      permissions: PERMISSION_PRESETS.ADMIN,
+      permissions: PERMISSION_PRESETS.SUPER_ADMIN,
       description: 'Run manual threat analysis'
     }
   },
@@ -89,7 +89,7 @@ const REALTIME_MONITORING_ROUTES = [
     metadata: {
       category: 'realtime_monitoring',
       i18nKey: 'endpoints.realtime_monitoring.simulate',
-      permissions: PERMISSION_PRESETS.ADMIN,
+      permissions: PERMISSION_PRESETS.SUPER_ADMIN,
       description: 'Simulate an event for testing'
     }
   },
@@ -121,7 +121,7 @@ const REALTIME_MONITORING_ROUTES = [
     metadata: {
       category: 'realtime_monitoring',
       i18nKey: 'endpoints.realtime_monitoring.alertsSend',
-      permissions: PERMISSION_PRESETS.ADMIN,
+      permissions: PERMISSION_PRESETS.SUPER_ADMIN,
       description: 'Send manual alert or notification'
     }
   },
@@ -141,7 +141,7 @@ const REALTIME_MONITORING_ROUTES = [
     metadata: {
       category: 'realtime_monitoring',
       i18nKey: 'endpoints.realtime_monitoring.alertsRulesCreate',
-      permissions: PERMISSION_PRESETS.ADMIN,
+      permissions: PERMISSION_PRESETS.SUPER_ADMIN,
       description: 'Create a new alert rule'
     }
   },
@@ -151,7 +151,7 @@ const REALTIME_MONITORING_ROUTES = [
     metadata: {
       category: 'realtime_monitoring',
       i18nKey: 'endpoints.realtime_monitoring.alertsRuleToggle',
-      permissions: PERMISSION_PRESETS.ADMIN,
+      permissions: PERMISSION_PRESETS.SUPER_ADMIN,
       description: 'Enable/disable an alert rule'
     }
   },
@@ -171,7 +171,7 @@ const REALTIME_MONITORING_ROUTES = [
     metadata: {
       category: 'realtime_monitoring',
       i18nKey: 'endpoints.realtime_monitoring.alertsChannelsCreate',
-      permissions: PERMISSION_PRESETS.ADMIN,
+      permissions: PERMISSION_PRESETS.SUPER_ADMIN,
       description: 'Create alert channel'
     }
   },
@@ -181,7 +181,7 @@ const REALTIME_MONITORING_ROUTES = [
     metadata: {
       category: 'realtime_monitoring',
       i18nKey: 'endpoints.realtime_monitoring.alertsTest',
-      permissions: PERMISSION_PRESETS.ADMIN,
+      permissions: PERMISSION_PRESETS.SUPER_ADMIN,
       description: 'Test the alert system'
     }
   },
@@ -191,7 +191,7 @@ const REALTIME_MONITORING_ROUTES = [
     metadata: {
       category: 'realtime_monitoring',
       i18nKey: 'endpoints.realtime_monitoring.alertsConfigure',
-      permissions: PERMISSION_PRESETS.ADMIN,
+      permissions: PERMISSION_PRESETS.SUPER_ADMIN,
       description: 'Configure alert thresholds/settings'
     }
   },
@@ -273,7 +273,7 @@ const REALTIME_MONITORING_ROUTES = [
     metadata: {
       category: 'realtime_monitoring',
       i18nKey: 'endpoints.realtime_monitoring.dashboardCache',
-      permissions: PERMISSION_PRESETS.ADMIN,
+      permissions: PERMISSION_PRESETS.SUPER_ADMIN,
       description: 'Clear dashboard cache'
     }
   },
@@ -295,7 +295,7 @@ const REALTIME_MONITORING_ROUTES = [
     metadata: {
       category: 'realtime_monitoring',
       i18nKey: 'endpoints.realtime_monitoring.incidentsCreate',
-      permissions: PERMISSION_PRESETS.ADMIN,
+      permissions: PERMISSION_PRESETS.SUPER_ADMIN,
       description: 'Create a realtime monitoring incident'
     }
   }

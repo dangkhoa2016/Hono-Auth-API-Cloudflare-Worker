@@ -917,7 +917,9 @@ export default {
         'configUpdated': "Alarmkonfiguration erfolgreich aktualisiert",
         'historyRetrieved': "Alarmverlauf erfolgreich abgerufen",
         'manualSent': "Manuelle Warnung erfolgreich gesendet",
+        'ruleCreated': "Alarmregel erfolgreich erstellt",
         'rulesRetrieved': "Alarmregeln erfolgreich abgerufen",
+        'ruleToggled': "Alarmregel erfolgreich umgeschaltet",
         'statusRetrieved': "Alarm-Systemstatus erfolgreich abgerufen"
       },
       'dashboard': {

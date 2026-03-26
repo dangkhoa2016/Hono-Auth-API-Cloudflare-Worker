@@ -917,7 +917,9 @@ export default {
         'configUpdated': 'Cấu hình cảnh báo được cập nhật thành công',
         'historyRetrieved': 'Lịch sử cảnh báo được truy xuất thành công',
         'manualSent': 'Gửi cảnh báo thủ công thành công',
+        'ruleCreated': 'Tạo quy tắc cảnh báo thành công',
         'rulesRetrieved': 'Quy tắc cảnh báo được truy xuất thành công',
+        'ruleToggled': 'Chuyển trạng thái quy tắc cảnh báo thành công',
         'statusRetrieved': 'Trạng thái hệ thống cảnh báo được truy xuất thành công'
       },
       'dashboard': {

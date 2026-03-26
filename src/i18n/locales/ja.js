@@ -917,7 +917,9 @@ export default {
         'configUpdated': "アラート設定が正常に更新されました",
         'historyRetrieved': "アラート履歴を正常に取得しました",
         'manualSent': "手動アラートが正常に送信されました",
+        'ruleCreated': "アラートルールを正常に作成しました",
         'rulesRetrieved': "アラートルールを正常に取得しました",
+        'ruleToggled': "アラートルールを正常に切り替えました",
         'statusRetrieved': "アラートシステムステータスを正常に取得しました"
       },
       'dashboard': {

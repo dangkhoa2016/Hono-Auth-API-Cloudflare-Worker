@@ -917,7 +917,9 @@ export default {
         'configUpdated': "Configuración de alertas actualizada correctamente",
         'historyRetrieved': "Historial de alertas recuperado correctamente",
         'manualSent': "Alerta manual enviada exitosamente",
+        'ruleCreated': "Regla de alerta creada correctamente",
         'rulesRetrieved': "Reglas de alerta recuperadas correctamente",
+        'ruleToggled': "Regla de alerta actualizada correctamente",
         'statusRetrieved': "Estado del sistema de alertas recuperado correctamente"
       },
       'dashboard': {
