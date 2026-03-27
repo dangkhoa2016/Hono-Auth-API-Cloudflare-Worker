@@ -276,7 +276,34 @@ audit.get('/export',
       auditRoutes_log(`Audit export request by ${user.role} ${user.id} format: ${query.format}`);
 
       const auditLogService = createAuditLogService(c.env);
-      const exportData = await auditLogService.exportLogs(query, query.format);
+      const exportResult = await auditLogService.exportLogs({
+        format: query.format,
+        startDate: query.startDate,
+        endDate: query.endDate,
+        filters: query.filters,
+        includeDetails: query.includeDetails,
+        maxRecords: query.maxRecords,
+        exclude_super_admin: user.role === ROLES.ADMIN
+      });
+
+      if (!exportResult.success) {
+        return await handleStandardError(
+          c,
+          new Error(exportResult.error || 'AUDIT_EXPORT_FAILED'),
+          'Failed to export audit logs',
+          auditRoutes_log,
+          'audit.export.exportFailed',
+          {
+            actor: user.full_name || user.email,
+            reason: exportResult.error || t(c, 'error.unknown'),
+            operation: t(c, 'audit.operations.export'),
+            format: query.format || 'unknown'
+          },
+          500
+        );
+      }
+
+      const exportContent = exportResult.data?.content ?? '';
 
       const contentType = query.format === 'csv' ? 'text/csv' : 'application/json';
       const filename = `audit_logs_${new Date().toISOString().split('T')[0]}.${query.format}`;
@@ -291,7 +318,7 @@ audit.get('/export',
         date: new Date().toLocaleDateString()
       });
 
-      return new Response(exportData, {
+      return new Response(exportContent, {
         headers: {
           'Content-Type': contentType,
           'Content-Disposition': `attachment; filename="${filename}"`,

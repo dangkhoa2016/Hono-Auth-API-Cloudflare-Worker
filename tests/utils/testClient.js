@@ -65,6 +65,8 @@ class TestClient {
             console.log(`JSON parse error for ${url}:`, jsonError);
             responseData = {};
           }
+        } else if (response.status !== 204) {
+          responseData = await response.text();
         } else {
           responseData = {};
         }

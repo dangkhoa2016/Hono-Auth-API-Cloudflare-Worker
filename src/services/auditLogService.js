@@ -861,17 +861,45 @@ export class AuditLogService extends BaseService {
       headers.join(','),
       ...data.map(row =>
         headers.map(header => {
-          const value = row[header];
+          const rawValue = row[header];
+          const value = rawValue === null || rawValue === undefined
+            ? ''
+            : typeof rawValue === 'object'
+              ? JSON.stringify(rawValue)
+              : String(rawValue);
+
           // Escape CSV values
-          if (typeof value === 'string' && (value.includes(',') || value.includes('"'))) {
+          if (value.includes(',') || value.includes('"') || value.includes('\n')) {
             return `"${value.replace(/"/g, '""')}"`;
           }
-          return value || '';
+          return value;
         }).join(',')
       )
     ].join('\n');
 
     return csvContent;
+  }
+
+  normalizeExportOptions(exportOptions = {}) {
+    const format = exportOptions.format || 'csv';
+    const filters = exportOptions.filters || {
+      action: exportOptions.action,
+      actor_id: exportOptions.userId,
+      actor_role: exportOptions.actorRole,
+      target_type: exportOptions.entityType,
+      start_date: exportOptions.startDate,
+      end_date: exportOptions.endDate,
+      search: exportOptions.search
+    };
+
+    return {
+      format,
+      filters,
+      include_sensitive: exportOptions.include_sensitive ?? exportOptions.includeDetails ?? false,
+      exclude_super_admin: exportOptions.exclude_super_admin ?? false,
+      exclude_super_admin_actions: exportOptions.exclude_super_admin_actions ?? false,
+      max_records: exportOptions.max_records ?? exportOptions.maxRecords ?? exportOptions.limit ?? 10000
+    };
   }
 
   /**
@@ -880,13 +908,13 @@ export class AuditLogService extends BaseService {
   async exportLogs(exportOptions = {}) {
     try {
       const {
-        format = 'csv',
-        filters = {},
-        include_sensitive = false,
-        exclude_super_admin = false,
-        exclude_super_admin_actions = false,
-        max_records = 10000
-      } = exportOptions;
+        format,
+        filters,
+        include_sensitive,
+        exclude_super_admin,
+        exclude_super_admin_actions,
+        max_records
+      } = this.normalizeExportOptions(exportOptions);
 
       // Get logs with applied filters
       const result = await this.getLogs(
