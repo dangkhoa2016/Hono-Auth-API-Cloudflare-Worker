@@ -1185,8 +1185,10 @@ export default {
       'categoryFilter': 'Category filter is required',
       'channel': 'Channel is required',
       'channelType': 'Channel type is required',
+      'condition': 'Condition is required',
       'conditionValue': 'Condition value is required',
       'confirmPassword': 'Password confirmation is required',
+      'cooldown': 'Cooldown is required',
       'date': 'Date is required',
       'days': 'Days value is required',
       'description': 'Description is required',
@@ -1308,6 +1310,11 @@ export default {
         'tooShort': 'Channel type must be at least {{minLength}} character long',
         'tooShort_other': 'Channel type must be at least {{minLength}} characters long'
       },
+      'condition': {
+        'tooLong': 'Condition cannot exceed {{maxLength}} characters',
+        'tooShort': 'Condition must be at least {{minLength}} character long',
+        'tooShort_other': 'Condition must be at least {{minLength}} characters long'
+      },
       'confirmPassword': {
         'tooShort': 'Password confirmation must be at least {{minLength}} character long',
         'tooShort_other': 'Password confirmation must be at least {{minLength}} characters long'
@@ -1424,6 +1431,10 @@ export default {
       'batchSize': {
         'tooLarge': 'Batch size cannot exceed {{maxValue}}',
         'tooSmall': 'Batch size must be at least {{minValue}}'
+      },
+      'cooldown': {
+        'tooLarge': 'Cooldown cannot exceed {{maxValue}}',
+        'tooSmall': 'Cooldown must be at least {{minValue}}'
       },
       'days': {
         'tooLarge': 'Days cannot exceed {{maxValue}}',

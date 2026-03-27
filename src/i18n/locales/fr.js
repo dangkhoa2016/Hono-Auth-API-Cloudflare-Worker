@@ -1185,8 +1185,10 @@ export default {
       'categoryFilter': "Le filtre de catégorie est requis",
       'channel': "Le canal est requis",
       'channelType': "Le type de canal est requis",
+      'condition': 'La condition est requise',
       'conditionValue': "La valeur de condition est requise",
       'confirmPassword': "La confirmation du mot de passe est requise",
+      'cooldown': 'Le délai d’attente est requis',
       'date': "La date est requise",
       'days': "La valeur en jours est requise",
       'description': "La description est requise",
@@ -1308,6 +1310,11 @@ export default {
         'tooShort': "Le type de canal doit contenir au moins {{minLength}} caractère",
         'tooShort_other': "Le type de canal doit contenir au moins {{minLength}} caractères"
       },
+      'condition': {
+        'tooLong': 'La condition ne peut pas dépasser {{maxLength}} caractères',
+        'tooShort': 'La condition doit contenir au moins {{minLength}} caractère',
+        'tooShort_other': 'La condition doit contenir au moins {{minLength}} caractères'
+      },
       'confirmPassword': {
         'tooShort': "La confirmation du mot de passe doit contenir au moins {{minLength}} caractère",
         'tooShort_other': "La confirmation du mot de passe doit contenir au moins {{minLength}} caractères"
@@ -1424,6 +1431,10 @@ export default {
       'batchSize': {
         'tooLarge': "La taille du lot ne peut pas dépasser {{maxValue}}",
         'tooSmall': "La taille du lot doit être au moins {{minValue}}"
+      },
+      'cooldown': {
+        'tooLarge': 'Le délai d’attente ne peut pas dépasser {{maxValue}}',
+        'tooSmall': 'Le délai d’attente doit être au moins {{minValue}}'
       },
       'days': {
         'tooLarge': "Les jours ne peuvent pas dépasser {{maxValue}}",

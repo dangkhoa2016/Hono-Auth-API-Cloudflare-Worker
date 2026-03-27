@@ -1185,8 +1185,10 @@ export default {
       'categoryFilter': "ตัวกรองหมวดหมู่เป็นสิ่งจำเป็น",
       'channel': "ช่องทางเป็นสิ่งจำเป็น",
       'channelType': "ประเภทช่องทางเป็นสิ่งจำเป็น",
+      'condition': 'เงื่อนไขเป็นสิ่งจำเป็น',
       'conditionValue': "ค่าของเงื่อนไขเป็นสิ่งจำเป็น",
       'confirmPassword': "การยืนยันรหัสผ่านเป็นสิ่งจำเป็น",
+      'cooldown': 'คูลดาวน์เป็นสิ่งจำเป็น',
       'date': "วันที่เป็นสิ่งจำเป็น",
       'days': "ต้องระบุจำนวนวัน",
       'description': "คำอธิบายเป็นสิ่งจำเป็น",
@@ -1308,6 +1310,11 @@ export default {
         'tooShort': "ประเภทช่องทางต้องมีความยาวอย่างน้อย {{minLength}} อักขระ",
         'tooShort_other': "ประเภทช่องทางต้องมีความยาวอย่างน้อย {{minLength}} อักขระ"
       },
+      'condition': {
+        'tooLong': 'เงื่อนไขต้องไม่เกิน {{maxLength}} อักขระ',
+        'tooShort': 'เงื่อนไขต้องมีความยาวอย่างน้อย {{minLength}} อักขระ',
+        'tooShort_other': 'เงื่อนไขต้องมีความยาวอย่างน้อย {{minLength}} อักขระ'
+      },
       'confirmPassword': {
         'tooShort': "การยืนยันรหัสผ่านต้องมีความยาวอย่างน้อย {{minLength}} ตัวอักษร",
         'tooShort_other': "การยืนยันรหัสผ่านต้องมีความยาวอย่างน้อย {{minLength}} ตัวอักษร"
@@ -1424,6 +1431,10 @@ export default {
       'batchSize': {
         'tooLarge': "ขนาดชุด (batch) ต้องไม่เกิน {{maxValue}}",
         'tooSmall': "ขนาดชุด (batch) ต้องมีอย่างน้อย {{minValue}}"
+      },
+      'cooldown': {
+        'tooLarge': 'คูลดาวน์ต้องไม่เกิน {{maxValue}}',
+        'tooSmall': 'คูลดาวน์ต้องมีอย่างน้อย {{minValue}}'
       },
       'days': {
         'tooLarge': "จำนวนวันต้องไม่เกิน {{maxValue}}",

@@ -1185,8 +1185,10 @@ export default {
       'categoryFilter': "カテゴリフィルターは必須です",
       'channel': "チャンネルは必須です",
       'channelType': "チャンネルタイプは必須です",
+      'condition': '条件は必須です',
       'conditionValue': "条件値は必須です",
       'confirmPassword': "パスワード確認は必須です",
+      'cooldown': 'クールダウンは必須です',
       'date': "日付は必須です",
       'days': "日数の値は必須です",
       'description': "説明は必須です",
@@ -1308,6 +1310,11 @@ export default {
         'tooShort': "チャンネルタイプは少なくとも{{minLength}}文字である必要があります",
         'tooShort_other': "チャンネルタイプは少なくとも{{minLength}}文字である必要があります"
       },
+      'condition': {
+        'tooLong': '条件は{{maxLength}}文字を超えることはできません',
+        'tooShort': '条件は少なくとも{{minLength}}文字である必要があります',
+        'tooShort_other': '条件は少なくとも{{minLength}}文字である必要があります'
+      },
       'confirmPassword': {
         'tooShort': "パスワードの確認は少なくとも{{minLength}}文字である必要があります",
         'tooShort_other': "パスワードの確認は少なくとも{{minLength}}文字である必要があります"
@@ -1424,6 +1431,10 @@ export default {
       'batchSize': {
         'tooLarge': "バッチサイズは{{maxValue}}を超えてはいけません",
         'tooSmall': "バッチサイズは{{minValue}}以上である必要があります"
+      },
+      'cooldown': {
+        'tooLarge': 'クールダウンは{{maxValue}}を超えることはできません',
+        'tooSmall': 'クールダウンは{{minValue}}以上である必要があります'
       },
       'days': {
         'tooLarge': "日数は{{maxValue}}を超えることはできません",

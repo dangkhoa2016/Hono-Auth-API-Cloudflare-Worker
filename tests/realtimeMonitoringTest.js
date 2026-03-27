@@ -528,15 +528,44 @@ class RealtimeMonitoringTest {
       const createResponse = await this.client.post(API_ENDPOINTS.realtimeMonitoringAlertsRules, {
         name: 'Test Alert Rule',
         severity: 'medium',
-        condition: 'return event.action === "test_action"',
+        condition: 'test',
         enabled: true,
-        description: 'Test rule for monitoring test actions'
+        description: 'Test rule for monitoring test actions',
+        cooldown: 300,
+        channels: ['email']
       }, {
         Authorization: `Bearer ${this.tokens.superAdmin}`
       });
 
-      this.assert.assertTrue(createResponse.status === 200 || createResponse.status === 403 || createResponse.status === 400,
-        'Should handle alert rule creation');
+      this.assert.assertTrue(createResponse.status === 200 || createResponse.status === 403,
+        `Should create alert rule with current payload shape (got ${createResponse.status})`);
+
+      if (createResponse.status === 200) {
+        this.assert.assertTrue(createResponse.data && createResponse.data.success === true,
+          'Create alert rule response should be successful');
+        this.assert.assertHasField(createResponse.data, 'data', 'Create alert rule response payload');
+        this.assert.assertTrue(Boolean(createResponse.data.data?.ruleId),
+          'Created alert rule should return a ruleId');
+      }
+
+      const invalidCreateResponse = await this.client.post(API_ENDPOINTS.realtimeMonitoringAlertsRules, {
+        name: 'Missing Condition Rule',
+        severity: 'medium',
+        enabled: true,
+        description: 'This payload should fail validation',
+        channels: ['email']
+      }, {
+        Authorization: `Bearer ${this.tokens.superAdmin}`
+      });
+
+      this.assert.assertTrue(invalidCreateResponse.status === 400 || invalidCreateResponse.status === 403,
+        `Should reject alert rule payload missing condition (got ${invalidCreateResponse.status})`);
+
+      if (invalidCreateResponse.status === 400) {
+        const responseText = JSON.stringify(invalidCreateResponse.data || {});
+        this.assert.assertStringNotContains(responseText, 'validation.fieldRequired.condition',
+          'Condition validation should resolve to a localized message');
+      }
 
       this.logger.success('Alert Rules Management completed successfully');
     } catch (error) {

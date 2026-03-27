@@ -34,9 +34,20 @@ export function createAlertRuleSchema(lang = 'en') {
     description: builder.description(),
     severity: builder.enum(SCHEMA_CONFIG.SEVERITY_LEVELS, 'severity'),
     enabled: builder.boolean('enabled').default(true),
-    conditions: builder.record(builder.any(), 'conditions'), // Use builder methods
-    actions: builder.array(builder.string('action', 1), 'actions', 1)
-  }, 'alertRule');
+    condition: builder.string('condition', 1, 500, false).optional(),
+    cooldown: builder.coerceNumber('cooldown', 0, 86400).default(300),
+    channels: builder.array(builder.string('channel', 1), 'channels', 1).optional().default(['email']),
+    conditions: builder.record(builder.any(), 'conditions').optional(),
+    actions: builder.array(builder.string('action', 1), 'actions', 1).optional()
+  }, 'alertRule').refine((data) => {
+    return Boolean(
+      String(data.condition || '').trim()
+      || (data.conditions && Object.keys(data.conditions).length)
+    );
+  }, {
+    message: builder.tl('validation.fieldRequired.condition'),
+    path: ['condition']
+  });
 }
 
 /**

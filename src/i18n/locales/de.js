@@ -1185,8 +1185,10 @@ export default {
       'categoryFilter': "Kategoriefilter ist erforderlich",
       'channel': "Kanal ist erforderlich",
       'channelType': "Kanaltyp ist erforderlich",
+      'condition': 'Bedingung ist erforderlich',
       'conditionValue': "Bedingungswert ist erforderlich",
       'confirmPassword': "Passwortbestätigung ist erforderlich",
+      'cooldown': 'Cooldown ist erforderlich',
       'date': "Datum ist erforderlich",
       'days': "Tageswert ist erforderlich",
       'description': "Beschreibung ist erforderlich",
@@ -1308,6 +1310,11 @@ export default {
         'tooShort': "Kanaltyp muss mindestens {{minLength}} Zeichen lang sein",
         'tooShort_other': "Kanaltyp muss mindestens {{minLength}} Zeichen lang sein"
       },
+      'condition': {
+        'tooLong': 'Bedingung darf {{maxLength}} Zeichen nicht überschreiten',
+        'tooShort': 'Bedingung muss mindestens {{minLength}} Zeichen lang sein',
+        'tooShort_other': 'Bedingung muss mindestens {{minLength}} Zeichen lang sein'
+      },
       'confirmPassword': {
         'tooShort': "Passwortbestätigung muss mindestens {{minLength}} Zeichen lang sein",
         'tooShort_other': "Passwortbestätigung muss mindestens {{minLength}} Zeichen lang sein"
@@ -1424,6 +1431,10 @@ export default {
       'batchSize': {
         'tooLarge': "Batch-Größe darf {{maxValue}} nicht überschreiten",
         'tooSmall': "Batch-Größe muss mindestens {{minValue}} betragen"
+      },
+      'cooldown': {
+        'tooLarge': 'Cooldown darf {{maxValue}} nicht überschreiten',
+        'tooSmall': 'Cooldown muss mindestens {{minValue}} betragen'
       },
       'days': {
         'tooLarge': "Tage dürfen {{maxValue}} nicht überschreiten",

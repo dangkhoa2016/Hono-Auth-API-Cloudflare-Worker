@@ -320,6 +320,7 @@ class MultiLanguageValidationErrorTests {
       this.testSecurityIncidentValidationErrors,
       this.testKvAdminValidationErrors,
       this.testRealtimeMonitoringValidationErrors,
+      this.testRealtimeMonitoringAlertRuleConditionLocalization,
       this.testZodDemoValidationErrors,
       this.testTranslationValidationErrors,
       this.testComplexNestedValidationErrors,
@@ -722,9 +723,10 @@ class MultiLanguageValidationErrorTests {
           endpoint: API_ENDPOINTS.realtimeMonitoringAlertsRules,
           method: 'POST',
           invalidData: {
-            rule_name: '',
-            conditions: 'not-an-object',
-            actions: 'not-an-array'
+            name: 'Localized alert rule validation',
+            severity: 'medium',
+            enabled: true,
+            channels: ['email']
           }
         },
         {
@@ -762,6 +764,53 @@ class MultiLanguageValidationErrorTests {
       this.logger.success('Real-time Monitoring validation errors test completed successfully');
     } catch (error) {
       this.logger.error(`[testRealtimeMonitoringValidationErrors] Real-time Monitoring validation errors test failed: ${error.message}`);
+      throw error;
+    }
+  }
+
+  async testRealtimeMonitoringAlertRuleConditionLocalization() {
+    try {
+      this.logger.info('Testing realtime monitoring alert rule condition localization');
+
+      for (const language of this.testLanguages) {
+        this.totalTests++;
+
+        const result = await this.client.post(
+          API_ENDPOINTS.realtimeMonitoringAlertsRules,
+          {
+            name: 'Localized condition validation',
+            description: 'Missing condition should trigger localized validation',
+            severity: 'medium',
+            enabled: true,
+            channels: ['email']
+          },
+          {
+            Authorization: `Bearer ${this.superAdminToken}`,
+            'Accept-Language': language.code
+          }
+        );
+
+        this.assert.assertStatus(result.status, 400, `${language.name} alert rule condition validation status`);
+
+        const responseText = JSON.stringify(result.data || {}).toLowerCase();
+        this.assert.assertStringNotContains(responseText, 'validation.fieldrequired.condition',
+          `${language.name} should not expose untranslated condition key`);
+
+        const validationErrors = Array.isArray(result.data?.errors)
+          ? result.data.errors
+          : (Array.isArray(result.data?.details?.errors) ? result.data.details.errors : []);
+        const conditionError = validationErrors.find((entry) => entry?.field === 'condition');
+        this.assert.assertTrue(Boolean(conditionError), `${language.name} should report condition field validation`);
+        this.assert.assertTrue(String(conditionError?.message || '').trim().length > 0,
+          `${language.name} condition error message should not be empty`);
+        this.assert.assertStringNotContains(String(conditionError?.message || ''), 'validation.fieldRequired.condition',
+          `${language.name} condition error message should be translated`);
+
+        this.passedTests++;
+        this.logger.success(`${language.name} alert rule condition localization - PASSED`);
+      }
+    } catch (error) {
+      this.logger.error(`[testRealtimeMonitoringAlertRuleConditionLocalization] failed: ${error.message}`);
       throw error;
     }
   }
