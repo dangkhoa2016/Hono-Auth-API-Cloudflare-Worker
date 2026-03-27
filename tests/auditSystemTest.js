@@ -277,8 +277,10 @@ class AuditSystemTestSuite {
       });
 
       this.assert.assertEqual(exportResponse.status, 200, 'Export should succeed');
-      // Export returns CSV/JSON data directly, not a JSON response with export_url
-      this.assert.assertTrue(exportResponse.status === 200, 'Export should return data');
+      this.assert.assertEqual(exportResponse.headers['content-type'], 'text/csv', 'Export should return CSV content type');
+      this.assert.assertTrue(typeof exportResponse.data === 'string', 'Export should return CSV text');
+      this.assert.assertTrue(!exportResponse.data.includes('[object Object]'), 'Export should not stringify raw objects');
+      this.assert.assertTrue(exportResponse.data.length > 0, 'Export should return non-empty CSV content');
     });
 
     await this.runTest('Audit Statistics', async () => {
@@ -383,6 +385,10 @@ class AuditSystemTestSuite {
         Authorization: `Bearer ${token}`
       });
       this.assert.assertTrue([200, 403, 404].includes(exp.status), 'Export may succeed, require higher role, or be unimplemented');
+      if (exp.status === 200) {
+        this.assert.assertTrue(typeof exp.data === 'string', 'Successful export should return text content');
+        this.assert.assertTrue(!exp.data.includes('[object Object]'), 'Successful export should not contain coerced object text');
+      }
     });
 
     // Security & validation (invalid token, malformed params, injection attempt)
