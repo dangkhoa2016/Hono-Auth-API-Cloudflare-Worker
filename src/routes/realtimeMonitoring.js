@@ -515,6 +515,15 @@ realtimeMonitoring.post('/alerts/rules',
     try {
       const ruleData = c.req.valid('json');
       const ruleId = `custom_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
+      const normalizedCondition = String(ruleData.condition || '').trim();
+      const legacyCondition = ruleData.conditions && typeof ruleData.conditions === 'object'
+        ? JSON.stringify(ruleData.conditions)
+        : '';
+      const conditionPattern = normalizedCondition || legacyCondition || 'default';
+      const cooldown = Number(ruleData.cooldown);
+      const channels = Array.isArray(ruleData.channels) && ruleData.channels.length
+        ? ruleData.channels
+        : (Array.isArray(ruleData.actions) && ruleData.actions.length ? ruleData.actions : ['email']);
 
       const alertService = createAlertSystemService(c.env);
       const ruleEngine = alertService.getRuleEngine();
@@ -532,10 +541,13 @@ realtimeMonitoring.post('/alerts/rules',
       };
 
       // Use predefined pattern or default
-      const conditionFn = conditionPatterns[ruleData.condition] || conditionPatterns['default'];
+      const conditionFn = conditionPatterns[conditionPattern] || conditionPatterns.default;
 
       ruleEngine.addRule(ruleId, {
         ...ruleData,
+        cooldown: Number.isFinite(cooldown) && cooldown >= 0 ? cooldown : 300,
+        channels,
+        conditionPattern,
         condition: conditionFn,
         template: {
           title: ruleData.name,

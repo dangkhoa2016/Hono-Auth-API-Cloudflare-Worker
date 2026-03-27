@@ -1185,8 +1185,10 @@ export default {
       'categoryFilter': "El filtro de categoría es obligatorio",
       'channel': "El canal es obligatorio",
       'channelType': "El tipo de canal es obligatorio",
+      'condition': 'La condición es obligatoria',
       'conditionValue': "El valor de condición es obligatorio",
       'confirmPassword': "La confirmación de la contraseña es obligatoria",
+      'cooldown': 'El tiempo de espera es obligatorio',
       'date': "La fecha es obligatoria",
       'days': "El valor de días es obligatorio",
       'description': "La descripción es obligatoria",
@@ -1308,6 +1310,11 @@ export default {
         'tooShort': "El tipo de canal debe tener al menos {{minLength}} carácter",
         'tooShort_other': "El tipo de canal debe tener al menos {{minLength}} caracteres"
       },
+      'condition': {
+        'tooLong': 'La condición no puede exceder los {{maxLength}} caracteres',
+        'tooShort': 'La condición debe tener al menos {{minLength}} carácter',
+        'tooShort_other': 'La condición debe tener al menos {{minLength}} caracteres'
+      },
       'confirmPassword': {
         'tooShort': "La confirmación de la contraseña debe tener al menos {{minLength}} carácter",
         'tooShort_other': "La confirmación de la contraseña debe tener al menos {{minLength}} caracteres"
@@ -1424,6 +1431,10 @@ export default {
       'batchSize': {
         'tooLarge': "El tamaño del lote no puede exceder {{maxValue}}",
         'tooSmall': "El tamaño del lote debe ser al menos {{minValue}}"
+      },
+      'cooldown': {
+        'tooLarge': 'El tiempo de espera no puede exceder {{maxValue}}',
+        'tooSmall': 'El tiempo de espera debe ser al menos {{minValue}}'
       },
       'days': {
         'tooLarge': "Los días no pueden exceder {{maxValue}}",

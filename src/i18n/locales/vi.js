@@ -1185,8 +1185,10 @@ export default {
       'categoryFilter': 'Bộ lọc danh mục là bắt buộc',
       'channel': 'Kênh là bắt buộc',
       'channelType': 'Loại kênh là bắt buộc',
+      'condition': 'Điều kiện là bắt buộc',
       'conditionValue': 'Giá trị điều kiện là bắt buộc',
       'confirmPassword': 'Xác nhận mật khẩu là bắt buộc',
+      'cooldown': 'Thời gian chờ là bắt buộc',
       'date': 'Ngày tháng là bắt buộc',
       'days': 'Số ngày là bắt buộc',
       'description': 'Mô tả là bắt buộc',
@@ -1308,6 +1310,11 @@ export default {
         'tooShort': 'Loại kênh phải có ít nhất {{minLength}} ký tự',
         'tooShort_other': 'Loại kênh phải có ít nhất {{minLength}} ký tự'
       },
+      'condition': {
+        'tooLong': 'Điều kiện không được vượt quá {{maxLength}} ký tự',
+        'tooShort': 'Điều kiện phải có ít nhất {{minLength}} ký tự',
+        'tooShort_other': 'Điều kiện phải có ít nhất {{minLength}} ký tự'
+      },
       'confirmPassword': {
         'tooShort': 'Xác nhận mật khẩu phải có ít nhất {{minLength}} ký tự',
         'tooShort_other': 'Xác nhận mật khẩu phải có ít nhất {{minLength}} ký tự'
@@ -1424,6 +1431,10 @@ export default {
       'batchSize': {
         'tooLarge': 'Kích thước lô không được vượt quá {{maxValue}}',
         'tooSmall': 'Kích thước lô phải ít nhất {{minValue}}'
+      },
+      'cooldown': {
+        'tooLarge': 'Thời gian chờ không được vượt quá {{maxValue}}',
+        'tooSmall': 'Thời gian chờ phải ít nhất {{minValue}}'
       },
       'days': {
         'tooLarge': 'Số ngày không được vượt quá {{maxValue}}',
