@@ -65,6 +65,7 @@ export const SCHEMA_CATEGORIES = {
       analyticsQuerySchema: { validatorName: 'analyticsQuery', defaultTarget: 'query' },
       archivalQuerySchema: { validatorName: 'archivalQuery', defaultTarget: 'json' },
       restoreQuerySchema: { validatorName: 'restoreQuery', defaultTarget: 'json' },
+      truncateQuerySchema: { validatorName: 'truncateQuery', defaultTarget: 'json' },
       performanceQuerySchema: { validatorName: 'performanceQuery', defaultTarget: 'query' },
       complianceReportSchema: { validatorName: 'complianceReport', defaultTarget: 'json' },
       alertConfigSchema: { validatorName: 'alertConfig', defaultTarget: 'json' },

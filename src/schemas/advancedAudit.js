@@ -60,6 +60,42 @@ export function createRestoreQuerySchema(lang = 'en') {
 }
 
 /**
+ * Create truncate query schema with i18n support
+ * @param {string} lang - Language code (default: 'en')
+ * @returns {Object} Zod schema with translated messages
+ */
+export function createTruncateQuerySchema(lang = 'en') {
+  const builder = createSchemaBuilder(lang);
+
+  return builder.object({
+    startDate: builder.date('startDate', true),
+    endDate: builder.date('endDate', true),
+    batchSize: builder.number('batchSize', 1, 10000).default(1000),
+    archiveFirst: builder.boolean('archiveFirst'),
+    dryRun: builder.boolean('dryRun').default(true),
+    confirmDelete: builder.boolean('confirmDelete').optional()
+  }, 'truncateQuery').refine(
+    data => data.startDate <= data.endDate,
+    {
+      message: builder.tl('validation.dateRange.invalid'),
+      path: ['endDate']
+    }
+  ).refine(
+    data => data.dryRun || data.confirmDelete === true,
+    {
+      message: builder.tl('validation.advancedAudit.confirmDeleteRequired'),
+      path: ['confirmDelete']
+    }
+  ).refine(
+    data => data.archiveFirst === true,
+    {
+      message: builder.tl('validation.advancedAudit.archiveFirstRequired'),
+      path: ['archiveFirst']
+    }
+  );
+}
+
+/**
  * Create performance query schema with i18n support
  * @param {string} lang - Language code (default: 'en')
  * @returns {Object} Zod schema with translated messages
@@ -165,6 +201,7 @@ export function createAdvancedAuditI18nSchemas(lang = 'en') {
     analyticsQuerySchema: createAnalyticsQuerySchema(lang),
     archivalQuerySchema: createArchivalQuerySchema(lang),
     restoreQuerySchema: createRestoreQuerySchema(lang),
+    truncateQuerySchema: createTruncateQuerySchema(lang),
     performanceQuerySchema: createPerformanceQuerySchema(lang),
     complianceReportSchema: createComplianceReportSchema(lang),
     alertConfigSchema: createAlertConfigSchema(lang),

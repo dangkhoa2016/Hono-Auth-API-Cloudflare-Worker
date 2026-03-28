@@ -228,7 +228,8 @@ export default {
       'compliance': 'Compliance reporting (admin access required)',
       'complianceReport': 'Generate compliance report (admin access required)',
       'exportAdvanced': 'Advanced export (admin access required)',
-      'middlewareStats': 'Middleware statistics (admin access required)'
+      'middlewareStats': 'Middleware statistics (admin access required)',
+      'truncate': 'Archive and remove live audit logs by date range (Super Admin only)'
     },
     'audit': {
       'export': 'Export audit logs (admin access required)',
@@ -379,6 +380,9 @@ export default {
         'customComplianceFailed': 'Failed to create custom compliance report - {{actor}} unable to complete {{operation}} for "[{{reportName}}]" ({{reportType}}): {{reason}}',
         'failed': 'Failed to generate compliance report - {{actor}} unable to complete {{operation}} for {{timeframe}} in {{format}} format: {{reason}}',
         'reportFailed': 'Failed to generate compliance report - {{actor}} unable to perform {{operation}} for {{type}} report: {{reason}}'
+      },
+      'truncate': {
+        'failed': 'Failed to archive and truncate audit logs - {{actor}} unable to complete {{operation}} for {{dateRange}} ({{dryRun}}): {{reason}}'
       },
       'export': {
         'failed': 'Failed to perform advanced export - {{actor}} unable to complete {{operation}} in {{format}} format ({{recordCount}} records): {{reason}}'
@@ -778,6 +782,9 @@ export default {
       'compliance': {
         'generated': 'Compliance audit report generated successfully'
       },
+      'truncate': {
+        'completed': 'Audit log truncate completed successfully with {{archivedCount}} archived and {{deletedCount}} removed from live storage out of {{totalFound}} records for {{startDate}} to {{endDate}} ({{dryRun}})'
+      },
       'performance': {
         'analyzed': 'Performance audit analysis completed successfully'
       },
@@ -1048,6 +1055,8 @@ export default {
   },
   'validation': {
     'advancedAudit': {
+      'archiveFirstRequired': 'Explicit archiveFirst=true is required for truncate operations',
+      'confirmDeleteRequired': 'Explicit confirmDelete=true is required when dryRun is false',
       'invalidRetentionAction': 'Invalid retention action: {{action}}, must be one of: {{validActions}}'
     },
     'advancedCleanup': {

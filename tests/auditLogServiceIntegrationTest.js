@@ -9,7 +9,7 @@
  * - GET /api/kv-admin/audit/configs/retention - Retention policies and archival settings
  * - GET /api/kv-admin/audit/configs/features - Feature toggle management
  * - POST /api/kv-admin/audit/features/:feature/toggle - Feature enable/disable control
- * - GET /api/kv-admin/audit/configs/alert-thresholds - Alert threshold configuration
+ * - GET /api/kv-admin/audit/configs/alerts - Alert threshold configuration
  *
  * Test coverage:
  * - Configuration-driven audit logging behavior with real-time feature toggles
@@ -41,7 +41,7 @@ class AuditLogServiceIntegrationTest {
   }
 
   async runAll() {
-    this.logger.logSuiteHeader('� Starting Audit Log Service Integration Tests');
+    this.logger.logSuiteHeader('Starting Audit Log Service Integration Tests');
 
     this.logger.info('Initializing test environment...');
     try {

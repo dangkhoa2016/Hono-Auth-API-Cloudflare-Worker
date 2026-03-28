@@ -496,6 +496,144 @@ export class AuditArchivalService extends BaseService {
   }
 
   /**
+   * Archive and remove live audit logs for a specific date range
+   * @param {Object} options - Truncate options
+   * @returns {Promise<Object>} Truncate results
+   */
+  async truncateLogsByDateRange(options = {}) {
+    const {
+      startDate,
+      endDate,
+      dryRun = true,
+      batchSize = 1000,
+      archiveFirst = false,
+      confirmDelete = false
+    } = options;
+
+    auditArchival_log(`Truncate requested for audit logs from ${startDate} to ${endDate}, dry run: ${dryRun}`);
+
+    if (!startDate || !endDate) {
+      throw new Error('START_AND_END_DATE_REQUIRED');
+    }
+
+    if (startDate > endDate) {
+      throw new Error('INVALID_DATE_RANGE');
+    }
+
+    if (archiveFirst !== true) {
+      throw new Error('ARCHIVE_FIRST_REQUIRED');
+    }
+
+    if (!dryRun && confirmDelete !== true) {
+      throw new Error('CONFIRM_DELETE_REQUIRED');
+    }
+
+    const summary = {
+      start_date: startDate,
+      end_date: endDate,
+      batch_size: batchSize,
+      archive_first: archiveFirst,
+      dry_run: dryRun,
+      total_found: 0,
+      archived_count: 0,
+      deleted_count: 0,
+      started_at: new Date().toISOString()
+    };
+
+    try {
+      await this.verifyArchiveTableExists();
+
+      const countQuery = `
+        SELECT COUNT(*) as count
+        FROM audit_logs
+        WHERE timestamp BETWEEN ? AND ?
+      `;
+
+      const countResult = await this.dbService.select(countQuery, [startDate, endDate], true);
+      summary.total_found = countResult?.count || 0;
+
+      if (dryRun || summary.total_found === 0) {
+        summary.would_delete = summary.total_found;
+        summary.completed_at = new Date().toISOString();
+        summary.duration_ms = new Date(summary.completed_at) - new Date(summary.started_at);
+        return summary;
+      }
+
+      let hasMore = true;
+      while (hasMore) {
+        const selectBatchQuery = `
+          SELECT id, actor_id, actor_role, action, target_type, target_id,
+                 details, ip_address, user_agent, timestamp
+          FROM audit_logs
+          WHERE timestamp BETWEEN ? AND ?
+          ORDER BY id
+          LIMIT ?
+        `;
+
+        const logs = await this.dbService.select(selectBatchQuery, [startDate, endDate, batchSize]);
+
+        if (!logs || logs.length === 0) {
+          hasMore = false;
+          break;
+        }
+
+        const archiveQuery = `
+          INSERT OR IGNORE INTO audit_logs_archive
+          (original_id, actor_id, actor_role, action, target_type, target_id,
+           details, ip_address, user_agent, timestamp)
+          VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+        `;
+
+        for (const log of logs) {
+          const archiveResult = await this.dbService.insert(archiveQuery, [
+            log.id,
+            log.actor_id,
+            log.actor_role,
+            log.action,
+            log.target_type,
+            log.target_id,
+            log.details,
+            log.ip_address,
+            log.user_agent,
+            log.timestamp
+          ]);
+
+          summary.archived_count += archiveResult?.changes || 0;
+        }
+
+        const deleteQuery = `
+          DELETE FROM audit_logs
+          WHERE id IN (
+            SELECT id FROM audit_logs
+            WHERE timestamp BETWEEN ? AND ?
+            LIMIT ?
+          )
+        `;
+
+        const result = await this.dbService.delete(deleteQuery, [startDate, endDate, batchSize]);
+        const deletedCount = result?.changes || 0;
+        summary.deleted_count += deletedCount;
+
+        auditArchival_log(
+          `Truncate batch archived ${summary.archived_count} and deleted ${deletedCount} logs (total deleted: ${summary.deleted_count})`
+        );
+
+        if (deletedCount < batchSize) {
+          hasMore = false;
+        }
+      }
+
+      summary.completed_at = new Date().toISOString();
+      summary.duration_ms = new Date(summary.completed_at) - new Date(summary.started_at);
+
+      return summary;
+    } catch (error) {
+      auditArchival_log(`Error truncating audit logs by date range: ${error.message}`);
+      throw error;
+    }
+  }
+
+  /**
    * Get archival status information
    * @returns {Promise<Object>} Archival status
    */

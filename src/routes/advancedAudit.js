@@ -542,6 +542,62 @@ advancedAudit.post('/archival/restore',
 );
 
 /**
+ * POST /api/advanced-audit/truncate - Archive and remove live audit logs by date range
+ * Accessible by: super_admin only
+*/
+advancedAudit.post('/truncate',
+  requireRole(ROLES.SUPER_ADMIN),
+  i18nValidatorsMiddleware.truncateQuery('json'),
+  async (c) => {
+    let user;
+    let options;
+    try {
+      user = c.get('user');
+      options = c.req.valid('json');
+
+      advancedAuditRoutes_log(`Audit truncate request by ${user.role} ${user.id}: ${options.startDate} to ${options.endDate}, dryRun=${options.dryRun}`);
+
+      const { AuditArchivalService } = await import('../services/auditArchivalService.js');
+      const archivalService = new AuditArchivalService(c.env);
+
+      const result = await archivalService.truncateLogsByDateRange(options);
+
+      advancedAuditRoutes_log(
+        `Audit truncate completed: ${result.archived_count || 0} archived, ${result.deleted_count} deleted, ${result.total_found} found`
+      );
+
+      return c.json(createSuccessResponse(result,
+        tSuccess(c, 'advancedAudit.truncate.completed', {
+          actor: user.full_name || user.email,
+          archivedCount: result.archived_count || 0,
+          deletedCount: result.deleted_count || 0,
+          totalFound: result.total_found || 0,
+          dryRun: result.dry_run ? 'dry-run' : 'executed',
+          startDate: options.startDate,
+          endDate: options.endDate
+        })
+      ));
+
+    } catch (error) {
+      return await handleStandardError(
+        c,
+        error,
+        'Failed to archive and truncate audit logs',
+        advancedAuditRoutes_log,
+        'advancedAudit.truncate.failed',
+        {
+          actor: user?.full_name || user?.email || 'unknown',
+          reason: error.message || t(c, 'error.unknown'),
+          operation: 'archive and truncate audit logs',
+          dateRange: `${options?.startDate || 'unknown'} to ${options?.endDate || 'unknown'}`,
+          dryRun: options?.dryRun ? 'dry-run' : 'executed'
+        }
+      );
+    }
+  }
+);
+
+/**
  * GET /api/advanced-audit/archive - Archive management endpoints
  * Accessible by: super_admin only
 */

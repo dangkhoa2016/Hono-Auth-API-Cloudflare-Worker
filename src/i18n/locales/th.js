@@ -228,7 +228,8 @@ export default {
       'compliance': "การรายงานการปฏิบัติตามข้อกำหนด (ต้องการสิทธิ์ผู้ดูแลระบบ)",
       'complianceReport': "สร้างรายงานการปฏิบัติตามข้อกำหนด (ต้องการสิทธิ์ผู้ดูแลระบบ)",
       'exportAdvanced': "การส่งออกขั้นสูง (ต้องการสิทธิ์ผู้ดูแลระบบ)",
-      'middlewareStats': "สถิติมิดเดิลแวร์ (ต้องการสิทธิ์ผู้ดูแลระบบ)"
+      'middlewareStats': "สถิติมิดเดิลแวร์ (ต้องการสิทธิ์ผู้ดูแลระบบ)",
+      'truncate': "เก็บถาวรและนำบันทึก audit ออกจากตาราง live ตามช่วงวันที่ (Super Admin เท่านั้น)"
     },
     'audit': {
       'export': "ส่งออกบันทึกการตรวจสอบ (ต้องการสิทธิ์ผู้ดูแลระบบ)",
@@ -379,6 +380,9 @@ export default {
         'customComplianceFailed': "ไม่สามารถสร้างรายงานการปฏิบัติตามกฎระเบียบแบบกำหนดเองได้ - {{actor}} ไม่สามารถทำ {{operation}} สำหรับ \"[{{reportName}}]\" ({{reportType}}) ให้เสร็จสิ้น: {{reason}}",
         'failed': "ไม่สามารถสร้างรายงานการปฏิบัติตามกฎระเบียบได้ - {{actor}} ไม่สามารถทำ {{operation}} สำหรับ {{timeframe}} ด้วยรูปแบบ {{format}} ให้เสร็จสิ้น: {{reason}}",
         'reportFailed': "ไม่สามารถสร้างรายงานการปฏิบัติตามกฎระเบียบได้ - {{actor}} ไม่สามารถดำเนินการ {{operation}} สำหรับรายงาน {{type}}: {{reason}}"
+      },
+      'truncate': {
+        'failed': "ไม่สามารถเก็บถาวรและ truncate บันทึก audit ตามช่วงวันที่ได้ - {{actor}} ไม่สามารถทำ {{operation}} สำหรับ {{dateRange}} ({{dryRun}}): {{reason}}"
       },
       'export': {
         'failed': "ไม่สามารถทำการส่งออกขั้นสูงได้ - {{actor}} ไม่สามารถทำ {{operation}} ด้วยรูปแบบ {{format}} ({{recordCount}} เรคอร์ด) ให้เสร็จสิ้น: {{reason}}"
@@ -778,6 +782,9 @@ export default {
       'compliance': {
         'generated': "สร้างรายงานการตรวจสอบการปฏิบัติตามข้อกำหนดสำเร็จ"
       },
+      'truncate': {
+        'completed': "truncate บันทึก audit ตามช่วงวันที่สำเร็จ โดยเก็บถาวร {{archivedCount}} รายการ และนำออกจากพื้นที่ live {{deletedCount}} รายการ จากทั้งหมด {{totalFound}} รายการ ระหว่าง {{startDate}} ถึง {{endDate}} ({{dryRun}})"
+      },
       'performance': {
         'analyzed': "การวิเคราะห์ประสิทธิภาพการตรวจสอบเสร็จสมบูรณ์สำเร็จ"
       },
@@ -1048,6 +1055,8 @@ export default {
   },
   'validation': {
     'advancedAudit': {
+      'archiveFirstRequired': 'ต้องส่ง archiveFirst=true สำหรับการทำ truncate',
+      'confirmDeleteRequired': "ต้องส่ง confirmDelete=true เมื่อ dryRun เป็น false",
       'invalidRetentionAction': "การดำเนินการเก็บรักษาไม่ถูกต้อง: {{action}}, ต้องเป็นหนึ่งใน: {{validActions}}"
     },
     'advancedCleanup': {

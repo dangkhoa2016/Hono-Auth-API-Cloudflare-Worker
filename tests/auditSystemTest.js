@@ -162,7 +162,7 @@ class AuditSystemTestSuite {
 
       // Try to get regular user token
       try {
-        const userLogin = await this.client.post(API_ENDPOINTS.login, TEST_USERS.user);
+        const userLogin = await this.client.post(API_ENDPOINTS.login, TEST_USERS.regular);
 
         if (userLogin.success && userLogin.data.data.access_token) {
           this.tokens.user = userLogin.data.data.access_token;
@@ -219,7 +219,7 @@ class AuditSystemTestSuite {
 
       // Check for login audit log (adjust action name to match actual response)
       const loginLog = logs.find(log => log.action === 'login' || log.action === 'LOGIN_SUCCESS');
-      this.assert.assertTrue(loginLog !== null, 'Should have login audit log');
+      this.assert.assertTrue(!!loginLog, 'Should have login audit log');
 
       // Note: Skip email check for anonymous login logs
       if (loginLog.actor_email) {
@@ -277,7 +277,10 @@ class AuditSystemTestSuite {
       });
 
       this.assert.assertEqual(exportResponse.status, 200, 'Export should succeed');
-      this.assert.assertEqual(exportResponse.headers['content-type'], 'text/csv', 'Export should return CSV content type');
+      this.assert.assertTrue(
+        (exportResponse.headers['content-type'] || '').includes('text/csv'),
+        'Export should return CSV content type'
+      );
       this.assert.assertTrue(typeof exportResponse.data === 'string', 'Export should return CSV text');
       this.assert.assertTrue(!exportResponse.data.includes('[object Object]'), 'Export should not stringify raw objects');
       this.assert.assertTrue(exportResponse.data.length > 0, 'Export should return non-empty CSV content');
@@ -293,10 +296,10 @@ class AuditSystemTestSuite {
       this.assert.assertEqual(statsResponse.status, 200, 'Stats should be accessible');
       this.assert.assertTrue(statsResponse.data.success, 'Stats response should be successful');
 
-      const stats = statsResponse.data;
-      this.assert.assertTrue(stats.total_events !== null, 'Should have total events count');
-      this.assert.assertTrue(stats.recent_activity !== null, 'Should have recent activity');
-      this.assert.assertTrue(stats.top_actions !== null, 'Should have top actions');
+      const stats = statsResponse.data.data || statsResponse.data;
+      this.assert.assertTrue(stats.total_events !== null && stats.total_events !== undefined, 'Should have total events count');
+      this.assert.assertTrue(stats.recent_activity !== null && stats.recent_activity !== undefined, 'Should have recent activity');
+      this.assert.assertTrue(stats.top_actions !== null && stats.top_actions !== undefined, 'Should have top actions');
     });
   }
 
@@ -499,7 +502,7 @@ class AuditSystemTestSuite {
       });
 
       this.assert.assertEqual(adminAuditResponse.status, 200, 'Admin should access audit logs');
-      const adminLogs = adminAuditResponse.data.logs || [];
+      const adminLogs = adminAuditResponse.data?.data?.logs || [];
 
       // Super admin should see all logs
       const superAdminAuditResponse = await this.client.get(API_ENDPOINTS.auditLogs, {
@@ -507,7 +510,7 @@ class AuditSystemTestSuite {
       });
 
       this.assert.assertEqual(superAdminAuditResponse.status, 200, 'Super admin should access audit logs');
-      const superAdminLogs = superAdminAuditResponse.data.logs || [];
+      const superAdminLogs = superAdminAuditResponse.data?.data?.logs || [];
 
       // Super admin should see more or equal logs
       this.assert.assertTrue(superAdminLogs.length >= adminLogs.length, 'Super admin should see more logs');
@@ -576,7 +579,7 @@ class AuditSystemTestSuite {
     await this.runTest('Compliance Reporting', async () => {
       const token = this.tokens.superAdmin;
 
-      const url = `${API_ENDPOINTS.advancedAuditCompliance}?type=gdpr&startDate=2024-01-01T00:00:00.000Z&endDate=2024-12-31T23:59:59.999Z`;
+      const url = `${API_ENDPOINTS.advancedAuditCompliance}?type=gdpr&start_date=2024-01-01T00:00:00.000Z&end_date=2024-12-31T23:59:59.999Z`;
       const complianceResponse = await this.client.get(url, {
         Authorization: `Bearer ${token}`
       });
@@ -721,7 +724,7 @@ class AuditSystemTestSuite {
       });
 
       this.assert.assertEqual(auditResponse.status, 200, 'Admin should access audit logs');
-      const logs = auditResponse.data.logs || [];
+      const logs = auditResponse.data?.data?.logs || [];
 
       // Verify no super_admin logs in results
       const superAdminLogs = logs.filter(log => log.actor_role === 'super_admin');
