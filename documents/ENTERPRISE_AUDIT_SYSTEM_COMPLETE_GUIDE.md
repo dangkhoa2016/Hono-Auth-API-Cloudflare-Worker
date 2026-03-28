@@ -44,7 +44,7 @@ Enterprise Audit System (50+ Endpoints)
 │   ├── AuditLogService with BaseService inheritance
 │   ├── Role-based filtering and pagination
 │   └── Health monitoring and statistics
-├── 🚀 Phase 2: Advanced Analytics (/api/advanced-audit/*) - 15 endpoints  
+├── 🚀 Phase 2: Advanced Analytics (/api/advanced-audit/*) - 16 endpoints  
 │   ├── Security, behavior, performance analytics
 │   ├── GDPR, SOX, ISO27001 compliance reporting
 │   ├── Data archival with automated retention
@@ -105,7 +105,7 @@ Enterprise Audit System (50+ Endpoints)
 - **Advanced Search Capabilities**: Full-text search with date ranges, actions, and entity filters
 - **Real-time Health Monitoring**: Continuous system health checks with performance metrics
 
-### **🚀 2. Advanced Audit Routes (`/api/advanced-audit/*`) - 15 Endpoints**  
+### **🚀 2. Advanced Audit Routes (`/api/advanced-audit/*`) - 16 Endpoints**  
 **File**: `src/routes/advancedAudit.js`  
 **Purpose**: Enterprise analytics, compliance reporting, and data archival management  
 **Authorization**: Admin (limited analytics) | Super Admin (full access)  
@@ -117,23 +117,28 @@ Enterprise Audit System (50+ Endpoints)
 - **GET `/analytics/behavior`** - User behavior analysis and pattern recognition  
 - **GET `/analytics/performance`** - System performance analytics and optimization insights
 
-#### **🗄️ Data Management Group (4 endpoints):**
+#### **🗄️ Data Management Group (7 endpoints):**
 - **GET `/archive`** - Archive management interface with retention policy status
 - **GET `/archival/stats`** - Detailed archival statistics and storage utilization
 - **POST `/archival/run`** - Execute automated data archival with compression
 - **POST `/archival/restore`** - Restore archived data with selective recovery options
+- **POST `/archive`** - Manual archive operations and archive policy actions
+- **POST `/retention`** - Retention policy management and cleanup simulation
+- **POST `/truncate`** - Archive-before-delete cleanup for live audit logs by date range
 
-#### **📋 Compliance & Reporting Group (4 endpoints):**
+#### **📋 Compliance & Reporting Group (5 endpoints):**
 - **GET `/compliance`** - Compliance overview with multi-standard support
 - **GET `/compliance/report`** - Generate compliance reports (GDPR, SOX, ISO27001)
 - **GET `/middleware/stats`** - Audit middleware performance statistics and optimization
 - **POST `/export-advanced`** - Advanced export with analytics and compliance data
+- **POST `/compliance`** - Compliance generation and configuration actions
 
 #### **💡 Enterprise Features:**
 - **Multi-Standard Compliance**: GDPR, SOX, ISO27001 reporting with automated validation
 - **Intelligent Data Archival**: Automated archival with configurable retention policies
+- **Safe Truncate Workflow**: Explicit archive-before-delete flow with dry-run and confirmation support
 - **Advanced Analytics Engine**: Pattern detection, trend analysis, and predictive insights
-- **CSV Export Capabilities**: Formatted exports for all analytics with role-based filtering
+- **Detailed Export Controls**: Core audit export supports `includeDetails`, `maxRecords`, and role-filtered payload shaping
 - **Performance Optimization**: Middleware statistics for continuous system improvement
 
 ### **🔴 3. Real-time Monitoring Routes (`/api/realtime-monitoring/*`) - 28 Endpoints**
@@ -383,7 +388,7 @@ Before diving into test cases details, let's understand the structure of **40+ A
 - 🔍 **GET /api/audit/logs** - Query audit logs with pagination & filtering
 - 🔎 **GET /api/audit/search** - Full-text search with complex filtering  
 - 📊 **GET /api/audit/stats** - Statistics and metrics by period/groupBy
-- 📤 **GET /api/audit/export** - Export CSV (super admin only)
+- 📤 **GET /api/audit/export** - Export CSV/JSON with detail controls and role-based filtering
 - 🏥 **GET /api/audit/system-health** - Health check and performance metrics
 - 🗑️ **DELETE /api/audit/logs/:id** - Delete a single audit log by numeric ID
 
@@ -400,6 +405,7 @@ Before diving into test cases details, let's understand the structure of **40+ A
   - `POST /archival/restore` - Restore archived data
   - `GET /archive` - List archives
   - `POST /archive` - Create manual archive
+  - `POST /truncate` - Archive and remove live audit logs by date range
   - `POST /retention` - Configure retention policies
 - 📋 **Compliance & Export**:
   - `GET /compliance/report` - Generate compliance reports
@@ -426,7 +432,7 @@ Before diving into test cases details, let's understand the structure of **40+ A
   - `GET /alerts/history` - Alert history
   - `POST /alerts/send` - Send manual alert
   - `GET /alerts/rules` - Get alert rules
-  - `POST /alerts/rules` - Create alert rule
+  - `POST /alerts/rules` - Create alert rule with validated `condition`/`conditions` and `cooldown`
   - `PUT /alerts/rules/:ruleId/toggle` - Toggle alert rule
   - `GET /alerts/channels` - Get notification channels
   - `POST /alerts/channels` - Configure notification channels
@@ -479,7 +485,7 @@ Use [TEST_GUIDE.md](./TEST_GUIDE.md) as the canonical command matrix for all aud
 **`unified-audit-test.sh (mode: endpoints)`** - Complete endpoint coverage (3-5 minutes)
 - ✅ ALL audit endpoints across 4 route groups
 - ✅ Core audit: 6 endpoints (/api/audit/*)
-- ✅ Advanced audit: 15 endpoints (/api/advanced-audit/*)
+- ✅ Advanced audit: 16 endpoints (/api/advanced-audit/*)
 - ✅ Real-time monitoring: 28 endpoints (/api/realtime-monitoring/*)
 - ✅ Security incident: 8 endpoints (/api/security-incident/*)
 - ✅ Authentication and authorization testing
@@ -681,7 +687,7 @@ await this.testIncidentManagement();    // Incident response
   - Core audit logging functionality
   - Role-based data filtering (admin vs super_admin)
   - Advanced search với full-text capabilities
-  - Export functionality với security restrictions
+  - Export functionality with `includeDetails`, `maxRecords`, and normalized filters
 
 #### **📊 Analytics Services**
 - **`auditAnalyticsService.js`** (18KB)
@@ -706,6 +712,7 @@ await this.testIncidentManagement();    // Incident response
 - **`alertSystemService.js`** (22KB)
   - Multi-channel notifications (console, webhook, email)
   - Configurable alert rules
+  - Localized validation support for `condition` and `cooldown`
   - Alert escalation workflows
   - Channel management
 
@@ -727,11 +734,11 @@ await this.testIncidentManagement();    // Incident response
 - **GET `/api/audit/logs`**: Main audit log retrieval với role-based filtering
 - **GET `/api/audit/search`**: Advanced search với full-text capabilities  
 - **GET `/api/audit/stats`**: Audit statistics (role-filtered)
-- **GET `/api/audit/export`**: Data export với security restrictions
+- **GET `/api/audit/export`**: Data export with `includeDetails`, `maxRecords`, and role-filtered sensitive fields
 - **GET `/api/audit/system-health`**: Audit system health monitoring
 - **DELETE `/api/audit/logs/:id`**: Delete a specific audit log by numeric ID
 
-#### **📊 Advanced Audit API: `/api/advanced-audit/*` (15 endpoints)**
+#### **📊 Advanced Audit API: `/api/advanced-audit/*` (16 endpoints)**
 - **GET `/api/advanced-audit/analytics`**: General analytics overview
 - **GET `/api/advanced-audit/analytics/security`**: Security-focused analytics
 - **GET `/api/advanced-audit/analytics/behavior`**: User behavior analytics
@@ -742,6 +749,8 @@ await this.testIncidentManagement();    // Incident response
 - **POST `/api/advanced-audit/archival/restore`**: Restore archived data
 - **GET `/api/advanced-audit/archive`**: Archive management overview
 - **POST `/api/advanced-audit/archive`**: Manual archive operations
+- **POST `/api/advanced-audit/truncate`**: Safe archive-before-delete live log cleanup by date range
+- **POST `/api/advanced-audit/retention`**: Retention policy management and cleanup operations
 - **GET `/api/advanced-audit/compliance`**: Compliance overview
 - **POST `/api/advanced-audit/compliance`**: Generate compliance reports
 - **POST `/api/advanced-audit/export-advanced`**: Advanced export functionality
@@ -763,7 +772,7 @@ await this.testIncidentManagement();    // Incident response
 - **GET `/alerts/history`**: Get alert history with optional filters
 - **POST `/alerts/send`**: Send a manual alert
 - **GET `/alerts/rules`**: Get all alert rules
-- **POST `/alerts/rules`**: Create a new alert rule
+- **POST `/alerts/rules`**: Create a new alert rule with localized validation for `condition` and `cooldown`
 - **PUT `/alerts/rules/:ruleId/toggle`**: Enable/disable an alert rule
 - **GET `/alerts/channels`**: Get all alert channels
 - **POST `/alerts/channels`**: Create a new alert channel
@@ -787,7 +796,7 @@ await this.testIncidentManagement();    // Incident response
 - **GET `/api/security-incident/status`**: Get service status and configuration
 - **POST `/api/security-incident/simulate`**: Simulate security threats (development only)
 
-**📊 Total API Coverage: 57+ Endpoints**
+**📊 Total API Coverage: 58+ Endpoints**
 
 ### **🔄 Middleware & Integration**
 
@@ -1020,7 +1029,7 @@ npm run deploy
 
 ### **🔔 Alerting & Notifications**
 - **Multi-channel Support**: Console, webhook, email
-- **Configurable Rules**: Custom alert conditions
+- **Configurable Rules**: Custom alert conditions with explicit cooldown validation and localized messages
 - **Escalation Workflows**: Automated incident escalation
 - **Alert History**: Complete alert audit trail
 

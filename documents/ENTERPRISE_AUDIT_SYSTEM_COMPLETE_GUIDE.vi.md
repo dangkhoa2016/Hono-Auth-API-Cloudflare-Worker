@@ -44,7 +44,7 @@ Hệ Thống Audit Doanh Nghiệp (50+ Endpoints)
 │   ├── AuditLogService với kế thừa BaseService
 │   ├── Lọc dựa trên vai trò và phân trang
 │   └── Giám sát sức khỏe và thống kê
-├── 🚀 Giai đoạn 2: Advanced Analytics (/api/advanced-audit/*) - 15 endpoints  
+├── 🚀 Giai đoạn 2: Advanced Analytics (/api/advanced-audit/*) - 16 endpoints  
 │   ├── Phân tích bảo mật, hành vi, hiệu năng
 │   ├── Báo cáo tuân thủ GDPR, SOX, ISO27001
 │   ├── Lưu trữ dữ liệu với chính sách giữ lại tự động
@@ -105,7 +105,7 @@ Hệ Thống Audit Doanh Nghiệp (50+ Endpoints)
 - **Khả Năng Tìm Kiếm Nâng Cao**: Tìm kiếm toàn văn với phạm vi ngày, hành động, và bộ lọc thực thể
 - **Giám Sát Sức Khỏe Thời Gian Thực**: Kiểm tra sức khỏe hệ thống liên tục với metrics hiệu năng
 
-### **🚀 2. Advanced Audit Routes (`/api/advanced-audit/*`) - 15 Endpoints**  
+### **🚀 2. Advanced Audit Routes (`/api/advanced-audit/*`) - 16 Endpoints**  
 **File**: `src/routes/advancedAudit.js`  
 **Mục đích**: Phân tích doanh nghiệp, báo cáo tuân thủ, và quản lý lưu trữ dữ liệu  
 **Phân quyền**: Admin (phân tích hạn chế) | Super Admin (toàn quyền truy cập)  
@@ -117,23 +117,28 @@ Hệ Thống Audit Doanh Nghiệp (50+ Endpoints)
 - **GET `/analytics/behavior`** - Phân tích hành vi người dùng và nhận dạng mẫu  
 - **GET `/analytics/performance`** - Phân tích hiệu năng hệ thống và insights tối ưu hóa
 
-#### **🗄️ Nhóm Quản Lý Dữ Liệu (4 endpoints):**
+#### **🗄️ Nhóm Quản Lý Dữ Liệu (7 endpoints):**
 - **GET `/archive`** - Giao diện quản lý lưu trữ với trạng thái chính sách giữ lại
 - **GET `/archival/stats`** - Thống kê lưu trữ chi tiết và sử dụng bộ nhớ
 - **POST `/archival/run`** - Thực hiện lưu trữ dữ liệu tự động với nén
 - **POST `/archival/restore`** - Khôi phục dữ liệu đã lưu trữ với tùy chọn phục hồi có chọn lọc
+- **POST `/archive`** - Các thao tác archive thủ công và hành động chính sách archive
+- **POST `/retention`** - Quản lý retention policy và mô phỏng cleanup
+- **POST `/truncate`** - Dọn dẹp log live theo khoảng ngày với luồng archive-before-delete
 
-#### **📋 Nhóm Tuân Thủ & Báo Cáo (4 endpoints):**
+#### **📋 Nhóm Tuân Thủ & Báo Cáo (5 endpoints):**
 - **GET `/compliance`** - Tổng quan tuân thủ với hỗ trợ đa tiêu chuẩn
 - **GET `/compliance/report`** - Tạo báo cáo tuân thủ (GDPR, SOX, ISO27001)
 - **GET `/middleware/stats`** - Thống kê hiệu năng middleware audit và tối ưu hóa
 - **POST `/export-advanced`** - Xuất nâng cao với dữ liệu phân tích và tuân thủ
+- **POST `/compliance`** - Tác vụ sinh báo cáo và cấu hình tuân thủ
 
 #### **💡 Các Tính Năng Doanh Nghiệp:**
 - **Tuân Thủ Đa Tiêu Chuẩn**: Báo cáo GDPR, SOX, ISO27001 với xác thực tự động
 - **Lưu Trữ Dữ Liệu Thông Minh**: Lưu trữ tự động với chính sách giữ lại có thể cấu hình
+- **Luồng Truncate An Toàn**: Yêu cầu archive trước khi xóa với hỗ trợ dry-run và xác nhận tường minh
 - **Engine Phân Tích Nâng Cao**: Phát hiện mẫu, phân tích xu hướng, và insights dự đoán
-- **Khả Năng Xuất CSV**: Xuất có định dạng cho tất cả phân tích với lọc dựa trên vai trò
+- **Điều Khiển Xuất Chi Tiết**: Core audit export hỗ trợ `includeDetails`, `maxRecords` và lọc payload theo vai trò
 - **Tối Ưu Hóa Hiệu Năng**: Thống kê middleware cho cải thiện hệ thống liên tục
 
 ### **🔴 3. Real-time Monitoring Routes (`/api/realtime-monitoring/*`) - 28 Endpoints**
@@ -383,7 +388,7 @@ Trước khi đi sâu vào chi tiết các trường hợp kiểm thử, hãy hi
 - 🔍 **GET /api/audit/logs** - Truy vấn log audit với phân trang & bộ lọc
 - 🔎 **GET /api/audit/search** - Tìm kiếm toàn văn với bộ lọc phức tạp  
 - 📊 **GET /api/audit/stats** - Thống kê và các chỉ số theo khoảng thời gian/nhóm
-- 📤 **GET /api/audit/export** - Xuất CSV (chỉ super admin)
+- 📤 **GET /api/audit/export** - Xuất CSV/JSON với điều khiển chi tiết và lọc theo vai trò
 - 🏥 **GET /api/audit/system-health** - Kiểm tra tình trạng và các chỉ số hiệu suất
 - 🗑️ **DELETE /api/audit/logs/:id** - Xóa một bản ghi audit theo ID dạng số
 
@@ -400,6 +405,7 @@ Trước khi đi sâu vào chi tiết các trường hợp kiểm thử, hãy hi
   - `POST /archival/restore` - Khôi phục dữ liệu đã lưu trữ
   - `GET /archive` - Danh sách lưu trữ
   - `POST /archive` - Tạo lưu trữ thủ công
+  - `POST /truncate` - Lưu trữ rồi loại log audit khỏi vùng live theo khoảng ngày
   - `POST /retention` - Cấu hình chính sách giữ lại
 - 📋 **Tuân Thủ & Xuất Dữ Liệu**:
   - `GET /compliance/report` - Tạo báo cáo tuân thủ
@@ -426,7 +432,7 @@ Trước khi đi sâu vào chi tiết các trường hợp kiểm thử, hãy hi
   - `GET /alerts/history` - Lịch sử cảnh báo
   - `POST /alerts/send` - Gửi cảnh báo thủ công
   - `GET /alerts/rules` - Lấy danh sách quy tắc cảnh báo
-  - `POST /alerts/rules` - Tạo quy tắc cảnh báo
+  - `POST /alerts/rules` - Tạo quy tắc cảnh báo với validation cho `condition`/`conditions` và `cooldown`
   - `PUT /alerts/rules/:ruleId/toggle` - Bật/tắt quy tắc cảnh báo
   - `GET /alerts/channels` - Lấy danh sách kênh thông báo
   - `POST /alerts/channels` - Cấu hình kênh thông báo
@@ -479,7 +485,7 @@ Dùng [TEST_GUIDE_vi.md](./TEST_GUIDE_vi.md) làm nguồn chuẩn cho toàn bộ
 **`unified-audit-test.sh (mode: endpoints)`** - Độ bao phủ endpoint hoàn chỉnh (3-5 phút)
 - ✅ TẤT CẢ endpoints audit trên 4 nhóm route
 - ✅ Audit cốt lõi: 6 endpoints (/api/audit/*)
-- ✅ Audit nâng cao: 15 endpoints (/api/advanced-audit/*)
+- ✅ Audit nâng cao: 16 endpoints (/api/advanced-audit/*)
 - ✅ Giám sát thời gian thực: 28 endpoints (/api/realtime-monitoring/*)
 - ✅ Sự cố bảo mật: 8 endpoints (/api/security-incident/*)
 - ✅ Kiểm thử xác thực và phân quyền
@@ -681,7 +687,7 @@ await this.testIncidentManagement();    // Phản hồi sự cố
   - Chức năng ghi log audit cốt lõi
   - Lọc dữ liệu dựa trên vai trò (admin so với super_admin)
   - Tìm kiếm nâng cao với khả năng toàn văn
-  - Chức năng xuất với các hạn chế bảo mật
+  - Chức năng xuất với `includeDetails`, `maxRecords` và bộ lọc chuẩn hóa
 
 #### **📊 Dịch Vụ Phân Tích**
 - **`auditAnalyticsService.js`** (18KB)
@@ -706,6 +712,7 @@ await this.testIncidentManagement();    // Phản hồi sự cố
 - **`alertSystemService.js`** (22KB)
   - Thông báo đa kênh (console, webhook, email)
   - Các quy tắc cảnh báo có thể cấu hình
+  - Hỗ trợ validation bản địa hóa cho `condition` và `cooldown`
   - Quy trình leo thang cảnh báo
   - Quản lý kênh
 
@@ -727,11 +734,11 @@ await this.testIncidentManagement();    // Phản hồi sự cố
 - **GET `/api/audit/logs`**: Lấy log audit chính với lọc dựa trên vai trò
 - **GET `/api/audit/search`**: Tìm kiếm nâng cao với khả năng toàn văn  
 - **GET `/api/audit/stats`**: Thống kê audit (đã lọc theo vai trò)
-- **GET `/api/audit/export`**: Xuất dữ liệu với các hạn chế bảo mật
+- **GET `/api/audit/export`**: Xuất dữ liệu với `includeDetails`, `maxRecords` và các trường nhạy cảm được lọc theo vai trò
 - **GET `/api/audit/system-health`**: Giám sát tình trạng hệ thống audit
 - **DELETE `/api/audit/logs/:id`**: Xóa một bản ghi audit theo ID dạng số
 
-#### **📊 API Audit Nâng Cao: `/api/advanced-audit/*` (15 endpoints)**
+#### **📊 API Audit Nâng Cao: `/api/advanced-audit/*` (16 endpoints)**
 - **GET `/api/advanced-audit/analytics`**: Tổng quan phân tích chung
 - **GET `/api/advanced-audit/analytics/security`**: Phân tích tập trung vào bảo mật
 - **GET `/api/advanced-audit/analytics/behavior`**: Phân tích hành vi người dùng
@@ -742,6 +749,8 @@ await this.testIncidentManagement();    // Phản hồi sự cố
 - **POST `/api/advanced-audit/archival/restore`**: Khôi phục dữ liệu đã lưu trữ
 - **GET `/api/advanced-audit/archive`**: Tổng quan quản lý kho lưu trữ
 - **POST `/api/advanced-audit/archive`**: Các hoạt động lưu trữ thủ công
+- **POST `/api/advanced-audit/truncate`**: Dọn dẹp log live an toàn theo khoảng ngày với archive-before-delete
+- **POST `/api/advanced-audit/retention`**: Quản lý retention policy và các thao tác cleanup
 - **GET `/api/advanced-audit/compliance`**: Tổng quan tuân thủ
 - **POST `/api/advanced-audit/compliance`**: Tạo báo cáo tuân thủ
 - **POST `/api/advanced-audit/export-advanced`**: Chức năng xuất nâng cao
@@ -763,7 +772,7 @@ await this.testIncidentManagement();    // Phản hồi sự cố
 - **GET `/alerts/history`**: Lấy lịch sử cảnh báo với các bộ lọc tùy chọn
 - **POST `/alerts/send`**: Gửi một cảnh báo thủ công
 - **GET `/alerts/rules`**: Lấy tất cả các quy tắc cảnh báo
-- **POST `/alerts/rules`**: Tạo một quy tắc cảnh báo mới
+- **POST `/alerts/rules`**: Tạo một quy tắc cảnh báo mới với validation i18n cho `condition` và `cooldown`
 - **PUT `/alerts/rules/:ruleId/toggle`**: Bật/tắt một quy tắc cảnh báo
 - **GET `/alerts/channels`**: Lấy tất cả các kênh cảnh báo
 - **POST `/alerts/channels`**: Tạo một kênh cảnh báo mới
@@ -787,7 +796,7 @@ await this.testIncidentManagement();    // Phản hồi sự cố
 - **GET `/api/security-incident/status`**: Lấy trạng thái dịch vụ và cấu hình
 - **POST `/api/security-incident/simulate`**: Mô phỏng các mối đe dọa bảo mật (chỉ dành cho phát triển)
 
-**📊 Tổng Độ Bao Phủ API: 57+ Endpoints**
+**📊 Tổng Độ Bao Phủ API: 58+ Endpoints**
 
 ### **🔄 Middleware & Tích Hợp**
 
@@ -1020,7 +1029,7 @@ npm run deploy
 
 ### **🔔 Cảnh Báo & Thông Báo**
 - **Hỗ Trợ Đa Kênh**: Console, webhook, email
-- **Các Quy Tắc Có Thể Cấu Hình**: Điều kiện cảnh báo tùy chỉnh
+- **Các Quy Tắc Có Thể Cấu Hình**: Điều kiện cảnh báo tùy chỉnh với validation cooldown tường minh và thông báo đa ngôn ngữ
 - **Quy Trình Leo Thang**: Leo thang sự cố tự động
 - **Lịch Sử Cảnh Báo**: Dấu vết audit cảnh báo hoàn chỉnh
 
