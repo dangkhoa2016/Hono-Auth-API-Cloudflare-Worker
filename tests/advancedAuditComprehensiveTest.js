@@ -93,6 +93,9 @@ import { TestClient } from './utils/testClient.js';
 import { TestLogger } from './utils/testLogger.js';
 import { TestAssertions } from './utils/testAssertions.js';
 import { API_ENDPOINTS, TEST_USERS, TEST_CONFIG } from './config/testConfig.js';
+import { DatabaseService } from '../src/services/databaseService.js';
+import { AuditArchivalService } from '../src/services/auditArchivalService.js';
+import { getPlatformProxy } from 'wrangler';
 
 /**
  * Comprehensive test suite for all advanced audit endpoints and functionality
@@ -106,6 +109,8 @@ class AdvancedAuditComprehensiveTest {
 
     // Test-specific properties
     this.tokens = {};
+    this.dbService = null;
+    this.archivalService = null;
   }
 
   /**
@@ -116,6 +121,7 @@ class AdvancedAuditComprehensiveTest {
 
     this.logger.info('Initializing test environment...');
     try {
+      await this.setupDatabase();
       await this.setupAuthentication();
       this.logger.success('Authentication completed successfully');
     } catch (error) {
@@ -138,6 +144,12 @@ class AdvancedAuditComprehensiveTest {
     if (this.logger.failCount > 0) {
       process.exit(1);
     }
+  }
+
+  async setupDatabase() {
+    const { env } = await getPlatformProxy({ environment: 'test' });
+    this.dbService = new DatabaseService(env);
+    this.archivalService = new AuditArchivalService(env);
   }
 
   /**
@@ -449,6 +461,10 @@ class AdvancedAuditComprehensiveTest {
     // Test archival with different parameters
     await this.testArchivalWithDifferentParameters();
     await this.testArchivalWithCategories();
+    await this.testTruncateEndpoint();
+    await this.testTruncateValidation();
+    await this.testTruncateArchiveExecution();
+    await this.testTruncateAccessControl();
   }
 
   async testArchivalWithDifferentParameters() {
@@ -499,6 +515,191 @@ class AdvancedAuditComprehensiveTest {
         this.assert.assertStatus(response.status, 200, `Should handle category ${category}`);
       }
     });
+  }
+
+  async testTruncateEndpoint() {
+    await this.runTest('Audit Truncate Dry Run', async () => {
+      const response = await this.client.post(API_ENDPOINTS.advancedAuditTruncate, {
+        startDate: '2024-01-01T00:00:00Z',
+        endDate: '2024-01-02T00:00:00Z',
+        archiveFirst: true,
+        dryRun: true,
+        batchSize: 100
+      }, {
+        Authorization: `Bearer ${this.tokens.superAdmin}`
+      });
+
+      this.assert.assertStatus(response.status, 200, 'Should support truncate dry-run requests');
+      this.assert.assertTrue(response.data.success, 'Truncate dry-run should be successful');
+      this.assert.assertHasFields(response.data.data, ['start_date', 'end_date', 'dry_run', 'total_found', 'archived_count', 'deleted_count'], 'Truncate response data');
+      this.assert.assertTrue(response.data.data.dry_run, 'Truncate request should remain in dry-run mode');
+    });
+  }
+
+  async testTruncateValidation() {
+    await this.runTest('Audit Truncate Validation', async () => {
+      const invalidRangeResponse = await this.client.post(API_ENDPOINTS.advancedAuditTruncate, {
+        startDate: '2024-01-03T00:00:00Z',
+        endDate: '2024-01-02T00:00:00Z',
+        archiveFirst: true,
+        dryRun: true
+      }, {
+        Authorization: `Bearer ${this.tokens.superAdmin}`
+      });
+
+      this.assert.assertStatus(invalidRangeResponse.status, 400, 'Invalid truncate date range should be rejected');
+
+      const missingArchiveFirstResponse = await this.client.post(API_ENDPOINTS.advancedAuditTruncate, {
+        startDate: '2024-01-01T00:00:00Z',
+        endDate: '2024-01-02T00:00:00Z',
+        dryRun: true
+      }, {
+        Authorization: `Bearer ${this.tokens.superAdmin}`
+      });
+
+      this.assert.assertStatus(missingArchiveFirstResponse.status, 400, 'Truncate without archiveFirst=true should be rejected');
+
+      const missingConfirmResponse = await this.client.post(API_ENDPOINTS.advancedAuditTruncate, {
+        startDate: '2024-01-01T00:00:00Z',
+        endDate: '2024-01-02T00:00:00Z',
+        archiveFirst: true,
+        dryRun: false,
+        batchSize: 10
+      }, {
+        Authorization: `Bearer ${this.tokens.superAdmin}`
+      });
+
+      this.assert.assertStatus(missingConfirmResponse.status, 400, 'Destructive truncate without confirmation should be rejected');
+
+      const archiveFirstFalseResponse = await this.client.post(API_ENDPOINTS.advancedAuditTruncate, {
+        startDate: '2024-01-01T00:00:00Z',
+        endDate: '2024-01-02T00:00:00Z',
+        archiveFirst: false,
+        dryRun: false,
+        confirmDelete: true,
+        batchSize: 10
+      }, {
+        Authorization: `Bearer ${this.tokens.superAdmin}`
+      });
+
+      this.assert.assertStatus(archiveFirstFalseResponse.status, 400, 'archiveFirst=false should be rejected');
+    });
+  }
+
+  async testTruncateArchiveExecution() {
+    await this.runTest('Audit Truncate Archive Execution', async () => {
+      const marker = `truncate-archive-${Date.now()}`;
+      const inRangeTimestamps = [
+        '2024-01-01T00:05:00Z',
+        '2024-01-01T00:10:00Z'
+      ];
+      const outOfRangeTimestamp = '2024-01-03T00:10:00Z';
+
+      await this.seedTruncateTestLogs(marker, inRangeTimestamps, outOfRangeTimestamp);
+
+      try {
+        const result = await this.archivalService.truncateLogsByDateRange({
+          startDate: '2024-01-01T00:00:00Z',
+          endDate: '2024-01-02T00:00:00Z',
+          archiveFirst: true,
+          dryRun: false,
+          confirmDelete: true,
+          batchSize: 10
+        });
+
+        this.assert.assertEqual(result.total_found, 2, 'Should find only in-range logs');
+        this.assert.assertEqual(result.archived_count, 2, 'Should archive all in-range logs before deletion');
+        this.assert.assertEqual(result.deleted_count, 2, 'Should delete all in-range logs from live table');
+
+        const liveRemaining = await this.countLiveLogsByMarker(marker);
+        const archivedCount = await this.countArchivedLogsByMarker(marker);
+        const liveInRangeRemaining = await this.countLiveLogsByMarkerAndRange(marker, '2024-01-01T00:00:00Z', '2024-01-02T00:00:00Z');
+
+        this.assert.assertEqual(liveRemaining, 1, 'Only out-of-range seed log should remain in live table');
+        this.assert.assertEqual(liveInRangeRemaining, 0, 'No in-range seed logs should remain in live table');
+        this.assert.assertEqual(archivedCount, 2, 'Archived table should contain the truncated in-range logs');
+      } finally {
+        await this.cleanupTruncateTestLogs(marker);
+      }
+    });
+  }
+
+  async testTruncateAccessControl() {
+    await this.runTest('Audit Truncate Access Control', async () => {
+      const response = await this.client.post(API_ENDPOINTS.advancedAuditTruncate, {
+        startDate: '2024-01-01T00:00:00Z',
+        endDate: '2024-01-02T00:00:00Z',
+        archiveFirst: true,
+        dryRun: true
+      }, {
+        Authorization: `Bearer ${this.tokens.admin}`
+      });
+
+      this.assert.assertStatus(response.status, 403, 'Admin should be forbidden from truncate endpoint');
+    });
+  }
+
+  async seedTruncateTestLogs(marker, inRangeTimestamps, outOfRangeTimestamp) {
+    for (const [index, timestamp] of [...inRangeTimestamps, outOfRangeTimestamp].entries()) {
+      await this.dbService.insert(
+        `
+          INSERT INTO audit_logs (actor_id, actor_role, action, target_type, target_id, details, ip_address, user_agent, timestamp)
+          VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
+        `,
+        [
+          1,
+          'super_admin',
+          'truncate_seed',
+          'truncate_test',
+          `${marker}-${index}`,
+          JSON.stringify({ marker, index, timestamp }),
+          '127.0.0.1',
+          'advanced-audit-truncate-test',
+          timestamp
+        ]
+      );
+    }
+  }
+
+  async countLiveLogsByMarker(marker) {
+    const result = await this.dbService.select(
+      `SELECT COUNT(*) as count FROM audit_logs WHERE action = ? AND target_type = ? AND details LIKE ?`,
+      ['truncate_seed', 'truncate_test', `%${marker}%`],
+      true
+    );
+
+    return result?.count || 0;
+  }
+
+  async countLiveLogsByMarkerAndRange(marker, startDate, endDate) {
+    const result = await this.dbService.select(
+      `SELECT COUNT(*) as count FROM audit_logs WHERE action = ? AND target_type = ? AND details LIKE ? AND timestamp BETWEEN ? AND ?`,
+      ['truncate_seed', 'truncate_test', `%${marker}%`, startDate, endDate],
+      true
+    );
+
+    return result?.count || 0;
+  }
+
+  async countArchivedLogsByMarker(marker) {
+    const result = await this.dbService.select(
+      `SELECT COUNT(*) as count FROM audit_logs_archive WHERE action = ? AND target_type = ? AND details LIKE ?`,
+      ['truncate_seed', 'truncate_test', `%${marker}%`],
+      true
+    );
+
+    return result?.count || 0;
+  }
+
+  async cleanupTruncateTestLogs(marker) {
+    await this.dbService.delete(
+      `DELETE FROM audit_logs WHERE action = ? AND target_type = ? AND details LIKE ?`,
+      ['truncate_seed', 'truncate_test', `%${marker}%`]
+    );
+    await this.dbService.delete(
+      `DELETE FROM audit_logs_archive WHERE action = ? AND target_type = ? AND details LIKE ?`,
+      ['truncate_seed', 'truncate_test', `%${marker}%`]
+    );
   }
 
   /**

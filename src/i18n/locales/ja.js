@@ -228,7 +228,8 @@ export default {
       'compliance': "コンプライアンス報告（管理者アクセス必須）",
       'complianceReport': "コンプライアンスレポートを生成（管理者アクセス必須）",
       'exportAdvanced': "高度なエクスポート（管理者アクセス必須）",
-      'middlewareStats': "ミドルウェア統計（管理者アクセス必須）"
+      'middlewareStats': "ミドルウェア統計（管理者アクセス必須）",
+      'truncate': "日付範囲で監査ログをアーカイブし、live領域から取り除く（Super Adminのみ）"
     },
     'audit': {
       'export': "監査ログをエクスポート（管理者アクセス必須）",
@@ -379,6 +380,9 @@ export default {
         'customComplianceFailed': "カスタムコンプライアンスレポートを生成できませんでした - {{actor}}が「[{{reportName}}]」({{reportType}})の{{operation}}を完了できませんでした: {{reason}}",
         'failed': "コンプライアンスレポートを生成できませんでした - {{actor}}が{{format}}形式で{{timeframe}}の{{operation}}を完了できませんでした: {{reason}}",
         'reportFailed': "コンプライアンスレポートを生成できませんでした - {{actor}}が{{type}}レポートの{{operation}}を実行できませんでした: {{reason}}"
+      },
+      'truncate': {
+        'failed': "日付範囲による監査ログのアーカイブとtruncateに失敗しました - {{actor}}は{{dateRange}}の{{operation}} ({{dryRun}}) を完了できませんでした: {{reason}}"
       },
       'export': {
         'failed': "高度なエクスポートを実行できませんでした - {{actor}}が{{format}}形式 ({{recordCount}}レコード)の{{operation}}を完了できませんでした: {{reason}}"
@@ -778,6 +782,9 @@ export default {
       'compliance': {
         'generated': "コンプライアンス監査レポートが正常に生成されました"
       },
+      'truncate': {
+        'completed': "{{startDate}} から {{endDate}} の {{totalFound}} 件中、{{archivedCount}} 件をアーカイブし、{{deletedCount}} 件をlive領域から除外する監査ログtruncateが正常に完了しました ({{dryRun}})"
+      },
       'performance': {
         'analyzed': "パフォーマンス監査分析が正常に完了しました"
       },
@@ -1048,6 +1055,8 @@ export default {
   },
   'validation': {
     'advancedAudit': {
+      'archiveFirstRequired': 'truncate 操作には archiveFirst=true を明示的に指定する必要があります',
+      'confirmDeleteRequired': 'dryRun が false の場合は confirmDelete=true が必要です',
       'invalidRetentionAction': "無効な保持アクション: {{action}}、次のいずれかである必要があります: {{validActions}}"
     },
     'advancedCleanup': {

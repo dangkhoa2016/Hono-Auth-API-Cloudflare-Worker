@@ -228,7 +228,8 @@ export default {
       'compliance': 'Báo cáo tuân thủ (yêu cầu quyền admin)',
       'complianceReport': 'Tạo báo cáo tuân thủ (yêu cầu quyền admin)',
       'exportAdvanced': 'Xuất nâng cao (yêu cầu quyền admin)',
-      'middlewareStats': 'Thống kê middleware (yêu cầu quyền admin)'
+      'middlewareStats': 'Thống kê middleware (yêu cầu quyền admin)',
+      'truncate': 'Lưu trữ và loại audit log khỏi bảng live theo khoảng ngày (chỉ Super Admin)'
     },
     'audit': {
       'export': 'Xuất logs audit (yêu cầu quyền admin)',
@@ -379,6 +380,9 @@ export default {
         'customComplianceFailed': 'Không thể tạo báo cáo tuân thủ tùy chỉnh - {{actor}} không thể hoàn thành {{operation}} cho "[{{reportName}}]" ({{reportType}}): {{reason}}',
         'failed': 'Không thể tạo báo cáo tuân thủ - {{actor}} không thể hoàn thành {{operation}} cho {{timeframe}} với định dạng {{format}}: {{reason}}',
         'reportFailed': 'Không thể tạo báo cáo tuân thủ - {{actor}} không thể thực hiện {{operation}} cho báo cáo {{type}}: {{reason}}'
+      },
+      'truncate': {
+        'failed': 'Không thể lưu trữ và truncate audit log theo khoảng ngày - {{actor}} không thể hoàn thành {{operation}} cho {{dateRange}} ({{dryRun}}): {{reason}}'
       },
       'export': {
         'failed': 'Không thể thực hiện xuất nâng cao - {{actor}} không thể hoàn thành {{operation}} với định dạng {{format}} ({{recordCount}} bản ghi): {{reason}}'
@@ -778,6 +782,9 @@ export default {
       'compliance': {
         'generated': 'Báo cáo tuân thủ kiểm toán được tạo thành công'
       },
+      'truncate': {
+        'completed': 'Đã truncate audit log theo khoảng ngày thành công với {{archivedCount}} bản ghi được lưu trữ và {{deletedCount}} bản ghi được loại khỏi vùng live trên tổng {{totalFound}} bản ghi từ {{startDate}} đến {{endDate}} ({{dryRun}})'
+      },
       'performance': {
         'analyzed': 'Phân tích hiệu năng kiểm toán hoàn tất thành công'
       },
@@ -1048,6 +1055,8 @@ export default {
   },
   'validation': {
     'advancedAudit': {
+      'archiveFirstRequired': 'Phải truyền archiveFirst=true cho thao tác truncate',
+      'confirmDeleteRequired': 'Phải truyền confirmDelete=true khi dryRun là false',
       'invalidRetentionAction': 'Hành động lưu giữ không hợp lệ: {{action}}, phải là một trong: {{validActions}}'
     },
     'advancedCleanup': {

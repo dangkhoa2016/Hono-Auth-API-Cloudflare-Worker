@@ -228,7 +228,8 @@ export default {
       'compliance': "Rapports de conformité (accès admin requis)",
       'complianceReport': "Générer un rapport de conformité (accès admin requis)",
       'exportAdvanced': "Exportation avancée (accès admin requis)",
-      'middlewareStats': "Statistiques du middleware (accès admin requis)"
+      'middlewareStats': "Statistiques du middleware (accès admin requis)",
+      'truncate': "Archiver et retirer les logs d'audit du stockage live par plage de dates (Super Admin uniquement)"
     },
     'audit': {
       'export': "Exporter les logs d'audit (accès admin requis)",
@@ -379,6 +380,9 @@ export default {
         'customComplianceFailed': "Impossible de générer le rapport de conformité personnalisé - {{actor}} n'a pas pu compléter {{operation}} pour \"[{{reportName}}]\" ({{reportType}}): {{reason}}",
         'failed': "Impossible de générer le rapport de conformité - {{actor}} n'a pas pu compléter {{operation}} pour {{timeframe}} avec le format {{format}}: {{reason}}",
         'reportFailed': "Impossible de générer le rapport de conformité - {{actor}} n'a pas pu effectuer {{operation}} pour le rapport {{type}}: {{reason}}"
+      },
+      'truncate': {
+        'failed': "Impossible d'archiver et de tronquer les logs d'audit par plage de dates - {{actor}} n'a pas pu compléter {{operation}} pour {{dateRange}} ({{dryRun}}): {{reason}}"
       },
       'export': {
         'failed': "Impossible d'effectuer l'exportation avancée - {{actor}} n'a pas pu compléter {{operation}} avec le format {{format}} ({{recordCount}} enregistrements): {{reason}}"
@@ -778,6 +782,9 @@ export default {
       'compliance': {
         'generated': "Rapport d’audit de conformité généré avec succès"
       },
+      'truncate': {
+        'completed': "Truncate des logs d'audit par plage de dates terminé avec succès : {{archivedCount}} archivés et {{deletedCount}} retirés du stockage live sur {{totalFound}} enregistrements de {{startDate}} à {{endDate}} ({{dryRun}})"
+      },
       'performance': {
         'analyzed': "Analyse de performance d’audit réalisée avec succès"
       },
@@ -1048,6 +1055,8 @@ export default {
   },
   'validation': {
     'advancedAudit': {
+      'archiveFirstRequired': 'archiveFirst=true est requis explicitement pour les opérations de truncate',
+      'confirmDeleteRequired': 'confirmDelete=true est requis quand dryRun est false',
       'invalidRetentionAction': "Action de rétention invalide : {{action}}, doit être l'une de : {{validActions}}"
     },
     'advancedCleanup': {

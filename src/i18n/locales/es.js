@@ -228,7 +228,8 @@ export default {
       'compliance': "Reportes de cumplimiento (requiere acceso de admin)",
       'complianceReport': "Generar reporte de cumplimiento (requiere acceso de admin)",
       'exportAdvanced': "Exportación avanzada (requiere acceso de admin)",
-      'middlewareStats': "Estadísticas de middleware (requiere acceso de admin)"
+      'middlewareStats': "Estadísticas de middleware (requiere acceso de admin)",
+      'truncate': "Archivar y retirar logs de auditoría del almacenamiento live por rango de fechas (solo Super Admin)"
     },
     'audit': {
       'export': "Exportar logs de auditoría (requiere acceso de admin)",
@@ -379,6 +380,9 @@ export default {
         'customComplianceFailed': "No se pudo generar informe de cumplimiento personalizado - {{actor}} no pudo completar {{operation}} para \"[{{reportName}}]\" ({{reportType}}): {{reason}}",
         'failed': "No se pudo generar informe de cumplimiento - {{actor}} no pudo completar {{operation}} para {{timeframe}} con formato {{format}}: {{reason}}",
         'reportFailed': "No se pudo generar informe de cumplimiento - {{actor}} no pudo realizar {{operation}} para informe {{type}}: {{reason}}"
+      },
+      'truncate': {
+        'failed': "No se pudieron archivar y truncar los logs de auditoría por rango de fechas - {{actor}} no pudo completar {{operation}} para {{dateRange}} ({{dryRun}}): {{reason}}"
       },
       'export': {
         'failed': "No se pudo realizar exportación avanzada - {{actor}} no pudo completar {{operation}} con formato {{format}} ({{recordCount}} registros): {{reason}}"
@@ -778,6 +782,9 @@ export default {
       'compliance': {
         'generated': "Informe de auditoría de cumplimiento generado correctamente"
       },
+      'truncate': {
+        'completed': "El truncate de logs de auditoría por rango de fechas se completó correctamente con {{archivedCount}} archivados y {{deletedCount}} retirados del almacenamiento live de {{totalFound}} registros entre {{startDate}} y {{endDate}} ({{dryRun}})"
+      },
       'performance': {
         'analyzed': "Análisis de rendimiento de auditoría completado correctamente"
       },
@@ -1048,6 +1055,8 @@ export default {
   },
   'validation': {
     'advancedAudit': {
+      'archiveFirstRequired': 'Se requiere archiveFirst=true de forma explícita para las operaciones de truncate',
+      'confirmDeleteRequired': 'Se requiere confirmDelete=true cuando dryRun es false',
       'invalidRetentionAction': "Acción de retención inválida: {{action}}, debe ser una de: {{validActions}}"
     },
     'advancedCleanup': {

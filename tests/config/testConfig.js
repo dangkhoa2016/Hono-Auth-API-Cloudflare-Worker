@@ -211,6 +211,7 @@ export const API_ENDPOINTS = {
   advancedAuditArchivalStats: '/api/advanced-audit/archival/stats',
   advancedAuditArchivalRun: '/api/advanced-audit/archival/run',
   advancedAuditArchivalRestore: '/api/advanced-audit/archival/restore',
+  advancedAuditTruncate: '/api/advanced-audit/truncate',
 
   // Advanced Audit - Middleware endpoints
   advancedAuditMiddlewareStats: '/api/advanced-audit/middleware/stats',
