@@ -464,6 +464,7 @@ class AdvancedAuditComprehensiveTest {
     await this.testTruncateEndpoint();
     await this.testTruncateValidation();
     await this.testTruncateArchiveExecution();
+    await this.testTruncateDateObjectRangeConsistency();
     await this.testTruncateAccessControl();
   }
 
@@ -618,6 +619,48 @@ class AdvancedAuditComprehensiveTest {
         this.assert.assertEqual(liveRemaining, 1, 'Only out-of-range seed log should remain in live table');
         this.assert.assertEqual(liveInRangeRemaining, 0, 'No in-range seed logs should remain in live table');
         this.assert.assertEqual(archivedCount, 2, 'Archived table should contain the truncated in-range logs');
+      } finally {
+        await this.cleanupTruncateTestLogs(marker);
+      }
+    });
+  }
+
+  async testTruncateDateObjectRangeConsistency() {
+    await this.runTest('Audit Truncate Date Object Range Consistency', async () => {
+      const marker = `truncate-date-objects-${Date.now()}`;
+      const inRangeTimestamps = [
+        '2024-01-01T08:15:00.000Z',
+        '2024-01-01T21:45:00.000Z'
+      ];
+      const outOfRangeTimestamp = '2024-01-03T00:10:00.000Z';
+      const startDate = '2024-01-01T00:00:00.000Z';
+      const endDate = '2024-01-02T00:00:00.000Z';
+
+      await this.seedTruncateTestLogs(marker, inRangeTimestamps, outOfRangeTimestamp);
+
+      try {
+        const listResponse = await this.client.get(
+          `${API_ENDPOINTS.auditLogs}?page=1&limit=100&startDate=${encodeURIComponent(startDate)}&endDate=${encodeURIComponent(endDate)}&action=truncate_seed&entityType=truncate_test`,
+          {
+            Authorization: `Bearer ${this.tokens.superAdmin}`
+          }
+        );
+
+        this.assert.assertStatus(listResponse.status, 200, 'Audit log list should accept the truncate comparison range');
+
+        const matchingLogs = (listResponse.data?.data?.logs || []).filter((log) => log?.details?.marker === marker);
+        this.assert.assertEqual(matchingLogs.length, 2, 'Audit log listing should return the two seeded in-range logs');
+
+        const truncateResult = await this.archivalService.truncateLogsByDateRange({
+          startDate: new Date(startDate),
+          endDate: new Date(endDate),
+          archiveFirst: true,
+          dryRun: true,
+          batchSize: 10
+        });
+
+        this.assert.assertEqual(truncateResult.total_found, 2, 'Truncate dry-run should find the same in-range logs when dates arrive as Date objects');
+        this.assert.assertEqual(truncateResult.would_delete, 2, 'Dry-run delete count should match the listing-visible logs');
       } finally {
         await this.cleanupTruncateTestLogs(marker);
       }
