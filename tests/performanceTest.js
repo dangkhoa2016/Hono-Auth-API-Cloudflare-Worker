@@ -361,46 +361,65 @@ class PerformanceTests {
       ]);
 
       const duration = 4000; // 4 seconds to smooth out jitter
+      const minBatchWindowMs = 250;
       const startTime = Date.now();
-      let requestCount = 0;
-      const errors = [];
+      let successfulRequests = 0;
+      let totalRequests = 0;
+      let errorCount = 0;
       const batchSize = 6; // Run 6 requests concurrently
-      const requestOptions = { timeoutMs: 3000, retries: 1 };
+      const requestOptions = { timeoutMs: 1200, retries: 0 };
 
-      // Keep making requests for the duration
+      // Keep measuring until there is no longer enough time for a fair batch.
       while (Date.now() - startTime < duration) {
-        try {
-          const batch = Array(batchSize).fill().map(() =>
-            this.client.get(API_ENDPOINTS.health, {}, requestOptions)
-              .then(res => {
-                if (res.status !== 200) {throw new Error(`Status ${res.status}`);}
-                return res;
-              })
-          );
+        const elapsedTime = Date.now() - startTime;
+        const remainingTime = duration - elapsedTime;
 
-          await Promise.all(batch);
-          requestCount += batchSize;
-        } catch (error) {
-          errors.push(error);
+        if (remainingTime < minBatchWindowMs) {
+          break;
+        }
+
+        const batchRequestOptions = {
+          ...requestOptions,
+          timeoutMs: Math.min(requestOptions.timeoutMs, remainingTime)
+        };
+
+        const batch = Array(batchSize).fill().map(() =>
+          this.client.get(API_ENDPOINTS.health, {}, batchRequestOptions)
+        );
+
+        const results = await Promise.allSettled(batch);
+        totalRequests += results.length;
+
+        for (const result of results) {
+          if (result.status === 'fulfilled' && result.value.status === 200) {
+            successfulRequests += 1;
+            continue;
+          }
+
+          errorCount += 1;
         }
       }
 
       const actualDuration = Date.now() - startTime;
-      const effectiveDuration = Math.max(actualDuration, duration);
-      const requestsPerSecond = (requestCount / effectiveDuration) * 1000;
+      const effectiveDuration = Math.max(actualDuration, 1);
+      const requestsPerSecond = (successfulRequests / effectiveDuration) * 1000;
+      const errorRate = totalRequests === 0 ? 1 : errorCount / totalRequests;
 
       this.logger.info(`Throughput Test (${actualDuration}ms):`);
-      this.logger.info(`Total requests: ${requestCount}`);
-      this.logger.info(`Errors: ${errors.length}`);
+      this.logger.info(`Successful requests: ${successfulRequests}`);
+      this.logger.info(`Total requests: ${totalRequests}`);
+      this.logger.info(`Errors: ${errorCount}`);
       this.logger.info(`Requests per second: ${requestsPerSecond.toFixed(2)}`);
 
-      if (errors.length > 0) {
-        this.logger.warning(`Throughput test encountered ${errors.length} transient error(s)`);
+      if (errorCount > 0) {
+        this.logger.warning(`Throughput test encountered ${errorCount} transient error(s)`);
       }
 
-      // Lower threshold slightly for CI/Cloud environments
+      this.assert.assertEqual(totalRequests > 0, true, 'Throughput test should complete at least one request');
+
+      // Lower threshold slightly for CI/Cloud environments.
       this.assert.assertEqual(requestsPerSecond >= 4.5, true, 'Should handle at least 5 requests per second (with small jitter allowance)');
-      this.assert.assertEqual(errors.length / requestCount < 0.05, true, 'Error rate should be under 5%');
+      this.assert.assertEqual(errorRate < 0.05, true, 'Error rate should be under 5%');
 
       this.logger.success('Throughput test completed successfully');
     } catch (error) {
