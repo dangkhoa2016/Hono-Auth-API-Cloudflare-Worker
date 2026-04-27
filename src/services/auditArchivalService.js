@@ -36,6 +36,54 @@ export class AuditArchivalService extends BaseService {
     auditArchival_log('AuditArchivalService initialized with retention policies');
   }
 
+  normalizeDateInput(dateValue, errorCode = 'INVALID_DATE') {
+    if (dateValue === null || dateValue === undefined || dateValue === '') {
+      throw new Error(errorCode);
+    }
+
+    if (dateValue instanceof Date) {
+      if (Number.isNaN(dateValue.getTime())) {
+        throw new Error(errorCode);
+      }
+
+      return dateValue.toISOString();
+    }
+
+    if (typeof dateValue === 'string') {
+      const parsedDate = new Date(dateValue);
+      if (Number.isNaN(parsedDate.getTime())) {
+        throw new Error(errorCode);
+      }
+
+      return parsedDate.toISOString();
+    }
+
+    if (typeof dateValue === 'number') {
+      const parsedDate = new Date(dateValue);
+      if (Number.isNaN(parsedDate.getTime())) {
+        throw new Error(errorCode);
+      }
+
+      return parsedDate.toISOString();
+    }
+
+    throw new Error(errorCode);
+  }
+
+  normalizeDateRange(startDate, endDate) {
+    const normalizedStartDate = this.normalizeDateInput(startDate, 'START_AND_END_DATE_REQUIRED');
+    const normalizedEndDate = this.normalizeDateInput(endDate, 'START_AND_END_DATE_REQUIRED');
+
+    if (normalizedStartDate > normalizedEndDate) {
+      throw new Error('INVALID_DATE_RANGE');
+    }
+
+    return {
+      startDate: normalizedStartDate,
+      endDate: normalizedEndDate
+    };
+  }
+
   /**
    * Archive old audit logs based on retention policies
    * @param {Object} options - Archival options
@@ -432,8 +480,9 @@ export class AuditArchivalService extends BaseService {
     auditArchival_log(`Restoring archived logs from ${startDate} to ${endDate}, dry run: ${dryRun}`);
 
     try {
+      const normalizedRange = this.normalizeDateRange(startDate, endDate);
       let whereClause = 'timestamp BETWEEN ? AND ?';
-      const bindings = [startDate, endDate];
+      const bindings = [normalizedRange.startDate, normalizedRange.endDate];
 
       if (userId) {
         whereClause += ' AND user_id = ?';
@@ -512,13 +561,7 @@ export class AuditArchivalService extends BaseService {
 
     auditArchival_log(`Truncate requested for audit logs from ${startDate} to ${endDate}, dry run: ${dryRun}`);
 
-    if (!startDate || !endDate) {
-      throw new Error('START_AND_END_DATE_REQUIRED');
-    }
-
-    if (startDate > endDate) {
-      throw new Error('INVALID_DATE_RANGE');
-    }
+    const normalizedRange = this.normalizeDateRange(startDate, endDate);
 
     if (archiveFirst !== true) {
       throw new Error('ARCHIVE_FIRST_REQUIRED');
@@ -529,8 +572,8 @@ export class AuditArchivalService extends BaseService {
     }
 
     const summary = {
-      start_date: startDate,
-      end_date: endDate,
+      start_date: normalizedRange.startDate,
+      end_date: normalizedRange.endDate,
       batch_size: batchSize,
       archive_first: archiveFirst,
       dry_run: dryRun,
@@ -549,7 +592,7 @@ export class AuditArchivalService extends BaseService {
         WHERE timestamp BETWEEN ? AND ?
       `;
 
-      const countResult = await this.dbService.select(countQuery, [startDate, endDate], true);
+      const countResult = await this.dbService.select(countQuery, [normalizedRange.startDate, normalizedRange.endDate], true);
       summary.total_found = countResult?.count || 0;
 
       if (dryRun || summary.total_found === 0) {
@@ -570,7 +613,7 @@ export class AuditArchivalService extends BaseService {
           LIMIT ?
         `;
 
-        const logs = await this.dbService.select(selectBatchQuery, [startDate, endDate, batchSize]);
+        const logs = await this.dbService.select(selectBatchQuery, [normalizedRange.startDate, normalizedRange.endDate, batchSize]);
 
         if (!logs || logs.length === 0) {
           hasMore = false;
@@ -610,7 +653,7 @@ export class AuditArchivalService extends BaseService {
           )
         `;
 
-        const result = await this.dbService.delete(deleteQuery, [startDate, endDate, batchSize]);
+        const result = await this.dbService.delete(deleteQuery, [normalizedRange.startDate, normalizedRange.endDate, batchSize]);
         const deletedCount = result?.changes || 0;
         summary.deleted_count += deletedCount;
 
@@ -765,9 +808,11 @@ export class AuditArchivalService extends BaseService {
         throw new Error('Date range is required for manual archive');
       }
 
+      const normalizedRange = this.normalizeDateRange(date_range.start, date_range.end);
+
       // Build query for date range
       const whereClause = 'timestamp BETWEEN ? AND ?';
-      const bindings = [date_range.start, date_range.end];
+      const bindings = [normalizedRange.startDate, normalizedRange.endDate];
 
       // Count logs in date range
       const countQuery = `SELECT COUNT(*) as count FROM audit_logs WHERE ${whereClause}`;
@@ -777,9 +822,12 @@ export class AuditArchivalService extends BaseService {
       if (dryRun) {
         return {
           dry_run: true,
-          date_range,
+          date_range: {
+            start: normalizedRange.startDate,
+            end: normalizedRange.endDate
+          },
           logs_to_archive: totalLogs,
-          message: `Would archive ${totalLogs} logs from ${date_range.start} to ${date_range.end}`
+          message: `Would archive ${totalLogs} logs from ${normalizedRange.startDate} to ${normalizedRange.endDate}`
         };
       }
 
@@ -794,7 +842,10 @@ export class AuditArchivalService extends BaseService {
 
       return {
         success: true,
-        date_range,
+        date_range: {
+          start: normalizedRange.startDate,
+          end: normalizedRange.endDate
+        },
         archived_count: archiveResult.total_archived,
         message: `Successfully archived ${archiveResult.total_archived} logs`
       };
