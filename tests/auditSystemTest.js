@@ -44,6 +44,15 @@ class AuditSystemTestSuite {
     this.tokens = {};
   }
 
+  getResponseBody(response) {
+    return response?.data ?? {};
+  }
+
+  getResponsePayload(response) {
+    const body = this.getResponseBody(response);
+    return body?.data ?? body;
+  }
+
   async runAll() {
     this.logger.logSuiteHeader('🔍 Starting Audit System Tests');
 
@@ -297,9 +306,12 @@ class AuditSystemTestSuite {
       this.assert.assertTrue(statsResponse.data.success, 'Stats response should be successful');
 
       const stats = statsResponse.data.data || statsResponse.data;
-      this.assert.assertTrue(stats.total_events !== null && stats.total_events !== undefined, 'Should have total events count');
+      const basicStats = stats.basic_stats || stats;
+      const topActions = stats.action_stats || stats.top_actions;
+
+      this.assert.assertTrue(basicStats.total_events !== null && basicStats.total_events !== undefined, 'Should have total events count');
       this.assert.assertTrue(stats.recent_activity !== null && stats.recent_activity !== undefined, 'Should have recent activity');
-      this.assert.assertTrue(stats.top_actions !== null && stats.top_actions !== undefined, 'Should have top actions');
+      this.assert.assertTrue(topActions !== null && topActions !== undefined, 'Should have top actions');
     });
   }
 
@@ -316,8 +328,8 @@ class AuditSystemTestSuite {
         Authorization: `Bearer ${adminToken}`
       });
       this.assert.assertEqual(response.status, 200, 'Should access audit logs');
-      this.assert.assertTrue(response.success ?? response.data?.success ?? true, 'Response should be successful');
-      const container = response.data?.data || response.data; // Flexible structure handling
+      this.assert.assertSuccess(response, 'Response should be successful');
+      const container = this.getResponsePayload(response);
       this.assert.assertHasField(container, 'logs', 'Should have logs array');
       this.assert.assertTrue(Array.isArray(container.logs), 'Logs should be an array');
       this.assert.assertHasField(container, 'pagination', 'Should have pagination');
@@ -547,11 +559,10 @@ class AuditSystemTestSuite {
       }
 
       this.assert.assertEqual(analyticsResponse.status, 200, 'Analytics should be accessible');
-      this.assert.assertTrue(analyticsResponse.data.success, 'Analytics response should be successful');
+      this.assert.assertSuccess(analyticsResponse, 'Analytics response should be successful');
 
-      const analytics = analyticsResponse.data;
-      // Check for any analytics data - be flexible about structure
-      this.assert.assertTrue(analytics.data !== null && analytics.data !== undefined, 'Should have analytics data');
+      const analytics = this.getResponsePayload(analyticsResponse);
+      this.assert.assertTrue(analytics !== null && analytics !== undefined, 'Should have analytics data');
     });
 
     await this.runTest('Archive Management', async () => {
@@ -573,7 +584,7 @@ class AuditSystemTestSuite {
       }
 
       this.assert.assertEqual(archiveResponse.status, 200, 'Archive policy should be created');
-      this.assert.assertTrue(archiveResponse.data.success, 'Archive response should be successful');
+      this.assert.assertSuccess(archiveResponse, 'Archive response should be successful');
     });
 
     await this.runTest('Compliance Reporting', async () => {
@@ -591,7 +602,7 @@ class AuditSystemTestSuite {
       }
 
       this.assert.assertEqual(complianceResponse.status, 200, 'Compliance report should be accessible');
-      this.assert.assertTrue(complianceResponse.data.success, 'Compliance response should be successful');
+      this.assert.assertSuccess(complianceResponse, 'Compliance response should be successful');
     });
   }
 
@@ -619,15 +630,15 @@ class AuditSystemTestSuite {
 
       this.assert.assertEqual(monitoringResponse.status, 200, 'Monitoring should start successfully');
 
-      // Check if response has success property, handle both formats
-      if (monitoringResponse.data && typeof monitoringResponse.data === 'object') {
-        if ('success' in monitoringResponse.data) {
-          this.assert.assertTrue(monitoringResponse.success, 'Monitoring response should be successful');
-        } else if ('message' in monitoringResponse.data) {
-          // Alternative format, just check if there's a message
-          this.assert.assertTrue(!!monitoringResponse.data.message, 'Should have a response message');
-        }
+      const monitoringBody = this.getResponseBody(monitoringResponse);
+      if (monitoringBody.success === false) {
+        this.assert.assertTrue(!!monitoringBody.message, 'Should explain why monitoring did not start');
+        return;
       }
+
+      this.assert.assertSuccess(monitoringResponse, 'Monitoring response should be successful');
+      const monitoring = this.getResponsePayload(monitoringResponse);
+      this.assert.assertHasFields(monitoring, ['intervalMs', 'enableThreatDetection', 'startedAt'], 'Should have monitoring start data');
     });
 
     await this.runTest('Alert System Configuration', async () => {
@@ -652,7 +663,7 @@ class AuditSystemTestSuite {
       }
 
       this.assert.assertEqual(alertResponse.status, 200, 'Alert configuration should succeed');
-      this.assert.assertTrue(alertResponse.data.success, 'Alert response should be successful');
+      this.assert.assertSuccess(alertResponse, 'Alert response should be successful');
     });
 
     await this.runTest('Dashboard Data Stream', async () => {
@@ -669,10 +680,10 @@ class AuditSystemTestSuite {
       }
 
       this.assert.assertEqual(dashboardResponse.status, 200, 'Dashboard data should be accessible');
-      this.assert.assertTrue(dashboardResponse.data.success, 'Dashboard response should be successful');
+      this.assert.assertSuccess(dashboardResponse, 'Dashboard response should be successful');
 
-      const dashboard = dashboardResponse.data;
-      this.assert.assertTrue(dashboard.data !== null, 'Should have dashboard data');
+      const dashboard = this.getResponsePayload(dashboardResponse);
+      this.assert.assertTrue(dashboard !== null && dashboard !== undefined, 'Should have dashboard data');
     });
 
     await this.runTest('Incident Response System', async () => {
@@ -695,10 +706,10 @@ class AuditSystemTestSuite {
       }
 
       this.assert.assertEqual(incidentResponse.status, 200, 'Incident should be created');
-      this.assert.assertTrue(incidentResponse.data.success, 'Incident response should be successful');
+      this.assert.assertSuccess(incidentResponse, 'Incident response should be successful');
 
-      const incident = incidentResponse.data;
-      this.assert.assertTrue(incident.data !== null, 'Should have incident data');
+      const incident = this.getResponsePayload(incidentResponse);
+      this.assert.assertTrue(incident !== null && incident !== undefined, 'Should have incident data');
     });
   }
 

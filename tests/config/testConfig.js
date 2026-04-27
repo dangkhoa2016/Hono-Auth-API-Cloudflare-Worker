@@ -302,7 +302,7 @@ export const EXPECTED_RESPONSES = {
   auditStats: {
     status: 200,
     hasFields: ['success', 'data'],
-    dataFields: ['total_events', 'recent_activity', 'top_actions']
+    dataFields: ['basic_stats', 'recent_activity', 'action_stats']
   },
 
   auditSearch: {

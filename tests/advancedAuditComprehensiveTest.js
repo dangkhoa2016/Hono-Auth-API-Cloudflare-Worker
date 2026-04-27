@@ -111,6 +111,7 @@ class AdvancedAuditComprehensiveTest {
     this.tokens = {};
     this.dbService = null;
     this.archivalService = null;
+    this.platformProxy = null;
   }
 
   /**
@@ -118,38 +119,56 @@ class AdvancedAuditComprehensiveTest {
    */
   async runAll(testGroup = 'all') {
     this.logger.logSuiteHeader('🧪 Starting Advanced Audit Comprehensive Tests');
-
-    this.logger.info('Initializing test environment...');
     try {
-      await this.setupDatabase();
-      await this.setupAuthentication();
-      this.logger.success('Authentication completed successfully');
-    } catch (error) {
-      this.logger.error(`[runAll] Authentication setup failed: ${error.message}`);
-      throw error;
-    }
+      this.logger.info('Initializing test environment...');
+      try {
+        await this.setupDatabase();
+        await this.setupAuthentication();
+        this.logger.success('Authentication completed successfully');
+      } catch (error) {
+        this.logger.error(`[runAll] Authentication setup failed: ${error.message}`);
+        throw error;
+      }
 
-    // Run the test group directly
-    try {
-      await this.runTestGroup(testGroup);
-      this.logger.recordResult(true);
-      this.logger.success(`Test group '${testGroup}' execution completed`);
-    } catch (error) {
-      this.logger.recordResult(false);
-      this.logger.error(`[runAll] Test group '${testGroup}' execution failed: ${error.message}`);
-    }
+      // Run the test group directly
+      try {
+        await this.runTestGroup(testGroup);
+        this.logger.recordResult(true);
+        this.logger.success(`Test group '${testGroup}' execution completed`);
+      } catch (error) {
+        this.logger.recordResult(false);
+        this.logger.error(`[runAll] Test group '${testGroup}' execution failed: ${error.message}`);
+      }
 
-    this.logger.logSummary();
+      this.logger.logSummary();
 
-    if (this.logger.failCount > 0) {
-      process.exit(1);
+      if (this.logger.failCount > 0) {
+        process.exit(1);
+      }
+    } finally {
+      await this.cleanup();
     }
   }
 
   async setupDatabase() {
-    const { env } = await getPlatformProxy({ environment: 'test' });
+    this.platformProxy = await getPlatformProxy({ environment: 'test' });
+    const { env } = this.platformProxy;
     this.dbService = new DatabaseService(env);
     this.archivalService = new AuditArchivalService(env);
+  }
+
+  async cleanup() {
+    if (typeof this.platformProxy?.dispose !== 'function') {
+      return;
+    }
+
+    try {
+      await this.platformProxy.dispose();
+    } catch (error) {
+      this.logger.warning(`Platform proxy cleanup failed: ${error.message}`);
+    } finally {
+      this.platformProxy = null;
+    }
   }
 
   /**
@@ -2005,8 +2024,12 @@ if (import.meta.url === `file://${process.argv[1]}`) {
   console.log(`\n🎯 Running Advanced Audit Tests - Group: ${command}`);
 
   const testSuite = new AdvancedAuditComprehensiveTest();
-  testSuite.runAll(command).catch(error => {
+
+  try {
+    await testSuite.runAll(command);
+    process.exit(0);
+  } catch (error) {
     console.error('Test execution failed:', error);
     process.exit(1);
-  });
+  }
 }
