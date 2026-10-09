@@ -196,3 +196,20 @@ export function getServiceCacheStats() {
 export function clearServiceCaches() {
   serviceConfigManager.clearAllCache();
 }
+
+/**
+ * Drop the cached configuration and service instances of a single environment.
+ *
+ * Targeted invalidation exists so one tenant or one KV change does not have to
+ * flush every environment the isolate has ever served. The caller must pass the
+ * same `env` object the services were created with: the lookup is by identity,
+ * not by content, so a rebuilt environment object is a different environment.
+ * @param {Object} env - Environment the services were created with
+ * @returns {Object} What was dropped for that environment
+*/
+export function invalidateServiceCaches(env) {
+  if (!env || (typeof env !== 'object' && typeof env !== 'function')) {
+    return { clearedEntries: 0 };
+  }
+  return { clearedEntries: serviceConfigManager.invalidateEnv(env) };
+}
