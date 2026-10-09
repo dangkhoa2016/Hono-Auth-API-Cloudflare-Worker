@@ -242,6 +242,48 @@ export class DatabaseService {
   }
 
   /**
+   * Execute a write whose result rows are the answer.
+   *
+   * `run()` reports how many rows changed but not what they now hold, so a
+   * caller that has to *decide* on a write - a rate-limit admission is the case
+   * that matters - would otherwise have to read the row back in a second
+   * statement. Between the write and that read another request can land, so the
+   * second statement answers a different question. `RETURNING` closes the gap:
+   * the rows come from the same statement that wrote them.
+   *
+   * Never retried. A replayed write here would apply a second time, and for a
+   * counter that means charging a caller twice for one request. A binding that
+   * cannot answer has to surface as an error, not as an admitted request.
+   *
+   * @param {string} query - SQL statement ending in RETURNING
+   * @param {Array} params - Parameters to bind
+   * @returns {Promise<{rows: Array, changes: number}>} Rows the statement returned
+   * @throws {Error} ServiceUnavailableError when D1 rejects the statement
+   */
+  async writeReturning(query, params = []) {
+    const featureFlags = await getFeatureFlags(this.env);
+    if (featureFlags.logSqlQueries) {
+      query_log(`Executing write-with-returning: ${describeQuery(query, params)}`);
+    }
+
+    return this.executeWithRetry(async () => {
+      const statement = this.database.prepare(query);
+
+      const result = params.length > 0
+        ? await statement.bind(...params).all()
+        : await statement.all();
+
+      const rows = result?.results || [];
+      return {
+        rows,
+        // A conditional write that matched nothing reports 0, which is the
+        // decision the caller asked for - not a failure.
+        changes: Number.isInteger(result?.meta?.changes) ? result.meta.changes : rows.length
+      };
+    }, 'Write-with-returning error', { attempts: 1 });
+  }
+
+  /**
    * Execute UPSERT (INSERT OR UPDATE) query with prepared statement
    * @param {string} query - SQL UPSERT query
    * @param {Array} params - Parameters to bind

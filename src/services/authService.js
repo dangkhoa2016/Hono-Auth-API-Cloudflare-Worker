@@ -1,6 +1,3 @@
-import { getSessionRevocationSettings } from '../utils/dynamicConfig.js';
-import { redactText } from '../utils/sensitiveData.js';
-import { ServiceUnavailableError, codeForError, isServiceError, statusForError } from '../utils/serviceErrors.js';
 import bcrypt from 'bcryptjs';
 import { authService_log, bcrypt_log, error_log, authError_log } from '../utils/debug.js';
 import { UserService } from './userService.js';
@@ -11,6 +8,9 @@ import {
   createTokenAuditService
 } from '../utils/serviceFactory.js';
 import { BaseService } from './baseService.js';
+import { ServiceUnavailableError, codeForError, isServiceError, statusForError } from '../utils/serviceErrors.js';
+import { redactText } from '../utils/sensitiveData.js';
+import { getSessionRevocationSettings } from '../utils/dynamicConfig.js';
 
 const RATE_LIMIT_CONTEXT_IP = 'auth:ip';
 const RATE_LIMIT_CONTEXT_EMAIL = 'auth:email';
@@ -24,6 +24,15 @@ function normalizeIdentifier(value) {
   return String(value).trim().toLowerCase();
 }
 
+/**
+ * Map a caught error to a service result.
+ * A dependency outage keeps its machine code and 503 status so the HTTP layer
+ * never reports a database problem as an authentication failure; anything else
+ * stays a generic server error without leaking the internal message.
+ * @param {Error} error - The caught error
+ * @param {string} logMessage - Log context for the fallback branch
+ * @returns {Object} Service result
+ */
 function dependencyFailure(error, logMessage) {
   if (isServiceError(error) && statusForError(error) >= 500) {
     authError_log(`${logMessage}: dependency unavailable (${codeForError(error)})`);
@@ -62,6 +71,9 @@ export class AuthService extends BaseService {
    * @param {string} password - User password
    * @param {string} ipAddress - Request IP address
    * @param {Object} requestContext - Additional request metadata (e.g., userAgent)
+   * @param {boolean} [requestContext.admitIp] - Set to false when the caller has
+   *   already reserved this request's unit of the shared per-IP budget. The
+   *   default is to admit, so a new route cannot accidentally skip it.
    * @returns {Promise<Object>} Authentication result
    */
   async login(email, password, ipAddress, requestContext = {}) {
@@ -70,30 +82,31 @@ export class AuthService extends BaseService {
     try {
       const normalizedEmail = normalizeIdentifier(email);
       const featureFlags = await this.getFeatureFlags();
-      const rateLimitConfig = await this.getRateLimitConfig();
       const isRateLimitDisabled = featureFlags.disableRateLimiting;
       const rateLimitService = createRateLimitService(this.env);
 
-      const lockoutDurationSeconds = rateLimitConfig.lockoutDuration * 60;
-
       if (!isRateLimitDisabled) {
-        const checks = [];
+        // The per-account budget is admitted here. The per-IP budget belongs to
+        // `strictRateLimitMiddleware`, which already reserved a unit for this
+        // same request on its way in; admitting it again would charge one login
+        // two units and halve the effective limit.
+        const admissions = [];
 
-        checks.push(rateLimitService.checkRateLimit(ipAddress, {
-          context: RATE_LIMIT_CONTEXT_IP,
-          limit: rateLimitConfig.maxAttempts,
-          blockDurationSeconds: lockoutDurationSeconds
-        }));
-
-        if (normalizedEmail) {
-          checks.push(rateLimitService.checkRateLimit(normalizedEmail, {
-            context: RATE_LIMIT_CONTEXT_EMAIL,
-            limit: rateLimitConfig.maxAttempts,
-            blockDurationSeconds: lockoutDurationSeconds
+        if (requestContext.admitIp !== false) {
+          admissions.push(rateLimitService.admitRequest(ipAddress, {
+            context: RATE_LIMIT_CONTEXT_IP,
+            limit: (await this.getRateLimitConfig()).maxAttempts
           }));
         }
 
-        const results = await Promise.all(checks);
+        if (normalizedEmail) {
+          admissions.push(rateLimitService.admitRequest(normalizedEmail, {
+            context: RATE_LIMIT_CONTEXT_EMAIL,
+            limit: (await this.getRateLimitConfig()).maxAttempts
+          }));
+        }
+
+        const results = await Promise.all(admissions);
         const blocked = results.find(result => !result.allowed);
 
         if (blocked) {
@@ -102,7 +115,7 @@ export class AuthService extends BaseService {
             success: false,
             error: 'RATE_LIMIT_EXCEEDED',
             statusCode: 429,
-            rateLimit: this._buildRateLimitMetadata(blocked, lockoutDurationSeconds)
+            rateLimit: this._buildRateLimitMetadata(blocked, blocked.windowSeconds)
           };
         }
       } else {
@@ -116,24 +129,6 @@ export class AuthService extends BaseService {
       if (!user) {
         authService_log(`Login failed: user not found for email: ${email}`);
 
-        if (!isRateLimitDisabled) {
-          const ops = [
-            rateLimitService.recordFailedAttempt(ipAddress, {
-              context: RATE_LIMIT_CONTEXT_IP,
-              metadata: { reason: 'user_not_found', email: normalizedEmail }
-            })
-          ];
-
-          if (normalizedEmail) {
-            ops.push(rateLimitService.recordFailedAttempt(normalizedEmail, {
-              context: RATE_LIMIT_CONTEXT_EMAIL,
-              metadata: { reason: 'user_not_found' }
-            }));
-          }
-
-          await Promise.all(ops);
-        }
-
         return {
           success: false,
           error: 'INVALID_CREDENTIALS',
@@ -146,28 +141,6 @@ export class AuthService extends BaseService {
 
       if (!isValidPassword) {
         authService_log(`Login failed: invalid password for user: ${user.id}`);
-
-        if (!isRateLimitDisabled) {
-          const ops = [
-            rateLimitService.recordFailedAttempt(ipAddress, {
-              context: RATE_LIMIT_CONTEXT_IP,
-              metadata: { reason: 'invalid_password', userId: user.id }
-            }),
-            rateLimitService.recordFailedAttempt(String(user.id), {
-              context: RATE_LIMIT_CONTEXT_USER,
-              metadata: { reason: 'invalid_password' }
-            })
-          ];
-
-          if (normalizedEmail) {
-            ops.push(rateLimitService.recordFailedAttempt(normalizedEmail, {
-              context: RATE_LIMIT_CONTEXT_EMAIL,
-              metadata: { reason: 'invalid_password', userId: user.id }
-            }));
-          }
-
-          await Promise.all(ops);
-        }
 
         return {
           success: false,
@@ -198,17 +171,21 @@ export class AuthService extends BaseService {
       authService_log(`Password verified successfully for user: ${user.id}`);
 
       if (!isRateLimitDisabled) {
-        const ops = [rateLimitService.resetFailedAttempts(ipAddress, { context: RATE_LIMIT_CONTEXT_IP })];
+        // Only the account's own budgets are released. The shared per-IP budget
+        // is deliberately left alone: clearing it here would let anyone holding
+        // one valid account reset the budget that is supposed to stop them
+        // guessing other accounts from the same address.
+        const releases = [];
 
         if (normalizedEmail) {
-          ops.push(rateLimitService.resetFailedAttempts(normalizedEmail, { context: RATE_LIMIT_CONTEXT_EMAIL }));
+          releases.push(rateLimitService.resetFailedAttempts(normalizedEmail, { context: RATE_LIMIT_CONTEXT_EMAIL }));
         }
 
         if (user?.id) {
-          ops.push(rateLimitService.resetFailedAttempts(String(user.id), { context: RATE_LIMIT_CONTEXT_USER }));
+          releases.push(rateLimitService.resetFailedAttempts(String(user.id), { context: RATE_LIMIT_CONTEXT_USER }));
         }
 
-        await Promise.all(ops);
+        await Promise.all(releases);
       }
 
       const tokens = await this.generateTokens(user, {
@@ -284,10 +261,13 @@ export class AuthService extends BaseService {
       const isRateLimitDisabled = featureFlags.disableRateLimiting;
 
       if (!isRateLimitDisabled) {
-        const rateLimit = await rateLimitService.checkRateLimit(ipAddress, {
+        // A distinct budget from the shared `auth:ip` one the middleware
+        // reserves, because refresh has its own much tighter policy (10 per 10
+        // minutes) and must not be able to exhaust the login budget or the
+        // other way round.
+        const rateLimit = await rateLimitService.admitRequest(ipAddress, {
           context: RATE_LIMIT_CONTEXT_REFRESH_IP,
           limit: 10,
-          blockDurationSeconds: 600,
           windowSeconds: 600
         });
 
@@ -306,13 +286,6 @@ export class AuthService extends BaseService {
 
       if (!validation.success) {
         authService_log(`Refresh token validation failed: ${validation.reason || validation.error}`);
-
-        if (!isRateLimitDisabled) {
-          await rateLimitService.recordFailedAttempt(ipAddress, {
-            context: RATE_LIMIT_CONTEXT_REFRESH_IP,
-            metadata: { reason: validation.reason || validation.error }
-          });
-        }
 
         return {
           success: false,
@@ -412,9 +385,9 @@ export class AuthService extends BaseService {
         metadata: { replaced: record.jti }
       });
 
-      if (!isRateLimitDisabled) {
-        await rateLimitService.resetFailedAttempts(ipAddress, { context: RATE_LIMIT_CONTEXT_REFRESH_IP });
-      }
+      // The refresh window counts requests, not failures, so a successful
+      // rotation does not refund it. Clearing it here would have let a caller
+      // that already holds a valid token mint an unbounded number of pairs.
 
       return {
         success: true,
