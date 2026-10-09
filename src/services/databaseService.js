@@ -1,5 +1,6 @@
 import { query_log, dbError_log } from '../utils/debug.js';
 import { getFeatureFlags } from '../utils/dynamicConfig.js';
+import { describeQuery, describeDatabaseError } from '../utils/sqlLogging.js';
 
 /**
  * Base Database Service to handle all database operations
@@ -22,7 +23,7 @@ export class DatabaseService {
   async select(query, params = [], firstOnly = false) {
     const featureFlags = await getFeatureFlags(this.env);
     if (featureFlags.logSqlQueries) {
-      query_log(`Executing SELECT query: ${query}, params: ${JSON.stringify(params)}`);
+      query_log(`Executing query: ${describeQuery(query, params)}`);
     }
 
     return this.executeWithRetry(async () => {
@@ -46,7 +47,7 @@ export class DatabaseService {
         }
         return queryResult.results || [];
       }
-    }, `SELECT query error: ${query}`, firstOnly ? null : []);
+    }, 'SELECT query error', firstOnly ? null : []);
   }
 
   /**
@@ -58,7 +59,7 @@ export class DatabaseService {
   async insert(query, params = []) {
     const featureFlags = await getFeatureFlags(this.env);
     if (featureFlags.logSqlQueries) {
-      query_log(`Executing INSERT query: ${query}, params: ${JSON.stringify(params)}`);
+      query_log(`Executing query: ${describeQuery(query, params)}`);
     }
 
     return this.executeWithRetry(async () => {
@@ -84,7 +85,7 @@ export class DatabaseService {
         }
         return null;
       }
-    }, `INSERT query error: ${query}`, null);
+    }, 'INSERT query error', null);
   }
 
   /**
@@ -96,7 +97,7 @@ export class DatabaseService {
   async update(query, params = []) {
     const featureFlags = await getFeatureFlags(this.env);
     if (featureFlags.logSqlQueries) {
-      query_log(`Executing UPDATE query: ${query}, params: ${JSON.stringify(params)}`);
+      query_log(`Executing query: ${describeQuery(query, params)}`);
     }
 
     return this.executeWithRetry(async () => {
@@ -121,7 +122,7 @@ export class DatabaseService {
         }
         return null;
       }
-    }, `UPDATE query error: ${query}`, null);
+    }, 'UPDATE query error', null);
   }
 
   /**
@@ -133,7 +134,7 @@ export class DatabaseService {
   async delete(query, params = []) {
     const featureFlags = await getFeatureFlags(this.env);
     if (featureFlags.logSqlQueries) {
-      query_log(`Executing DELETE query: ${query}, params: ${JSON.stringify(params)}`);
+      query_log(`Executing query: ${describeQuery(query, params)}`);
     }
 
     return this.executeWithRetry(async () => {
@@ -154,7 +155,7 @@ export class DatabaseService {
         query_log('DELETE query failed');
         return null;
       }
-    }, `DELETE query error: ${query}`, null);
+    }, 'DELETE query error', null);
   }
 
   /**
@@ -166,7 +167,7 @@ export class DatabaseService {
   async upsert(query, params = []) {
     const featureFlags = await getFeatureFlags(this.env);
     if (featureFlags.logSqlQueries) {
-      query_log(`Executing UPSERT query: ${query}, params: ${JSON.stringify(params)}`);
+      query_log(`Executing query: ${describeQuery(query, params)}`);
     }
 
     try {
@@ -189,7 +190,7 @@ export class DatabaseService {
         return null;
       }
     } catch (error) {
-      dbError_log(`UPSERT query error: ${error.message}, query: ${query}`);
+      dbError_log(`UPSERT query error: ${describeDatabaseError(error)}`);
       return null;
     }
   }
@@ -204,7 +205,7 @@ export class DatabaseService {
   async execute(query, params = [], method = 'run') {
     const featureFlags = await getFeatureFlags(this.env);
     if (featureFlags.logSqlQueries) {
-      query_log(`Executing custom query: ${query}, params: ${JSON.stringify(params)}, method: ${method}`);
+      query_log(`Executing query: ${describeQuery(query, params)}, method: ${method}`);
     }
 
     try {
@@ -233,7 +234,7 @@ export class DatabaseService {
       query_log(`Custom query completed successfully with method: ${method}`);
       return result;
     } catch (error) {
-      dbError_log(`Custom query error: ${error.message}, query: ${query}`);
+      dbError_log(`Custom query error: ${describeDatabaseError(error)}`);
       return null;
     }
   }
@@ -249,7 +250,7 @@ export class DatabaseService {
       query_log(`Database health check: ${isHealthy ? 'HEALTHY' : 'UNHEALTHY'}`);
       return isHealthy;
     } catch (error) {
-      dbError_log(`Database health check failed: ${error.message}`);
+      dbError_log(`Database health check failed: ${describeDatabaseError(error)}`);
       return false;
     }
   }
@@ -279,7 +280,7 @@ export class DatabaseService {
       query_log(`Database info retrieved: ${JSON.stringify(info)}`);
       return info;
     } catch (error) {
-      dbError_log(`Error getting database info: ${error.message}`);
+      dbError_log(`Error getting database info: ${describeDatabaseError(error)}`);
       return {
         version: 'unknown',
         tables: [],
@@ -362,7 +363,7 @@ export class DatabaseService {
       query_log('Database metrics retrieved successfully');
       return metrics;
     } catch (error) {
-      dbError_log(`Error getting database metrics: ${error.message}`);
+      dbError_log(`Error getting database metrics: ${describeDatabaseError(error)}`);
       return {
         performance: {
           queryResponseTime: 'unknown',
@@ -422,7 +423,7 @@ export class DatabaseService {
 
     const whereClause = whereParts.length > 0 ? `WHERE ${whereParts.join(' AND ')}` : '';
 
-    query_log(`Built WHERE clause: ${whereClause}, params: ${JSON.stringify(params)}`);
+    query_log(`Built WHERE clause with ${conditions ? Object.keys(conditions).length : 0} condition(s), ${params.length} bound parameters omitted`);
 
     return { whereClause, params };
   }
@@ -448,7 +449,7 @@ export class DatabaseService {
 
     const setClause = setParts.join(', ');
 
-    query_log(`Built SET clause: ${setClause}, params: ${JSON.stringify(params)}`);
+    query_log(`Built SET clause with ${updateData ? Object.keys(updateData).length : 0} field(s), ${params.length} bound parameters omitted`);
 
     return { setClause, params };
   }
@@ -470,7 +471,7 @@ export class DatabaseService {
         const result = await operation();
         return result; // Success
       } catch (error) {
-        dbError_log(`${errorMessage} (attempt ${attempt}/${maxRetries}): ${error.message}`);
+        dbError_log(`${errorMessage} (attempt ${attempt}/${maxRetries}): ${describeDatabaseError(error)}`);
 
         if (attempt === maxRetries) {
           dbError_log('All database operation attempts failed, returning fallback value');

@@ -442,7 +442,7 @@ export class EmailService extends BaseService {
     const provider = (emailConfig.provider || 'mailchannels').toLowerCase();
 
     if (debugMode) {
-      emailService_log(`context: ${JSON.stringify(safeContext)}`);
+      emailService_log('Registration email processing started');
     }
     const toggleResult = this.checkConfigToggles(emailConfig);
     if (toggleResult) {return toggleResult;}
@@ -494,7 +494,7 @@ export class EmailService extends BaseService {
 
     const headerResult = this.buildEmailHeaders(emailConfig, provider);
     if (headerResult.error) {return headerResult.error;}
-    const { headers, authHeader } = headerResult;
+    const { headers } = headerResult;
 
     const endpoint = emailConfig.providerEndpoint || (provider === 'brevo'
       ? 'https://api.brevo.com/v3/smtp/email'
@@ -502,8 +502,7 @@ export class EmailService extends BaseService {
 
     try {
       if (debugMode) {
-        emailService_log(`Headers: ${JSON.stringify(headers)}`);
-        emailService_log(`Payload: ${JSON.stringify(payload)}`);
+        emailService_log('Registration email provider request prepared');
       }
 
       const response = await fetch(endpoint, {
@@ -513,8 +512,7 @@ export class EmailService extends BaseService {
       });
 
       if (!response.ok) {
-        const bodyText = await response.text().catch(() => '');
-        error_log(`Email send failed with status ${response.status}: ${bodyText}`);
+        error_log(`Email send failed with status ${response.status}`);
         return {
           success: false,
           error: 'EMAIL_SEND_FAILED',
@@ -522,10 +520,8 @@ export class EmailService extends BaseService {
           provider: emailConfig.provider,
           ...(debugMode ? {
             debug: {
-              endpoint,
-              authHeader,
               apiKeyPresent: Boolean(emailConfig.providerApiKey),
-              body: bodyText
+              status: response.status
             }
           } : {})
         };
@@ -534,17 +530,15 @@ export class EmailService extends BaseService {
       emailService_log(`Registration confirmation email sent to ${user.email} via ${emailConfig.provider}`);
       return { success: true, provider: emailConfig.provider, activationUrl };
     } catch (error) {
-      error_log(`Email send error: ${error.message}`);
+      error_log('Email provider request failed');
       return {
         success: false,
         error: 'EMAIL_SEND_ERROR',
         provider: emailConfig.provider,
         ...(debugMode ? {
           debug: {
-            endpoint,
-            authHeader,
             apiKeyPresent: Boolean(emailConfig.providerApiKey),
-            message: error.message
+            code: 'EMAIL_SEND_ERROR'
           }
         } : {})
       };
@@ -624,15 +618,14 @@ export class EmailService extends BaseService {
       const response = await fetch(endpoint, { method: 'POST', headers, body: JSON.stringify(payload) });
 
       if (!response.ok) {
-        const bodyText = await response.text().catch(() => '');
-        error_log(`Email verification send failed: ${response.status} ${bodyText}`);
+        error_log(`Email verification send failed: ${response.status}`);
         return { success: false, error: 'EMAIL_SEND_FAILED', status: response.status, provider: emailConfig.provider };
       }
 
       emailService_log(`Email change verification sent to ${recipientEmail}`);
       return { success: true, provider: emailConfig.provider, verificationUrl };
     } catch (error) {
-      error_log(`Email send error: ${error.message}`);
+      error_log('Email provider request failed');
       return { success: false, error: 'EMAIL_SEND_ERROR', provider: emailConfig.provider };
     }
   }

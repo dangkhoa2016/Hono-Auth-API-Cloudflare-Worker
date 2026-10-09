@@ -1,4 +1,5 @@
 import { auditService_log } from '../utils/debug.js';
+import { redactSensitiveData } from './sensitiveData.js';
 
 /**
  * Shared utilities for audit services
@@ -55,20 +56,29 @@ export function buildAuditWhereClause(filters = {}, params = []) {
     newParams.push(filters.ip_address);
   }
 
-  // Role-based filtering
+  // Role-based filtering.
+  //
+  // NULL policy: a row with no actor_role is a system event, not a super_admin
+  // event, so it stays visible. In SQL `NULL != 'super_admin'` evaluates to NULL
+  // (not true) and would silently drop every system event from an admin's view,
+  // which is how the audit trail loses exactly the events nobody expected to
+  // lose. COALESCE makes "unknown role" compare as "not super_admin".
   if (filters.exclude_super_admin) {
-    conditions.push('actor_role != ?');
+    conditions.push('COALESCE(actor_role, \'\') != ?');
     newParams.push('super_admin');
   }
 
+  // Same NULL trap here: a row with no target_type/target_identifier is not a
+  // request against a super_admin user, so it must stay visible. Only an actual
+  // USER target whose identifier names a super_admin is hidden.
   if (filters.exclude_super_admin_actions) {
-    conditions.push('(target_type != ? OR (target_type = ? AND target_identifier NOT LIKE ?))');
-    newParams.push('USER', 'USER', '%super_admin%');
+    conditions.push('(IFNULL(target_type, \'\') != ? OR IFNULL(target_identifier, \'\') NOT LIKE ?)');
+    newParams.push('USER', '%super_admin%');
   }
 
   const whereClause = conditions.length > 0 ? `WHERE ${conditions.join(' AND ')}` : '';
 
-  auditService_log(`Built WHERE clause: ${whereClause}, params: ${JSON.stringify(newParams)}`);
+  auditService_log(`Built WHERE clause: ${whereClause} (${newParams.length} bound parameters omitted)`);
 
   return { whereClause, params: newParams };
 }
@@ -123,7 +133,6 @@ export function sanitizeAuditDetails(details, level = 'standard') {
     return details;
   }
 
-  const sanitized = { ...details };
   let sensitiveFields = [];
 
   switch (level) {
@@ -140,12 +149,30 @@ export function sanitizeAuditDetails(details, level = 'standard') {
     sensitiveFields = ['password', 'token', 'secret', 'key', 'credential'];
   }
 
-  Object.keys(sanitized).forEach(key => {
-    const lowerKey = key.toLowerCase();
-    if (sensitiveFields.some(field => lowerKey.includes(field))) {
-      sanitized[key] = level === 'strict' ? '[REDACTED]' : '***MASKED***';
-    }
+  const marker = level === 'strict' ? '[REDACTED]' : '***MASKED***';
+  const base = redactSensitiveData(details, {
+    maxDepth: 8,
+    maxKeys: 300,
+    maxString: 2048
   });
 
-  return sanitized;
+  const applyStrictKeys = (node) => {
+    if (Array.isArray(node)) {
+      return node.map(applyStrictKeys);
+    }
+    if (!node || typeof node !== 'object') {
+      return node;
+    }
+    const out = {};
+    for (const [key, value] of Object.entries(node)) {
+      if (sensitiveFields.some((field) => key.toLowerCase().includes(field))) {
+        out[key] = value === null || value === undefined || value === '' ? value : marker;
+        continue;
+      }
+      out[key] = applyStrictKeys(value);
+    }
+    return out;
+  };
+
+  return applyStrictKeys(base);
 }
