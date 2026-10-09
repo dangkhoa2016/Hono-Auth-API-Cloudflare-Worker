@@ -4,7 +4,7 @@
 
 **Dự án**: Hono Auth Worker - Hệ thống Audit Doanh nghiệp  
 **Trạng thái**: ✅ **SẴN SÀNG PRODUCTION** ✅  
-**Cập nhật lần cuối**: 30 tháng 7, 2025
+**Cập nhật lần cuối**: 28 tháng 3, 2026
 
 ---
 
@@ -206,13 +206,25 @@ Xuất audit logs trong các định dạng khác nhau.
 **Query Parameters**:
 ```typescript
 {
-  format?: 'csv' | 'json' | 'xlsx'; // Định dạng xuất (mặc định: json)
-  maxRecords?: number;              // Số bản ghi tối đa (mặc định: 1000)
-  includeDetails?: boolean;         // Bao gồm payload chi tiết (mặc định: true)
-  filters?: object;                 // Bộ lọc dạng object (tùy chọn)
-  startDate?: string;     // Lọc theo ngày bắt đầu
-  endDate?: string;       // Lọc theo ngày kết thúc
+  format?: 'csv' | 'json' | 'xlsx'; // Định dạng yêu cầu (mặc định: json)
+  maxRecords?: number;              // Số bản ghi tối đa trả về (mặc định: 1000)
+  includeDetails?: boolean;         // Có bao gồm các trường chi tiết/nhạy cảm hay không
+  startDate?: string;               // Lọc theo ngày bắt đầu (ISO)
+  endDate?: string;                 // Lọc theo ngày kết thúc (ISO)
 }
+```
+
+**Ghi chú hành vi**:
+- Kết quả export vẫn bị lọc theo vai trò giống `GET /api/audit/logs`.
+- `includeDetails=false` chỉ xuất các trường vận hành; `true` sẽ kèm `details`, `old_values`, `new_values` và `error_message`.
+- Export CSV trả về `text/csv`; các export không phải CSV được trả dưới dạng nội dung JSON để tải xuống.
+- Response có thêm `Content-Disposition` và `X-Export-Message` để phục vụ tải file và thông báo thành công đã bản địa hóa.
+
+**Response Headers**:
+```http
+Content-Type: text/csv | application/json
+Content-Disposition: attachment; filename="audit_logs_YYYY-MM-DD.csv"
+X-Export-Message: Audit logs exported successfully
 ```
 
 ### **🏥 GET /api/audit/system-health**
@@ -366,6 +378,50 @@ Tạo bản lưu trữ thủ công.
 
 **Quyền truy cập**: Chỉ Super Admin
 
+### **✂️ POST /api/advanced-audit/truncate**
+Lưu trữ rồi loại audit log khỏi bảng live theo khoảng thời gian.
+
+**Quyền truy cập**: Chỉ Super Admin
+
+**Request Body**:
+```json
+{
+  "startDate": "2024-01-01T00:00:00Z",
+  "endDate": "2024-01-31T23:59:59Z",
+  "batchSize": 1000,
+  "dryRun": true,
+  "archiveFirst": true,
+  "confirmDelete": false
+}
+```
+
+**Quy tắc validation**:
+- `startDate` và `endDate` là bắt buộc.
+- `startDate` phải nhỏ hơn hoặc bằng `endDate`.
+- `archiveFirst=true` là bắt buộc cho mọi request truncate.
+- `confirmDelete=true` là bắt buộc khi `dryRun=false`.
+
+**Ghi chú hành vi**:
+- Thao tác này lưu trữ các bản ghi phù hợp sang `audit_logs_archive` trước khi loại khỏi vùng live.
+- `dryRun=true` chỉ trả về số lượng, không thay đổi dữ liệu.
+
+**Các trường response**:
+```json
+{
+  "success": true,
+  "data": {
+    "start_date": "2024-01-01T00:00:00Z",
+    "end_date": "2024-01-31T23:59:59Z",
+    "batch_size": 1000,
+    "archive_first": true,
+    "dry_run": true,
+    "total_found": 42,
+    "archived_count": 0,
+    "deleted_count": 0
+  }
+}
+```
+
 ### **⚙️ POST /api/advanced-audit/retention**
 Cấu hình chính sách giữ lại dữ liệu.
 
@@ -481,10 +537,36 @@ Tạo quy tắc cảnh báo mới.
 
 **Quyền truy cập**: Chỉ Super Admin
 
+**Request Body**:
+```json
+{
+  "name": "High failed login burst",
+  "description": "Cảnh báo khi phát hiện nhiều lần đăng nhập thất bại",
+  "severity": "high",
+  "enabled": true,
+  "condition": "return event.failed_attempts > 5",
+  "cooldown": 300,
+  "channels": ["email", "console"]
+}
+```
+
+**Ghi chú validation**:
+- Phải có ít nhất một trong hai trường `condition` hoặc `conditions` kiểu cũ.
+- `condition` hiện có thông báo lỗi i18n đầy đủ trên các ngôn ngữ được hỗ trợ.
+- `cooldown` được validate là số trong khoảng `0` đến `86400` và mặc định là `300`.
+- Nếu bỏ qua `channels`, API sẽ fallback sang `actions` khi có; nếu không sẽ dùng `['email']`.
+
 ### **🔄 PUT /alerts/rules/:ruleId/toggle**
 Bật/tắt quy tắc cảnh báo.
 
 **Quyền truy cập**: Chỉ Super Admin
+
+**Request Body**:
+```json
+{
+  "enabled": false
+}
+```
 
 ### **📢 GET /alerts/channels**
 Lấy danh sách kênh thông báo.
@@ -658,10 +740,38 @@ curl -X GET "http://localhost:8788/api/audit/search?query=failed+login&limit=10"
 
 ### **Ví dụ Xuất dữ liệu**
 ```bash
-# Xuất dưới dạng CSV
-curl -X GET "http://localhost:8788/api/audit/export?format=csv&limit=1000" \
+# Xuất audit log đã lọc dưới dạng CSV, không kèm trường chi tiết nhạy cảm
+curl -X GET "http://localhost:8788/api/audit/export?format=csv&maxRecords=1000&includeDetails=false&startDate=2026-03-01T00:00:00Z&endDate=2026-03-28T23:59:59Z" \
   -H "Authorization: Bearer your-token"
+
+# Chạy dry-run truncate an toàn theo khoảng ngày
+curl -X POST "http://localhost:8788/api/advanced-audit/truncate" \
+  -H "Authorization: Bearer your-token" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "startDate": "2026-03-01T00:00:00Z",
+    "endDate": "2026-03-15T23:59:59Z",
+    "dryRun": true,
+    "archiveFirst": true,
+    "confirmDelete": false
+  }'
+
+# Tạo alert rule với condition và cooldown tường minh
+curl -X POST "http://localhost:8788/api/realtime-monitoring/alerts/rules" \
+  -H "Authorization: Bearer your-token" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "name": "High failed login burst",
+    "description": "Cảnh báo khi có nhiều lần đăng nhập thất bại",
+    "severity": "high",
+    "enabled": true,
+    "condition": "return event.failed_attempts > 5",
+    "cooldown": 300,
+    "channels": ["email", "console"]
+  }'
 ```
+
+Đợt cập nhật validation gần đây cũng bổ sung thông báo lỗi i18n cho `condition` và `cooldown` của alert rule trên toàn bộ các ngôn ngữ được hỗ trợ.
 
 ---
 
@@ -785,7 +895,7 @@ API Hệ thống Audit cung cấp **hỗ trợ đa ngôn ngữ toàn diện** v�
 
 **Tất cả endpoints của Hệ thống Audit đều hỗ trợ thông báo lỗi đa ngôn ngữ**:
 - **Core Audit Routes** (`/api/audit/*`) - 6 endpoints với hỗ trợ i18n đầy đủ
-- **Advanced Audit Routes** (`/api/advanced-audit/*`) - 15 endpoints với hỗ trợ i18n đầy đủ
+- **Advanced Audit Routes** (`/api/advanced-audit/*`) - 16 endpoints với hỗ trợ i18n đầy đủ
 - **Real-time Monitoring Routes** (`/api/realtime-monitoring/*`) - 15+ endpoints với hỗ trợ i18n đầy đủ
 - **Security Incident Routes** (`/api/security-incident/*`) - 10+ endpoints với hỗ trợ i18n đầy đủ
 

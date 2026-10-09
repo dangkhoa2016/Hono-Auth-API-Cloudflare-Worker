@@ -4,7 +4,7 @@
 
 **Project**: Hono Auth Worker - Enterprise Audit System  
 **Status**: ✅ **PRODUCTION READY** ✅  
-**Last Updated**: July 30, 2025
+**Last Updated**: March 28, 2026
 
 ---
 
@@ -206,13 +206,25 @@ Export audit logs in various formats.
 **Query Parameters**:
 ```typescript
 {
-  format?: 'csv' | 'json' | 'xlsx'; // Export format (default: json)
-  maxRecords?: number;              // Max records (default: 1000)
-  includeDetails?: boolean;         // Include detail payloads (default: true)
-  filters?: object;                 // Optional structured filters object
-  startDate?: string;     // Filter by start date
-  endDate?: string;       // Filter by end date
+  format?: 'csv' | 'json' | 'xlsx'; // Requested export format (default: json)
+  maxRecords?: number;              // Max records returned (default: 1000)
+  includeDetails?: boolean;         // Include sensitive detail fields in export output
+  startDate?: string;               // Filter by start date (ISO format)
+  endDate?: string;                 // Filter by end date (ISO format)
 }
+```
+
+**Behavior Notes**:
+- Export results are role-filtered in the same way as `GET /api/audit/logs`.
+- `includeDetails=false` keeps the export to operational fields only; `true` also includes `details`, `old_values`, `new_values`, and `error_message`.
+- CSV exports return `text/csv`; non-CSV exports are returned as downloadable JSON content.
+- The response includes `Content-Disposition` and `X-Export-Message` headers for download handling and localized success messaging.
+
+**Response Headers**:
+```http
+Content-Type: text/csv | application/json
+Content-Disposition: attachment; filename="audit_logs_YYYY-MM-DD.csv"
+X-Export-Message: Audit logs exported successfully
 ```
 
 ### **🏥 GET /api/audit/system-health**
@@ -366,6 +378,50 @@ Create manual archive.
 
 **Access**: Super Admin only
 
+### **✂️ POST /api/advanced-audit/truncate**
+Archive and remove live audit logs in a date range.
+
+**Access**: Super Admin only
+
+**Request Body**:
+```json
+{
+  "startDate": "2024-01-01T00:00:00Z",
+  "endDate": "2024-01-31T23:59:59Z",
+  "batchSize": 1000,
+  "dryRun": true,
+  "archiveFirst": true,
+  "confirmDelete": false
+}
+```
+
+**Validation Rules**:
+- `startDate` and `endDate` are required.
+- `startDate` must be earlier than or equal to `endDate`.
+- `archiveFirst=true` is mandatory for all truncate requests.
+- `confirmDelete=true` is mandatory when `dryRun=false`.
+
+**Behavior Notes**:
+- This operation archives matching records into `audit_logs_archive` before removing them from live storage.
+- `dryRun=true` reports counts only and does not mutate data.
+
+**Response Fields**:
+```json
+{
+  "success": true,
+  "data": {
+    "start_date": "2024-01-01T00:00:00Z",
+    "end_date": "2024-01-31T23:59:59Z",
+    "batch_size": 1000,
+    "archive_first": true,
+    "dry_run": true,
+    "total_found": 42,
+    "archived_count": 0,
+    "deleted_count": 0
+  }
+}
+```
+
 ### **⚙️ POST /api/advanced-audit/retention**
 Configure data retention policies.
 
@@ -481,10 +537,36 @@ Create a new alert rule.
 
 **Access**: Super Admin only
 
+**Request Body**:
+```json
+{
+  "name": "High failed login burst",
+  "description": "Alert when repeated login failures are detected",
+  "severity": "high",
+  "enabled": true,
+  "condition": "return event.failed_attempts > 5",
+  "cooldown": 300,
+  "channels": ["email", "console"]
+}
+```
+
+**Validation Notes**:
+- At least one of `condition` or legacy `conditions` must be provided.
+- `condition` is validated with localized i18n messages across supported languages.
+- `cooldown` is validated as a numeric value from `0` to `86400` and defaults to `300`.
+- If `channels` is omitted, the API falls back to `actions` when present, otherwise `['email']`.
+
 ### **🔄 PUT /alerts/rules/:ruleId/toggle**
 Toggle an alert rule on/off.
 
 **Access**: Super Admin only
+
+**Request Body**:
+```json
+{
+  "enabled": false
+}
+```
 
 ### **📢 GET /alerts/channels**
 Get notification channels.
@@ -658,10 +740,38 @@ curl -X GET "http://localhost:8788/api/audit/search?query=failed+login&limit=10"
 
 ### **Export Example**
 ```bash
-# Export as CSV
-curl -X GET "http://localhost:8788/api/audit/export?format=csv&limit=1000" \
+# Export filtered audit logs as CSV without sensitive detail fields
+curl -X GET "http://localhost:8788/api/audit/export?format=csv&maxRecords=1000&includeDetails=false&startDate=2026-03-01T00:00:00Z&endDate=2026-03-28T23:59:59Z" \
   -H "Authorization: Bearer your-token"
+
+# Safe truncate dry run for a date range
+curl -X POST "http://localhost:8788/api/advanced-audit/truncate" \
+  -H "Authorization: Bearer your-token" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "startDate": "2026-03-01T00:00:00Z",
+    "endDate": "2026-03-15T23:59:59Z",
+    "dryRun": true,
+    "archiveFirst": true,
+    "confirmDelete": false
+  }'
+
+# Create an alert rule with explicit condition and cooldown
+curl -X POST "http://localhost:8788/api/realtime-monitoring/alerts/rules" \
+  -H "Authorization: Bearer your-token" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "name": "High failed login burst",
+    "description": "Alert on repeated failed login attempts",
+    "severity": "high",
+    "enabled": true,
+    "condition": "return event.failed_attempts > 5",
+    "cooldown": 300,
+    "channels": ["email", "console"]
+  }'
 ```
+
+Recent validation coverage also includes localized alert-rule error messages for `condition` and `cooldown` across all supported languages.
 
 ---
 
@@ -785,7 +895,7 @@ The Audit System API provides comprehensive **multilingual support** with locali
 
 **All Audit System endpoints support multilingual error messages**:
 - **Core Audit Routes** (`/api/audit/*`) - 6 endpoints with full i18n
-- **Advanced Audit Routes** (`/api/advanced-audit/*`) - 15 endpoints with full i18n
+- **Advanced Audit Routes** (`/api/advanced-audit/*`) - 16 endpoints with full i18n
 - **Real-time Monitoring Routes** (`/api/realtime-monitoring/*`) - 15+ endpoints with full i18n
 - **Security Incident Routes** (`/api/security-incident/*`) - 10+ endpoints with full i18n
 
