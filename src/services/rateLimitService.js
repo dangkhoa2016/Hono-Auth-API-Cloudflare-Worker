@@ -1,8 +1,62 @@
 import { rateLimitService_log, rateLimit_log, dbError_log } from '../utils/debug.js';
 import { BaseService } from './baseService.js';
 import { createKvConfigService } from '../utils/serviceFactory.js';
+import { ServiceUnavailableError } from '../utils/serviceErrors.js';
 
 const DEFAULT_CONTEXT = 'auth:ip';
+
+/**
+ * Bucket used when the caller cannot be identified at all - a missing client IP
+ * header, a header that is literally `unknown`, an empty string.
+ *
+ * The previous behaviour was to return `allowed: true` and skip the counter
+ * entirely, which meant a request whose IP could not be parsed had no budget at
+ * all: every such request was free. That is a bypass, and it is reachable by
+ * anything that can suppress a header. Collapsing them into one shared bucket
+ * is a deliberate choice over the alternative - giving each unparsable value its
+ * own key, which is the same bypass with more bookkeeping. The cost is that a
+ * deployment which cannot resolve any client IP will exhaust the shared bucket
+ * and start returning 429s; that is a loud, diagnosable failure, which is
+ * preferable to a silent one.
+ */
+const UNRESOLVED_IDENTIFIER_BUCKET = 'unresolved';
+
+/**
+ * The admission statement.
+ *
+ * A counter row is reserved by the statement that decides the request, so the
+ * decision and the write cannot be interleaved with another request's:
+ *
+ *   - `WHERE attempts_count < ? OR <window elapsed>` is the admission. When it
+ *     is false, the `DO UPDATE` matches nothing, the row is not written at all,
+ *     and `RETURNING` yields zero rows. A denial therefore cannot move
+ *     `last_attempt_at`, which matters: a denial that touched the row would hold
+ *     the window open indefinitely under a flood.
+ *   - When the window has elapsed the update branch restarts the counter at 1 and
+ *     moves `first_attempt_at`, so the window is fixed at first admission and a
+ *     denied request never extends it.
+ *   - `RETURNING attempts_count` gives the admitted request its own position in
+ *     the window. Reading it back afterwards would answer for whoever wrote
+ *     last, not for this request.
+ *
+ * `unixepoch()` is used instead of comparing the stored strings because the
+ * column holds two shapes: the ISO strings this service writes and the
+ * `CURRENT_TIMESTAMP` shape a seeded or upgraded database carries. A lexical
+ * comparison of those two is wrong.
+ *
+ * `windowSeconds <= 0` means "no window": the counter never resets on its own,
+ * which is the same meaning the option had before.
+ */
+const ADMISSION_SQL = `INSERT INTO rate_limit_counters
+     (context, identifier, attempts_count, first_attempt_at, last_attempt_at, created_at, updated_at)
+   VALUES (?, ?, 1, ?, ?, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP)
+   ON CONFLICT(context, identifier) DO UPDATE SET
+     attempts_count   = CASE WHEN ? > 0 AND unixepoch(first_attempt_at) + ? <= ? THEN 1 ELSE attempts_count + 1 END,
+     first_attempt_at = CASE WHEN ? > 0 AND unixepoch(first_attempt_at) + ? <= ? THEN ? ELSE first_attempt_at END,
+     last_attempt_at  = ?,
+     updated_at       = CURRENT_TIMESTAMP
+   WHERE attempts_count < ? OR (? > 0 AND unixepoch(first_attempt_at) + ? <= ?)
+   RETURNING attempts_count, first_attempt_at, last_attempt_at`;
 
 function isInvalidIdentifier(identifier) {
   if (!identifier && identifier !== 0) {return true;}
@@ -18,19 +72,13 @@ function normalizeIdentifier(identifier) {
   return String(identifier).trim().toLowerCase().slice(0, 255);
 }
 
-function pickFirstDefined(...values) {
-  for (const value of values) {
-    if (value !== undefined && value !== null) {
-      return value;
-    }
-  }
-  return undefined;
-}
-
 /**
  * Service for managing rate limiting
- * Inherits optimized config management from BaseService
-*/
+ *
+ * The limiter is an admission control, not a counter you poll: a request either
+ * reserves a unit of its window or it does not, and the two are decided by one
+ * D1 statement. See `admitRequest`.
+ */
 export class RateLimitService extends BaseService {
   constructor(env) {
     super(env, 'RateLimitService');
@@ -39,380 +87,154 @@ export class RateLimitService extends BaseService {
   }
 
   /**
-   * Check rate limit for a given identifier and context
-   * @param {string} identifier - Identifier to rate limit (IP, email, userId)
-   * @param {Object} options - Context-specific options
-   * @returns {Promise<Object>} Rate limit evaluation result
+   * Reserve one unit of a window, or refuse.
+   *
+   * D1 is the only authority. A cached copy cannot answer this question: KV has
+   * no compare-and-set, so a KV-based limiter is a read followed by a write and
+   * two concurrent callers can both be admitted. The old implementation had
+   * that path, preferred it whenever a KV binding existed, and fell back to
+   * `allowed: true` when either store failed - so a stale or broken cache did
+   * not fail the request, it waved it through. Configuration still comes from
+   * KV through the base service; only the counter is authoritative in D1.
+   *
+   * @param {string} identifier - IP, email or user id to limit
+   * @param {Object} [options] - Window description
+   * @param {string} [options.context] - Counter context, part of the key
+   * @param {number} [options.limit] - Admissions allowed per window
+   * @param {number} [options.windowSeconds] - Window length; 0 disables the reset
+   * @param {string} [options.unresolvedBucket] - Bucket for unusable identifiers
+   * @returns {Promise<{allowed: boolean, attempts: number, limit: number, retryAfterSeconds: number, context: string, windowSeconds: number, skipped?: boolean, reason?: string}>} Admission decision
+   * @throws {ServiceUnavailableError} When the counter cannot be read or written
    */
-  async checkRateLimit(identifier, options = {}) {
-    const normalized = normalizeIdentifier(identifier);
-    const resolved = await this._resolveOptions(options);
-
-    rateLimit_log(`Checking rate limit for identifier: ${normalized || 'N/A'} in context: ${resolved.context}`);
-
-    if (!normalized) {
-      return {
-        allowed: true,
-        attempts: 0,
-        limit: resolved.limit,
-        context: resolved.context
-      };
-    }
+  async admitRequest(identifier, options = {}) {
+    const resolved = await this._resolveAdmissionOptions(options);
 
     if (resolved.disabled) {
       return {
         allowed: true,
         attempts: 0,
         limit: resolved.limit,
+        retryAfterSeconds: 0,
         context: resolved.context,
-        isDisabled: true
+        windowSeconds: resolved.windowSeconds,
+        skipped: true,
+        reason: 'rate_limiting_disabled'
       };
     }
 
-    // Use KV if available (Performance Optimization)
-    if (this.kvService.kv) {
-      return this.checkRateLimitKV(normalized, resolved);
-    }
+    const key = normalizeIdentifier(identifier) || options.unresolvedBucket || UNRESOLVED_IDENTIFIER_BUCKET;
+    const nowUnix = Math.floor(Date.now() / 1000);
+    const nowIso = new Date(nowUnix * 1000).toISOString();
+    const { windowSeconds, limit } = resolved;
 
+    rateLimit_log(`Admitting request for ${key} in context ${resolved.context} (limit ${limit}/${windowSeconds}s)`);
+
+    let admitted;
     try {
-      const record = await this.dbService.select(
-        `SELECT id, attempts_count, first_attempt_at, last_attempt_at
-         FROM rate_limit_counters
-         WHERE context = ? AND identifier = ?`,
-        [resolved.context, normalized],
-        true
-      );
-
-      if (!record) {
-        return {
-          allowed: true,
-          attempts: 0,
-          limit: resolved.limit,
-          context: resolved.context
-        };
-      }
-
-      const now = Date.now();
-      const firstAttempt = record.first_attempt_at ? Date.parse(record.first_attempt_at) : null;
-      const lastAttempt = record.last_attempt_at ? Date.parse(record.last_attempt_at) : null;
-
-      if (firstAttempt && resolved.windowSeconds > 0 && (now - firstAttempt) / 1000 > resolved.windowSeconds) {
-        await this.resetFailedAttempts(normalized, resolved);
-        return {
-          allowed: true,
-          attempts: 0,
-          limit: resolved.limit,
-          context: resolved.context,
-          reset: true
-        };
-      }
-
-      if (record.attempts_count >= resolved.limit) {
-        if (lastAttempt && resolved.blockDurationSeconds > 0) {
-          const elapsedSeconds = (now - lastAttempt) / 1000;
-          if (elapsedSeconds < resolved.blockDurationSeconds) {
-            const retryAfterSeconds = Math.max(1, Math.ceil(resolved.blockDurationSeconds - elapsedSeconds));
-            rateLimit_log(`Rate limit exceeded for context ${resolved.context}, retry after ${retryAfterSeconds}s`);
-            return {
-              allowed: false,
-              attempts: record.attempts_count,
-              limit: resolved.limit,
-              context: resolved.context,
-              retryAfterSeconds,
-              blockDurationSeconds: resolved.blockDurationSeconds
-            };
-          }
-        }
-
-        await this.resetFailedAttempts(normalized, resolved);
-        return {
-          allowed: true,
-          attempts: 0,
-          limit: resolved.limit,
-          context: resolved.context,
-          reset: true
-        };
-      }
-
-      return {
-        allowed: true,
-        attempts: record.attempts_count,
-        limit: resolved.limit,
-        context: resolved.context,
-        blockDurationSeconds: resolved.blockDurationSeconds
-      };
+      admitted = await this.dbService.writeReturning(ADMISSION_SQL, [
+        resolved.context,
+        key,
+        nowIso,
+        nowIso,
+        windowSeconds, windowSeconds, nowUnix,
+        windowSeconds, windowSeconds, nowUnix, nowIso,
+        nowIso,
+        limit,
+        windowSeconds, windowSeconds, nowUnix
+      ]);
     } catch (error) {
-      dbError_log(`Rate limit check error: ${error.message}`);
-      return {
-        allowed: true,
-        attempts: 0,
-        limit: resolved.limit,
+      // A write that did not happen must not be reported as an admission. The
+      // caller decides what a 503 means; it is never this layer's call to allow.
+      dbError_log(`Rate limit admission failed for context ${resolved.context}: ${error.message}`);
+      if (error instanceof ServiceUnavailableError) {
+        throw error;
+      }
+      throw new ServiceUnavailableError('Rate limit counter is unavailable', {
         context: resolved.context,
-        error: error.message
-      };
-    }
-  }
-
-  /**
-   * Check rate limit using KV
-   * @param {string} normalized - Normalized identifier
-   * @param {Object} resolved - Resolved options
-   */
-  async checkRateLimitKV(normalized, resolved) {
-    const key = `ratelimit:${resolved.context}:${normalized}`;
-    try {
-      const record = await this.kvService.getRaw(key, 'json');
-
-      if (!record) {
-        return { allowed: true, attempts: 0, limit: resolved.limit, context: resolved.context };
-      }
-
-      const now = Date.now();
-      // Check window reset
-      if (resolved.windowSeconds > 0 && (now - record.firstAttempt) / 1000 > resolved.windowSeconds) {
-        await this.resetFailedAttemptsKV(normalized, resolved);
-        return { allowed: true, attempts: 0, limit: resolved.limit, context: resolved.context, reset: true };
-      }
-
-      if (record.attempts >= resolved.limit) {
-        // Check lockout
-        if (record.lastAttempt && resolved.blockDurationSeconds > 0) {
-          const elapsed = (now - record.lastAttempt) / 1000;
-          if (elapsed < resolved.blockDurationSeconds) {
-            const retryAfter = Math.ceil(resolved.blockDurationSeconds - elapsed);
-            rateLimit_log(`Rate limit exceeded (KV) for context ${resolved.context}, retry after ${retryAfter}s`);
-            return { allowed: false, attempts: record.attempts, limit: resolved.limit, context: resolved.context, retryAfterSeconds: retryAfter, blockDurationSeconds: resolved.blockDurationSeconds };
-          }
-        }
-        // Lockout expired
-        await this.resetFailedAttemptsKV(normalized, resolved);
-        return { allowed: true, attempts: 0, limit: resolved.limit, context: resolved.context, reset: true };
-      }
-
-      return { allowed: true, attempts: record.attempts, limit: resolved.limit, context: resolved.context };
-
-    } catch (e) {
-      dbError_log(`KV Rate limit check error: ${e.message}`);
-      // Fallback to allow if KV fails
-      return { allowed: true, attempts: 0, limit: resolved.limit, context: resolved.context, error: e.message };
-    }
-  }
-
-  /**
-   * Record failed attempt for the given identifier/context
-   * @param {string} identifier - Identifier (IP/email/user)
-   * @param {Object} options - Context configuration
-   * @returns {Promise<boolean>} True if recorded successfully
-   */
-  async recordFailedAttempt(identifier, options = {}) {
-    const normalized = normalizeIdentifier(identifier);
-    const resolved = await this._resolveOptions(options);
-
-    if (!normalized || resolved.disabled) {
-      return true;
-    }
-
-    rateLimit_log(`Recording failed attempt for ${normalized} in context ${resolved.context}`);
-
-    // Use KV if available
-    if (this.kvService.kv) {
-      return this.recordFailedAttemptKV(normalized, resolved);
-    }
-
-    try {
-      const nowIso = new Date().toISOString();
-      const existing = await this.dbService.select(
-        `SELECT id, attempts_count, first_attempt_at
-         FROM rate_limit_counters
-         WHERE context = ? AND identifier = ?`,
-        [resolved.context, normalized],
-        true
-      );
-
-      const metadataJson = resolved.metadata ? JSON.stringify(resolved.metadata).slice(0, 1024) : null;
-
-      if (!existing) {
-        await this.dbService.insert(
-          `INSERT INTO rate_limit_counters (
-             context, identifier, attempts_count, first_attempt_at,
-             last_attempt_at, metadata, created_at, updated_at
-           ) VALUES (?, ?, 1, ?, ?, ?, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP)`,
-          [resolved.context, normalized, nowIso, nowIso, metadataJson]
-        );
-        return true;
-      }
-
-      const firstAttempt = existing.first_attempt_at ? Date.parse(existing.first_attempt_at) : null;
-      if (firstAttempt && resolved.windowSeconds > 0 && (Date.now() - firstAttempt) / 1000 > resolved.windowSeconds) {
-        await this.dbService.update(
-          `UPDATE rate_limit_counters
-           SET attempts_count = 1,
-               first_attempt_at = ?,
-               last_attempt_at = ?,
-               metadata = ?,
-               updated_at = CURRENT_TIMESTAMP
-           WHERE id = ?`,
-          [nowIso, nowIso, metadataJson, existing.id]
-        );
-        return true;
-      }
-
-      await this.dbService.update(
-        `UPDATE rate_limit_counters
-         SET attempts_count = attempts_count + 1,
-             last_attempt_at = ?,
-             metadata = ?,
-             updated_at = CURRENT_TIMESTAMP
-         WHERE id = ?`,
-        [nowIso, metadataJson, existing.id]
-      );
-
-      return true;
-    } catch (error) {
-      dbError_log(`Failed to record rate limit attempt: ${error.message}`);
-      return false;
-    }
-  }
-
-  /**
-   * Record failed attempt using KV
-   * @param {string} normalized - Normalized identifier
-   * @param {Object} resolved - Resolved options
-   */
-  async recordFailedAttemptKV(normalized, resolved) {
-    const key = `ratelimit:${resolved.context}:${normalized}`;
-    const now = Date.now();
-
-    try {
-      let record = await this.kvService.getRaw(key, 'json');
-
-      if (!record) {
-        record = { attempts: 1, firstAttempt: now, lastAttempt: now, metadata: resolved.metadata };
-      } else {
-        if (resolved.windowSeconds > 0 && (now - record.firstAttempt) / 1000 > resolved.windowSeconds) {
-          record = { attempts: 1, firstAttempt: now, lastAttempt: now, metadata: resolved.metadata };
-        } else {
-          record.attempts++;
-          record.lastAttempt = now;
-          if (resolved.metadata) {record.metadata = resolved.metadata;}
-        }
-      }
-
-      // Calculate TTL: Max of window or block duration
-      const ttl = Math.max(resolved.windowSeconds, resolved.blockDurationSeconds, 60); // Min 60s
-      await this.kvService.putRaw(key, JSON.stringify(record), {
-        expirationTtl: ttl,
-        metadata: this._buildKvMetadata(normalized, resolved, record)
+        cause: error.message
       });
-      return true;
-    } catch (e) {
-      dbError_log(`Failed to record rate limit attempt (KV): ${e.message}`);
-      return false;
     }
+
+    const row = admitted.rows[0];
+    if (row) {
+      return {
+        allowed: true,
+        attempts: Number(row.attempts_count),
+        limit,
+        retryAfterSeconds: 0,
+        context: resolved.context,
+        windowSeconds
+      };
+    }
+
+    rateLimit_log(`Rate limit exceeded for ${key} in context ${resolved.context}`);
+    return {
+      allowed: false,
+      attempts: limit,
+      limit,
+      retryAfterSeconds: await this._retryAfterSeconds(resolved, key, nowUnix),
+      context: resolved.context,
+      windowSeconds
+    };
   }
 
   /**
-   * Reset failed attempts for the given identifier/context
-   * @param {string} identifier - Identifier (IP/email/user)
-   * @param {Object} options - Context configuration
-   * @returns {Promise<boolean>} True if reset successfully
+   * Seconds until the current window ends.
+   *
+   * This is reporting only - the decision has already been made by the admission
+   * statement, and nothing here can turn a denial into an admission. The row is
+   * read after the fact, so a concurrent request may have moved it; the value is
+   * a hint for a `Retry-After` header, and the worst case is being told to come
+   * back a moment too early and be refused again.
+   *
+   * If the read fails the full window is reported. That is the pessimistic
+   * answer and it costs the caller a retry, not an over-admission.
+   * @param {Object} resolved - Resolved admission options
+   * @param {string} key - Counter key the admission used
+   * @param {number} nowUnix - Current time in whole seconds
+   * @returns {Promise<number>} Seconds to wait
    */
-  async resetFailedAttempts(identifier, options = {}) {
-    const normalized = normalizeIdentifier(identifier);
-    const resolved = await this._resolveOptions(options);
-
-    if (!normalized || resolved.disabled) {
-      return true;
+  async _retryAfterSeconds(resolved, key, nowUnix) {
+    if (resolved.windowSeconds <= 0) {
+      return 1;
     }
-
-    // Use KV if available
-    if (this.kvService.kv) {
-      return this.resetFailedAttemptsKV(normalized, resolved);
-    }
-
     try {
-      await this.dbService.delete(
-        'DELETE FROM rate_limit_counters WHERE context = ? AND identifier = ?',
-        [resolved.context, normalized]
-      );
-      return true;
-    } catch (error) {
-      dbError_log(`Failed to reset rate limit counter: ${error.message}`);
-      return false;
-    }
-  }
-
-  /**
-   * Reset failed attempts using KV
-   * @param {string} normalized - Normalized identifier
-   * @param {Object} resolved - Resolved options
-   */
-  async resetFailedAttemptsKV(normalized, resolved) {
-    const key = `ratelimit:${resolved.context}:${normalized}`;
-    try {
-      await this.kvService.deleteRaw(key);
-      return true;
-    } catch (e) {
-      dbError_log(`Failed to reset rate limit counter (KV): ${e.message}`);
-      return false;
-    }
-  }
-
-  /**
-   * Get attempt count for identifier/context
-   * @param {string} identifier - Identifier (IP/email/user)
-   * @param {Object} options - Context configuration
-   * @returns {Promise<number>} Number of attempts recorded
-   */
-  async getAttemptCount(identifier, options = {}) {
-    const normalized = normalizeIdentifier(identifier);
-    const resolved = await this._resolveOptions(options);
-
-    if (!normalized || resolved.disabled) {
-      return 0;
-    }
-
-    // Use KV if available
-    if (this.kvService.kv) {
-      return this.getAttemptCountKV(normalized, resolved);
-    }
-
-    try {
-      const record = await this.dbService.select(
-        `SELECT attempts_count
+      const row = await this.dbService.select(
+        `SELECT attempts_count, first_attempt_at
          FROM rate_limit_counters
          WHERE context = ? AND identifier = ?`,
-        [resolved.context, normalized],
+        [resolved.context, key],
         true
       );
-
-      return record ? record.attempts_count : 0;
+      if (!row) {
+        return resolved.windowSeconds;
+      }
+      const windowStartedAt = Math.floor(Date.parse(row.first_attempt_at) / 1000);
+      if (!Number.isFinite(windowStartedAt)) {
+        return resolved.windowSeconds;
+      }
+      const remaining = resolved.windowSeconds - (nowUnix - windowStartedAt);
+      return remaining > 0 ? remaining : 1;
     } catch (error) {
-      dbError_log(`Error getting rate limit count: ${error.message}`);
-      return 0;
+      dbError_log(`Rate limit retry-after lookup failed for context ${resolved.context}: ${error.message}`);
+      return resolved.windowSeconds;
     }
   }
 
   /**
-   * Get attempt count using KV
-   * @param {string} normalized - Normalized identifier
-   * @param {Object} resolved - Resolved options
+   * Option precedence: an explicit option wins, otherwise the environment
+   * configuration applies. `lockoutDuration` is published in minutes and becomes
+   * the window in seconds, which is how it was read before and is kept so no
+   * deployment's effective limit changes silently.
+   * @param {Object} options - Caller options
+   * @returns {Promise<Object>} Resolved options
    */
-  async getAttemptCountKV(normalized, resolved) {
-    const key = `ratelimit:${resolved.context}:${normalized}`;
-    try {
-      const record = await this.kvService.getRaw(key, 'json');
-      return record ? record.attempts : 0;
-    } catch (e) {
-      dbError_log(`Error getting rate limit count (KV): ${e.message}`);
-      return 0;
-    }
-  }
-
-  async _resolveOptions(options) {
+  async _resolveAdmissionOptions(options) {
     const config = await this.getRateLimitConfig();
     const context = options.context || DEFAULT_CONTEXT;
-    const limit = typeof options.limit === 'number' && options.limit > 0 ? options.limit : config.maxAttempts;
+    const limit = typeof options.limit === 'number' && options.limit > 0
+      ? options.limit
+      : config.maxAttempts;
     const lockoutSeconds = typeof options.blockDurationSeconds === 'number'
       ? Math.max(0, options.blockDurationSeconds)
       : config.lockoutDuration * 60;
@@ -423,31 +245,82 @@ export class RateLimitService extends BaseService {
     return {
       context,
       limit,
-      blockDurationSeconds: lockoutSeconds,
       windowSeconds,
-      metadata: options.metadata || null,
-      disabled: config.disabled,
-      isDisabled: config.disabled
+      disabled: config.disabled === true
     };
   }
 
-  _buildKvMetadata(normalized, resolved, record) {
-    const sourceMetadata = record?.metadata || resolved.metadata || {};
-    const kvMetadata = {
-      type: 'rate_limit',
-      context: resolved.context,
-      identifier: normalized,
-      attempts: record?.attempts || 0,
-      firstAttempt: record?.firstAttempt || null,
-      lastAttempt: record?.lastAttempt || null,
-      reason: pickFirstDefined(sourceMetadata.reason),
-      userId: pickFirstDefined(sourceMetadata.userId),
-      email: pickFirstDefined(sourceMetadata.email),
-      method: pickFirstDefined(sourceMetadata.method)
-    };
+  /**
+   * Release a budget.
+   *
+   * Used where the policy really is "this key is no longer under attack" - a
+   * successful login for the account itself. It is deliberately not applied to a
+   * shared per-IP budget: one account logging in successfully would otherwise
+   * hand every other attempt from that address a fresh window.
+   * @param {string} identifier - Identifier to release
+   * @param {Object} [options] - Context description
+   * @returns {Promise<boolean>} True when released
+   * @throws {ServiceUnavailableError} When the counter cannot be deleted
+   */
+  async resetFailedAttempts(identifier, options = {}) {
+    const key = normalizeIdentifier(identifier);
+    const context = options.context || DEFAULT_CONTEXT;
 
-    return Object.fromEntries(
-      Object.entries(kvMetadata).filter(([, value]) => value !== undefined && value !== null)
-    );
+    if (!key) {
+      return true;
+    }
+
+    try {
+      await this.dbService.delete(
+        'DELETE FROM rate_limit_counters WHERE context = ? AND identifier = ?',
+        [context, key]
+      );
+      return true;
+    } catch (error) {
+      dbError_log(`Failed to reset rate limit counter: ${error.message}`);
+      if (error instanceof ServiceUnavailableError) {
+        throw error;
+      }
+      throw new ServiceUnavailableError('Rate limit counter is unavailable', {
+        context,
+        cause: error.message
+      });
+    }
+  }
+
+  /**
+   * Get attempt count for identifier/context
+   * @param {string} identifier - IP/email/user
+   * @param {Object} options - Context configuration
+   * @returns {Promise<number>} Number of attempts recorded
+   */
+  async getAttemptCount(identifier, options = {}) {
+    const key = normalizeIdentifier(identifier);
+    const context = options.context || DEFAULT_CONTEXT;
+
+    if (!key) {
+      return 0;
+    }
+
+    try {
+      const record = await this.dbService.select(
+        `SELECT attempts_count
+         FROM rate_limit_counters
+         WHERE context = ? AND identifier = ?`,
+        [context, key],
+        true
+      );
+
+      return record ? record.attempts_count : 0;
+    } catch (error) {
+      dbError_log(`Error getting rate limit count: ${error.message}`);
+      if (error instanceof ServiceUnavailableError) {
+        throw error;
+      }
+      throw new ServiceUnavailableError('Rate limit counter is unavailable', {
+        context,
+        cause: error.message
+      });
+    }
   }
 }

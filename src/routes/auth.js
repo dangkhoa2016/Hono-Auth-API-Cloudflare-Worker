@@ -1,4 +1,3 @@
-import { serviceErrorFromResult } from '../utils/serviceErrors.js';
 import { Hono } from 'hono';
 import { createAuthService } from '../utils/serviceFactory.js';
 import { getClientIP, createSuccessResponse } from '../utils/helpers.js';
@@ -9,6 +8,7 @@ import { t, tSuccess } from '../i18n/index.js';
 import { unifiedMiddlewares } from '../middleware/unifiedRequestMiddleware.js';
 import { strictRateLimitMiddleware } from '../middleware/rateLimit.js';
 import { handleStandardError } from '../utils/errorHandler.js';
+import { serviceErrorFromResult } from '../utils/serviceErrors.js';
 import { authMiddleware } from '../middleware/auth.js';
 
 const auth = new Hono();
@@ -47,7 +47,7 @@ auth.post('/login', strictRateLimitMiddleware, i18nValidatorsMiddleware.login(),
     const userAgent = c.req.header('user-agent') || 'Unknown';
 
     const authService = createAuthService(c.env);
-    const result = await authService.login(email, password, ipAddress, { userAgent });
+    const result = await authService.login(email, password, ipAddress, { userAgent, admitIp: false });
 
     if (!result.success) {
       applyRateLimitHeaders(c, result.rateLimit);
