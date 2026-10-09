@@ -14,6 +14,8 @@ import { tSuccess, t } from '../i18n/index.js';
 import { unifiedMiddlewares } from '../middleware/unifiedRequestMiddleware.js';
 import { i18nValidatorsMiddleware } from '../middleware/i18nValidator.js';
 import { handleStandardError } from '../utils/errorHandler.js';
+import { serviceErrorFromResult } from '../utils/serviceErrors.js';
+import { createAuditScope } from '../services/auditScope.js';
 
 const audit = new Hono();
 
@@ -35,13 +37,12 @@ audit.get('/logs',
     const actorRoleFilter = query.actorRole || c.req.query('actorRole');
 
     try {
-      auditRoutes_log(`Audit logs request by ${user.role} ${user.id} with filters:`, query);
+      auditRoutes_log(`Audit logs request by ${user.role} ${user.id} with filters: ${JSON.stringify(query)}`);
 
       const auditLogService = createAuditLogService(c.env);
 
-      // Prepare filters and pagination for audit service
+      // Role restriction is derived server-side; the client only narrows filters
       const filters = {
-        exclude_super_admin: user.role === ROLES.ADMIN, // Admin users only see non-super_admin logs
         action: query.action,
         actor_id: query.userId,
         actor_role: actorRoleFilter,
@@ -55,7 +56,7 @@ audit.get('/logs',
         limit: query.limit
       };
 
-      const result = await auditLogService.getLogs(filters, pagination);
+      const result = await auditLogService.getLogs(filters, pagination, user);
 
       if (!result.success) {
         auditRoutes_log(`Failed to get audit logs: ${result.error}`);
@@ -67,7 +68,7 @@ audit.get('/logs',
           'audit.logs.retrieveFailed',
           {
             actor: user.full_name || user.email,
-            reason: result.error || t(c, 'error.unknown'),
+            reason: t(c, 'system.serverError'),
             suggestion: user.role === 'super_admin' ?
               t(c, 'audit.logs.suggestion_super_admin') :
               t(c, 'audit.logs.suggestion_admin'),
@@ -107,7 +108,7 @@ audit.get('/logs',
         'audit.logs.retrieveFailed',
         {
           actor: user.full_name || user.email,
-          reason: error.message || t(c, 'error.unknown'),
+          reason: t(c, 'system.serverError'),
           operation: t(c, 'audit.operations.logsView')
         }
       );
@@ -134,7 +135,7 @@ audit.get('/search',
       const result = await auditLogService.searchLogs({
         ...query,
         actorRole: actorRoleFilter
-      }, user.role, user.id);
+      }, user);
 
       if (!result.success) {
         return await handleStandardError(
@@ -145,7 +146,7 @@ audit.get('/search',
           'audit.search.searchFailed',
           {
             actor: user.full_name || user.email,
-            reason: result.error || t(c, 'error.unknown'),
+            reason: t(c, 'system.serverError'),
             query: query.search,
             suggestion: user.role === 'super_admin' ?
               t(c, 'audit.search.suggestion_super_admin') :
@@ -184,7 +185,7 @@ audit.get('/search',
         'audit.search.searchFailed',
         {
           actor: user.full_name || user.email,
-          reason: error.message || t(c, 'error.unknown'),
+          reason: t(c, 'system.serverError'),
           operation: t(c, 'audit.operations.search'),
           query: query.search || t(c, 'audit.search.noQuery')
         }
@@ -207,7 +208,7 @@ audit.get('/stats',
 
       const auditLogService = createAuditLogService(c.env);
       const stats = await auditLogService.getAuditStats({
-        exclude_super_admin: user.role === ROLES.ADMIN
+        exclude_super_admin: createAuditScope(user).excludeSuperAdmin
       });
 
       if (!stats.success) {
@@ -220,7 +221,7 @@ audit.get('/stats',
           'audit.stats.statsFailed',
           {
             actor: user.full_name || user.email,
-            reason: stats.error || t(c, 'error.unknown'),
+            reason: t(c, 'system.serverError'),
             suggestion: user.role === 'super_admin' ?
               t(c, 'audit.stats.suggestion_super_admin') :
               t(c, 'audit.stats.suggestion_admin'),
@@ -252,7 +253,7 @@ audit.get('/stats',
         'audit.stats.statsFailed',
         {
           actor: user.full_name || user.email,
-          reason: error.message || t(c, 'error.unknown'),
+          reason: t(c, 'system.serverError'),
           operation: t(c, 'audit.operations.stats'),
           role: user.role
         }
@@ -271,48 +272,87 @@ audit.get('/export',
   async (c) => {
     const user = c.get('user');
     const query = c.req.valid('query');
+    // The export service already defaults an absent format to json, but the
+    // route went on to use the raw query value for the content type, the
+    // filename and the success message. Omitting `format` therefore produced a
+    // 500 from `undefined.toUpperCase()` and a filename ending in
+    // `.undefined`. One value, used everywhere, so the default a client gets is
+    // the default the service already chose.
+    const format = String(query.format || 'json').toLowerCase();
 
     try {
-      auditRoutes_log(`Audit export request by ${user.role} ${user.id} format: ${query.format}`);
+      auditRoutes_log(`Audit export request by ${user.role} ${user.id} format: ${format}`);
 
       const auditLogService = createAuditLogService(c.env);
       const exportResult = await auditLogService.exportLogs({
-        format: query.format,
+        format,
         startDate: query.startDate,
         endDate: query.endDate,
         filters: query.filters,
         includeDetails: query.includeDetails,
-        maxRecords: query.maxRecords,
-        exclude_super_admin: user.role === ROLES.ADMIN
-      });
+        maxRecords: query.maxRecords
+      }, user);
 
       if (!exportResult.success) {
+        // A format we cannot produce is the caller's mistake, not a server
+        // fault: 422 with the real list, never a file labelled `.excel` that
+        // turns out to hold JSON.
+        if (exportResult.statusCode === 422) {
+          // The correlation id has to reach the body, not only the
+          // `X-Request-ID` header: a support request usually starts from the
+          // JSON a client logged, and an id that is absent there cannot be
+          // quoted. The middleware minted this one, so body and header agree.
+          const requestId = c.get('requestId');
+          return c.json({
+            success: false,
+            error: exportResult.error,
+            code: exportResult.error,
+            message: exportResult.message,
+            supported_formats: exportResult.supported_formats,
+            ...(requestId ? { requestId } : {})
+          }, 422);
+        }
+
+
+        // The service has already decided what this failure is. Rebuilding a
+        // bare `Error` from its message threw that decision away, which is how
+        // a store outage ended up reported to the client as a 500 the client
+        // caused. `serviceErrorFromResult` keeps the status and the machine
+        // code, and the status is re-read from the error below.
+        const failure = serviceErrorFromResult(exportResult, 'AUDIT_EXPORT_FAILED');
+        const requestId = c.get('requestId');
+
         return await handleStandardError(
           c,
-          new Error(exportResult.error || 'AUDIT_EXPORT_FAILED'),
+          failure,
           'Failed to export audit logs',
           auditRoutes_log,
           'audit.export.exportFailed',
           {
             actor: user.full_name || user.email,
-            reason: exportResult.error || t(c, 'error.unknown'),
+            // Not `exportResult.error`: that is an internal token, and a caller
+            // cannot act on it. The machine code rides in `code` instead.
+            reason: t(c, 'system.serverError'),
             operation: t(c, 'audit.operations.export'),
-            format: query.format || 'unknown'
+            format
           },
-          500
+          500,
+          // The id has to be in the body, not only the `X-Request-ID` header:
+          // a support request usually starts from the JSON a client logged.
+          requestId ? { requestId } : null
         );
       }
 
       const exportContent = exportResult.data?.content ?? '';
 
-      const contentType = query.format === 'csv' ? 'text/csv' : 'application/json';
-      const filename = `audit_logs_${new Date().toISOString().split('T')[0]}.${query.format}`;
+      const contentType = format === 'csv' ? 'text/csv' : 'application/json';
+      const filename = `audit_logs_${new Date().toISOString().split('T')[0]}.${format}`;
 
-      auditRoutes_log(`Exporting audit logs as ${query.format}: ${filename}`);
+      auditRoutes_log(`Exporting audit logs as ${format}: ${filename}`);
 
       // Add success message as header (for logging/debugging)
       const successMessage = tSuccess(c, 'auditMessages.exported', {
-        format: query.format.toUpperCase(),
+        format: format.toUpperCase(),
         filename: filename,
         actor: user.full_name || user.email,
         date: new Date().toLocaleDateString()
@@ -335,9 +375,9 @@ audit.get('/export',
         'audit.export.exportFailed',
         {
           actor: user.full_name || user.email,
-          reason: error.message || t(c, 'error.unknown'),
+          reason: t(c, 'system.serverError'),
           operation: t(c, 'audit.operations.export'),
-          format: query.format || 'unknown'
+          format
         }
       );
     }
@@ -378,7 +418,7 @@ audit.get('/system-health',
         'audit.health.healthFailed',
         {
           actor: user.full_name || user.email,
-          reason: error.message || t(c, 'error.unknown'),
+          reason: t(c, 'system.serverError'),
           operation: t(c, 'audit.operations.healthCheck'),
           checkType: t(c, 'audit.health.systemCheck')
         }
@@ -414,7 +454,7 @@ audit.delete('/logs/:id', requireRole(ROLE_COMBINATIONS.ADMIN_ONLY), async (c) =
         'audit.logs.retrieveFailed',
         {
           actor: user.full_name || user.email,
-          reason: result.error || t(c, 'error.unknown'),
+          reason: t(c, 'system.serverError'),
           operation: 'delete audit log'
         },
         500
@@ -433,7 +473,7 @@ audit.delete('/logs/:id', requireRole(ROLE_COMBINATIONS.ADMIN_ONLY), async (c) =
       'audit.logs.retrieveFailed',
       {
         actor: user.full_name || user.email,
-        reason: error.message || t(c, 'error.unknown'),
+        reason: t(c, 'system.serverError'),
         operation: 'delete audit log'
       }
     );

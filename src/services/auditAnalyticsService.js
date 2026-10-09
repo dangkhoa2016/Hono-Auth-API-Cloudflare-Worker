@@ -6,6 +6,7 @@
 import { BaseService } from './baseService.js';
 import { auditAnalytics_log } from '../utils/debug.js';
 import { ROLE_COMBINATIONS } from '../constants/roles.js';
+import { buildScopedWhere, resolveAuditScope } from './auditScope.js';
 
 /**
  * Advanced analytics service for audit logs
@@ -21,7 +22,7 @@ export class AuditAnalyticsService extends BaseService {
    * @param {Object} options - Analytics options
    * @returns {Promise<Object>} Security analytics data
    */
-  async getSecurityAnalytics(options = {}) {
+  async getSecurityAnalytics(options = {}, principal) {
     const {
       timeframe = '24h',
       // includeDetails = false
@@ -31,6 +32,8 @@ export class AuditAnalyticsService extends BaseService {
 
     try {
       const timeframeSql = this.getTimeframeSQL(timeframe);
+      const scoped = buildScopedWhere({}, resolveAuditScope(principal));
+      const scopeCondition = scoped.whereClause.replace(/^WHERE /, '') || '1=1';
 
       // Execute queries in parallel for better performance
       const [failedLogins, suspiciousIps, adminActivity, rateLimitEvents] = await Promise.all([
@@ -42,12 +45,12 @@ export class AuditAnalyticsService extends BaseService {
             COUNT(DISTINCT actor_id) as affected_users,
             MAX(timestamp) as last_attempt
           FROM audit_logs 
-          WHERE (LOWER(action) LIKE '%login%' OR target_identifier LIKE '%/auth/login%') AND status != 'SUCCESS'
+          WHERE ${scopeCondition} AND (LOWER(action) LIKE '%login%' OR target_identifier LIKE '%/auth/login%') AND status != 'SUCCESS'
             AND timestamp >= ${timeframeSql}
           GROUP BY ip_address
           ORDER BY count DESC
           LIMIT 10
-        `, []),
+        `, scoped.params),
 
         // Suspicious IP activity
         this.dbService.select(`
@@ -59,13 +62,13 @@ export class AuditAnalyticsService extends BaseService {
             MIN(timestamp) as first_seen,
             MAX(timestamp) as last_seen
           FROM audit_logs 
-          WHERE timestamp >= ${timeframeSql}
+          WHERE ${scopeCondition} AND timestamp >= ${timeframeSql}
             AND ip_address IS NOT NULL
           GROUP BY ip_address
           HAVING total_requests > 100 OR unique_users > 10
           ORDER BY total_requests DESC
           LIMIT 20
-        `, []),
+        `, scoped.params),
 
         // Admin activity analysis
         this.dbService.select(`
@@ -75,11 +78,11 @@ export class AuditAnalyticsService extends BaseService {
             COUNT(*) as count,
             COUNT(DISTINCT actor_id) as unique_admins
           FROM audit_logs 
-          WHERE actor_role IN (?, ?)
+          WHERE ${scopeCondition} AND actor_role IN (?, ?)
             AND timestamp >= ${timeframeSql}
           GROUP BY actor_role, action
           ORDER BY count DESC
-        `, ROLE_COMBINATIONS.ADMIN_ONLY),
+        `, [...scoped.params, ...ROLE_COMBINATIONS.ADMIN_ONLY]),
 
         // Rate limiting events
         this.dbService.select(`
@@ -89,12 +92,12 @@ export class AuditAnalyticsService extends BaseService {
             ip_address,
             COUNT(*) as blocks_per_ip
           FROM audit_logs 
-          WHERE action LIKE '%rate_limit%' 
+          WHERE ${scopeCondition} AND action LIKE '%rate_limit%'
             AND timestamp >= ${timeframeSql}
           GROUP BY ip_address
           ORDER BY blocks_per_ip DESC
           LIMIT 10
-        `, [])
+        `, scoped.params)
       ]);
 
       const analytics = {
@@ -124,7 +127,7 @@ export class AuditAnalyticsService extends BaseService {
    * @param {Object} options - Analytics options
    * @returns {Promise<Object>} User behavior analytics
    */
-  async getUserBehaviorAnalytics(options = {}) {
+  async getUserBehaviorAnalytics(options = {}, principal) {
     const {
       timeframe = '7d',
       actorRole = null,
@@ -135,7 +138,10 @@ export class AuditAnalyticsService extends BaseService {
 
     try {
       const timeframeSql = this.getTimeframeSQL(timeframe);
-      const roleFilter = actorRole ? `AND actor_role = '${actorRole}'` : '';
+      const scoped = buildScopedWhere({}, resolveAuditScope(principal));
+      const scopeCondition = scoped.whereClause.replace(/^WHERE /, '') || '1=1';
+      const roleFilter = actorRole ? 'AND actor_role = ?' : '';
+      const behaviorParams = [...scoped.params, ...(actorRole ? [actorRole] : [])];
 
       // Execute queries in parallel
       const [activityPatterns, actionsByRole, peakHours] = await Promise.all([
@@ -156,13 +162,13 @@ export class AuditAnalyticsService extends BaseService {
               END
             ) * 100 as business_hours_percentage
           FROM audit_logs 
-          WHERE timestamp >= ${timeframeSql}
+          WHERE ${scopeCondition} AND timestamp >= ${timeframeSql}
             ${roleFilter}
             AND actor_id IS NOT NULL
           GROUP BY actor_id, actor_role
           ORDER BY total_actions DESC
           LIMIT 50
-        `, []),
+        `, behaviorParams),
 
         // Most common actions by role
         this.dbService.select(`
@@ -172,12 +178,12 @@ export class AuditAnalyticsService extends BaseService {
             COUNT(*) as count,
             COUNT(DISTINCT actor_id) as unique_users
           FROM audit_logs 
-          WHERE timestamp >= ${timeframeSql}
+          WHERE ${scopeCondition} AND timestamp >= ${timeframeSql}
             ${roleFilter}
             AND actor_id IS NOT NULL
           GROUP BY actor_role, action
           ORDER BY actor_role, count DESC
-        `, []),
+        `, behaviorParams),
 
         // Peak activity hours
         this.dbService.select(`
@@ -186,12 +192,12 @@ export class AuditAnalyticsService extends BaseService {
             COUNT(*) as activity_count,
             COUNT(DISTINCT actor_id) as unique_users
           FROM audit_logs 
-          WHERE timestamp >= ${timeframeSql}
+          WHERE ${scopeCondition} AND timestamp >= ${timeframeSql}
             ${roleFilter}
             AND actor_id IS NOT NULL
           GROUP BY strftime('%H', timestamp)
           ORDER BY activity_count DESC
-        `, [])
+        `, behaviorParams)
       ]);
 
       const analytics = {
@@ -220,13 +226,15 @@ export class AuditAnalyticsService extends BaseService {
    * @param {Object} options - Analytics options
    * @returns {Promise<Object>} Performance analytics
    */
-  async getPerformanceAnalytics(options = {}) {
+  async getPerformanceAnalytics(options = {}, principal) {
     const { timeframe = '24h' } = options;
 
     auditAnalytics_log(`Generating performance analytics for timeframe: ${timeframe}`);
 
     try {
       const timeframeSql = this.getTimeframeSQL(timeframe);
+      const scoped = buildScopedWhere({}, resolveAuditScope(principal));
+      const scopeCondition = scoped.whereClause.replace(/^WHERE /, '') || '1=1';
 
       // Execute queries in parallel
       const [volume, size, actionFrequency] = await Promise.all([
@@ -239,10 +247,10 @@ export class AuditAnalyticsService extends BaseService {
             COUNT(DISTINCT actor_id) as unique_users,
             COUNT(DISTINCT action) as unique_actions
           FROM audit_logs 
-          WHERE timestamp >= ${timeframeSql}
+          WHERE ${scopeCondition} AND timestamp >= ${timeframeSql}
           GROUP BY DATE(timestamp), strftime('%H', timestamp)
           ORDER BY timestamp DESC
-        `, []),
+        `, scoped.params),
 
         // Database size and growth
         this.dbService.select(`
@@ -252,7 +260,8 @@ export class AuditAnalyticsService extends BaseService {
             MAX(timestamp) as latest_record,
             MIN(timestamp) as oldest_record
           FROM audit_logs
-        `, [], true),
+          WHERE ${scopeCondition}
+        `, scoped.params, true),
 
         // Action frequency analysis
         this.dbService.select(`
@@ -268,10 +277,10 @@ export class AuditAnalyticsService extends BaseService {
               END
             ) as avg_duration_ms
           FROM audit_logs 
-          WHERE timestamp >= ${timeframeSql}
+          WHERE ${scopeCondition} AND timestamp >= ${timeframeSql}
           GROUP BY action
           ORDER BY frequency DESC
-        `, [])
+        `, scoped.params)
       ]);
 
       const analytics = {
