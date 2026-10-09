@@ -10,8 +10,9 @@ import debug from './debugEnhanced.js'; // Use the enhanced debug with ANSI colo
 import { DEBUG_PREFIX } from '../constants/app.js';
 
 
-// temporatory enable here - will be controlled by middleware in index.js
-debug.enable(`${DEBUG_PREFIX}:*`);
+// Debug namespaces stay disabled until configureDebugNamespaces() runs.
+// Importing this module must never turn logging on, because module
+// initialization happens before any middleware or env check.
 
 // Create debug instances for different components
 const createDebugger = (namespace) => debug(`${DEBUG_PREFIX}:${namespace}`);
@@ -190,6 +191,20 @@ export const {
   testSuite_log,
   schemaRegistry_log
 } = debuggers;
+
+/**
+ * Turn debug namespaces on/off from a resolved DEBUG setting.
+ * Empty string, 'none' and 'off' all mean disabled.
+ */
+export function configureDebugNamespaces(setting) {
+  const normalized = typeof setting === 'string' ? setting.trim() : '';
+  if (normalized === '' || normalized.toLowerCase() === 'none' || normalized.toLowerCase() === 'off') {
+    debug.disable();
+    return { enabled: false, namespaces: [] };
+  }
+  debug.enable(normalized);
+  return { enabled: true, namespaces: normalized.split(',').map((item) => item.trim()).filter(Boolean) };
+}
 
 // Export helper function
 export { createDebugger, debug };
