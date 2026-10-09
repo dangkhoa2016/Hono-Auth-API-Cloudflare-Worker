@@ -75,6 +75,7 @@ const debuggers = {
   kvConfigService_log: createDebugger('services:kv-config'),
   dbService_log: createDebugger('services:database'),
   auditRetentionService_log: createDebugger('services:audit-retention'),
+  auditRetentionPolicy_log: createDebugger('services:audit-retention-policy'),
   auditConfigService_log: createDebugger('services:audit-config'),
   i18nService_log: createDebugger('services:i18n'),
 
@@ -161,6 +162,7 @@ export const {
   kvConfigService_log,
   dbService_log,
   auditRetentionService_log,
+  auditRetentionPolicy_log,
   auditConfigService_log,
   i18nService_log,
   auditMonitoring_log,

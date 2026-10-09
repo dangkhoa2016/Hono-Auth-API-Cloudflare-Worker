@@ -25,6 +25,10 @@ const BATCH_SIZE = 1000;
 /**
  * Audit Retention Service
  * Manages data retention policies and cleanup operations for audit logs
+ *
+ * T5: the audit-log half of a cleanup no longer deletes rows itself. It delegates
+ * to the archival service, so the rows a simulation counts are exactly the rows
+ * an execution archives, and nothing is deleted before its archive copy exists.
 */
 export class AuditRetentionService extends BaseService {
   constructor(env) {
@@ -297,6 +301,44 @@ export class AuditRetentionService extends BaseService {
   }
 
   /**
+   * Archive-then-delete audit logs older than the policy window.
+   *
+   * The simulation and the execution both come through here, so a dry run and a
+   * real run are the same query against the same cutoff. The archival service
+   * refuses to delete without `archiveFirst` and an explicit confirmation, which
+   * is what keeps a cleanup from quietly becoming data loss.
+   *
+   * @param {number} retentionDays - Days of audit history to keep. Rows older
+   *   than this are archived and removed; newer rows are not touched.
+   * @param {{dryRun: boolean}} mode - Preview or execute
+   * @returns {Promise<Object>} Summary from the archival service
+   */
+  async auditLogCleanup(retentionDays, { dryRun }) {
+    if (!Number.isFinite(retentionDays) || retentionDays <= 0) {
+      throw new RangeError(`audit log retention must be a positive number of days, got ${retentionDays}`);
+    }
+
+    // Imported lazily so this module does not pull in the archive schema at load
+    // time; the archival service owns those tables.
+    const { AuditArchivalService } = await import('./auditArchivalService.js');
+    const archival = new AuditArchivalService(this.env);
+
+    // The range is "everything up to the cutoff", because a retention policy is
+    // about what is too old. The end is inclusive, so a row exactly on the
+    // cutoff is archived; the window itself is `retentionDays` wide from there
+    // to now.
+    const now = new Date();
+    return archival.truncateLogsByDateRange({
+      startDate: new Date(0).toISOString(),
+      endDate: new Date(now.getTime() - retentionDays * 86400000).toISOString(),
+      batchSize: BATCH_SIZE,
+      archiveFirst: true,
+      dryRun,
+      confirmDelete: true
+    });
+  }
+
+  /**
    * Simulate cleanup operation without actual deletion
    * @param {Object} options - Cleanup simulation options
    * @param {string} lang - Language code for validation
@@ -336,20 +378,15 @@ export class AuditRetentionService extends BaseService {
         options: validation.data
       };
 
-      // Simulate audit logs cleanup
+      // Simulate audit logs cleanup.
       if (policy.audit_log_retention_days) {
-        const cutoffDate = new Date();
-        cutoffDate.setDate(cutoffDate.getDate() - policy.audit_log_retention_days);
-
-        const auditLogsQuery = `
-          SELECT COUNT(*) as count 
-          FROM audit_logs 
-          WHERE timestamp < ?
-        `;
-
-        const auditLogsResult = await this.dbService.select(auditLogsQuery, [cutoffDate.toISOString()]);
-        results.audit_logs.eligible = auditLogsResult[0]?.count || 0;
-        results.audit_logs.affected_records = results.audit_logs.eligible;
+        // Delegated for the same reason the execution is: one predicate, one
+        // cutoff. Counting with a simpler query than the one that later deletes
+        // is how a preview comes to over-report.
+        const preview = await this.auditLogCleanup(policy.audit_log_retention_days, { dryRun: true });
+        results.audit_logs.eligible = preview.total_found;
+        results.audit_logs.affected_records = preview.total_found;
+        results.audit_logs.would_archive = preview.would_delete ?? preview.total_found;
       }
 
       // Simulate user data cleanup (if applicable)
@@ -443,42 +480,23 @@ export class AuditRetentionService extends BaseService {
         }
       };
 
-      // Actual audit logs cleanup with batch processing
+      // Actual audit logs cleanup. The archival service archives and deletes in
+      // one transaction per chunk, so a failure part-way through leaves every row
+      // in one table or the other, never in neither.
       if (policy.audit_log_retention_days) {
-        const cutoffDate = new Date();
-        cutoffDate.setDate(cutoffDate.getDate() - policy.audit_log_retention_days);
-
         try {
-          // Process in batches to avoid overwhelming the database
-          let totalDeleted = 0;
-          let hasMore = true;
-
-          while (hasMore) {
-            const deleteQuery = `
-              DELETE FROM audit_logs 
-              WHERE timestamp < ? 
-              LIMIT ?
-            `;
-
-            const deleteResult = await this.dbService.run(
-              deleteQuery,
-              [cutoffDate.toISOString(), BATCH_SIZE]
-            );
-
-            const deleted = deleteResult.changes || 0;
-            totalDeleted += deleted;
-
-            auditRetentionService_log(`Deleted batch: ${deleted} records`);
-
-            // If we deleted fewer than the batch size, we're done
-            hasMore = deleted >= BATCH_SIZE;
-          }
-
-          results.audit_logs.deleted = totalDeleted;
-          auditRetentionService_log(`Total deleted audit log records: ${totalDeleted}`);
+          const outcome = await this.auditLogCleanup(policy.audit_log_retention_days, { dryRun: false });
+          results.audit_logs.deleted = outcome.deleted_count;
+          results.audit_logs.archived = outcome.archived_count;
+          results.audit_logs.eligible = outcome.total_found;
+          results.audit_logs.batches = outcome.batches;
+          auditRetentionService_log(
+            `Archived ${outcome.archived_count} audit rows and deleted ${outcome.deleted_count}`
+          );
         } catch (error) {
           results.audit_logs.errors = 1;
-          auditRetentionService_log(`Error deleting audit logs: ${error.message}`);
+          auditRetentionService_log(`Error cleaning up audit logs: ${error.message}`);
+          results.errors = [...(results.errors || []), `Audit logs cleanup error: ${error.message}`];
         }
       }
 
