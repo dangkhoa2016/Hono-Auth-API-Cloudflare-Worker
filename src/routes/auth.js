@@ -245,6 +245,7 @@ auth.post('/logout-all', authMiddleware, i18nValidatorsMiddleware.logoutAll(), a
 
 // GET /activate - Activate user account via email link
 auth.get('/activate', async (c) => {
+  const frontendHomeUrl = getActivationHomeUrl(c.env.FRONTEND_URL);
   authRoutes_log(`Activation attempt from IP: ${getClientIP(c)}`);
 
   try {
@@ -257,7 +258,8 @@ auth.get('/activate', async (c) => {
         success: false,
         error: 'MISSING_PARAMS',
         message: t(c, 'auth.activationMissingToken', {}, 'Missing activation token'),
-        appName
+        appName,
+        frontendHomeUrl
       }), 400);
     }
 
@@ -279,7 +281,8 @@ auth.get('/activate', async (c) => {
         success: false,
         error: result.error,
         message: errorMessages[result.error] || result.message,
-        appName
+        appName,
+        frontendHomeUrl
       }), result.error === 'DISABLED_BY_ADMIN' ? 403 : 400);
     }
 
@@ -289,7 +292,8 @@ auth.get('/activate', async (c) => {
         success: true,
         alreadyActive: true,
         message: t(c, 'auth.activationAlreadyActive', {}, 'Your account is already active. You can log in now.'),
-        appName
+        appName,
+        frontendHomeUrl
       }));
     }
 
@@ -298,7 +302,8 @@ auth.get('/activate', async (c) => {
       success: true,
       user: result.user,
       message: t(c, 'auth.activationSuccess', {}, 'Your account has been activated successfully!'),
-      appName
+      appName,
+      frontendHomeUrl
     }));
 
   } catch (error) {
@@ -307,7 +312,8 @@ auth.get('/activate', async (c) => {
       success: false,
       error: 'SERVER_ERROR',
       message: t(c, 'auth.activationServerError', {}, 'An error occurred. Please try again later.'),
-      appName: 'Hono Auth API'
+      appName: 'Hono Auth API',
+      frontendHomeUrl
     }), 500);
   }
 });
@@ -315,7 +321,30 @@ auth.get('/activate', async (c) => {
 /**
  * Render activation result page (HTML)
  */
-function renderActivationPage({ success, alreadyActive, user, error, message, appName = 'Hono Auth API' }) {
+function getActivationHomeUrl(value) {
+  if (!value) {return '/';}
+  try {
+    const url = new URL(value);
+    const local = ['localhost', '127.0.0.1', '[::1]'].includes(url.hostname);
+    if ((url.protocol !== 'https:' && !(url.protocol === 'http:' && local))
+      || url.username || url.password || url.search || url.hash
+      || !/^(?:[a-z\d._-]+|\[[a-f\d:.]+\])$/i.test(url.hostname)) {
+      return '/';
+    }
+    if (!url.pathname.endsWith('/')) {url.pathname += '/';}
+    return url.href;
+  } catch {
+    return '/';
+  }
+}
+
+function escapeActivationText(value) {
+  return String(value ?? '').replace(/[&<>"']/g, character => ({
+    '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', '\'': '&#39;'
+  })[character]);
+}
+
+function renderActivationPage({ success, alreadyActive, user, error, message, appName = 'Hono Auth API', frontendHomeUrl = '/' }) {
   const title = success ? '✅ Account Activated' : '❌ Activation Failed';
   const fullTitle = `${appName} | ${title}`;
   // eslint-disable-next-line no-unused-vars
@@ -326,7 +355,7 @@ function renderActivationPage({ success, alreadyActive, user, error, message, ap
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>${fullTitle}</title>
+  <title>${escapeActivationText(fullTitle)}</title>
   <style>
     * { margin: 0; padding: 0; box-sizing: border-box; }
     body { 
@@ -403,14 +432,14 @@ function renderActivationPage({ success, alreadyActive, user, error, message, ap
     <h1>${success ? (alreadyActive ? 'Already Active' : 'Account Activated!') : 'Activation Failed'}</h1>
     ${user ? `
     <div class="user-info">
-      <p><strong>Email:</strong> ${user.email}</p>
-      <p><strong>Name:</strong> ${user.full_name}</p>
+      <p><strong>Email:</strong> ${escapeActivationText(user.email)}</p>
+      <p><strong>Name:</strong> ${escapeActivationText(user.full_name)}</p>
       <p><strong>Activated:</strong> ${new Date(user.activated_at).toLocaleString()}</p>
     </div>
     ` : ''}
-    <p>${message}</p>
-    <a href="/login" class="btn">${success ? 'Go to Login' : 'Back to Home'}</a>
-    ${error ? `<p class="error-code">Error: ${error}</p>` : ''}
+    <p>${escapeActivationText(message)}</p>
+    <a href="${escapeActivationText(frontendHomeUrl)}" class="btn">${success ? 'Go to Home' : 'Back to Home'}</a>
+    ${error ? `<p class="error-code">Error: ${escapeActivationText(error)}</p>` : ''}
   </div>
 </body>
 </html>`;
