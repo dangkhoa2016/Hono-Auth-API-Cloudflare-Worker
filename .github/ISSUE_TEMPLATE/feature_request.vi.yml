@@ -1,0 +1,35 @@
+name: Đề xuất tính năng (Tiếng Việt)
+description: Đề xuất một khả năng hoặc cải thiện cụ thể.
+title: "[Feature] "
+body:
+  - type: markdown
+    attributes:
+      value: >-
+        Issue là công khai. Không gửi token, mật khẩu, export database hoặc dữ liệu riêng tư. Báo lỗ hổng theo
+        [SECURITY.md](https://github.com/dangkhoa2016/Hono-Auth-API-Cloudflare-Worker/blob/main/.github/SECURITY.md).
+  - type: textarea
+    id: problem
+    attributes:
+      label: Vấn đề cần giải quyết
+    validations:
+      required: true
+  - type: textarea
+    id: proposal
+    attributes:
+      label: Hành vi đề xuất
+    validations:
+      required: true
+  - type: textarea
+    id: acceptance
+    attributes:
+      label: Cách kiểm chứng kết quả
+      description: Mô tả kết quả quan sát được, kể cả lỗi/chưa hỗ trợ nếu liên quan.
+    validations:
+      required: true
+  - type: textarea
+    id: impact
+    attributes:
+      label: Ảnh hưởng và phương án khác
+      description: Nêu API/client, migration, cấu hình hoặc tích hợp ngoài nếu có.
+    validations:
+      required: false

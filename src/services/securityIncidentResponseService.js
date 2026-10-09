@@ -447,7 +447,7 @@ class IncidentManager {
 
   async getResponseActions(incidentId) {
     const rows = await this.db.select(
-      `SELECT * FROM incident_response_actions WHERE incident_id = ? ORDER BY executed_at ASC`,
+      'SELECT * FROM incident_response_actions WHERE incident_id = ? ORDER BY executed_at ASC',
       [incidentId]
     );
     return rows.map(row => ({
@@ -494,12 +494,12 @@ class IncidentManager {
     };
     // Insert into DB
     await this.db.insert(
-      `INSERT INTO security_incidents (id, type, severity, status, title, description, metadata, detected_at, updated_at, tags, created_by) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+      'INSERT INTO security_incidents (id, type, severity, status, title, description, metadata, detected_at, updated_at, tags, created_by) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)',
       [incident.id, incident.type, incident.severity, incident.status, incident.title, incident.description, JSON.stringify(incident.metadata), incident.detectedAt, incident.updatedAt, JSON.stringify(incident.tags), incidentData.metadata?.createdBy || 'system']
     );
     // Add timeline entry in DB
     await this.db.insert(
-      `INSERT INTO incident_timeline (incident_id, timestamp, event_type, description, actor, details) VALUES (?, ?, ?, ?, ?, ?)`,
+      'INSERT INTO incident_timeline (incident_id, timestamp, event_type, description, actor, details) VALUES (?, ?, ?, ?, ?, ?)',
       [incident.id, now, 'incident_created', 'Security incident detected and created', 'system', null]
     );
     // Cache in RAM
@@ -516,25 +516,25 @@ class IncidentManager {
     if (!incident) {
       // Try to load from DB
       incident = await this.getIncident(incidentId);
-      if (!incident) throw new Error(`Incident not found: ${incidentId}`);
+      if (!incident) {throw new Error(`Incident not found: ${incidentId}`);}
     }
     const oldStatus = incident.status;
     incident.status = newStatus;
     incident.updatedAt = new Date().toISOString();
-    if (updateInfo.assignedTo) incident.assignee = updateInfo.assignedTo;
-    if (updateInfo.resolution) incident.resolution = updateInfo.resolution;
+    if (updateInfo.assignedTo) {incident.assignee = updateInfo.assignedTo;}
+    if (updateInfo.resolution) {incident.resolution = updateInfo.resolution;}
     // Update DB
     await this.db.update(
-      `UPDATE security_incidents SET status=?, updated_at=?, assignee=?, notes=? WHERE id=?`,
+      'UPDATE security_incidents SET status=?, updated_at=?, assignee=?, notes=? WHERE id=?',
       [incident.status, incident.updatedAt, incident.assignee, updateInfo.resolution || null, incidentId]
     );
     // Add timeline entry in DB
     await this.db.insert(
-      `INSERT INTO incident_timeline (incident_id, timestamp, event_type, description, actor, details) VALUES (?, ?, ?, ?, ?, ?)`,
+      'INSERT INTO incident_timeline (incident_id, timestamp, event_type, description, actor, details) VALUES (?, ?, ?, ?, ?, ?)',
       [incidentId, incident.updatedAt, 'status_change', `Status changed from ${oldStatus} to ${newStatus}`, updateInfo.actor || 'system', updateInfo.resolution ? JSON.stringify({ resolution: updateInfo.resolution }) : null]
     );
     // Update cache
-    if (!incident.timeline) incident.timeline = [];
+    if (!incident.timeline) {incident.timeline = [];}
     incident.timeline.push({ timestamp: incident.updatedAt, event: 'status_change', description: `Status changed from ${oldStatus} to ${newStatus}`, actor: updateInfo.actor || 'system', resolution: updateInfo.resolution });
     this.incidents.set(incidentId, incident);
     securityIncident_log(`Incident ${incidentId} status updated: ${oldStatus} -> ${newStatus}`);
@@ -548,9 +548,9 @@ class IncidentManager {
     let incident = this.incidents.get(incidentId);
     if (!incident) {
       incident = await this.getIncident(incidentId);
-      if (!incident) throw new Error(`Incident not found: ${incidentId}`);
+      if (!incident) {throw new Error(`Incident not found: ${incidentId}`);}
     }
-    if (!incident.responseResults) incident.responseResults = [];
+    if (!incident.responseResults) {incident.responseResults = [];}
     incident.responseResults.push(responseResults);
     incident.updatedAt = new Date().toISOString();
     // Insert response actions into DB (flattened)
@@ -559,7 +559,7 @@ class IncidentManager {
         if (ruleResult.actions && Array.isArray(ruleResult.actions)) {
           for (const action of ruleResult.actions) {
             await this.db.insert(
-              `INSERT INTO incident_response_actions (incident_id, rule_id, rule_name, action_type, action_status, priority, params, result, executed_at, completed_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+              'INSERT INTO incident_response_actions (incident_id, rule_id, rule_name, action_type, action_status, priority, params, result, executed_at, completed_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)',
               [incidentId, ruleResult.ruleId, ruleResult.ruleName, action.action, action.success ? 'completed' : 'failed', action.priority || 0, action.params ? JSON.stringify(action.params) : null, JSON.stringify(action), action.timestamp || incident.updatedAt, action.timestamp || incident.updatedAt]
             );
           }
@@ -568,11 +568,11 @@ class IncidentManager {
     }
     // Add timeline entry in DB
     await this.db.insert(
-      `INSERT INTO incident_timeline (incident_id, timestamp, event_type, description, actor, details) VALUES (?, ?, ?, ?, ?, ?)`,
+      'INSERT INTO incident_timeline (incident_id, timestamp, event_type, description, actor, details) VALUES (?, ?, ?, ?, ?, ?)',
       [incidentId, incident.updatedAt, 'response_executed', `Automated response executed: ${responseResults.actionsExecuted} actions`, 'automated_response_system', JSON.stringify(responseResults)]
     );
     // Update cache
-    if (!incident.timeline) incident.timeline = [];
+    if (!incident.timeline) {incident.timeline = [];}
     incident.timeline.push({ timestamp: incident.updatedAt, event: 'response_executed', description: `Automated response executed: ${responseResults.actionsExecuted} actions`, actor: 'automated_response_system', details: responseResults });
     this.incidents.set(incidentId, incident);
     securityIncident_log(`Response results added to incident ${incidentId}`);
@@ -584,10 +584,10 @@ class IncidentManager {
    */
   async getIncident(incidentId) {
     // Try RAM cache first
-    if (this.incidents.has(incidentId)) return this.incidents.get(incidentId);
+    if (this.incidents.has(incidentId)) {return this.incidents.get(incidentId);}
     // Load from DB
     const row = await this.db.select('SELECT * FROM security_incidents WHERE id = ?', [incidentId], true);
-    if (!row) return null;
+    if (!row) {return null;}
     // Load timeline
     const timeline = await this.db.select('SELECT * FROM incident_timeline WHERE incident_id = ? ORDER BY timestamp ASC', [incidentId]);
     // Load response actions
@@ -677,11 +677,11 @@ class IncidentManager {
     // Compose stats
     const stats = {
       total: totalRow?.total || 0,
-      byStatus: { 
-        detected: 0, investigating: 0, contained: 0, resolved: 0, false_positive: 0 
+      byStatus: {
+        detected: 0, investigating: 0, contained: 0, resolved: 0, false_positive: 0
       },
-      bySeverity: { 
-        low: 0, medium: 0, high: 0, critical: 0 
+      bySeverity: {
+        low: 0, medium: 0, high: 0, critical: 0
       },
       byType: {},
       recent: {
@@ -691,9 +691,9 @@ class IncidentManager {
       avgResolutionTime: avgResTimeRow?.avg_time ? Math.round(avgResTimeRow.avg_time * 10) / 10 : 0,
       openIncidents: openRow?.count || 0
     };
-    for (const row of byStatusRows) stats.byStatus[row.status] = row.count;
-    for (const row of bySeverityRows) stats.bySeverity[row.severity] = row.count;
-    for (const row of byTypeRows) stats.byType[row.type] = row.count;
+    for (const row of byStatusRows) {stats.byStatus[row.status] = row.count;}
+    for (const row of bySeverityRows) {stats.bySeverity[row.severity] = row.count;}
+    for (const row of byTypeRows) {stats.byType[row.type] = row.count;}
     return stats;
   }
 }

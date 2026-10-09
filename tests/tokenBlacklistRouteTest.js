@@ -101,11 +101,11 @@ class TokenBlacklistTests {
 
     this.assert.assertStatus(res.status, 500, 'Should return 500 due to Error thrown in route');
     this.assert.assertTrue(res.data.success === false, 'Response success should be false');
-    
+
     // Dependent on `enableDetailedErrors` feature flag, the actual string might be masked
     this.assert.assertTrue(typeof res.data.error === 'string' && res.data.error.length > 0, 'Error should be a non-empty string');
     if (res.data.error.includes('User ID')) {
-       this.logger.success('Detailed error message received correctly');
+      this.logger.success('Detailed error message received correctly');
     }
 
     this.logger.success('Auto Detect Fail Check passed');
@@ -145,13 +145,13 @@ class TokenBlacklistTests {
       email: TEST_USERS.admin.email, // using admin just to not log out super_admin
       password: TEST_USERS.admin.password
     });
-    
+
     if (!loginRes.data.success) {
       throw new Error('Failed to create dummy login for auto-detect test');
     }
 
     const dummyToken = loginRes.data.data.token || loginRes.data.data.access_token;
-    
+
     // Parse JWT to extract JTI (naive base64 decode)
     const payloadBase64 = dummyToken.split('.')[1];
     const payloadStr = Buffer.from(payloadBase64, 'base64').toString('utf-8');

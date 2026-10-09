@@ -450,7 +450,7 @@ class AdminUserTests {
       // Verify new security metrics are included in the results
       const systemSecurity = response.data.data.system?.security;
       this.assert.exists(systemSecurity, 'Should return system security object');
-      // Using typeof check or inequality to undefined because values could be 0, which is falsy 
+      // Using typeof check or inequality to undefined because values could be 0, which is falsy
       this.assert.assertTrue(systemSecurity.recentFailedLogins !== undefined, 'Should include recentFailedLogins');
       this.assert.assertTrue(systemSecurity.totalFailedAttempts !== undefined, 'Should include totalFailedAttempts');
       this.assert.assertTrue(systemSecurity.uniqueIpsWithFailures !== undefined, 'Should include uniqueIpsWithFailures');

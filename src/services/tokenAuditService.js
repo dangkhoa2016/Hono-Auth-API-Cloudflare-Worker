@@ -175,14 +175,14 @@ export class TokenAuditService extends BaseService {
   }
 
   async updateLog(id, data) {
-    if (!id || !data) return false;
+    if (!id || !data) {return false;}
 
     try {
       const { action, success, errorMessage, metadata } = data;
-      
+
       const setClauses = [];
       const params = [];
-      
+
       if (action !== undefined) {
         setClauses.push('action = ?');
         params.push(action);
@@ -200,10 +200,10 @@ export class TokenAuditService extends BaseService {
         params.push(serializeMetadata(metadata));
       }
 
-      if (setClauses.length === 0) return true; // Nothing to update
-      
+      if (setClauses.length === 0) {return true;} // Nothing to update
+
       params.push(id);
-      
+
       const result = await this.dbService.update(
         `UPDATE token_audit_logs 
          SET ${setClauses.join(', ')}
@@ -231,7 +231,7 @@ export class TokenAuditService extends BaseService {
   }
 
   async bulkDeleteLogs(ids) {
-    if (!ids || ids.length === 0) return 0;
+    if (!ids || ids.length === 0) {return 0;}
 
     try {
       const placeholders = ids.map(() => '?').join(',');

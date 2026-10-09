@@ -1,0 +1,22 @@
+name = "backend-r12-local-smoke"
+main = "../../src/index.js"
+compatibility_date = "2025-06-01"
+compatibility_flags = ["nodejs_compat"]
+workers_dev = false
+
+[vars]
+ENVIRONMENT = "test"
+ENV = "test"
+DEBUG = ""
+JWT_SECRET = "local-r12-smoke-fake-secret-not-for-deployment"
+EMAIL_PROVIDER_API_KEY = "local-r12-fake-no-mail"
+
+[[d1_databases]]
+binding = "DB"
+database_name = "r12-local-smoke"
+database_id = "00000000-0000-0000-0000-000000000012"
+migrations_dir = "../../migrations"
+
+[[kv_namespaces]]
+binding = "CONFIG_KV"
+id = "00000000000000000000000000000012"
