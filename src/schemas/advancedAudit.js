@@ -3,6 +3,7 @@
  * I18n-aware Zod schemas for advanced audit features (analytics, archival, compliance)
  */
 
+import { MAX_PAGE_ROWS, RETENTION_CATEGORIES } from '../services/auditRetentionPolicy.js';
 import { createSchemaBuilder } from './base.js';
 import { getAllRoles } from '../constants/roles.js';
 
@@ -36,8 +37,16 @@ export function createArchivalQuerySchema(lang = 'en') {
 
   return builder.object({
     dryRun: builder.boolean('dryRun').default(true),
-    batchSize: builder.number('batchSize', 100, 10000).default(1000),
-    categoryFilter: builder.enum(['authentication', 'admin_operations', 'security_events', 'general'], 'categoryFilter').optional(),
+    // Same ceiling as `truncateQuerySchema`, and for the same reason: it is the
+    // archival page size, and the service refuses anything larger rather than
+    // silently clamping.
+    batchSize: builder.number('batchSize', 1, MAX_PAGE_ROWS).default(1000),
+    // T5: the old enum named the four fixed windows the previous service used
+    // (authentication / admin_operations / security_events / general). Those are
+    // gone; the categories are now the ones the policy actually applies, taken
+    // from the policy module so the two cannot drift. Recorded as a breaking
+    // change in the API contract.
+    categoryFilter: builder.enum([...RETENTION_CATEGORIES], 'categoryFilter').optional(),
     forceArchival: builder.boolean('forceArchival').default(false)
   }, 'archivalQuery');
 }
@@ -70,7 +79,11 @@ export function createTruncateQuerySchema(lang = 'en') {
   return builder.object({
     startDate: builder.date('startDate', true),
     endDate: builder.date('endDate', true),
-    batchSize: builder.number('batchSize', 1, 10000).default(1000),
+    // T5: the upper bound is the archival page size. The service splits a page
+    // into D1 transaction-sized chunks, so a larger value would be read into
+    // memory for no benefit. It is rejected here rather than silently clamped,
+    // so the caller learns the request was not honoured as written.
+    batchSize: builder.number('batchSize', 1, MAX_PAGE_ROWS).default(1000),
     archiveFirst: builder.boolean('archiveFirst'),
     dryRun: builder.boolean('dryRun').default(true),
     confirmDelete: builder.boolean('confirmDelete').optional()

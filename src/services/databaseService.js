@@ -150,6 +150,55 @@ export class DatabaseService {
   }
 
   /**
+   * Run several statements as one D1 batch.
+   *
+   * D1 executes a batch as a single transaction: if any statement fails, none of
+   * them are applied. This is what makes "copy then delete" safe - the rows are
+   * either both in the archive and gone from hot storage, or neither changed.
+   * Separate `insert()`/`delete()` calls are not a transaction, however they are
+   * sequenced.
+   *
+   * @param {Array<{query: string, params: Array}>} entries - Statements to run
+   * @returns {Promise<Array>} Per-statement results, in order
+   * @throws {Error} When D1 rejects the batch; nothing is applied
+   */
+  async batch(entries) {
+    if (!Array.isArray(entries) || entries.length === 0) {
+      throw new Error('batch requires at least one statement');
+    }
+    const featureFlags = await getFeatureFlags(this.env);
+    if (featureFlags.logSqlQueries) {
+      query_log(`Executing batch of ${entries.length} statements`);
+    }
+
+    // No retry: a failed batch means a constraint or a conflict, and replaying
+    // it could apply a half-understood write. Reads are retried elsewhere.
+    let results;
+    try {
+      const statements = entries.map(({ query, params = [] }) => (
+        params.length > 0
+          ? this.database.prepare(query).bind(...params)
+          : this.database.prepare(query)
+      ));
+      results = await this.database.batch(statements);
+    } catch (error) {
+      // Only identifiable infrastructure failures become 503. Constraint and
+      // transaction-assertion errors must retain their domain meaning.
+      const message = error instanceof Error ? error.message : '';
+      if (/^D1_ERROR:/i.test(message)
+          && /network connection (?:lost|reset)|database is (?:overloaded|unavailable)|connection (?:reset|refused)|(?:request|query) timed out/i.test(message)
+          && !/SQLITE_CONSTRAINT|constraint failed|integer overflow/i.test(message)) {
+        throw new ServiceUnavailableError('Database batch dependency is unavailable', { operation: 'BATCH' });
+      }
+      throw error;
+    }
+    if (featureFlags.logSqlQueries) {
+      query_log(`Batch completed: ${results.length} statements`);
+    }
+    return results;
+  }
+
+  /**
    * Execute UPSERT (INSERT OR UPDATE) query with prepared statement
    * @param {string} query - SQL UPSERT query
    * @param {Array} params - Parameters to bind

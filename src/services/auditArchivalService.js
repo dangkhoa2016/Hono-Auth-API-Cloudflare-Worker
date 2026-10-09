@@ -9,17 +9,84 @@
 
 import { BaseService } from './baseService.js';
 import { auditArchival_log } from '../utils/debug.js';
+import {
+  buildArchiveSelection,
+  buildCategoryPredicate,
+  buildCutoffProtectionPredicate,
+  buildSelectionPredicate,
+  resolveRetentionPolicy,
+  retentionCategories,
+  CATEGORY_CONFIG_KEYS,
+  CATEGORY_FALLBACK_DAYS,
+  MAX_PAGE_ROWS,
+  UNKNOWN_ACTOR_ROLE
+} from './auditRetentionPolicy.js';
+
+/**
+ * One representative action per category, used to resolve that category's
+ * duration without inspecting a real event.
+ */
+/**
+ * Statement budget for one `batch()`. Each INSERT has a SQL assertion; the
+ * final DELETE also has an assertion, all inside the same transaction.
+ *
+ * Exceeding it is not a tuning problem: D1 rejects the whole request, and a
+ * rejected batch means nothing was written, so a page larger than this would
+ * simply fail every archival run.
+ */
+export const MAX_STATEMENTS_PER_TRANSACTION = 100;
+
+/** Two statements per row, plus DELETE and its assertion. */
+export const MAX_ROWS_PER_TRANSACTION = Math.floor((MAX_STATEMENTS_PER_TRANSACTION - 2) / 2);
+
+/**
+ * Split a page into transaction-sized chunks. Every chunk copies exactly the rows
+ * it then deletes, so a failure part-way through leaves the earlier chunks
+ * consistent and the remaining rows in hot storage for the next attempt.
+ * @param {Array} logs - Rows to archive
+ * @returns {Array<Array>} Chunks of at most `MAX_ROWS_PER_TRANSACTION` rows
+ */
+export function chunkForTransaction(logs) {
+  const chunks = [];
+  for (let i = 0; i < logs.length; i += MAX_ROWS_PER_TRANSACTION) {
+    chunks.push(logs.slice(i, i + MAX_ROWS_PER_TRANSACTION));
+  }
+  return chunks;
+}
+
+/**
+ * Require the immediately preceding audit write to change exactly count rows.
+ * @param {number} count - Required number of changes
+ * @returns {{query: string, params: number[]}} SQL transaction assertion
+ */
+// SQLite's changes() counts the preceding write, excluding trigger writes.
+// The false CASE branch deliberately raises SQLite's documented integer
+// overflow error. D1 then rolls back the entire batch, including earlier
+// successful copies. No schema mutation or guard row is needed.
+// https://www.sqlite.org/lang_corefunc.html (abs, changes)
+function assertAuditWriteCount(count) {
+  return {
+    query: 'SELECT CASE WHEN changes() = ? THEN 1 ELSE abs(-9223372036854775808) END AS archive_write_verified',
+    params: [count]
+  };
+}
+
+const CATEGORY_SAMPLE = Object.freeze({
+  general: 'unknown_action',
+  sensitive: 'password_change',
+  administrative: 'user_role_change',
+  compliance: 'data_export'
+});
 
 /**
  * Service for managing audit log archival and retention
  * Requires: audit_logs_archive table (created by migration 0004)
  *
  * Features:
- * - Automatic archival based on retention policies
- * - Category-based retention (authentication, admin_operations, security_events, general)
- * - Archive to separate table for important logs (admin/security)
- * - Direct deletion for less important logs (authentication/general)
- * - Restore functionality for archived logs
+ * - Automatic archival based on the shared retention policy
+ * - Category-based retention: the longest window an event matches always wins
+ * - Every archived row is copied and deleted in one transaction
+ * - Restore functionality for archived logs, preserving ids and metadata
  * - Statistics and monitoring
  * - Manual archival triggers
  * - Policy management
@@ -27,12 +94,10 @@ import { auditArchival_log } from '../utils/debug.js';
 export class AuditArchivalService extends BaseService {
   constructor(env) {
     super(env, 'AuditArchivalService');
-    this.retentionPolicies = {
-      authentication: 365, // days
-      admin_operations: 2555, // 7 years
-      security_events: 1095, // 3 years
-      general: 90 // days
-    };
+    // Fallback windows only, reported for visibility. The durations an event
+    // actually gets are resolved per event by the policy module, which also
+    // reads configuration.
+    this.retentionPolicies = { ...CATEGORY_FALLBACK_DAYS };
     auditArchival_log('AuditArchivalService initialized with retention policies');
   }
 
@@ -93,105 +158,242 @@ export class AuditArchivalService extends BaseService {
     const {
       dryRun = false,
       batchSize = 1000,
-      categoryFilter = null
+      categoryFilter = null,
+      now = new Date()
     } = options;
+
+    // A filter the policy does not know is refused here. Filtering it away
+    // instead would report a successful run that archived nothing at all.
+    if (categoryFilter !== null && categoryFilter !== undefined && !retentionCategories().includes(categoryFilter)) {
+      throw new RangeError(`unknown retention category: ${categoryFilter}`);
+    }
 
     auditArchival_log(`Starting log archival process, dry run: ${dryRun}`);
 
-    try {
-      const archivalSummary = {
-        started_at: new Date().toISOString(),
-        dry_run: dryRun,
-        categories_processed: [],
-        total_archived: 0,
-        total_deleted: 0,
-        errors: []
-      };
+    const config = await this.loadRetentionConfig();
+    const archivalSummary = {
+      started_at: new Date(now).toISOString(),
+      dry_run: dryRun,
+      categories_processed: [],
+      total_archived: 0,
+      total_deleted: 0,
+      total_found: 0,
+      errors: []
+    };
 
-      // Process each retention policy
-      for (const [category, retentionDays] of Object.entries(this.retentionPolicies)) {
-        if (categoryFilter && categoryFilter !== category) {
-          continue;
-        }
+    // Longest retention first. A category is only ever visited after the ones
+    // that keep data longer have had their chance, so no row is deleted by a
+    // shorter schedule that ran later.
+    const categories = retentionCategories()
+      .filter((category) => !categoryFilter || categoryFilter === category)
+      .sort((a, b) => config.daysFor(b, now) - config.daysFor(a, now));
 
-        try {
-          const result = await this.processCategoryArchival(
-            category,
-            retentionDays,
-            dryRun,
-            batchSize
-          );
+    for (const category of categories) {
+      const sample = { action: category === 'general' ? 'unknown_action' : CATEGORY_SAMPLE[category] };
+      try {
+        const policy = resolveRetentionPolicy(sample, config.values, new Date(now));
+        const result = await this.processCategoryArchival(
+          category,
+          policy.days,
+          dryRun,
+          batchSize,
+          new Date(now),
+          config.values
+        );
 
-          archivalSummary.categories_processed.push({
-            category,
-            retention_days: retentionDays,
-            ...result
-          });
+        archivalSummary.categories_processed.push({
+          category,
+          retention_days: policy.days,
+          policy_source: policy.source,
+          matches: policy.categories,
+          ...result
+        });
 
-          archivalSummary.total_archived += result.archived_count;
-          archivalSummary.total_deleted += result.deleted_count;
-
-          auditArchival_log(`Category ${category} processed: archived ${result.archived_count}, deleted ${result.deleted_count}`);
-
-        } catch (error) {
-          auditArchival_log(`Error processing category ${category}: ${error.message}`);
-          archivalSummary.errors.push({
-            category,
-            error: error.message
-          });
-        }
+        archivalSummary.total_archived += result.archived_count;
+        archivalSummary.total_deleted += result.deleted_count;
+        archivalSummary.total_found += result.total_found;
+      } catch (error) {
+        auditArchival_log(`Error processing category ${category}: ${error.message}`);
+        archivalSummary.errors.push({ category, error: error.message });
       }
-
-      archivalSummary.completed_at = new Date().toISOString();
-      archivalSummary.duration_ms = new Date(archivalSummary.completed_at) - new Date(archivalSummary.started_at);
-
-      auditArchival_log(`Archival process completed: ${archivalSummary.total_archived} archived, ${archivalSummary.total_deleted} deleted`);
-
-      return archivalSummary;
-
-    } catch (error) {
-      auditArchival_log(`Error during archival process: ${error.message}`);
-      throw error;
     }
+
+    archivalSummary.completed_at = new Date().toISOString();
+    archivalSummary.duration_ms = new Date(archivalSummary.completed_at) - new Date(archivalSummary.started_at);
+
+    auditArchival_log(
+      `Archival process completed: ${archivalSummary.total_archived} archived, ${archivalSummary.total_deleted} deleted`
+    );
+    return archivalSummary;
   }
 
   /**
-   * Process archival for a specific category
+   * The configured durations, keyed by config key.
+   *
+   * A category with no usable configured value keeps its documented fallback, so
+   * a key that is missing or unreadable never shortens a window here.
+   * @returns {Promise<Object>} Durations by config key
    */
-  async processCategoryArchival(category, retentionDays, dryRun, batchSize) {
-    const cutoffDate = new Date(Date.now() - (retentionDays * 24 * 60 * 60 * 1000)).toISOString();
+  async loadRetentionConfigValues() {
+    const { values } = await this.loadRetentionConfig();
+    return values;
+  }
 
-    // Define category mapping
-    const categoryConditions = {
-      authentication: 'action IN (\'login\', \'logout\', \'login_failed\', \'token_refresh\')',
-      admin_operations: 'actor_role IN (\'admin\', \'super_admin\') AND action IN (\'create\', \'update\', \'delete\', \'role_change\')',
-      security_events: 'action LIKE \'%security%\' OR action LIKE \'%rate_limit%\' OR action = \'login_failed\'',
-      general: '1=1' // All other logs
+  /**
+   * Read the retention configuration through the shared resolver.
+   *
+   * Values come from T4's resolver, so a `false`/`0`/empty setting is honoured
+   * as written and an unusable one is reported instead of silently shortening a
+   * retention window.
+   * @returns {Promise<{values: Object, daysFor: (category: string) => number}>} Config accessor
+   */
+  async loadRetentionConfig() {
+    const { KVConfigService } = await import('./kvConfigService.js');
+    const service = new KVConfigService(this.env);
+    const values = {};
+    for (const key of Object.values(CATEGORY_CONFIG_KEYS)) {
+      const raw = await service.get(key, null, false);
+      if (raw !== null && raw !== undefined) {
+        values[key] = raw;
+      }
+    }
+    return {
+      values,
+      daysFor: (category, now = new Date()) => {
+        const policy = resolveRetentionPolicy(
+          { action: CATEGORY_SAMPLE[category] ?? 'unknown_action' },
+          values,
+          now
+        );
+        return policy.days;
+      }
     };
+  }
 
-    const condition = categoryConditions[category] || categoryConditions.general;
+  /**
+   * Columns copied from `audit_logs` into the archive.
+   *
+   * Migration 0011 added the columns that 0004 never had; archiving without them
+   * lost the actor email, the request id, the before/after values and the
+   * status, so a restore could not reproduce the row.
+   */
+  static ARCHIVE_SOURCE_COLUMNS = Object.freeze([
+    'actor_id', 'actor_email', 'action', 'target_type', 'target_id', 'target_identifier',
+    'request_id', 'details', 'old_values', 'new_values', 'status', 'error_message',
+    'ip_address', 'user_agent', 'timestamp'
+  ]);
 
-    // Count logs to be processed
-    const countQuery = `
-      SELECT COUNT(*) as count
-      FROM audit_logs 
-      WHERE timestamp < ? 
-        AND (${condition})
+  /**
+   * Build the parameter list for one archive insert.
+   *
+   * `actor_role` is NOT NULL in the archive but nullable in the source, so a
+   * missing role is stored as a sentinel and flagged. Anything else that cannot
+   * be represented is stored as NULL with `metadata_complete = 0`.
+   *
+   * @param {Object} log - Row from `audit_logs`
+   * @returns {Array} Bound parameters
+   */
+  buildArchiveParams(log) {
+    const syntheticRole = log.actor_role === null || log.actor_role === undefined;
+    return [
+      log.id,
+      log.actor_id ?? null,
+      syntheticRole ? UNKNOWN_ACTOR_ROLE : log.actor_role,
+      log.actor_email ?? null,
+      log.action,
+      log.target_type ?? null,
+      log.target_id ?? null,
+      log.target_identifier ?? null,
+      log.request_id ?? null,
+      log.details ?? null,
+      log.old_values ?? null,
+      log.new_values ?? null,
+      log.status ?? null,
+      log.error_message ?? null,
+      log.ip_address ?? null,
+      log.user_agent ?? null,
+      log.timestamp,
+      syntheticRole ? 1 : 0
+    ];
+  }
+
+  /**
+   * Copy exactly the selected row versions and delete them in one transaction.
+   * A changed/deleted source row, ignored insert or ignored delete must abort
+   * before commit; checking response counts afterwards cannot undo data loss.
+   *
+   * @param {Object[]} logs - Selected rows, at most MAX_ROWS_PER_TRANSACTION
+   * @returns {Promise<{archived: number, deleted: number}>} Verified counts
+   */
+  async copyChunk(logs) {
+    const fields = ['id', 'actor_role', ...AuditArchivalService.ARCHIVE_SOURCE_COLUMNS];
+    const insertQuery = `
+      INSERT INTO audit_logs_archive
+      (original_id, actor_id, actor_role, actor_email, action, target_type, target_id,
+       target_identifier, request_id, details, old_values, new_values, status,
+       error_message, ip_address, user_agent, timestamp, metadata_complete,
+       actor_role_synthetic)
+      SELECT ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 1, ?
+      WHERE EXISTS (SELECT 1 FROM audit_logs WHERE ${fields.map(field => `${field} IS ?`).join(' AND ')})
     `;
+    const entries = logs.flatMap(log => [
+      { query: insertQuery, params: [...this.buildArchiveParams(log), ...fields.map(field => log[field] ?? null)] },
+      assertAuditWriteCount(1)
+    ]);
+    const ids = logs.map(log => log.id);
+    const deleteIndex = entries.length;
+    entries.push({
+      query: `DELETE FROM audit_logs WHERE id IN (${ids.map(() => '?').join(', ')})`,
+      params: ids
+    }, assertAuditWriteCount(ids.length));
 
-    const countResult = await this.dbService.select(countQuery, [cutoffDate], true);
-    const totalToProcess = countResult?.count || 0;
+    const results = await this.dbService.batch(entries);
+    const insertChanges = logs.reduce((total, _log, index) => total + (results[index * 2]?.meta?.changes ?? 0), 0);
+    const deleted = results[deleteIndex]?.meta?.changes ?? 0;
+    // Response validation supplements the SQL assertions; it is not the
+    // mechanism that provides rollback.
+    if (insertChanges !== logs.length || deleted !== logs.length) {
+      throw new Error(
+        `Archive transaction mismatch: copied ${insertChanges}/${logs.length}, deleted ${deleted}/${logs.length}`
+      );
+    }
+    return { archived: insertChanges, deleted };
+  }
+
+  /**
+   * Process archival for one category using the shared retention policy.
+   * @param {string} category - Retention category
+   * @param {number} retentionDays - Days from the policy
+   * @param {boolean} dryRun - Preview only
+   * @param {number} batchSize - Rows per transaction
+   * @param {Date} [now] - Current time, injectable for tests
+   * @param {Object} [configValues] - Retention configuration captured for this sweep
+   * @returns {Promise<Object>} Category result
+   */
+  async processCategoryArchival(category, retentionDays, dryRun, batchSize, now = new Date(), configValues = null) {
+    const cutoffDate = new Date(now.getTime() - retentionDays * 86400000).toISOString();
+    // Automatic retention selects everything strictly older than the cutoff.
+    // Manual ranges remain inclusive. Mark this internal selection only after
+    // validation so callers cannot change the manual-range contract.
+    const selection = {
+      ...buildArchiveSelection(
+        { startDate: cutoffDate, endDate: cutoffDate, batchSize, dryRun },
+        { canReadAll: true },
+        now
+      ),
+      olderThan: true
+    };
+    // General already excludes every protected category. Repeating those
+    // matchers adds no protection and can exceed D1's bound-parameter limit.
+    const protection = category === 'general' ? null : buildCutoffProtectionPredicate(
+      cutoffDate, now, configValues ?? await this.loadRetentionConfigValues()
+    );
+
+    const totalToProcess = await this.countArchivable(category, selection, protection);
 
     if (totalToProcess === 0) {
-      return {
-        dry_run: dryRun,
-        archived_count: 0,
-        deleted_count: 0,
-        total_found: 0
-      };
+      return { dry_run: dryRun, archived_count: 0, deleted_count: 0, total_found: 0, retention_days: retentionDays };
     }
-
-    auditArchival_log(`Found ${totalToProcess} logs to process for category ${category}`);
 
     if (dryRun) {
       return {
@@ -199,129 +401,115 @@ export class AuditArchivalService extends BaseService {
         archived_count: 0,
         deleted_count: 0,
         total_found: totalToProcess,
-        would_process: totalToProcess
+        would_process: totalToProcess,
+        retention_days: retentionDays
       };
     }
 
-    // For admin operations and security events, archive to a separate table
-    // For others, delete after retention period
-    let archivedCount = 0;
-    let deletedCount = 0;
-
-    if (category === 'admin_operations' || category === 'security_events') {
-      archivedCount = await this.archiveToTable(condition, cutoffDate, batchSize);
-    }
-
-    if (category === 'authentication' || category === 'general') {
-      deletedCount = await this.deleteOldLogs(condition, cutoffDate, batchSize);
-    }
-
+    const result = await this.runArchival(selection, category, protection);
     return {
-      archived_count: archivedCount,
-      deleted_count: deletedCount,
-      total_found: totalToProcess
+      dry_run: false,
+      archived_count: result.archived,
+      deleted_count: result.deleted,
+      total_found: result.selected,
+      retention_days: retentionDays,
+      batches: result.batches
     };
   }
 
   /**
-   * Archive important logs to separate table
+   * Count the rows a selection would archive, using the same predicate the
+   * execution uses. The category narrows the set; a `general` category is not a
+   * blanket `1=1`, it is everything the other categories did not claim.
+   * @param {string|null} category - Retention category or null for all
+   * @param {Object} selection - Validated selection
+   * @returns {Promise<number>} Row count
    */
-  async archiveToTable(condition, cutoffDate, batchSize) {
-    await this.verifyArchiveTableExists();
-
-    let totalArchived = 0;
-    let offset = 0;
-    let isContined = true;
-
-    while (isContined) {
-      const selectQuery = `
-        SELECT id, actor_id, actor_role, action, target_type, target_id, 
-               details, ip_address, user_agent, timestamp
-        FROM audit_logs 
-        WHERE timestamp < ? 
-          AND (${condition})
-        ORDER BY id
-        LIMIT ? OFFSET ?
-      `;
-
-      const logs = await this.dbService.select(selectQuery, [cutoffDate, batchSize, offset]);
-
-      if (!logs || logs.length === 0) {
-        isContined = false;
-        break;
-      }
-
-      // Insert into archive table (archived_at will use DEFAULT CURRENT_TIMESTAMP)
-      const insertQuery = `
-        INSERT INTO audit_logs_archive 
-        (original_id, actor_id, actor_role, action, target_type, target_id, 
-         details, ip_address, user_agent, timestamp)
-        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
-      `;
-
-      for (const log of logs) {
-        await this.dbService.insert(insertQuery, [
-          log.id,
-          log.actor_id,
-          log.actor_role,
-          log.action,
-          log.target_type,
-          log.target_id,
-          log.details,
-          log.ip_address,
-          log.user_agent,
-          log.timestamp
-        ]);
-      }
-
-      // Delete from main table
-      const deleteQuery = `
-        DELETE FROM audit_logs 
-        WHERE id IN (${logs.map(() => '?').join(',')})
-      `;
-
-      await this.dbService.update(deleteQuery, logs.map(log => log.id));
-
-      totalArchived += logs.length;
-      offset += batchSize;
-
-      auditArchival_log(`Archived batch: ${logs.length} logs (total: ${totalArchived})`);
-    }
-
-    return totalArchived;
+  async countArchivable(category, selection, extra = null) {
+    const { sql, params } = buildSelectionPredicate(selection);
+    const fragments = [category ? this.categoryPredicate(category) : null, extra]
+      .filter((fragment) => fragment && fragment.sql);
+    const extraParams = fragments.flatMap((fragment) => fragment.params);
+    const row = await this.dbService.select(
+      `SELECT COUNT(*) as count FROM audit_logs WHERE ${sql}${fragments.map((f) => ` AND (${f.sql})`).join('')}`,
+      [...params, ...extraParams],
+      true
+    );
+    return row?.count || 0;
   }
 
   /**
-   * Delete old logs that don't need archiving
+   * Build the category predicate from the shared policy module.
+   *
+   * The old implementation passed SQL fragments between categories and ended
+   * with `general: '1=1'`, so the general sweep deleted security and compliance
+   * events that an earlier category was supposed to keep. The fragment now comes
+   * from the same matcher `resolveRetentionPolicy` uses, and a general sweep
+   * only takes what the protected categories did not claim.
+   * @param {string} category - Retention category
+   * @returns {{sql: string, params: Array}} Fragment and bound parameters
    */
-  async deleteOldLogs(condition, cutoffDate, batchSize) {
-    let totalDeleted = 0;
-    let isContined = true;
+  categoryPredicate(category) {
+    return buildCategoryPredicate(category);
+  }
 
-    while (isContined) {
-      const deleteQuery = `
-        DELETE FROM audit_logs 
-        WHERE id IN (
-          SELECT id FROM audit_logs 
-          WHERE timestamp < ? 
-            AND (${condition})
-          LIMIT ?
-        )
-      `;
+  /**
+   * Run an archival selection to completion.
+   * @param {Object} selection - Validated selection
+   * @param {string|null} category - Retention category, or null for a plain range
+   * @param {{sql: string, params: Array}} [extra] - Additional predicate, such as
+   *   the per-category retention protection
+   * @returns {Promise<{archived: number, deleted: number, selected: number, batches: number}>} Totals
+   */
+  async runArchival(selection, category = null, extra = null) {
+    let archived = 0;
+    let deleted = 0;
+    let selected = 0;
+    let batches = 0;
+    let cursor = selection.cursorAfterId;
+    const predicate = category ? this.categoryPredicate(category) : { sql: '', params: [] };
+    const fragments = [predicate, extra].filter((fragment) => fragment && fragment.sql);
+    const extraParams = fragments.flatMap((fragment) => fragment.params);
 
-      const result = await this.dbService.update(deleteQuery, [cutoffDate, batchSize]);
+    for (;;) {
+      // Keyset pagination: `id > cursor` ordered by id. An OFFSET would skip rows
+      // as soon as the previous batch deleted them.
+      const page = { ...selection, cursorAfterId: cursor };
+      const { sql, params } = buildSelectionPredicate(page);
+      const logs = await this.dbService.select(
+        `SELECT id, actor_id, actor_email, actor_role, action, target_type, target_id,
+                target_identifier, request_id, details, old_values, new_values, status,
+                error_message, ip_address, user_agent, timestamp
+         FROM audit_logs
+         WHERE ${sql}${fragments.map((fragment) => ` AND (${fragment.sql})`).join('')}
+         ORDER BY id
+         LIMIT ?`,
+        [...params, ...extraParams, page.limit]
+      );
 
-      const deletedCount = result.changes || 0;
-      totalDeleted += deletedCount;
+      if (!logs || logs.length === 0) {
+        break;
+      }
 
-      auditArchival_log(`Deleted batch: ${deletedCount} logs (total: ${totalDeleted})`);
+      // A page larger than one transaction is split. Each chunk is atomic on its
+      // own, so a failure stops the sweep with the copied rows already deleted
+      // and the untouched rows still in hot storage.
+      for (const chunk of chunkForTransaction(logs)) {
+        const result = await this.copyChunk(chunk);
+        archived += result.archived;
+        deleted += result.deleted;
+        batches += 1;
+        auditArchival_log(`Archived batch ${batches}: ${result.archived} copied, ${result.deleted} deleted`);
+      }
+      selected += logs.length;
+      cursor = logs[logs.length - 1].id;
 
-      if (deletedCount < batchSize) {
-        isContined = false;
+      if (logs.length < selection.limit) {
+        break;
       }
     }
 
-    return totalDeleted;
+    return { archived, deleted, selected, batches };
   }
 
   /**
@@ -360,9 +548,9 @@ export class AuditArchivalService extends BaseService {
       const mainStatsQuery = `
         SELECT 
           COUNT(*) as total_logs,
-          COUNT(CASE WHEN timestamp >= datetime('now', '-30 days') THEN 1 END) as logs_30d,
-          COUNT(CASE WHEN timestamp >= datetime('now', '-90 days') THEN 1 END) as logs_90d,
-          COUNT(CASE WHEN timestamp >= datetime('now', '-365 days') THEN 1 END) as logs_1y,
+          COUNT(CASE WHEN julianday(timestamp) >= julianday('now', '-30 days') THEN 1 END) as logs_30d,
+          COUNT(CASE WHEN julianday(timestamp) >= julianday('now', '-90 days') THEN 1 END) as logs_90d,
+          COUNT(CASE WHEN julianday(timestamp) >= julianday('now', '-365 days') THEN 1 END) as logs_1y,
           MIN(timestamp) as oldest_log,
           MAX(timestamp) as newest_log
         FROM audit_logs
@@ -390,27 +578,27 @@ export class AuditArchivalService extends BaseService {
         archiveStats = { archived_logs: 0 };
       }
 
-      // Calculate logs eligible for archival by category
+      // Eligibility per category, using the same predicate the sweep uses. The
+      // previous version carried hand-written SQL fragments here, including a
+      // `general: 1=1` that counted security and compliance events as eligible
+      // for deletion on the shortest schedule.
       const eligibilityStats = {};
-      for (const [category, retentionDays] of Object.entries(this.retentionPolicies)) {
+      for (const category of retentionCategories()) {
+        const retentionDays = CATEGORY_FALLBACK_DAYS[category];
         const cutoffDate = new Date(Date.now() - (retentionDays * 24 * 60 * 60 * 1000)).toISOString();
-
-        const categoryConditions = {
-          authentication: 'action IN (\'login\', \'logout\', \'login_failed\', \'token_refresh\')',
-          admin_operations: 'actor_role IN (\'admin\', \'super_admin\') AND action IN (\'create\', \'update\', \'delete\', \'role_change\')',
-          security_events: 'action LIKE \'%security%\' OR action LIKE \'%rate_limit%\' OR action = \'login_failed\'',
-          general: '1=1'
-        };
-
-        const condition = categoryConditions[category] || categoryConditions.general;
+        const predicate = this.categoryPredicate(category);
 
         const eligibilityQuery = `
           SELECT COUNT(*) as eligible_count
-          FROM audit_logs 
-          WHERE timestamp < ? AND (${condition})
+          FROM audit_logs
+          WHERE julianday(timestamp) < julianday(?)${predicate.sql ? ` AND (${predicate.sql})` : ''}
         `;
 
-        const result = await this.dbService.select(eligibilityQuery, [cutoffDate], true);
+        const result = await this.dbService.select(
+          eligibilityQuery,
+          [cutoffDate, ...predicate.params],
+          true
+        );
         eligibilityStats[category] = {
           retention_days: retentionDays,
           eligible_for_archival: result?.eligible_count || 0
@@ -479,69 +667,158 @@ export class AuditArchivalService extends BaseService {
 
     auditArchival_log(`Restoring archived logs from ${startDate} to ${endDate}, dry run: ${dryRun}`);
 
-    try {
-      const normalizedRange = this.normalizeDateRange(startDate, endDate);
-      let whereClause = 'timestamp BETWEEN ? AND ?';
-      const bindings = [normalizedRange.startDate, normalizedRange.endDate];
+    const normalizedRange = this.normalizeDateRange(startDate, endDate);
+    const whereClause = ['julianday(timestamp) >= julianday(?)', 'julianday(timestamp) <= julianday(?)'];
+    const bindings = [normalizedRange.startDate, normalizedRange.endDate];
 
-      if (userId) {
-        whereClause += ' AND user_id = ?';
-        bindings.push(userId);
-      }
-
-      if (action) {
-        whereClause += ' AND action = ?';
-        bindings.push(action);
-      }
-
-      // Count logs to restore
-      const countQuery = `
-        SELECT COUNT(*) as count
-        FROM audit_logs_archive 
-        WHERE ${whereClause}
-      `;
-
-      const countResult = await this.dbService.select(countQuery, bindings, true);
-      const totalToRestore = countResult?.count || 0;
-
-      if (totalToRestore === 0) {
-        return {
-          dry_run: dryRun,
-          restored_count: 0,
-          total_found: 0
-        };
-      }
-
-      if (dryRun) {
-        return {
-          dry_run: true,
-          restored_count: 0,
-          total_found: totalToRestore,
-          would_restore: totalToRestore
-        };
-      }
-
-      // Restore logs
-      const restoreQuery = `
-        INSERT INTO audit_logs (actor_id, actor_role, action, target_type, target_id, details, ip_address, user_agent, timestamp)
-        SELECT actor_id, actor_role, action, target_type, target_id, details, ip_address, user_agent, timestamp
-        FROM audit_logs_archive
-        WHERE ${whereClause}
-      `;
-
-      const result = await this.dbService.insert(restoreQuery, bindings);
-
-      auditArchival_log(`Restored ${result.changes} logs from archive`);
-
-      return {
-        restored_count: result.changes || 0,
-        total_found: totalToRestore
-      };
-
-    } catch (error) {
-      auditArchival_log(`Error restoring archived logs: ${error.message}`);
-      throw error;
+    // The archive column is `actor_id`; the old query filtered on `user_id`,
+    // which does not exist, so filtering by user always threw.
+    if (userId) {
+      whereClause.push('actor_id = ?');
+      bindings.push(userId);
     }
+    if (action) {
+      whereClause.push('action = ?');
+      bindings.push(action);
+    }
+
+    const predicate = whereClause.join(' AND ');
+    const countResult = await this.dbService.select(
+      `SELECT COUNT(*) as count FROM audit_logs_archive WHERE ${predicate}`,
+      bindings,
+      true
+    );
+    const totalToRestore = countResult?.count || 0;
+
+    if (totalToRestore === 0) {
+      return { dry_run: dryRun, restored_count: 0, total_found: 0, conflicts: 0, incomplete_metadata: 0 };
+    }
+
+    if (dryRun) {
+      return {
+        dry_run: true,
+        restored_count: 0,
+        total_found: totalToRestore,
+        would_restore: totalToRestore,
+        conflicts: 0,
+        incomplete_metadata: 0
+      };
+    }
+
+    const rows = await this.dbService.select(
+      `SELECT * FROM audit_logs_archive WHERE ${predicate} ORDER BY original_id`,
+      bindings
+    );
+
+    const result = { restored_count: 0, total_found: totalToRestore, conflicts: 0, incomplete_metadata: 0 };
+
+    // Each row is restored on its own: one conflicting event must not abort the
+    // restore of the others, and the conflict is reported rather than resolved
+    // by overwriting either copy.
+    for (const row of rows) {
+      const outcome = await this.restoreOne(row);
+      if (outcome === 'restored') {
+        result.restored_count += 1;
+      } else if (outcome === 'conflict') {
+        result.conflicts += 1;
+      } else if (outcome === 'incomplete') {
+        result.incomplete_metadata += 1;
+      }
+    }
+
+    result.metadata_note =
+      'Rows archived before migration 0011 have no status, actor email or before/after values. ' +
+      'Those fields stay NULL and are reported instead of being invented.';
+
+    auditArchival_log(`Restored ${result.restored_count} logs, ${result.conflicts} conflicts`);
+    return result;
+  }
+
+  /**
+   * Restore one archived row, preserving its id and metadata.
+   *
+   * A row whose id already exists in hot storage is a conflict when the content
+   * differs and a no-op when it is identical, so restoring twice never creates a
+   * second copy of the same event.
+   *
+   * @param {Object} row - Row from `audit_logs_archive`
+   * @returns {Promise<'restored'|'already_present'|'conflict'|'incomplete'>} Outcome
+   */
+  async restoreOne(row) {
+    const existing = await this.dbService.select('SELECT * FROM audit_logs WHERE id = ?', [row.original_id], true);
+
+    if (existing) {
+      return this.sameAuditEvent(existing, row) ? 'already_present' : 'conflict';
+    }
+
+    const syntheticRole = row.actor_role_synthetic === 1;
+    const restoreQuery = `
+      INSERT INTO audit_logs
+      (id, actor_id, actor_role, actor_email, action, target_type, target_id,
+       target_identifier, request_id, details, old_values, new_values, status,
+       error_message, ip_address, user_agent, timestamp)
+      VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+    `;
+
+    // Both statements in one transaction: the row is marked as restored only if
+    // it actually came back, and the archive copy is never dropped.
+    await this.dbService.batch([
+      {
+        query: restoreQuery,
+        params: [
+          row.original_id,
+          row.actor_id ?? null,
+          syntheticRole ? null : row.actor_role,
+          row.actor_email ?? null,
+          row.action,
+          row.target_type ?? null,
+          row.target_id ?? null,
+          row.target_identifier ?? null,
+          row.request_id ?? null,
+          row.details ?? null,
+          row.old_values ?? null,
+          row.new_values ?? null,
+          row.status ?? null,
+          row.error_message ?? null,
+          row.ip_address ?? null,
+          row.user_agent ?? null,
+          row.timestamp
+        ]
+      },
+      assertAuditWriteCount(1),
+      {
+        query: 'UPDATE audit_logs_archive SET restored_at = ?, restored_original_id = ? WHERE original_id = ?',
+        params: [new Date().toISOString(), row.original_id, row.original_id]
+      },
+      assertAuditWriteCount(1)
+    ]);
+
+    return row.metadata_complete === 1 ? 'restored' : 'incomplete';
+  }
+
+  /**
+   * Compare an archived row with the hot row of the same id.
+   * @param {Object} hot - Row from `audit_logs`
+   * @param {Object} archived - Row from `audit_logs_archive`
+   * @returns {boolean} True when the two describe the same event
+   */
+  sameAuditEvent(hot, archived) {
+    const fields = [
+      'actor_id', 'actor_email', 'action', 'target_type', 'target_id', 'target_identifier',
+      'request_id', 'details', 'old_values', 'new_values', 'error_message',
+      'ip_address', 'user_agent', 'timestamp', 'status'
+    ];
+    return fields.every((field) => {
+      const left = hot[field] ?? null;
+      const right = archived[field] ?? null;
+      if (left === null || right === null) {
+        return left === right;
+      }
+      if (left instanceof Date || right instanceof Date) {
+        return new Date(left).toISOString() === new Date(right).toISOString();
+      }
+      return String(left) === String(right);
+    }) && (hot.actor_role ?? null) === (archived.actor_role_synthetic === 1 ? null : archived.actor_role);
   }
 
   /**
@@ -553,122 +830,80 @@ export class AuditArchivalService extends BaseService {
     const {
       startDate,
       endDate,
-      dryRun = true,
       batchSize = 1000,
-      archiveFirst = false,
-      confirmDelete = false
+      archiveFirst = true,
+      dryRun = false,
+      confirmDelete = false,
+      now = new Date()
     } = options;
 
     auditArchival_log(`Truncate requested for audit logs from ${startDate} to ${endDate}, dry run: ${dryRun}`);
 
-    const normalizedRange = this.normalizeDateRange(startDate, endDate);
-
     if (archiveFirst !== true) {
       throw new Error('ARCHIVE_FIRST_REQUIRED');
     }
-
     if (!dryRun && confirmDelete !== true) {
       throw new Error('CONFIRM_DELETE_REQUIRED');
     }
 
+    // One validated selection. The preview and the execution below read the same
+    // start, end and batch size, so a preview cannot drift from what runs.
+    const selection = buildArchiveSelection(
+      { startDate, endDate, batchSize, dryRun },
+      { canReadAll: true },
+      now
+    );
+
+    // Each category's own window still protects its rows, even when the caller
+    // names a range. The preview and the execution below use this same fragment,
+    // so the count a caller sees is the count the sweep acts on.
+    const protection = buildCutoffProtectionPredicate(selection.endDate, now, await this.loadRetentionConfigValues());
+
     const summary = {
-      start_date: normalizedRange.startDate,
-      end_date: normalizedRange.endDate,
-      batch_size: batchSize,
+      start_date: selection.startDate,
+      end_date: selection.endDate,
+      batch_size: selection.limit,
       archive_first: archiveFirst,
-      dry_run: dryRun,
+      dry_run: selection.dryRun,
       total_found: 0,
       archived_count: 0,
       deleted_count: 0,
-      started_at: new Date().toISOString()
+      // Declared here so a preview and an execution answer with the same shape;
+      // a caller must not have to tell them apart to read the field.
+      protected_by_policy: protection.protectedCategories,
+      started_at: new Date(now).toISOString()
     };
 
     try {
       await this.verifyArchiveTableExists();
+      summary.total_found = await this.countArchivable(null, selection, protection);
 
-      const countQuery = `
-        SELECT COUNT(*) as count
-        FROM audit_logs
-        WHERE timestamp BETWEEN ? AND ?
-      `;
-
-      const countResult = await this.dbService.select(countQuery, [normalizedRange.startDate, normalizedRange.endDate], true);
-      summary.total_found = countResult?.count || 0;
-
-      if (dryRun || summary.total_found === 0) {
+      if (selection.dryRun || summary.total_found === 0) {
         summary.would_delete = summary.total_found;
+        summary.preview_is_estimate = !selection.dryRun
+          ? false
+          : 'Rows written after this preview are not included; re-run the preview against a fresh selection.';
         summary.completed_at = new Date().toISOString();
         summary.duration_ms = new Date(summary.completed_at) - new Date(summary.started_at);
         return summary;
       }
 
-      let hasMore = true;
-      while (hasMore) {
-        const selectBatchQuery = `
-          SELECT id, actor_id, actor_role, action, target_type, target_id,
-                 details, ip_address, user_agent, timestamp
-          FROM audit_logs
-          WHERE timestamp BETWEEN ? AND ?
-          ORDER BY id
-          LIMIT ?
-        `;
+      const result = await this.runArchival(selection, null, protection);
+      summary.archived_count = result.archived;
+      summary.deleted_count = result.deleted;
+      summary.batches = result.batches;
 
-        const logs = await this.dbService.select(selectBatchQuery, [normalizedRange.startDate, normalizedRange.endDate, batchSize]);
-
-        if (!logs || logs.length === 0) {
-          hasMore = false;
-          break;
-        }
-
-        const archiveQuery = `
-          INSERT OR IGNORE INTO audit_logs_archive
-          (original_id, actor_id, actor_role, action, target_type, target_id,
-           details, ip_address, user_agent, timestamp)
-          VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
-        `;
-
-        for (const log of logs) {
-          const archiveResult = await this.dbService.insert(archiveQuery, [
-            log.id,
-            log.actor_id,
-            log.actor_role,
-            log.action,
-            log.target_type,
-            log.target_id,
-            log.details,
-            log.ip_address,
-            log.user_agent,
-            log.timestamp
-          ]);
-
-          summary.archived_count += archiveResult?.changes || 0;
-        }
-
-        const deleteQuery = `
-          DELETE FROM audit_logs
-          WHERE id IN (
-            SELECT id FROM audit_logs
-            WHERE timestamp BETWEEN ? AND ?
-            LIMIT ?
-          )
-        `;
-
-        const result = await this.dbService.delete(deleteQuery, [normalizedRange.startDate, normalizedRange.endDate, batchSize]);
-        const deletedCount = result?.changes || 0;
-        summary.deleted_count += deletedCount;
-
-        auditArchival_log(
-          `Truncate batch archived ${summary.archived_count} and deleted ${deletedCount} logs (total deleted: ${summary.deleted_count})`
+      // The execution may only ever remove what it copied. `runArchival` already
+      // fails the transaction on a mismatch; this states the invariant in the
+      // result the route returns.
+      if (summary.archived_count !== summary.deleted_count) {
+        throw new Error(
+          `Truncate aborted: copied ${summary.archived_count} rows but deleted ${summary.deleted_count}`
         );
-
-        if (deletedCount < batchSize) {
-          hasMore = false;
-        }
       }
 
       summary.completed_at = new Date().toISOString();
       summary.duration_ms = new Date(summary.completed_at) - new Date(summary.started_at);
-
       return summary;
     } catch (error) {
       auditArchival_log(`Error truncating audit logs by date range: ${error.message}`);
@@ -730,18 +965,19 @@ export class AuditArchivalService extends BaseService {
     try {
       auditArchival_log('Getting archival policies');
 
+      // Reported from the policy module so the documented windows and the ones
+      // the sweep applies cannot drift. The previous response listed three
+      // figures (1095/2555/365) that matched nothing in the code.
       const policies = {
-        retention_policies: this.retentionPolicies,
+        retention_policies: { ...CATEGORY_FALLBACK_DAYS },
+        retention_config_keys: { ...CATEGORY_CONFIG_KEYS },
         archival_settings: {
-          batch_size: 1000,
-          compression_enabled: true,
+          batch_size: MAX_PAGE_ROWS,
+          max_rows_per_transaction: MAX_ROWS_PER_TRANSACTION,
+          max_statements_per_transaction: MAX_STATEMENTS_PER_TRANSACTION,
+          compression_enabled: false,
           auto_archival_enabled: true,
           archival_schedule: '0 2 * * *' // Daily at 2 AM
-        },
-        compliance_settings: {
-          gdpr_retention_days: 1095, // 3 years
-          sox_retention_days: 2555,  // 7 years
-          general_retention_days: 365 // 1 year
         }
       };
 
@@ -874,7 +1110,7 @@ export class AuditArchivalService extends BaseService {
           endDate: date_range.end,
           dryRun: options.dryRun || false
         });
-        
+
         return {
           success: true,
           restore_location,
@@ -891,11 +1127,14 @@ export class AuditArchivalService extends BaseService {
         };
       }
 
-      // Restore specific log by its original ID
-      const countQuery = `SELECT COUNT(*) as count FROM audit_logs_archive WHERE original_id = ?`;
-      const countResult = await this.dbService.select(countQuery, [archive_id], true);
-      
-      if (!countResult || countResult.count === 0) {
+      // Restore the specific log by its original id.
+      const archivedRow = await this.dbService.select(
+        'SELECT * FROM audit_logs_archive WHERE original_id = ?',
+        [archive_id],
+        true
+      );
+
+      if (!archivedRow) {
         return {
           success: false,
           error: 'Archive not found',
@@ -904,39 +1143,30 @@ export class AuditArchivalService extends BaseService {
         };
       }
 
-      // Check if it already exists in hot storage to prevent constraint violations
-      const hotCountQuery = `SELECT COUNT(*) as count FROM audit_logs WHERE id = ?`;
-      const hotCountResult = await this.dbService.select(hotCountQuery, [archive_id], true);
-      
-      if (hotCountResult && hotCountResult.count > 0) {
+      const outcome = await this.restoreOne(archivedRow);
+
+      if (outcome === 'conflict') {
+        // The hot row keeps its own content and the archive copy is untouched:
+        // neither version is overwritten to make the conflict disappear.
         return {
           success: false,
-          error: 'Already restored',
+          error: 'Restore conflict',
           archive_id,
-          message: `Log with ID ${archive_id} already exists in hot storage`
+          outcome,
+          message: `A different audit event already occupies ID ${archive_id}; both copies were kept`
         };
       }
-
-      // Perform actual restore
-      const restoreQuery = `
-        INSERT INTO audit_logs (id, actor_id, actor_role, action, target_type, target_id, details, ip_address, user_agent, timestamp)
-        SELECT original_id, actor_id, actor_role, action, target_type, target_id, details, ip_address, user_agent, timestamp
-        FROM audit_logs_archive
-        WHERE original_id = ?
-      `;
-
-      const result = await this.dbService.insert(restoreQuery, [archive_id]);
-      
-      // Optionally clean it up from archive table
-      const deleteQuery = `DELETE FROM audit_logs_archive WHERE original_id = ?`;
-      await this.dbService.update(deleteQuery, [archive_id]);
 
       const finalResult = {
         success: true,
         archive_id,
         restore_location,
-        restored_count: result.changes || 1,
-        message: `Successfully restored archive ${archive_id} to ${restore_location}`
+        outcome,
+        restored_count: outcome === 'already_present' ? 0 : 1,
+        metadata_complete: archivedRow.metadata_complete === 1,
+        message: outcome === 'already_present'
+          ? `Archive ${archive_id} was already restored; the existing row was left in place`
+          : `Successfully restored archive ${archive_id} to ${restore_location}`
       };
 
       auditArchival_log(`Archive restore completed: ${JSON.stringify(finalResult)}`);
