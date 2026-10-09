@@ -128,6 +128,9 @@ export const DEFAULT_CONFIGS = {
   AUDIT_THREAT_DETECTION_ENABLED: true,
 
   // Export Configuration
+  // NOTE: these are the *stored* defaults. They are not what the export path
+  // enforces - see AUDIT_EXPORT_EFFECTIVE below for that. Kept as-is so an
+  // existing KV namespace still deserialises.
   AUDIT_EXPORT_MAX_RECORDS: 10000,
   AUDIT_EXPORT_ALLOWED_FORMATS: 'csv,json,excel',
   AUDIT_EXPORT_TIMEOUT_MS: 120000,
@@ -175,8 +178,26 @@ export function isValidKVKey(key) {
 }
 
 /**
+ * What the export path actually enforces.
+ *
+ * The service capped a query at 10000 rows and the route gave up after 5000ms,
+ * while `AUDIT_EXPORT_MAX_RECORDS` and `AUDIT_EXPORT_TIMEOUT_MS` sat in KV
+ * holding 10000 and 120000. An operator could read the settings endpoint,
+ * change the timeout to 300000, and see no effect - the stored value was
+ * never consulted. Rather than widen or narrow the enforced limits, which is
+ * an operational decision, the enforced numbers now live here and both the
+ * service, the route and the settings endpoint read them from this one place.
+ * The stored keys are reported as what they are: not effective.
+ */
+export const AUDIT_EXPORT_EFFECTIVE = Object.freeze({
+  MAX_RECORDS: 10000,
+  TIMEOUT_MS: 5000,
+  FORMATS: Object.freeze(['json', 'csv'])
+});
+
+/**
  * Get all KV keys
-*/
+ */
 export function getAllKVKeys() {
   return [...KV_CONFIG_KEYS];
 }

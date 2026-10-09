@@ -2,8 +2,15 @@
 import { BaseService } from './baseService.js';
 import { createKvConfigService } from '../utils/serviceFactory.js';
 import { auditService_log, error_log } from '../utils/debug.js';
+import { renderCsv } from '../utils/csv.js';
 
-
+/**
+ * Formats `GET /api/audit/export` can genuinely produce.
+ *
+ * The default in AUDIT_EXPORT_ALLOWED_FORMATS listed `excel`; the route has
+ * never had a writer for it.
+ */
+const EXPORT_FORMATS = ['json', 'csv'];
 import { ROLES } from '../constants/roles.js';
 import {
   safeParseAuditJSON,
@@ -866,34 +873,24 @@ export class AuditLogService extends BaseService {
    * Generate CSV format for export
    */
   generateCSV(data) {
-    if (data.length === 0) {return '';}
-
-    const headers = Object.keys(data[0]);
-    const csvContent = [
-      headers.join(','),
-      ...data.map(row =>
-        headers.map(header => {
-          const rawValue = row[header];
-          const value = rawValue === null || rawValue === undefined
-            ? ''
-            : typeof rawValue === 'object'
-              ? JSON.stringify(rawValue)
-              : String(rawValue);
-
-          // Escape CSV values
-          if (value.includes(',') || value.includes('"') || value.includes('\n')) {
-            return `"${value.replace(/"/g, '""')}"`;
-          }
-          return value;
-        }).join(',')
-      )
-    ].join('\n');
-
-    return csvContent;
+    // Escaping, line endings and formula neutralising live in one place now, so
+    // this route and the advanced route cannot drift apart again.
+    return renderCsv(data);
   }
 
-  normalizeExportOptions(exportOptions = {}) {
-    const format = exportOptions.format || 'csv';
+  normalizeExportOptions(exportOptions = {}, scope = null) {
+    const resolvedScope = resolveAuditScope(scope);
+    // The requested format is checked here rather than at the switch below.
+    // That switch had `json` as its default arm, so `format=excel` produced a
+    // JSON body under a `.excel` filename - the overclaim this route shipped.
+    const format = String(exportOptions.format || 'csv').toLowerCase();
+    if (!EXPORT_FORMATS.includes(format)) {
+      return {
+        unsupported_format: true,
+        requested_format: format,
+        supported_formats: [...EXPORT_FORMATS]
+      };
+    }
     const filters = exportOptions.filters || {
       action: exportOptions.action,
       actor_id: exportOptions.userId,
@@ -908,8 +905,8 @@ export class AuditLogService extends BaseService {
       format,
       filters,
       include_sensitive: exportOptions.include_sensitive ?? exportOptions.includeDetails ?? false,
-      exclude_super_admin: exportOptions.exclude_super_admin ?? false,
-      exclude_super_admin_actions: exportOptions.exclude_super_admin_actions ?? false,
+      exclude_super_admin: resolvedScope.excludeSuperAdmin,
+      exclude_super_admin_actions: resolvedScope.excludeSuperAdmin,
       max_records: exportOptions.max_records ?? exportOptions.maxRecords ?? exportOptions.limit ?? 10000
     };
   }
@@ -919,6 +916,18 @@ export class AuditLogService extends BaseService {
    */
   async exportLogs(exportOptions = {}, principal = null) {
     try {
+      const scope = resolveAuditScope(principal);
+      const options = this.normalizeExportOptions(exportOptions, scope);
+      if (options.unsupported_format) {
+        return {
+          success: false,
+          statusCode: 422,
+          error: 'UNSUPPORTED_EXPORT_OPTION',
+          message: `Format "${options.requested_format}" is not supported; use ${options.supported_formats.join(' or ')}.`,
+          supported_formats: options.supported_formats
+        };
+      }
+
       const {
         format,
         filters,
@@ -926,16 +935,25 @@ export class AuditLogService extends BaseService {
         exclude_super_admin,
         exclude_super_admin_actions,
         max_records
-      } = this.normalizeExportOptions(exportOptions);
+      } = options;
 
-      // Get logs with applied filters
+      // Get logs with applied filters; scope is re-applied inside getLogs
       const result = await this.getLogs(
         { ...filters, exclude_super_admin, exclude_super_admin_actions },
         { page: 1, limit: max_records },
-        resolveAuditScope(principal)
+        scope
       );
 
       if (!result.success) {
+        // `getLogs` reduces a store fault to a message-only failure. For an
+        // export that loses the two things a client needs in order to tell an
+        // outage from its own mistake: the status and a machine code. Re-typing
+        // the failure here is safe because this is the read the export depends
+        // on, so an unclassified failure from it *is* a dependency failure.
+        // Failures that already carry a status are passed through untouched.
+        if (!Number.isInteger(result.statusCode)) {
+          return { success: false, statusCode: 503, code: 'DB_UNAVAILABLE', error: 'DB_UNAVAILABLE' };
+        }
         return result;
       }
 
@@ -987,8 +1005,12 @@ export class AuditLogService extends BaseService {
         }
       };
     } catch (error) {
+      // The store read is already handled above, so reaching here means the
+      // failure was in turning the records into a file. That is this route's
+      // own fault, not an outage, and the raw message is logged rather than
+      // handed back for a caller to read.
       error_log(`Failed to export audit logs: ${error.message}`);
-      return { success: false, error: error.message };
+      return { success: false, statusCode: 500, code: 'EXPORT_FAILED', error: 'EXPORT_FAILED' };
     }
   }
 

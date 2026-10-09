@@ -221,9 +221,7 @@ class DashboardDataAggregator {
         WHERE timestamp >= ?
         GROUP BY action 
         ORDER BY count DESC 
-        LIMIT 15 
-        GROUP BY action 
-        ORDER BY count DESC
+        LIMIT 15
       `, [last24h.toISOString()]);
 
       return {

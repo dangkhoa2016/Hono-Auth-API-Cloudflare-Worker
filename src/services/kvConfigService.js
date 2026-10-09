@@ -2,7 +2,7 @@ import { kvConfigService_log } from '../utils/debug.js';
 import { parseConfigValue } from '../utils/configResolver.js';
 import { ConfigDependencyUnavailableError } from '../utils/serviceErrors.js';
 import { CLOUDFLARE_KV_PREFIX } from '../constants/app.js';
-import { DEFAULT_CONFIGS } from '../constants/kvKeys.js';
+import { DEFAULT_CONFIGS, AUDIT_EXPORT_EFFECTIVE } from '../constants/kvKeys.js';
 import { describeValueShape } from '../utils/sensitiveData.js';
 
 /**
@@ -553,14 +553,30 @@ export class KVConfigService {
    * @returns {Promise<Object>} Export settings
    */
   async getExportSettings() {
-    const allowedFormats = await this.getAuditConfig('AUDIT_EXPORT_ALLOWED_FORMATS');
+    // The stored AUDIT_EXPORT_MAX_RECORDS and AUDIT_EXPORT_TIMEOUT_MS keys are
+    // reported as stored, but they are not what the export path enforces: the
+    // service capped a query at 10000 rows and the route gave up after 5000ms
+    // regardless of either value. Publishing the stored numbers here is what
+    // let an operator set a two minute timeout and watch a five second one
+    // happen. The enforced values are reported instead, and the stored keys are
+    // left untouched for an existing namespace.
+    const maxRecords = await this.getAuditConfig('AUDIT_EXPORT_MAX_RECORDS');
+    const timeoutMs = await this.getAuditConfig('AUDIT_EXPORT_TIMEOUT_MS');
     return {
-      maxRecords: await this.getAuditConfig('AUDIT_EXPORT_MAX_RECORDS'),
-      allowedFormats: typeof allowedFormats === 'string'
-        ? allowedFormats.split(',').map(f => f.trim())
-        : ['csv', 'json'],
-      timeoutMs: await this.getAuditConfig('AUDIT_EXPORT_TIMEOUT_MS'),
-      compressionEnabled: await this.getBooleanConfig('AUDIT_EXPORT_COMPRESSION_ENABLED')
+      // The formats and flags are the ones the export service implements, not
+      // what AUDIT_EXPORT_ALLOWED_FORMATS says. That setting defaulted to
+      // 'csv,json,excel' and reported compression on, so a UI built from this
+      // method offered an Excel download and a compressed file that the
+      // backend never produced.
+      allowedFormats: [...AUDIT_EXPORT_EFFECTIVE.FORMATS],
+      compressionEnabled: false,
+      maxRecords: AUDIT_EXPORT_EFFECTIVE.MAX_RECORDS,
+      timeoutMs: AUDIT_EXPORT_EFFECTIVE.TIMEOUT_MS,
+      storedSettings: {
+        maxRecords,
+        timeoutMs,
+        applied: false
+      }
     };
   }
 

@@ -13,6 +13,7 @@ import { advancedAuditRoutes_log } from '../utils/debug.js';
 import { unifiedMiddlewares } from '../middleware/unifiedRequestMiddleware.js';
 import { handleStandardError } from '../utils/errorHandler.js';
 import { t, tSuccess } from '../i18n/index.js';
+import { AUDIT_EXPORT_EFFECTIVE } from '../constants/kvKeys.js';
 
 const advancedAudit = new Hono();
 
@@ -894,6 +895,7 @@ advancedAudit.post('/export-advanced',
     let user;
     let body = {};
     let rawBody = '';
+    const requestId = c.get('requestId') || c.req.header('cf-ray') || null;
     try {
       user = c.get('user');
       rawBody = await c.req.text();
@@ -901,22 +903,47 @@ advancedAudit.post('/export-advanced',
       // Reject unexpectedly large payloads to avoid runaway processing
       if (rawBody && rawBody.length > 50000) {
         advancedAuditRoutes_log('Export request too large, rejecting with 413');
-        return new Response(JSON.stringify({ success: false, error: 'Request too large' }), {
-          status: 413,
-          headers: { 'Content-Type': 'application/json' }
-        });
+        return exportRefusal(
+          c,
+          413,
+          'PAYLOAD_TOO_LARGE',
+          'The export request is larger than this endpoint accepts. Narrow the filters and try again.',
+          requestId
+        );
       }
 
-      if (rawBody) {
-        try {
-          body = JSON.parse(rawBody);
-        } catch (parseError) {
-          advancedAuditRoutes_log(`Invalid export payload: ${parseError.message}`);
-          body = {};
-        }
+      // A body that cannot be read is not a body with no filters. The previous
+      // version replaced a parse failure with `{}` and went on to export
+      // everything, so a client that sent a truncated or mistyped payload
+      // received a complete, successful report of the whole audit log and had
+      // no way to tell it from the report it asked for.
+      const parsed = parseExportBody(rawBody);
+      if (parsed.error) {
+        advancedAuditRoutes_log(`Rejected export payload: ${parsed.error}`);
+        return exportRefusal(
+          c,
+          400,
+          'INVALID_EXPORT_FILTER',
+          'The export request body could not be read as an export request.',
+          requestId
+        );
+      }
+      body = parsed.body;
+      if (body === null) {
+        return exportRefusal(
+          c,
+          400,
+          'INVALID_EXPORT_FILTER',
+          'The export request body must be a JSON object.',
+          requestId
+        );
       }
 
-      const format = (body.format || 'json').toLowerCase();
+      // `format` is normalised only after it is known to be a string. Calling
+      // `.toLowerCase()` on whatever arrived turned a numeric `format` into a
+      // 500 with a JavaScript error in the response, which is both the wrong
+      // status and a disclosure of the server's internals.
+      const format = typeof body.format === 'string' ? body.format.toLowerCase() : 'json';
       const filters = body.filters || {};
       const options = body.options || {};
       const aggregation = body.aggregation;
@@ -927,63 +954,64 @@ advancedAudit.post('/export-advanced',
       const { AuditExportService } = await import('../services/auditExportService.js');
       const exportService = new AuditExportService(c.env);
 
-      const exportPromise = (async () => {
-        try {
-          switch (format) {
-          case 'csv':
-            return aggregation
-              ? exportService.exportAggregatedCSV({ filters, aggregation })
-              : exportService.exportToCSV({ filters, options });
-          case 'excel':
-            return exportService.exportToExcel({ filters, options });
-          case 'pdf':
-            return exportService.exportToPDF({ filters, options });
-          case 'json':
-          default:
-            return exportService.exportToJSON({ filters, options });
-          }
-        } catch (exportError) {
-          advancedAuditRoutes_log(`Export processing error: ${exportError.message}`);
-          return {
-            success: true,
-            data: [],
-            metadata: { warning: 'Export failed; returning empty result', error: exportError.message },
-            size: 0
-          };
-        }
-      })();
+      // A timeout is a failure. The previous answer was a success envelope with
+      // an empty array, which a client could not tell from an export that found
+      // nothing.
+      let timeoutHandle;
+      const timeout = new Promise((resolve) => {
+        timeoutHandle = setTimeout(() => resolve({ __timedOut: true }), AUDIT_EXPORT_EFFECTIVE.TIMEOUT_MS);
+      });
 
-      // Prevent long-running exports from triggering client aborts
-      const exportResult = await Promise.race([
-        exportPromise,
-        new Promise(resolve => setTimeout(() => resolve({ timedOut: true }), 5000))
-      ]);
-
-      if (exportResult?.timedOut) {
-        advancedAuditRoutes_log('Export operation timed out, returning fallback response');
-        return c.json(createSuccessResponse({
-          success: true,
-          data: [],
-          metadata: {
-            format,
-            warning: 'Export timed out; returning minimal response',
-            generated_at: new Date().toISOString()
-          }
-        }));
+      let exportResult;
+      try {
+        exportResult = await Promise.race([
+          exportService.export({ format, filters, options, aggregation, requestId }),
+          timeout
+        ]);
+      } finally {
+        // In a `finally`, not after the await: a rejection from the exporter
+        // skips a bare `clearTimeout` on the line below and leaves the deadline
+        // armed for the rest of its window after the client already has an
+        // answer. `Promise.race` does not cancel the losing query, so the
+        // deadline governs the response, not the D1 work underneath it.
+        clearTimeout(timeoutHandle);
       }
 
-      const normalizedResult = {
-        success: exportResult.success !== false,
-        format,
-        data: exportResult.data || [],
-        metadata: exportResult.metadata || exportResult.aggregation_info || { filters },
-        size: exportResult.size || 0,
-        filename: exportResult.filename
-      };
+      if (exportResult?.__timedOut) {
+        advancedAuditRoutes_log('Export operation timed out');
+        return exportRefusal(c, 504, 'EXPORT_TIMEOUT', 'The export took too long and produced no file. Narrow the filters and try again.', requestId);
+      }
 
-      return c.json(createSuccessResponse(normalizedResult));
+      if (exportResult?.success !== true) {
+        const statusCode = Number.isInteger(exportResult?.statusCode) ? exportResult.statusCode : 500;
+        advancedAuditRoutes_log(
+          `Export refused (${exportResult?.error}) for ${user.role} ${user.id}: format=${format}`
+        );
+        return exportRefusal(
+          c,
+          statusCode,
+          exportResult?.error || 'EXPORT_FAILED',
+          exportResult?.message || 'The export could not be produced.',
+          exportResult?.requestId || requestId,
+          exportResult
+        );
+      }
+
+      return c.json(createSuccessResponse({
+        format: exportResult.format,
+        data: exportResult.data,
+        total_records: exportResult.total_records,
+        size: exportResult.size,
+        filename: exportResult.filename,
+        metadata: exportResult.metadata
+      }));
 
     } catch (error) {
+      // The reason is the translated generic text, not `error.message`. The
+      // message belongs to whatever threw - a driver, a parser, an assertion -
+      // and interpolating it into the response put internal detail in the
+      // public body regardless of the detailed-errors setting. The exception
+      // itself is still logged above, which is where a stack trace belongs.
       return await handleStandardError(
         c,
         error,
@@ -1001,10 +1029,143 @@ advancedAudit.post('/export-advanced',
   }
 );
 
+
+/**
+ * Read and shape-check the export request body.
+ *
+ * The rules this encodes, in order:
+ *   - nothing at all is an export with no filters, which is what an empty body
+ *     has always meant and is not the same as a body that failed to parse;
+ *   - anything else must be a JSON object. `null`, an array and a bare string
+ *     are all readable JSON with no sensible reading as an export request;
+ *   - the fields the exporter reads must have the types it expects, so a wrong
+ *     type is reported as the caller error it is instead of surfacing later as
+ *     a failure inside the service.
+ *
+ * An empty body is kept distinct from a malformed one on purpose. They used to
+ * arrive at the same place, and the difference between "I asked for no filters"
+ * and "my payload did not survive the network" is the difference between a full
+ * report and a mistake.
+ *
+ * @param {string} rawBody - The request body as read
+ * @returns {{body: Object|null, error: string|null}} The object to export with,
+ *   or `null` when the body is not an object; `error` names the problem for the
+ *   log and never reaches the client.
+ */
+function parseExportBody(rawBody) {
+  if (!rawBody || !rawBody.trim()) {
+    return { body: {}, error: null };
+  }
+
+  let parsed;
+  try {
+    parsed = JSON.parse(rawBody);
+  } catch (parseError) {
+    // The parser's own message quotes the payload, so it is logged rather than
+    // returned.
+    return { body: null, error: `not JSON: ${parseError.message}` };
+  }
+
+  if (parsed === null || typeof parsed !== 'object' || Array.isArray(parsed)) {
+    return { body: null, error: `body must be a JSON object, got ${Array.isArray(parsed) ? 'array' : typeof parsed}` };
+  }
+
+  if (parsed.format !== undefined && typeof parsed.format !== 'string') {
+    return { body: null, error: `format must be a string, got ${typeof parsed.format}` };
+  }
+  for (const key of ['filters', 'options', 'aggregation']) {
+    const value = parsed[key];
+    if (value === undefined || value === null) {
+      continue;
+    }
+    if (typeof value !== 'object' || Array.isArray(value)) {
+      return { body: null, error: `${key} must be an object, got ${Array.isArray(value) ? 'array' : typeof value}` };
+    }
+  }
+
+  return { body: parsed, error: null };
+}
+
+/**
+ * An export that produced nothing, answered as a failure.
+ *
+ * `data` is absent rather than empty on purpose: an empty array is a valid
+ * answer to a query that matched nothing, and returning it here would make a
+ * broken export indistinguishable from a quiet one.
+ * @param {Object} c - Hono context
+ * @param {number} status - HTTP status
+ * @param {string} code - Machine-readable code
+ * @param {string} message - Human-readable reason, safe to show an operator
+ * @param {string|null} requestId - Correlation id for support
+ * @param {Object} [metadata] - Service refusal detail, filtered to an allowlist
+ * @returns {Response} The error response
+ */
+function exportRefusal(c, status, code, message, requestId, metadata = {}) {
+  // Only these two keys are copied out of the service result. Spreading the
+  // object instead would let any field a future service adds become part of
+  // the public response without anyone deciding that it should be.
+  const allowed = {};
+  if (Array.isArray(metadata?.supported_formats)) {
+    allowed.supported_formats = [...metadata.supported_formats];
+  }
+  if (metadata?.availableOptions && typeof metadata.availableOptions === 'object') {
+    allowed.availableOptions = { ...metadata.availableOptions };
+  }
+
+  return c.json({
+    success: false,
+    error: code,
+    code,
+    message,
+    ...(requestId ? { requestId } : {}),
+    ...allowed
+  }, status);
+}
+
+/**
+ * GET /api/advanced-audit/capabilities - What this backend can actually export
+ * Accessible by: super_admin only
+ *
+ * The contract pointed a UI at this endpoint to decide which options to show,
+ * but no route was ever mounted, so the only honest description of the writers
+ * lived in a service method no HTTP client could reach. The response is the
+ * service's own `getCapabilities()`, not a second hand-maintained copy: a
+ * duplicated list is exactly the kind that advertises Excel after the Excel
+ * writer is gone.
+ */
+advancedAudit.get('/capabilities',
+  requireRole(ROLES.SUPER_ADMIN),
+  async (c) => {
+    let user;
+    try {
+      user = c.get('user');
+
+      const { AuditExportService } = await import('../services/auditExportService.js');
+      const capabilities = new AuditExportService(c.env).getCapabilities();
+
+      return c.json(createSuccessResponse(capabilities));
+    } catch (error) {
+      return await handleStandardError(
+        c,
+        error,
+        'Failed to describe export capabilities',
+        advancedAuditRoutes_log,
+        'advancedAudit.export.failed',
+        {
+          actor: user?.full_name || user?.email || 'unknown',
+          reason: t(c, 'system.serverError'),
+          operation: 'describe export capabilities'
+        }
+      );
+    }
+  }
+);
+
+
 /**
  * GET /api/advanced-audit/middleware/stats - Middleware performance stats
  * Accessible by: super_admin only
-*/
+ */
 advancedAudit.get('/middleware/stats',
   requireRole(ROLES.SUPER_ADMIN),
   async (c) => {
