@@ -1,4 +1,3 @@
-import { redactText } from '../utils/sensitiveData.js';
 import { generateActivationToken } from '../utils/activationToken.js';
 import bcrypt from 'bcryptjs';
 import { userService_log, query_log, dbError_log } from '../utils/debug.js';
@@ -11,6 +10,7 @@ import {
 } from '../constants/roles.js';
 import { BaseService } from './baseService.js';
 import { createKvConfigService } from '../utils/serviceFactory.js';
+import { redactText } from '../utils/sensitiveData.js';
 
 /**
  * Service for managing operations with users table
@@ -24,6 +24,28 @@ export class UserService extends BaseService {
   }
 
   /**
+   * Read the fields an authorization decision depends on, from a read that is
+   * required to be current.
+   *
+   * Role, status and auth version decide what a request is allowed to do, so
+   * they are never served from the identity cache and never read from a
+   * replica that may lag: a session revoked on the primary has to be rejected
+   * on the next request, not on the next cache expiry.
+   *
+   * @param {number|string} id - User id
+   * @returns {Promise<Object|null>} The row, or null when the user is gone
+   */
+  async findSecurityState(id) {
+    query_log(`Reading authoritative security state for user: ${id}`);
+
+    return await this.dbService.selectAuthoritative(
+      'SELECT id, role, status, auth_version FROM users WHERE id = ?',
+      [id],
+      true
+    );
+  }
+
+  /**
    * Find user by email
    * @param {string} email - User email
    * @returns {Promise<Object|null>} User object or null
@@ -33,7 +55,7 @@ export class UserService extends BaseService {
 
     try {
       const user = await this.dbService.select(
-        'SELECT id, full_name, email, password, role, status, disabled_by_admin FROM users WHERE email = ?',
+        'SELECT id, full_name, email, password, role, status, disabled_by_admin, auth_version FROM users WHERE email = ?',
         [email],
         true
       );
@@ -63,7 +85,10 @@ export class UserService extends BaseService {
 
     try {
       const user = await this.dbService.select(
-        'SELECT id, full_name, email, new_email, role, status, created_at, disabled_by_admin FROM users WHERE id = ?',
+        // auth_version is selected because the revocation check compares it on
+        // every authenticated request; leaving it out made that check
+        // unreachable rather than merely slow.
+        'SELECT id, full_name, email, new_email, role, status, auth_version, created_at, disabled_by_admin FROM users WHERE id = ?',
         [id],
         true
       );
@@ -153,16 +178,41 @@ export class UserService extends BaseService {
   async delete(id) {
     userService_log(`Deleting user ID: ${id}`);
     try {
-      const result = await this.dbService.delete('DELETE FROM users WHERE id = ?', [id]);
+      // refresh_tokens and audit_logs both reference users without ON DELETE
+      // CASCADE, so a plain DELETE fails on any user who has ever logged in and
+      // the failure used to be swallowed into a bare false. The dependents are
+      // cleared first, in the same transaction as the delete itself.
+      const results = await this.dbService.batch([
+        {
+          // Session artifacts, and per the retention rule the freshest rows
+          // only: they have no value once the user is gone.
+          query: 'DELETE FROM refresh_tokens WHERE user_id = ?',
+          params: [id]
+        },
+        {
+          // The audit trail outlives the account. Only the dangling reference is
+          // dropped; actor_role and actor_email keep the who and the what.
+          query: 'UPDATE audit_logs SET actor_id = NULL WHERE actor_id = ?',
+          params: [id]
+        },
+        {
+          query: 'DELETE FROM users WHERE id = ?',
+          params: [id]
+        }
+      ]);
 
-      if (result && result.success) {
-        userService_log(`User deleted successfully, ID: ${id}`);
-        await this.invalidateUserCache(id);
-        return true;
-      } else {
+      const removed = Number(results?.[2]?.meta?.changes ?? 0);
+      if (removed !== 1) {
         userService_log(`Failed to delete user, ID: ${id}`);
         return false;
       }
+
+      userService_log(
+        `User deleted successfully, ID: ${id}; cleared `
+        + `${Number(results?.[0]?.meta?.changes ?? 0)} refresh tokens`
+      );
+      await this.invalidateUserCache(id);
+      return true;
     } catch (error) {
       dbError_log(`Error deleting user: ${error.message}`);
       return false;
@@ -286,20 +336,29 @@ export class UserService extends BaseService {
         };
       }
 
-      // Update password
-      const updateResult = await this.updatePassword(userId, newPassword);
+      // Commit the verified password replacement, version bump and refresh
+      // revocation together. A revocation failure must preserve the old hash.
+      const bcryptConfig = await this.getBcryptConfig();
+      const hashedPassword = await bcrypt.hash(newPassword, bcryptConfig.saltRounds);
+      const sessions = await this.revokeAllSessions(userId, 'PASSWORD_CHANGE', {
+        previousHash: user.password,
+        nextHash: hashedPassword
+      });
 
-      if (!updateResult) {
-        userService_log(`Password change failed: could not update password for user: ${userId}`);
+      if (!sessions.success) {
+        userService_log(`Password change could not be committed for user: ${userId}`);
         return {
           success: false,
-          error: 'UPDATE_FAILED'
+          error: 'UPDATE_FAILED',
+          reason: 'SESSION_REVOCATION_FAILED'
         };
       }
 
-      userService_log(`Password changed successfully for user: ${userId}`);
+      userService_log(`Password changed successfully for user: ${userId}; all sessions ended`);
       return {
-        success: true
+        success: true,
+        reauthRequired: true,
+        authVersion: sessions.authVersion
       };
 
     } catch (error) {
@@ -318,6 +377,70 @@ export class UserService extends BaseService {
    * @param {string} newPassword - New password (not hashed)
    * @returns {Promise<boolean>} True if successful
    */
+  /**
+   * Ends every session a user holds.
+   *
+   * Bumping auth_version and revoking the refresh rows happen in one
+   * transaction, because either alone leaves a window: revoking refresh alone
+   * leaves other devices' access tokens working until they expire, and the
+   * version bump alone leaves refresh tokens able to mint a new pair. Every
+   * token issued before this call stops being accepted by the middleware on its
+   * very next request, whichever device it is on.
+   * @param {number} userId - User to end sessions for
+   * @param {string} reason - Audit reason recorded on the revoked rows
+   * @param {{previousHash: string, nextHash: string}|null} [passwordChange] - Verified password replacement
+   * @returns {Promise<Object>} Result carrying the new version
+   */
+  async revokeAllSessions(userId, reason = 'USER_LOGOUT_ALL', passwordChange = null) {
+    const nowIso = new Date().toISOString();
+
+    const userWrite = passwordChange ? {
+      query: `UPDATE users
+              SET password = ?, auth_version = auth_version + 1, updated_at = CURRENT_TIMESTAMP
+              WHERE id = ? AND password = ?`,
+      params: [passwordChange.nextHash, userId, passwordChange.previousHash]
+    } : {
+      query: 'UPDATE users SET auth_version = auth_version + 1, updated_at = CURRENT_TIMESTAMP WHERE id = ?',
+      params: [userId]
+    };
+    // An intervening password change or ignored write cannot revoke sessions
+    // and report success for a password that was never installed. An assertion
+    // failure aborts this D1 transaction (SQLite's documented abs overflow).
+    const passwordGuard = passwordChange ? [{
+      query: 'SELECT CASE WHEN changes() = 1 THEN 1 ELSE abs(-9223372036854775808) END AS password_write_verified',
+      params: []
+    }] : [];
+    const results = await this.dbService.batch([
+      userWrite,
+      ...passwordGuard,
+      {
+        query: `UPDATE refresh_tokens
+                SET revoked = 1,
+                    revoked_at = ?,
+                    revocation_reason = ?,
+                    updated_at = CURRENT_TIMESTAMP
+                WHERE user_id = ? AND revoked = 0`,
+        params: [nowIso, reason, userId]
+      }
+    ]);
+
+    const bumped = Number(results?.[0]?.meta?.changes ?? 0);
+    if (bumped !== 1) {
+      userService_log(`Could not end sessions: user ${userId} not found`);
+      return { success: false, error: 'USER_NOT_FOUND' };
+    }
+
+    await this.invalidateUserCache(userId);
+    const user = await this.findById(userId);
+    userService_log(`Ended all sessions for user ${userId} (${reason}); now at version ${user?.auth_version}`);
+
+    return {
+      success: true,
+      authVersion: user?.auth_version ?? null,
+      revokedCount: Number(results?.at(-1)?.meta?.changes ?? 0)
+    };
+  }
+
   async updatePassword(id, newPassword) {
     userService_log(`Updating password for user ID: ${id}`);
     const bcryptConfig = await this.getBcryptConfig();

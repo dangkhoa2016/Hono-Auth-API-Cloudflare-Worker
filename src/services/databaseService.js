@@ -52,6 +52,49 @@ export class DatabaseService {
   }
 
   /**
+   * Execute a SELECT that has to reflect the primary.
+   *
+   * Used for the reads an authorization decision depends on. D1 can route a
+   * session to a read replica, and a replica that has not caught up would let a
+   * revoked session through, so those reads ask for `first-primary`. A binding
+   * without session support falls back to the plain statement rather than
+   * failing the request.
+   *
+   * @param {string} query - SQL SELECT query
+   * @param {Array} params - Parameters to bind
+   * @param {boolean} firstOnly - Return first record instead of array
+   * @returns {Promise<Object|Array|null>} Query result
+   */
+  async selectAuthoritative(query, params = [], firstOnly = false) {
+    return await this.executeWithRetry(async () => {
+      // Only a session's first query is primary-pinned. Each authorization read
+      // (including a retry) needs a new session, not a service-lifetime session.
+      const session = this._primarySession();
+      const statement = (session || this.database).prepare(query);
+      const result = firstOnly
+        ? await statement.bind(...params).first()
+        : (await statement.bind(...params).all()).results || [];
+      return result;
+    }, 'Authoritative SELECT query error', { attempts: 3 });
+  }
+
+  /**
+   * Start a fresh primary-pinned session. Plain D1 queries also use the primary
+   * when the Sessions API is absent or cannot be initialized.
+   * @returns {Object|null} A new D1 session, or null for the plain binding
+   */
+  _primarySession() {
+    try {
+      if (typeof this.database.withSession === 'function') {
+        return this.database.withSession('first-primary');
+      }
+    } catch (error) {
+      query_log(`Authoritative reads using plain primary binding: ${error.name || 'Error'}`);
+    }
+    return null;
+  }
+
+  /**
    * Execute INSERT query with prepared statement and retry logic
    * @param {string} query - SQL INSERT query
    * @param {Array} params - Parameters to bind
