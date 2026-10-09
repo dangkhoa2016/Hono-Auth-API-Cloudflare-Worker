@@ -154,7 +154,7 @@ export class TokenService extends BaseService {
       try {
         payload = await verifyToken(refreshToken, jwtConfig.secret);
       } catch (verifyError) {
-        tokenService_log(`Refresh token verification failed: ${verifyError.message}`);
+        tokenService_log(`Refresh token verification failed: ${verifyError.name || 'Error'}`);
         return {
           success: false,
           error: 'REFRESH_TOKEN_INVALID',
@@ -504,12 +504,12 @@ export class TokenService extends BaseService {
     try {
       payload = await verifyToken(token, jwtConfig.secret);
     } catch (error) {
-      error_log(`Access token verification failed: ${error.message}`);
+      error_log(`Access token verification failed: ${error.name || 'Error'}`);
       return {
         success: false,
         error: 'ACCESS_TOKEN_INVALID',
         reason: 'TOKEN_SIGNATURE_INVALID',
-        details: error.message
+        details: error.name || 'Error'
       };
     }
 
