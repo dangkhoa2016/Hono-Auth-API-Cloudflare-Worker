@@ -1,6 +1,8 @@
 import { error_log, middleware_log, i18nMiddleware_log } from '../utils/debug.js';
 import { getFeatureFlags } from '../utils/dynamicConfig.js';
 import { getStandardErrorMessage, handleStandardError } from '../utils/errorHandler.js';
+import { codeForError, statusForError, isServiceError } from '../utils/serviceErrors.js';
+import { redactText } from '../utils/sensitiveData.js';
 
 /**
  * Global error handling middleware with i18n support
@@ -13,12 +15,14 @@ export const errorHandler = async (err, c) => {
   await getFeatureFlags(c.env); // Ensure flags loaded (side effects / future use)
   i18nMiddleware_log(`Processing error handler in language: ${lang}`);
 
-  const statusCode = err.status || 500;
+  const serviceStatus = isServiceError(err) ? statusForError(err) : null;
+  const statusCode = serviceStatus || err.status || 500;
+  const machineCode = isServiceError(err) ? codeForError(err) : null;
 
   // Build log object first
   error_log(`Global error handler caught error: ${JSON.stringify({
-    message: err.message,
-    stack: err.stack,
+    message: redactText(err.message || ''),
+    code: machineCode,
     url: c.req.url,
     method: c.req.method,
     language: lang,
@@ -26,11 +30,19 @@ export const errorHandler = async (err, c) => {
   })}`);
 
   // Always build a consistent translated+raw message using standardized helper
-  const fallbackKey = statusCode >= 500 ? 'system.serverError' : 'system.operationFailed';
+  const fallbackKey = statusCode >= 500 ? 'system.serviceUnavailable' : 'system.operationFailed';
   const composedMessage = await getStandardErrorMessage(c, err, fallbackKey);
 
-  // Use composed message as original error replacement to maintain consistent formatting
-  return await handleStandardError(c, new Error(composedMessage), 'Global error handler', error_log, fallbackKey, {}, statusCode);
+  return await handleStandardError(
+    c,
+    new Error(composedMessage),
+    'Global error handler',
+    error_log,
+    fallbackKey,
+    { reason: machineCode || 'internal' },
+    statusCode,
+    machineCode ? { code: machineCode } : null
+  );
 };
 
 /**

@@ -1,5 +1,7 @@
+import { redactText } from '../utils/sensitiveData.js';
+import { ServiceUnavailableError, codeForError, isServiceError, statusForError } from '../utils/serviceErrors.js';
 import bcrypt from 'bcryptjs';
-import { authService_log, bcrypt_log, error_log } from '../utils/debug.js';
+import { authService_log, bcrypt_log, error_log, authError_log } from '../utils/debug.js';
 import { UserService } from './userService.js';
 import {
   createRateLimitService,
@@ -19,6 +21,24 @@ function normalizeIdentifier(value) {
     return null;
   }
   return String(value).trim().toLowerCase();
+}
+
+function dependencyFailure(error, logMessage) {
+  if (isServiceError(error) && statusForError(error) >= 500) {
+    authError_log(`${logMessage}: dependency unavailable (${codeForError(error)})`);
+    return {
+      success: false,
+      error: codeForError(error),
+      reason: 'DEPENDENCY_UNAVAILABLE',
+      statusCode: statusForError(error)
+    };
+  }
+  return {
+    success: false,
+    error: 'SERVER_ERROR',
+    statusCode: 500,
+    details: error.name || 'Error'
+  };
 }
 
 /**
@@ -242,13 +262,8 @@ export class AuthService extends BaseService {
       };
 
     } catch (error) {
-      error_log(`Login service error: ${error.message}`);
-      return {
-        success: false,
-        error: 'SERVER_ERROR',
-        statusCode: 500,
-        details: error.message
-      };
+      error_log(`Login service error: ${error.name || 'Error'}: ${redactText(error.message)}`);
+      return dependencyFailure(error, 'Login service error');
     }
   }
 
@@ -358,13 +373,8 @@ export class AuthService extends BaseService {
       };
 
     } catch (error) {
-      error_log(`Refresh token service error: ${error.message}`);
-      return {
-        success: false,
-        error: 'SERVER_ERROR',
-        statusCode: 500,
-        details: error.message
-      };
+      error_log(`Refresh token service error: ${error.name || 'Error'}: ${redactText(error.message)}`);
+      return dependencyFailure(error, 'Refresh token service error');
     }
   }
 
@@ -419,12 +429,15 @@ export class AuthService extends BaseService {
       return result;
 
     } catch (error) {
-      error_log(`Access token verification error: ${error.message}`);
-      return {
-        success: false,
-        error: 'ACCESS_TOKEN_INVALID',
-        details: error.message
-      };
+      if (error instanceof ServiceUnavailableError) {
+        error_log('Access token verification blocked: database dependency unavailable');
+        return {
+          ...dependencyFailure(error, 'Access token verification blocked'),
+          reason: 'BLACKLIST_LOOKUP_FAILED'
+        };
+      }
+      error_log(`Access token verification error: ${error.name || 'Error'}: ${redactText(error.message)}`);
+      return dependencyFailure(error, 'Access token verification error');
     }
   }
 
@@ -456,7 +469,8 @@ export class AuthService extends BaseService {
         success: false,
         error: accessVerification.error || 'ACCESS_TOKEN_INVALID',
         reason: accessVerification.reason || 'ACCESS_TOKEN_INVALID',
-        statusCode: 401
+        // Keep a dependency outage at 503; only real token problems are 401.
+        statusCode: accessVerification.statusCode || 401
       };
     }
 
@@ -502,7 +516,7 @@ export class AuthService extends BaseService {
       };
     }
 
-    await this.tokenService.revokeRefreshToken(refreshPayload.jti, 'USER_LOGOUT', { skipIfRevoked: true });
+    const refreshRevocation = await this.tokenService.revokeRefreshToken(refreshPayload.jti, 'USER_LOGOUT', { skipIfRevoked: true });
 
     if (accessPayload.jti && accessPayload.exp) {
       await this.tokenBlacklistService.addToBlacklist({
@@ -511,6 +525,15 @@ export class AuthService extends BaseService {
         expiresAt: accessPayload.exp * 1000,
         reason: 'USER_LOGOUT'
       });
+    }
+
+    if (!refreshRevocation.revoked) {
+      return {
+        success: false,
+        error: 'DB_UNAVAILABLE',
+        reason: 'REFRESH_REVOCATION_NOT_CONFIRMED',
+        statusCode: 503
+      };
     }
 
     await this.tokenAuditService.logTokenAction('logout', accessPayload.user_id, {

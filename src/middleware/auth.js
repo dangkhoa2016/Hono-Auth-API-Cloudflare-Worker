@@ -1,3 +1,5 @@
+import { describeAuthScheme, redactText } from '../utils/sensitiveData.js';
+import { codeForError, isServiceError, statusForError } from '../utils/serviceErrors.js';
 import { authMiddleware_log, authError_log } from '../utils/debug.js';
 import { createAuthService, createUserService, createKvConfigService } from '../utils/serviceFactory.js';
 import { handleStandardError } from '../utils/errorHandler.js';
@@ -12,7 +14,7 @@ import { getClientIP } from '../utils/auditHelpers.js';
 export const authMiddleware = async (c, next) => {
   const authorization = c.req.header('Authorization');
 
-  authMiddleware_log(`Checking authorization header: ${authorization}`);
+  authMiddleware_log(`Authorization header ${authorization ? `present (${describeAuthScheme(authorization)})` : 'missing'}`);
 
   if (!authorization || !authorization.startsWith('Bearer ')) {
     authError_log('Missing or invalid authorization header');
@@ -32,6 +34,20 @@ export const authMiddleware = async (c, next) => {
   if (!verification.success) {
     const reason = verification.reason || verification.error || 'TOKEN_INVALID';
     authError_log(`Token verification failed: ${reason}`);
+
+    if (verification.statusCode === 503 || verification.error === 'DB_UNAVAILABLE') {
+      return await handleStandardError(
+        c,
+        new Error('DB_UNAVAILABLE'),
+        'Auth middleware: token verification blocked by dependency failure',
+        authError_log,
+        'system.serviceUnavailable',
+        { reason: 'DB_UNAVAILABLE' },
+        503,
+        { code: 'DB_UNAVAILABLE' }
+      );
+    }
+
     return await handleStandardError(c, new Error(reason), 'Auth middleware: token verification failed', authError_log, 'auth.tokenInvalid', { reason }, 401);
   }
 
@@ -110,7 +126,21 @@ export const authMiddleware = async (c, next) => {
     c.set('user', userWithRole);
     await next();
   } catch (error) {
-    authError_log(`Error loading user details: ${error.message}`);
+    authError_log(`Error loading user details: ${error.name || 'Error'}: ${redactText(error.message)}`);
+    // A dependency outage is never a client error: reporting 401 here would
+    // tell the client to drop a perfectly valid session.
+    if (isServiceError(error) && statusForError(error) >= 500) {
+      return await handleStandardError(
+        c,
+        new Error('DB_UNAVAILABLE'),
+        'Auth middleware: user lookup unavailable',
+        authError_log,
+        'system.serviceUnavailable',
+        { reason: 'DB_UNAVAILABLE' },
+        503,
+        { code: codeForError(error) }
+      );
+    }
     return await handleStandardError(c, error, 'Error loading user details', authError_log, 'system.serverError');
   }
 };

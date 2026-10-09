@@ -1,3 +1,4 @@
+import { redactText } from '../utils/sensitiveData.js';
 import { generateActivationToken } from '../utils/activationToken.js';
 import bcrypt from 'bcryptjs';
 import { userService_log, query_log, dbError_log } from '../utils/debug.js';
@@ -45,8 +46,10 @@ export class UserService extends BaseService {
 
       return user;
     } catch (error) {
-      dbError_log(`Error finding user by email: ${error.message}`);
-      return null;
+      // `null` means "no row". A broken dependency must reach the caller so
+      // security decisions fail closed with 503 instead of a fake 401.
+      dbError_log(`Error finding user by email: ${error.name || 'Error'}: ${redactText(error.message)}`);
+      throw error;
     }
   }
 
@@ -73,8 +76,9 @@ export class UserService extends BaseService {
 
       return user;
     } catch (error) {
-      dbError_log(`Error finding user by ID: ${error.message}`);
-      return null;
+      // See findByEmail: only a genuine empty result may become null.
+      dbError_log(`Error finding user by ID: ${error.name || 'Error'}: ${redactText(error.message)}`);
+      throw error;
     }
   }
 
