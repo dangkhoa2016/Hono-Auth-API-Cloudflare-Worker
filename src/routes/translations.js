@@ -4,16 +4,58 @@
 */
 
 import { Hono } from 'hono';
+import { z } from 'zod';
 import { loadTranslation, getSupportedLanguagesFromFiles, validateTranslation } from '../i18n/loader.js';
 import { createSuccessResponse } from '../utils/helpers.js';
 import { i18n_log } from '../utils/debug.js';
 import { unifiedMiddlewares } from '../middleware/unifiedRequestMiddleware.js';
 import { handleStandardError } from '../utils/errorHandler.js';
 import { tSuccess } from '../i18n/index.js';
+import { MissingTranslationError, MissingInterpolationError } from '../i18n/service.js';
 import { I18nDemo, i18nTestUtils } from '../utils/i18nDemo.js';
 
 const translations = new Hono();
 translations.use('*', unifiedMiddlewares.auto());
+
+const demoKey = z.string().min(1).max(256);
+const demoParams = z.record(z.string(), z.unknown());
+const demoSchemas = {
+  plurals: z.object({ key: demoKey, counts: z.array(z.number().finite().nonnegative()).min(1).max(100).optional(), params: demoParams.optional() }),
+  formatting: z.object({ key: demoKey, testCases: z.array(demoParams).min(1).max(100) }),
+  context: z.object({ key: demoKey, contexts: z.array(z.string().min(1).max(100)).min(1).max(100) })
+};
+
+function validateDemo(kind) {
+  return async (c, next) => {
+    let body;
+    try {
+      body = await c.req.json();
+    } catch {
+      return await handleStandardError(c, new Error('INVALID_JSON'), 'Translation demo JSON validation', i18n_log,
+        'validation.invalidJson', { details: 'Malformed JSON' }, 400);
+    }
+    const result = demoSchemas[kind].safeParse(body);
+    if (!result.success) {
+      return await handleStandardError(c, new Error('INVALID_DEMO_INPUT'), 'Translation demo input validation', i18n_log,
+        'validationField', { field: 'body', error: 'Expected a translation key and 1–100 valid cases' }, 400);
+    }
+    c.set('translationDemoInput', result.data);
+    await next();
+  };
+}
+
+function handleDemoError(c, error, key, operation, messageKey) {
+  // Only failures for the user-selected resource are input errors. Failures
+  // translating the server's completion message remain server errors.
+  if ((error instanceof MissingTranslationError || error instanceof MissingInterpolationError) && error.key === key) {
+    return handleStandardError(c, error, operation, i18n_log, 'validationField', {
+      field: 'body', error: 'Translation key or required interpolation values are invalid'
+    }, 400);
+  }
+  return handleStandardError(c, error, operation, i18n_log, messageKey, {
+    key: key || 'unknown', reason: error.message
+  });
+}
 
 // GET /translations - List all available translations
 
@@ -92,6 +134,13 @@ translations.get('/:language/validate', async (c) => {
   i18n_log(`Validating translations for language: ${language}`);
 
   try {
+    const supportedLanguages = await getSupportedLanguagesFromFiles();
+    if (!supportedLanguages.includes(language)) {
+      return await handleStandardError(c, new Error('LANGUAGE_NOT_SUPPORTED'), 'Translations validate - not supported', i18n_log, 'i18n.languageNotSupported', {
+        language,
+        supportedLanguages: supportedLanguages.join(', ')
+      }, 404);
+    }
     const validation = await validateTranslation(language);
 
     return c.json(createSuccessResponse({
@@ -115,9 +164,16 @@ translations.get('/:language/section/:section', async (c) => {
   i18n_log(`Fetching section '${section}' for language: ${language}`);
 
   try {
+    const supportedLanguages = await getSupportedLanguagesFromFiles();
+    if (!supportedLanguages.includes(language)) {
+      return await handleStandardError(c, new Error('LANGUAGE_NOT_SUPPORTED'), 'Translations section - not supported', i18n_log, 'i18n.languageNotSupported', {
+        language,
+        supportedLanguages: supportedLanguages.join(', ')
+      }, 404);
+    }
     const translationData = await loadTranslation(language);
 
-    if (!translationData[section]) {
+    if (!Object.hasOwn(translationData, section)) {
       return await handleStandardError(c, new Error('SECTION_NOT_FOUND'), 'Translations get section - not found', i18n_log, 'i18n.sectionNotFound', {
         section,
         language
@@ -139,6 +195,7 @@ translations.get('/:language/section/:section', async (c) => {
 
 // GET /translations/demo/enhanced - Demo enhanced i18n features
 translations.get('/demo/enhanced', async (c) => {
+  const startedAt = Date.now();
   i18n_log('Running enhanced i18n features demo');
 
   try {
@@ -148,7 +205,7 @@ translations.get('/demo/enhanced', async (c) => {
       ...demoResults,
       message: tSuccess(c, 'operation.completed', {
         operationType: 'enhanced_demo',
-        duration: 150
+        duration: Date.now() - startedAt
       })
     }));
   } catch (error) {
@@ -160,6 +217,7 @@ translations.get('/demo/enhanced', async (c) => {
 
 // GET /translations/demo/plurals - Demo plural translations
 translations.get('/demo/plurals', async (c) => {
+  const startedAt = Date.now();
   i18n_log('Running plurals demo');
 
   try {
@@ -169,7 +227,7 @@ translations.get('/demo/plurals', async (c) => {
       ...pluralsDemo,
       message: tSuccess(c, 'operation.completed', {
         operationType: 'plurals_demo',
-        duration: 25
+        duration: Date.now() - startedAt
       })
     }));
   } catch (error) {
@@ -181,6 +239,7 @@ translations.get('/demo/plurals', async (c) => {
 
 // GET /translations/demo/formatting - Demo formatting features
 translations.get('/demo/formatting', async (c) => {
+  const startedAt = Date.now();
   i18n_log('Running formatting demo');
 
   try {
@@ -190,7 +249,7 @@ translations.get('/demo/formatting', async (c) => {
       ...formattingDemo,
       message: tSuccess(c, 'operation.completed', {
         operationType: 'formatting_demo',
-        duration: 35
+        duration: Date.now() - startedAt
       })
     }));
   } catch (error) {
@@ -202,6 +261,7 @@ translations.get('/demo/formatting', async (c) => {
 
 // GET /translations/demo/context - Demo contextual translations
 translations.get('/demo/context', async (c) => {
+  const startedAt = Date.now();
   i18n_log('Running contextual translations demo');
 
   try {
@@ -211,7 +271,7 @@ translations.get('/demo/context', async (c) => {
       ...contextDemo,
       message: tSuccess(c, 'operation.completed', {
         operationType: 'context_demo',
-        duration: 30
+        duration: Date.now() - startedAt
       })
     }));
   } catch (error) {
@@ -223,6 +283,7 @@ translations.get('/demo/context', async (c) => {
 
 // GET /translations/demo/errors - Demo enhanced error messages
 translations.get('/demo/errors', async (c) => {
+  const startedAt = Date.now();
   i18n_log('Running error messages demo');
 
   try {
@@ -232,7 +293,7 @@ translations.get('/demo/errors', async (c) => {
       ...errorDemo,
       message: tSuccess(c, 'operation.completed', {
         operationType: 'error_demo',
-        duration: 40
+        duration: Date.now() - startedAt
       })
     }));
   } catch (error) {
@@ -244,6 +305,7 @@ translations.get('/demo/errors', async (c) => {
 
 // GET /translations/demo/success - Demo enhanced success messages
 translations.get('/demo/success', async (c) => {
+  const startedAt = Date.now();
   i18n_log('Running success messages demo');
 
   try {
@@ -253,7 +315,7 @@ translations.get('/demo/success', async (c) => {
       ...successDemo,
       message: tSuccess(c, 'operation.completed', {
         operationType: 'success_demo',
-        duration: 45
+        duration: Date.now() - startedAt
       })
     }));
   } catch (error) {
@@ -264,14 +326,15 @@ translations.get('/demo/success', async (c) => {
 });
 
 // POST /translations/test/plurals - Test pluralization with custom data
-translations.post('/test/plurals', async (c) => {
+translations.post('/test/plurals', validateDemo('plurals'), async (c) => {
+  const startedAt = Date.now();
   i18n_log('Testing pluralization with custom data');
 
   let key; // Declare key variable at the top level
 
   try {
   // Accept optional interpolation params in request body
-    const { key: parsedKey, counts, params } = await c.req.json();
+    const { key: parsedKey, counts, params } = c.get('translationDemoInput');
     key = parsedKey; // Assign parsed key
 
     if (!key) {
@@ -291,25 +354,23 @@ translations.post('/test/plurals', async (c) => {
       results,
       message: tSuccess(c, 'operation.completed', {
         operationType: 'pluralization_test',
-        duration: 25 // Approximate processing time
+        duration: Date.now() - startedAt
       })
     }));
   } catch (error) {
-    return await handleStandardError(c, error, 'Failed to test pluralization functionality', i18n_log, 'i18n.plurals_test_failed', {
-      key: key || 'unknown',
-      reason: error.message
-    });
+    return await handleDemoError(c, error, key, 'Failed to test pluralization functionality', 'i18n.plurals_test_failed');
   }
 });
 
 // POST /translations/test/formatting - Test formatting with custom data
-translations.post('/test/formatting', async (c) => {
+translations.post('/test/formatting', validateDemo('formatting'), async (c) => {
+  const startedAt = Date.now();
   i18n_log('Testing formatting with custom data');
 
   let key; // Declare key variable at the top level
 
   try {
-    const { key: parsedKey, testCases } = await c.req.json();
+    const { key: parsedKey, testCases } = c.get('translationDemoInput');
     key = parsedKey; // Assign parsed key
 
     if (!key || !testCases) {
@@ -327,25 +388,23 @@ translations.post('/test/formatting', async (c) => {
       results,
       message: tSuccess(c, 'operation.completed', {
         operationType: 'formatting_test',
-        duration: 50 // Approximate processing time
+        duration: Date.now() - startedAt
       })
     }));
   } catch (error) {
-    return await handleStandardError(c, error, 'Failed to test formatting functionality', i18n_log, 'i18n.formatting_test_failed', {
-      key: key || 'unknown',
-      reason: error.message
-    });
+    return await handleDemoError(c, error, key, 'Failed to test formatting functionality', 'i18n.formatting_test_failed');
   }
 });
 
 // POST /translations/test/context - Test contextual translations
-translations.post('/test/context', async (c) => {
+translations.post('/test/context', validateDemo('context'), async (c) => {
+  const startedAt = Date.now();
   i18n_log('Testing contextual translations with custom data');
 
   let key; // Declare key variable at the top level
 
   try {
-    const { key: parsedKey, contexts } = await c.req.json();
+    const { key: parsedKey, contexts } = c.get('translationDemoInput');
     key = parsedKey; // Assign parsed key
 
     if (!key || !contexts) {
@@ -362,15 +421,12 @@ translations.post('/test/context', async (c) => {
       contexts,
       results,
       message: tSuccess(c, 'operation.completed', {
-        count: results.length,
-        context: 'contextual_test'
+        operationType: 'contextual_test',
+        duration: Date.now() - startedAt
       })
     }));
   } catch (error) {
-    return await handleStandardError(c, error, 'Failed to test contextual translations', i18n_log, 'i18n.context_test_failed', {
-      key: key || 'unknown',
-      reason: error.message
-    });
+    return await handleDemoError(c, error, key, 'Failed to test contextual translations', 'i18n.context_test_failed');
   }
 });
 
