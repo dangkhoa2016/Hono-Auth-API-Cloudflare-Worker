@@ -9,6 +9,23 @@ import { i18nValidatorsMiddleware } from '../middleware/i18nValidator.js';
 import { handleStandardError } from '../utils/errorHandler.js';
 import { t, tError, tSuccess } from '../i18n/index.js';
 import { clearServiceCaches } from '../utils/serviceFactory.js';
+import { buildConfigComparison } from '../utils/configResolver.js';
+import { describeConfigValue, isSensitiveKey, MASKED } from '../utils/sensitiveData.js';
+
+/**
+ * Read one key straight from KV without the service cache, so the comparison
+ * reflects storage instead of a value cached by an earlier request.
+ */
+function createRawKvReader(kvConfig) {
+  if (!kvConfig || !kvConfig.kv) {
+    return null;
+  }
+  return {
+    async get(realKey) {
+      return await kvConfig.kv.get(realKey);
+    }
+  };
+}
 
 function buildRateLimitMetadataFromValue(value) {
   if (!value || typeof value !== 'object' || Array.isArray(value)) {
@@ -52,15 +69,25 @@ kvAdmin.get('/configs', async (c) => {
 
     // Merge with default configs and only show allowed keys
     const result = {};
+    const sensitiveKeys = [];
     for (const key of KV_CONFIG_KEYS) {
-      result[key] = configs[key] !== undefined ? configs[key] : DEFAULT_CONFIGS[key];
+      const value = configs[key] !== undefined ? configs[key] : DEFAULT_CONFIGS[key];
+      // A stored secret is never echoed over HTTP. The operator can see that a
+      // value is set and can replace it, but not read it back.
+      if (isSensitiveKey(key) && configs[key] !== undefined && configs[key] !== null && configs[key] !== '') {
+        sensitiveKeys.push(key);
+        result[key] = MASKED;
+        continue;
+      }
+      result[key] = value;
     }
 
-    kvAdminRoutes_log(`Retrieved all configs: ${Object.keys(result).length} items`);
+    kvAdminRoutes_log(`Retrieved all configs: ${Object.keys(result).length} items (${sensitiveKeys.length} masked)`);
     return c.json({
       success: true,
       data: {
         configs: result,
+        maskedKeys: sensitiveKeys,
         allowedKeys: KV_CONFIG_KEYS,
         defaults: DEFAULT_CONFIGS
       },
@@ -106,34 +133,23 @@ kvAdmin.get('/configs/defaults', (c) => {
 */
 kvAdmin.get('/configs/env-comparison', async (c) => {
   try {
-    const kvConfigs = await c.kvConfig.getAll();
-    const comparison = {};
-
-    for (const key of KV_CONFIG_KEYS) {
-      comparison[key] = {
-        env: c.env[key] || null,
-        kv: kvConfigs[key] !== undefined ? kvConfigs[key] : null,
-        default: DEFAULT_CONFIGS[key] || null,
-        source: kvConfigs[key] !== undefined ? 'kv' : (c.env[key] ? 'env' : 'default')
-      };
-    }
+    const { comparison, summary } = await buildConfigComparison({
+      keys: KV_CONFIG_KEYS,
+      env: c.env,
+      kv: createRawKvReader(c.kvConfig)
+    });
 
     return c.json({
       success: true,
       data: {
         comparison,
-        summary: {
-          total: Object.keys(comparison).length,
-          fromKV: Object.values(comparison).filter(v => v.source === 'kv').length,
-          fromEnv: Object.values(comparison).filter(v => v.source === 'env').length,
-          fromDefault: Object.values(comparison).filter(v => v.source === 'default').length
-        }
+        summary
       },
       message: tSuccess(c, 'kv.configs.comparisonRetrieved', {
         actor: c.get('user')?.fullName || 'System',
-        kvCount: Object.values(comparison).filter(v => v.source === 'kv').length,
-        envCount: Object.values(comparison).filter(v => v.source === 'env').length,
-        defaultCount: Object.values(comparison).filter(v => v.source === 'default').length
+        kvCount: summary.fromKV,
+        envCount: summary.fromEnv,
+        defaultCount: summary.fromDefault
       })
     });
   } catch (error) {
@@ -161,7 +177,7 @@ kvAdmin.get('/configs/:key', async (c) => {
 
   try {
     const value = await c.kvConfig.get(key, DEFAULT_CONFIGS[key]);
-    kvAdminRoutes_log(`Retrieved config: ${key} = ${value}`);
+    kvAdminRoutes_log(`Retrieved config: ${key} = ${describeConfigValue(key, value)}`);
 
     return c.json({
       success: true,

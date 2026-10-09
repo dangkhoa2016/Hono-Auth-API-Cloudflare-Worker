@@ -1,10 +1,43 @@
 import { dynamicConfig_log } from './debug.js';
 import { DEFAULT_CONFIGS, isValidKVKey } from '../constants/kvKeys.js';
 import { DEFAULT_JWT_SECRET } from '../constants/security.js';
+import { describeConfigValue } from './sensitiveData.js';
+import { resolveConfigKey, parseConfigValue, isSecuritySensitiveKey } from './configResolver.js';
+import { isServiceError, ConfigDependencyUnavailableError } from './serviceErrors.js';
 // Lazy-load to avoid circular dependency with serviceFactory during tests
 async function getKvConfigService(env) {
   const { createKvConfigService } = await import('../utils/serviceFactory.js');
   return createKvConfigService(env);
+}
+
+/**
+ * KV reader backed by KVConfigService. Resolution itself happens in
+ * configResolver, so this only supplies the storage read.
+ *
+ * A read that throws is converted into a typed dependency error, because
+ * "the binding is unreachable" and "the operator never set this key" lead to
+ * different responses and must not reach the resolver as the same `null`.
+ */
+async function getKvReader(env, key) {
+  if (!isValidKVKey(key)) {
+    return null;
+  }
+  const kvConfig = await getKvConfigService(env);
+  if (!kvConfig || !kvConfig.kv) {
+    return null;
+  }
+  return {
+    async get(realKey) {
+      try {
+        return await kvConfig.kv.get(realKey);
+      } catch (error) {
+        throw new ConfigDependencyUnavailableError('CONFIG_KV is unreachable', {
+          key,
+          reason: error?.message
+        });
+      }
+    }
+  };
 }
 
 /**
@@ -24,88 +57,32 @@ async function getKvConfigService(env) {
  * console.log(value); // 'default value' or the value from KV/env
 */
 export async function getDynamicConfig(env, key, defaultValue = null, preferKV = true) {
+  if (typeof key !== 'string' || key.length === 0) {
+    return defaultValue;
+  }
+
   try {
-    const isKVKey = isValidKVKey(key);
-    const kvConfig = isKVKey ? await getKvConfigService(env) : null;
-
-    if (isKVKey && kvConfig && preferKV) {
-      // first: get from KV, fallback to env, then default
-      const kvValue = await kvConfig.get(key);
-      if (kvValue !== null && kvValue !== undefined) {
-        dynamicConfig_log(`Dynamic config from cloudflare KV: ${key} = ${kvValue}`);
-        return parseEnvValue(kvValue);
-      }
-
-      // Fallback to env
-      if (env[key] !== undefined) {
-        dynamicConfig_log(`Dynamic config fallback to ENV: ${key} = ${env[key]}`);
-        return parseEnvValue(env[key]);
-      }
-
-      // Fallback to default
-      const finalDefault = defaultValue !== null ? defaultValue : DEFAULT_CONFIGS[key];
-      dynamicConfig_log(`Dynamic config using default: ${key} = ${finalDefault}`);
-      return finalDefault;
-    } else {
-      // Get from env first, fallback to KV (if any), then default
-      if (env[key] !== undefined) {
-        dynamicConfig_log(`Dynamic config from ENV: ${key} = ${env[key]}`);
-        return parseEnvValue(env[key]);
-      }
-
-      // Fallback to KV if key is in KV
-      if (isKVKey && kvConfig) {
-        const kvValue = await kvConfig.get(key);
-        if (kvValue !== null && kvValue !== undefined) {
-          dynamicConfig_log(`Dynamic config fallback to KV: ${key} = ${kvValue}`);
-          return parseEnvValue(kvValue);
-        }
-      }
-
-      // Fallback to default
-      const finalDefault = defaultValue !== null ? defaultValue : DEFAULT_CONFIGS[key];
-      dynamicConfig_log(`Dynamic config using default: ${key} = ${finalDefault}`);
-      return finalDefault;
-    }
+    const kvReader = await getKvReader(env, key);
+    const resolved = await resolveConfigKey(key, env, kvReader, {
+      preferKV,
+      fallbackValue: defaultValue === null ? undefined : defaultValue
+    });
+    dynamicConfig_log(`Dynamic config from ${resolved.source.toUpperCase()}: ${key} = ${describeConfigValue(key, resolved.value)}`);
+    return resolved.value;
   } catch (error) {
-    dynamicConfig_log(`Error getting dynamic config for ${key}: ${error.message}`);
-    const finalDefault = defaultValue !== null ? defaultValue : DEFAULT_CONFIGS[key];
-    return finalDefault;
+    // A security-relevant key holding an unusable value is a contract error and
+    // must reach the caller. Swallowing it here would silently put the control
+    // back to its default, which for these keys can mean "disabled".
+    //
+    // The same holds for an unreachable KV: a control whose configuration cannot
+    // be read is not the same as a control that was never configured, so the
+    // outage is rethrown instead of being reported as "not set".
+    if (isServiceError(error) && (isSecuritySensitiveKey(key) || !(error instanceof ConfigDependencyUnavailableError))) {
+      throw error;
+    }
+    dynamicConfig_log(`Config dependency unavailable for ${key}; using default (${error.message})`);
+    return defaultValue !== null ? defaultValue : DEFAULT_CONFIGS[key];
   }
-}
-
-/**
- * Parse value from env (string) to appropriate data type
- * @param {string} value - Value from env
- * @returns {*} Parsed value
- * @example
- * const parsed = parseEnvValue('true'); // true
- * const parsed = parseEnvValue('123'); // 123
- * const parsed = parseEnvValue('null'); // null
- * const parsed = parseEnvValue('undefined'); // undefined
- * const parsed = parseEnvValue('some string'); // 'some string'
- * @throws {Error} If unable to parse value
-*/
-function parseEnvValue(value) {
-  if (typeof value !== 'string') {
-    return value;
-  }
-
-  // Boolean values
-  if (value === 'true') {return true;}
-  if (value === 'false') {return false;}
-
-  // Null/undefined
-  if (value === 'null') {return null;}
-  if (value === 'undefined') {return undefined;}
-
-  // Numbers
-  const num = Number(value);
-  if (!isNaN(num) && isFinite(num) && value.trim() !== '') {
-    return num;
-  }
-
-  return value;
 }
 
 /**
@@ -122,10 +99,23 @@ function parseEnvValue(value) {
 export async function getBooleanConfig(env, key, defaultValue = false) {
   try {
     const value = await getDynamicConfig(env, key, defaultValue);
-    return Boolean(value);
+    if (typeof value === 'boolean') {
+      return value;
+    }
+    // Non-boolean leftovers are parsed, never coerced by truthiness: the string
+    // "false" and the number 0 are both false.
+    const parsed = parseConfigValue(key, value);
+    if (parsed.status === 'ok') {
+      return parsed.value === true;
+    }
+    dynamicConfig_log(`Unusable boolean value for ${key}; using ${defaultValue}`);
+    return defaultValue === true;
   } catch (error) {
+    if (isServiceError(error)) {
+      throw error;
+    }
     dynamicConfig_log(`Error getting boolean config for ${key}: ${error.message}`);
-    return Boolean(defaultValue);
+    return defaultValue === true;
   }
 }
 
@@ -144,7 +134,8 @@ export async function getBooleanConfig(env, key, defaultValue = false) {
 export async function getNumberConfig(env, key, defaultValue = 0, min = null, max = null) {
   try {
     const value = await getDynamicConfig(env, key, defaultValue);
-    let num = Number(value);
+    // An empty or absent value is "unset", not 0.
+    let num = (value === null || value === undefined || value === '') ? Number.NaN : Number(value);
 
     if (isNaN(num) || !isFinite(num)) {
       num = Number(defaultValue);
@@ -155,6 +146,9 @@ export async function getNumberConfig(env, key, defaultValue = 0, min = null, ma
 
     return num;
   } catch (error) {
+    if (isServiceError(error)) {
+      throw error;
+    }
     dynamicConfig_log(`Error getting number config for ${key}: ${error.message}`);
     return Number(defaultValue);
   }
@@ -182,6 +176,9 @@ export async function getStringConfig(env, key, defaultValue = '', maxLength = n
 
     return str;
   } catch (error) {
+    if (isServiceError(error)) {
+      throw error;
+    }
     dynamicConfig_log(`Error getting string config for ${key}: ${error.message}`);
     return String(defaultValue);
   }

@@ -23,6 +23,7 @@ const debuggers = {
   app_log: createDebugger('app'),
   server_log: createDebugger('server'),
   config_log: createDebugger('config'),
+  configResolver_log: createDebugger('config:resolver'),
 
   // Middleware
   middleware_log: createDebugger('middleware'),
@@ -121,6 +122,7 @@ export const {
   routeScanner_log,
   server_log,
   config_log,
+  configResolver_log,
   middleware_log,
   authMiddleware_log,
   corsMiddleware_log,

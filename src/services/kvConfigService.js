@@ -1,6 +1,9 @@
 import { kvConfigService_log } from '../utils/debug.js';
+import { parseConfigValue } from '../utils/configResolver.js';
+import { ConfigDependencyUnavailableError } from '../utils/serviceErrors.js';
 import { CLOUDFLARE_KV_PREFIX } from '../constants/app.js';
 import { DEFAULT_CONFIGS } from '../constants/kvKeys.js';
+import { describeValueShape } from '../utils/sensitiveData.js';
 
 /**
  * KV Configuration Service
@@ -45,15 +48,17 @@ export class KVConfigService {
         this.cache.delete(key);
       }
 
-      // Get from KV with circuit breaker
-      const value = await this.getWithCircuitBreaker(key, defaultValue);
+      // Get from KV. A read that never succeeds is reported as a dependency
+      // outage, not as "the key is absent": the two need different handling and
+      // the caller decides whether to fall back.
+      const value = await this.getWithCircuitBreaker(key);
 
-      if (value === null) {
-        kvConfigService_log(`Key not found in KV: ${key}, using default: ${defaultValue}`);
+      if (value === null || value === undefined) {
+        kvConfigService_log(`Key not found in KV: ${key}, using default: ${describeValueShape(defaultValue)}`);
         return defaultValue;
       }
 
-      const parsedValue = this.parseValue(value);
+      const parsedValue = this.parseValue(value, this.registryKey(key));
 
       // Cache the result
       if (useCache) {
@@ -63,7 +68,7 @@ export class KVConfigService {
         });
       }
 
-      kvConfigService_log(`Retrieved from KV: ${key} = ${parsedValue}`);
+      kvConfigService_log(`Retrieved from KV: ${key} = ${describeValueShape(parsedValue)}`);
       return parsedValue;
     } catch (error) {
       kvConfigService_log(`Error getting key ${key}: ${error.message}`);
@@ -93,7 +98,7 @@ export class KVConfigService {
       // Invalidate cache for this specific key to force fresh fetch on next read
       // This ensures immediate consistency after an update
       this.cache.delete(key);
-      kvConfigService_log(`Set KV config: ${key} = ${value} (cache invalidated for this key)`);
+      kvConfigService_log(`Set KV config: ${key} = ${describeValueShape(value)} (cache invalidated for this key)`);
       return true;
     } catch (error) {
       kvConfigService_log(`Error setting key ${key}: ${error.message}`);
@@ -132,10 +137,7 @@ export class KVConfigService {
    */
   async getAll() {
     try {
-      const list = await this.kv.list({
-        prefix: CLOUDFLARE_KV_PREFIX,
-        limit: 1000 // Limit to prevent overload
-      });
+      const list = await this.listConfigs();
       if (!list.keys || list.keys.length === 0) {
         kvConfigService_log('No KV configs found');
         return {};
@@ -153,8 +155,33 @@ export class KVConfigService {
       kvConfigService_log(`Retrieved all configs: ${Object.keys(configs).length} items`);
       return configs;
     } catch (error) {
+      // An outage must not look like "there are no configurations": callers
+      // such as the kv-admin comparison endpoint would otherwise report every
+      // key as unset while the binding is simply unreachable.
+      if (error instanceof ConfigDependencyUnavailableError) {
+        throw error;
+      }
       kvConfigService_log(`Error getting all configs: ${error.message}`);
       return {};
+    }
+  }
+
+  /**
+   * List the configuration keys, reporting an unreachable binding as an outage.
+   * @returns {Promise<{keys: Array}>} KV listing
+   * @throws {ConfigDependencyUnavailableError} When the binding cannot be read
+   */
+  async listConfigs() {
+    try {
+      return await this.kv.list({
+        prefix: CLOUDFLARE_KV_PREFIX,
+        limit: 1000 // Limit to prevent overload
+      });
+    } catch (error) {
+      throw new ConfigDependencyUnavailableError('CONFIG_KV is unreachable', {
+        operation: 'list',
+        reason: error.message
+      });
     }
   }
 
@@ -174,14 +201,14 @@ export class KVConfigService {
     if (!Array.isArray(keys)) {
       keys = [keys];
     }
-    
+
     keys.forEach(key => {
       // Handle keys with and without prefix
       let cacheKey = key;
       if (!key.startsWith(CLOUDFLARE_KV_PREFIX)) {
         cacheKey = this.realKey(key);
       }
-      
+
       if (this.cache.has(cacheKey)) {
         this.cache.delete(cacheKey);
         kvConfigService_log(`Invalidated cache for key: ${cacheKey}`);
@@ -190,11 +217,42 @@ export class KVConfigService {
   }
 
   /**
-   * Parse value from string - Optimized version
-   * Handles type conversion with better performance and cleaner logic
+   * Parse a value read from KV.
+   *
+   * Delegates to `configResolver` for every key in the published registry, so
+   * the KV service, `dynamicConfig` and the kv-admin routes cannot drift apart
+   * on booleans, numbers or empty strings. Keys outside the registry (the
+   * `AUDIT_*` settings below) keep a generic JSON/scalar parse.
+   *
+   * @param {*} value - Raw value as stored
+   * @param {string} [key] - Configuration key, when known
+   * @returns {*} Parsed value
    */
-  parseValue(value) {
-    kvConfigService_log(`parseValue input: ${JSON.stringify(value)} (type: ${typeof value})`);
+  parseValue(value, key = null) {
+    if (key !== null) {
+      // Values written by `set()` are JSON-encoded, so a stored string arrives as
+      // `"true"` rather than `true`. Unwrap that first, then let the registry
+      // decide the type, otherwise an encoded boolean would look invalid.
+      let candidate = value;
+      if (typeof value === 'string') {
+        const decoded = this._decodeJsonString(value);
+        if (decoded !== undefined) {
+          candidate = decoded;
+        }
+      }
+      const parsed = parseConfigValue(key, candidate);
+      if (parsed.status === 'ok') {
+        return parsed.value;
+      }
+      // `missing` and `invalid` are the caller's decision: a stored value that
+      // cannot be used must not reach business code as if it were valid.
+      if (parsed.status === 'invalid') {
+        kvConfigService_log(`Unusable stored value for ${key} (${parsed.reason}); ignoring it`);
+      }
+      return value;
+    }
+
+    kvConfigService_log(`parseValue input type: ${typeof value}, length: ${typeof value === 'string' ? value.length : 0}`);
 
     // Early return for non-string values
     if (typeof value !== 'string') {
@@ -206,7 +264,6 @@ export class KVConfigService {
 
     // Handle empty strings
     if (trimmedValue === '') {
-      // kvConfigService_log('parseValue returning empty string');
       return '';
     }
 
@@ -219,16 +276,13 @@ export class KVConfigService {
     };
 
     if (trimmedValue in specialValues) {
-      const result = specialValues[trimmedValue];
-      // kvConfigService_log(`parseValue special value: ${trimmedValue} -> ${result}`);
-      return result;
+      return specialValues[trimmedValue];
     }
 
     // Try number conversion before JSON parsing (more efficient for numbers)
     if (this._isNumericString(trimmedValue)) {
       const num = Number(trimmedValue);
       if (isFinite(num)) {
-        // kvConfigService_log(`parseValue number converted: ${num} (type: ${typeof num})`);
         return num;
       }
     }
@@ -236,7 +290,6 @@ export class KVConfigService {
     // Try JSON parsing for complex values (objects, arrays, quoted strings)
     try {
       const parsed = JSON.parse(value); // Use original value for JSON parse
-      // kvConfigService_log(`parseValue JSON parsed: ${JSON.stringify(parsed)} (type: ${typeof parsed})`);
 
       // If JSON parsed to a different string, apply the same parsing logic
       if (typeof parsed === 'string' && parsed !== value) {
@@ -246,8 +299,25 @@ export class KVConfigService {
       return parsed;
     } catch {
       // JSON parse failed, return trimmed original string
-      // kvConfigService_log(`parseValue returning original string: ${trimmedValue}`);
       return trimmedValue;
+    }
+  }
+
+  /**
+   * Decode a JSON-encoded string, e.g. `"true"` -> `true`.
+   * @param {string} value - Raw stored value
+   * @returns {*} The decoded string, or undefined when it is not an encoded string
+   * @private
+   */
+  _decodeJsonString(value) {
+    if (typeof value !== 'string' || !value.startsWith('"')) {
+      return undefined;
+    }
+    try {
+      const decoded = JSON.parse(value);
+      return typeof decoded === 'string' ? decoded : undefined;
+    } catch {
+      return undefined;
     }
   }
 
@@ -279,7 +349,7 @@ export class KVConfigService {
    * @param {*} defaultValue - Default value if operation fails
    * @returns {Promise<*>} Configuration value or default
    */
-  async getWithCircuitBreaker(key, defaultValue) {
+  async getWithCircuitBreaker(key) {
     const maxRetries = 3;
     const baseDelay = 100; // 100ms
 
@@ -292,8 +362,14 @@ export class KVConfigService {
         kvConfigService_log(`KV get attempt ${attempt} failed: ${error.message}`);
 
         if (attempt === maxRetries) {
-          kvConfigService_log(`All KV get attempts failed for key: ${key}, using circuit breaker fallback`);
-          return defaultValue; // Circuit breaker: return default after all retries
+          kvConfigService_log(`All KV get attempts failed for key: ${key}; reporting an outage, not a miss`);
+          // Reads are safe to retry, so this is not a silent degradation: the
+          // caller receives a typed 503-class error and decides the policy.
+          throw new ConfigDependencyUnavailableError('CONFIG_KV is unreachable', {
+            key,
+            attempts: maxRetries,
+            reason: error.message
+          });
         }
 
         // Exponential backoff
@@ -302,6 +378,15 @@ export class KVConfigService {
         await new Promise(resolve => setTimeout(resolve, delay));
       }
     }
+  }
+
+  /**
+   * Strip the KV prefix so the shared parser sees a registry key.
+   * @param {string} key - Key as stored, with or without prefix
+   * @returns {string} Key without the prefix
+   */
+  registryKey(key) {
+    return String(key).replace(`${CLOUDFLARE_KV_PREFIX}:`, '');
   }
 
   // ==========================================================================
@@ -384,7 +469,7 @@ export class KVConfigService {
         expiry: Date.now() + this.defaultCacheTTL
       });
 
-      kvConfigService_log(`Retrieved audit config: ${key} = ${value} (type: ${typeof value})`);
+      kvConfigService_log(`Retrieved audit config: ${key} = ${describeValueShape(value)}`);
       return value;
     } catch (error) {
       kvConfigService_log(`Error getting audit config ${key}: ${error.message}`);
@@ -525,11 +610,18 @@ export class KVConfigService {
    */
   async getBooleanConfig(key) {
     const value = await this.getAuditConfig(key);
+    // The string "false" and the number 0 are both false. `Boolean(value)` is
+    // never used to decide: a non-empty string that is not a boolean literal
+    // must not be reported as `true`.
     if (typeof value === 'boolean') {return value;}
     if (typeof value === 'string') {
-      return value.toLowerCase() === 'true';
+      const normalized = value.trim().toLowerCase();
+      if (normalized === 'true' || normalized === '1') {return true;}
+      if (normalized === 'false' || normalized === '0') {return false;}
     }
-    return Boolean(value);
+    kvConfigService_log(`Non-boolean value for ${key}: ${describeValueShape(value)}`);
+    const parsed = parseConfigValue(key, value);
+    return parsed.status === 'ok' ? Boolean(parsed.value) : false;
   }
 
   /**
@@ -539,7 +631,14 @@ export class KVConfigService {
    */
   async getNumericConfig(key) {
     const value = await this.getAuditConfig(key);
-    return typeof value === 'number' ? value : parseInt(value, 10) || 0;
+    if (typeof value === 'number') {return value;}
+    // Registry ranges apply here too, so a stored value cannot drift outside
+    // the published bounds.
+    const parsed = parseConfigValue(key, value);
+    if (parsed.status === 'ok' && typeof parsed.value === 'number') {
+      return parsed.value;
+    }
+    return Number.isFinite(parseInt(value, 10)) ? parseInt(value, 10) : 0;
   }
 
   /**

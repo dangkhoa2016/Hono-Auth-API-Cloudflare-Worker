@@ -34,7 +34,22 @@ function assertClean(text, label) {
   }
 }
 
+test('B01: cold start with empty DEBUG must not log secret values', async () => {
+  const env = createTestEnv({ DEBUG: '', ENVIRONMENT: 'production', ENV: 'production' });
+  env.JWT_SECRET = FAKE_SECRETS.JWT_SECRET;
 
+  const capture = captureLogs();
+  try {
+    const { getDynamicConfig, getJwtSettings } = await import('../../src/utils/dynamicConfig.js');
+    await getDynamicConfig(env, 'JWT_SECRET', null);
+    const settings = await getJwtSettings(env);
+    assert.equal(settings.secret, FAKE_SECRETS.JWT_SECRET, 'secret must still resolve for business logic');
+  } finally {
+    capture.restore();
+  }
+
+  assertClean(capture.text, 'dynamic config debug output');
+});
 
 test('B01: debug namespaces are not enabled at module import time', async () => {
   const { debug, jwt_log, app_log } = await import('../../src/utils/debug.js');
@@ -246,7 +261,26 @@ test('R1: auth middleware never logs the raw Authorization header (debug on and 
   }
 });
 
+test('R1: KV config service never logs a stored secret value', async () => {
+  const { configureDebugNamespaces } = await import('../../src/utils/debug.js');
+  // KVConfigService prefixes keys with `hono-auth-api:` before touching the binding.
+  const env = await seedKv(createTestEnv(), 'hono-auth-api:JWT_SECRET', FAKE_SECRETS.JWT_SECRET);
 
+  configureDebugNamespaces('hono-auth-api:*');
+  const capture = captureLogs();
+  let resolved;
+  try {
+    const { KVConfigService } = await import('../../src/services/kvConfigService.js');
+    const service = new KVConfigService(env);
+    resolved = await service.get('JWT_SECRET');
+  } finally {
+    capture.restore();
+    configureDebugNamespaces('');
+  }
+
+  assert.equal(resolved, FAKE_SECRETS.JWT_SECRET, 'business logic must still receive the stored value');
+  assertClean(capture.text, 'KV config service debug output');
+});
 
 test('B02: audit sanitizer masks URL, encoded-query and free-text copies of a token', () => {
   const marker = `FAKE-URL-TOKEN-${OPAQUE_BIND_MARKER}`;
@@ -662,3 +696,44 @@ function runColdStartProbe(debug) {
     );
   });
 }
+
+test('B01/B02/R1: production cold start leaks no marker, with debug off and debug on', async () => {
+  const debugOff = await runColdStartProbe('');
+
+  assert.equal(debugOff.code, 0, `cold start failed:\n${debugOff.output}`);
+  assert.ok(debugOff.result, `probe produced no sentinel line:\n${debugOff.output}`);
+
+  // The probe must have really served traffic, otherwise "no marker" is vacuous.
+  assert.equal(debugOff.result.debug, '');
+  assert.equal(debugOff.result.health, 200, '/health must serve on a cold production boot');
+  assert.equal(debugOff.result.guarded, 401, 'the marker bearer token must be rejected by the real auth middleware');
+  assert.equal(debugOff.result.missing, 404, 'the notFoundHandler path must also run');
+  assert.match(debugOff.result.healthBody, /"status":"ok"/, 'the health body must be a real response');
+
+  const debugOn = await runColdStartProbe('*');
+
+  assert.equal(debugOn.code, 0, `cold start with debug on failed:\n${debugOn.output}`);
+  assert.ok(debugOn.result, `probe produced no sentinel line:\n${debugOn.output}`);
+  assert.equal(debugOn.result.debug, '*');
+  assert.equal(debugOn.result.health, 200);
+
+  // Non-vacuity: turning debug on must produce real log volume. Without this,
+  // an empty capture would satisfy every marker assertion above.
+  assert.ok(
+    debugOn.output.length > debugOff.output.length * 5,
+    `debug-on capture looks empty: on=${debugOn.output.length} chars, off=${debugOff.output.length} chars`
+  );
+  assert.match(debugOn.output, /hono-auth-api:/, 'the debug-on capture must contain app debug output');
+
+  for (const [label, run] of [['debug off', debugOff], ['debug on', debugOn]]) {
+    for (const marker of ALL_MARKERS) {
+      assertNoMarker(run.output, marker, `cold start (${label})`);
+    }
+    assertNoMarker(run.output, FAKE_BEARER_MARKER, `cold start (${label}) Authorization header`);
+  }
+
+  // Spot-check that redaction kept the useful part of the signal. A sink that
+  // logged nothing at all would also pass every marker assertion.
+  assert.match(debugOn.output, /Authorization header present/, 'the auth middleware should still log header presence');
+  assert.match(debugOn.output, /JWT_SECRET = <redacted:set>/, 'config logging should keep presence without the value');
+});
