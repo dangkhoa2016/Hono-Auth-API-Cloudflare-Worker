@@ -347,19 +347,36 @@ export class TokenService extends BaseService {
                updated_at = CURRENT_TIMESTAMP
            WHERE jti = ?`;
 
-      await this.dbService.update(query, [now, reason, jti]);
-      tokenService_log(`Refresh token ${jti} revoked`);
-      return true;
+      const result = await this.dbService.update(query, [now, reason, jti]);
+      const changes = Number(result?.changes ?? 0);
+
+      if (changes > 0) {
+        tokenService_log(`Refresh token ${jti} revoked (${changes} row(s))`);
+        return { revoked: true, reason: 'REVOKED', changes };
+      }
+
+      const existing = await this.dbService.select(
+        'SELECT revoked, revocation_reason FROM refresh_tokens WHERE jti = ? LIMIT 1',
+        [jti],
+        true
+      );
+
+      if (existing && Number(existing.revoked) === 1) {
+        return { revoked: true, reason: 'ALREADY_REVOKED', changes: 0 };
+      }
+
+      error_log(`Refresh token ${jti} was not found, revocation not applied`);
+      return { revoked: false, reason: 'NOT_REVOKED', changes: 0 };
     } catch (error) {
       error_log(`Failed to revoke refresh token ${jti}: ${error.message}`);
-      return false;
+      throw error;
     }
   }
 
   async revokeAllTokensForUser(userId, reason = 'ADMIN_REVOKE') {
     try {
       const now = nowIso();
-      await this.dbService.update(
+      const result = await this.dbService.update(
         `UPDATE refresh_tokens
          SET revoked = 1,
              revoked_at = COALESCE(revoked_at, ?),
@@ -368,9 +385,12 @@ export class TokenService extends BaseService {
          WHERE user_id = ? AND revoked = 0`,
         [now, reason, userId]
       );
-      tokenService_log(`Revoked all active refresh tokens for user ${userId}`);
+      const revoked = Number(result?.changes ?? 0);
+      tokenService_log(`Revoked ${revoked} active refresh token(s) for user ${userId}`);
+      return { revoked, reason: revoked > 0 ? 'REVOKED' : 'NOTHING_ACTIVE' };
     } catch (error) {
       error_log(`Failed to revoke all tokens for user ${userId}: ${error.message}`);
+      throw error;
     }
   }
 

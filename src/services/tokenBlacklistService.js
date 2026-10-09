@@ -1,5 +1,6 @@
 import { BaseService } from './baseService.js';
 import { tokenBlacklistService_log, error_log } from '../utils/debug.js';
+import { ServiceUnavailableError } from '../utils/serviceErrors.js';
 
 function toIsoDate(value) {
   if (!value) {
@@ -39,7 +40,7 @@ export class TokenBlacklistService extends BaseService {
       [userId],
       true
     );
-    
+
     if (!userExists) {
       throw new Error(`User ID ${userId} does not exist in the database.`);
     }
@@ -58,7 +59,7 @@ export class TokenBlacklistService extends BaseService {
         [jti, userId, expiresIso, reason]
       );
 
-      if (!result) {
+      if (!result || result.success !== true) {
         throw new Error('Database insertion failed. Please check if userId exists and parameters are valid.');
       }
 
@@ -72,8 +73,11 @@ export class TokenBlacklistService extends BaseService {
 
   /**
    * Check if a JTI is blacklisted and still valid
+   * Fail-closed: a lookup error must never be reported as "not blacklisted",
+   * otherwise a revoked token would keep working while D1 is unavailable.
    * @param {string} jti - Token JTI
    * @returns {Promise<boolean>} True if blacklisted
+   * @throws {ServiceUnavailableError} When the blacklist state cannot be determined
    */
   async isBlacklisted(jti) {
     if (!jti) {
@@ -91,7 +95,13 @@ export class TokenBlacklistService extends BaseService {
       return Boolean(record);
     } catch (error) {
       error_log(`Failed to check blacklist for ${jti}: ${error.message}`);
-      return false;
+      if (error instanceof ServiceUnavailableError) {
+        throw error;
+      }
+      throw new ServiceUnavailableError('Token revocation state could not be verified', {
+        operation: 'isBlacklisted',
+        cause: error.message
+      });
     }
   }
 

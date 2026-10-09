@@ -520,7 +520,48 @@ test('A-05: SQL logging emits no raw query text, literal or driver error', async
   assert.ok(capture.text.length > 0, 'the SQL log must still record the operation, not be disabled to pass');
 });
 
+test('A-05: a database error carrying a credential is logged without the message', async () => {
+  const { configureDebugNamespaces } = await import('../../src/utils/debug.js');
+  const db = {
+    prepare(_sql) {
+      const statement = {
+        bind() { return statement; },
+        async first() {
+          throw new Error(`D1_ERROR: rejected statement for ${SQL_ERROR_MARKER}`);
+        },
+        async all() {
+          throw new Error(`D1_ERROR: rejected statement for ${SQL_ERROR_MARKER}`);
+        },
+        async run() {
+          throw new Error(`D1_ERROR: rejected statement for ${SQL_ERROR_MARKER}`);
+        }
+      };
+      return statement;
+    }
+  };
+  const env = createTestEnv({ DB: db, CONFIG_KV: null });
 
+  configureDebugNamespaces('hono-auth-api:*');
+  const capture = captureLogs();
+  try {
+    const { DatabaseService } = await import('../../src/services/databaseService.js');
+    const service = new DatabaseService(env);
+    await assert.rejects(
+      () => service.select('SELECT 1', [], true),
+      'a database failure must still surface as a rejection'
+    );
+  } finally {
+    capture.restore();
+    configureDebugNamespaces('');
+  }
+
+  assert.equal(
+    capture.text.includes(SQL_ERROR_MARKER),
+    false,
+    `driver error text leaked into the SQL log:\n${capture.text}`
+  );
+  assert.ok(capture.text.length > 0, 'the SQL log must still record the failure, not be disabled to pass');
+});
 
 /**
  * Run the cold-start probe in its own process.

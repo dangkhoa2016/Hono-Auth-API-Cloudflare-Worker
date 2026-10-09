@@ -1,5 +1,6 @@
 import { query_log, dbError_log } from '../utils/debug.js';
 import { getFeatureFlags } from '../utils/dynamicConfig.js';
+import { ServiceUnavailableError } from '../utils/serviceErrors.js';
 import { describeQuery, describeDatabaseError } from '../utils/sqlLogging.js';
 
 /**
@@ -47,7 +48,7 @@ export class DatabaseService {
         }
         return queryResult.results || [];
       }
-    }, 'SELECT query error', firstOnly ? null : []);
+    }, 'SELECT query error', { attempts: 3 });
   }
 
   /**
@@ -69,23 +70,19 @@ export class DatabaseService {
         ? await statement.bind(...params).run()
         : await statement.run();
 
-      if (result.success) {
-        if (featureFlags.logSqlQueries) {
-          query_log(`INSERT query completed successfully, inserted ID: ${result.meta?.last_row_id}`);
-        }
-        return {
-          success: true,
-          insertId: result.meta?.last_row_id,
-          changes: result.meta?.changes,
-          meta: result.meta
-        };
-      } else {
-        if (featureFlags.logSqlQueries) {
-          query_log('INSERT query failed');
-        }
-        return null;
+      if (!result || result.success === false) {
+        throw new Error('INSERT did not report success');
       }
-    }, 'INSERT query error', null);
+      if (featureFlags.logSqlQueries) {
+        query_log(`INSERT query completed successfully, inserted ID: ${result.meta?.last_row_id}`);
+      }
+      return {
+        success: true,
+        insertId: result.meta?.last_row_id,
+        changes: result.meta?.changes,
+        meta: result.meta
+      };
+    }, 'INSERT query error', { attempts: 1 });
   }
 
   /**
@@ -107,22 +104,18 @@ export class DatabaseService {
         ? await statement.bind(...params).run()
         : await statement.run();
 
-      if (result.success) {
-        if (featureFlags.logSqlQueries) {
-          query_log(`UPDATE query completed successfully, affected rows: ${result.meta?.changes}`);
-        }
-        return {
-          success: true,
-          changes: result.meta?.changes,
-          meta: result.meta
-        };
-      } else {
-        if (featureFlags.logSqlQueries) {
-          query_log('UPDATE query failed');
-        }
-        return null;
+      if (!result || result.success === false) {
+        throw new Error('UPDATE did not report success');
       }
-    }, 'UPDATE query error', null);
+      if (featureFlags.logSqlQueries) {
+        query_log(`UPDATE query completed successfully, affected rows: ${result.meta?.changes}`);
+      }
+      return {
+        success: true,
+        changes: result.meta?.changes,
+        meta: result.meta
+      };
+    }, 'UPDATE query error', { attempts: 1 });
   }
 
   /**
@@ -144,25 +137,23 @@ export class DatabaseService {
         ? await statement.bind(...params).run()
         : await statement.run();
 
-      if (result.success) {
-        query_log(`DELETE query completed successfully, affected rows: ${result.meta?.changes}`);
-        return {
-          success: true,
-          changes: result.meta?.changes,
-          meta: result.meta
-        };
-      } else {
-        query_log('DELETE query failed');
-        return null;
+      if (!result || result.success === false) {
+        throw new Error('DELETE did not report success');
       }
-    }, 'DELETE query error', null);
+      query_log(`DELETE query completed successfully, affected rows: ${result.meta?.changes}`);
+      return {
+        success: true,
+        changes: result.meta?.changes,
+        meta: result.meta
+      };
+    }, 'DELETE query error', { attempts: 1 });
   }
 
   /**
    * Execute UPSERT (INSERT OR UPDATE) query with prepared statement
    * @param {string} query - SQL UPSERT query
    * @param {Array} params - Parameters to bind
-   * @returns {Promise<Object|null>} Upsert result
+   * @returns {Promise<Object|null>} Upsert result with meta info
    */
   async upsert(query, params = []) {
     const featureFlags = await getFeatureFlags(this.env);
@@ -177,21 +168,19 @@ export class DatabaseService {
         ? await statement.bind(...params).run()
         : await statement.run();
 
-      if (result.success) {
-        query_log(`UPSERT query completed successfully, changes: ${result.meta?.changes}`);
-        return {
-          success: true,
-          insertId: result.meta?.last_row_id,
-          changes: result.meta?.changes,
-          meta: result.meta
-        };
-      } else {
-        query_log('UPSERT query failed');
-        return null;
+      if (!result || result.success === false) {
+        throw new Error('UPSERT did not report success');
       }
+      query_log(`UPSERT query completed successfully, changes: ${result.meta?.changes}`);
+      return {
+        success: true,
+        insertId: result.meta?.last_row_id,
+        changes: result.meta?.changes,
+        meta: result.meta
+      };
     } catch (error) {
       dbError_log(`UPSERT query error: ${describeDatabaseError(error)}`);
-      return null;
+      throw toServiceUnavailable(error, 'UPSERT');
     }
   }
 
@@ -455,34 +444,52 @@ export class DatabaseService {
   }
 
   /**
-   * Execute database operation with retry logic
+   * Execute a database operation with a bounded attempt budget.
+   * `attempts` is the TOTAL number of tries, not the number of extra retries:
+   * `attempts: 1` means the statement is issued exactly once. Only reads get a
+   * budget above 1; a write is never replayed blindly because a previous
+   * attempt may already have been applied.
    * @param {Function} operation - Async operation to execute
    * @param {string} errorMessage - Error message prefix
-   * @param {*} fallbackValue - Value to return on failure
-   * @param {number} maxRetries - Maximum number of retries
-   * @returns {Promise<*>} Operation result or fallback value
+   * @param {Object} options - `{ attempts }` control object
+   * @returns {Promise<*>} Operation result
+   * @throws {ServiceUnavailableError} When the database state cannot be determined
    */
-  async executeWithRetry(operation, errorMessage, fallbackValue, maxRetries = 3) {
+  async executeWithRetry(operation, errorMessage, options = {}) {
+    const maxAttempts = Number.isInteger(options.attempts) ? options.attempts : 3;
     const baseDelay = 100; // 100ms
+    let lastError = null;
 
-    for (let attempt = 1; attempt <= maxRetries; attempt++) {
+    for (let attempt = 1; attempt <= maxAttempts; attempt++) {
       try {
-        query_log(`Database operation attempt ${attempt}/${maxRetries}`);
-        const result = await operation();
-        return result; // Success
+        query_log(`Database operation attempt ${attempt}/${maxAttempts}`);
+        return await operation();
       } catch (error) {
-        dbError_log(`${errorMessage} (attempt ${attempt}/${maxRetries}): ${describeDatabaseError(error)}`);
+        lastError = error;
+        dbError_log(`${errorMessage} (attempt ${attempt}/${maxAttempts}): ${describeDatabaseError(error)}`);
 
-        if (attempt === maxRetries) {
-          dbError_log('All database operation attempts failed, returning fallback value');
-          return fallbackValue; // All retries failed
+        if (attempt === maxAttempts) {
+          break;
         }
 
-        // Exponential backoff
         const delay = baseDelay * Math.pow(2, attempt - 1);
         query_log(`Waiting ${delay}ms before retry ${attempt + 1}`);
         await new Promise(resolve => setTimeout(resolve, delay));
       }
     }
+
+    dbError_log('All database operation attempts failed, raising DB_UNAVAILABLE');
+    throw toServiceUnavailable(lastError, errorMessage);
   }
+}
+
+function toServiceUnavailable(error, context) {
+  if (error instanceof ServiceUnavailableError) {
+    return error;
+  }
+  const cause = error instanceof Error ? error : new Error(String(error));
+  return new ServiceUnavailableError(
+    `${context}: database dependency unavailable`,
+    { cause: cause.message, operation: context }
+  );
 }
