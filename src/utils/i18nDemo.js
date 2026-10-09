@@ -98,9 +98,9 @@ export class I18nDemo {
     contexts.forEach(context => {
       examples.push({
         context,
-        welcome: t(c, 'zodDemo.title', context),
-        dataAccess: t(c, 'zodDemo.searchResultTitle', context),
-        invalidCredentials: t(c, 'errors.auth.invalidCredentials', context)
+        welcome: t(c, 'zodDemo.title', { context }),
+        dataAccess: t(c, 'zodDemo.searchResultTitle', { context }),
+        invalidCredentials: t(c, 'errors.auth.invalidCredentials', { context })
       });
     });
 
@@ -143,9 +143,9 @@ export class I18nDemo {
     examples.push({
       type: 'auth_errors',
       data: [
-        { error: tError(c, 'auth.failed', { count: 5 }) },
+        { error: tError(c, 'auth.failed', { count: 5, timeWindow: '1 minute' }) },
         { error: tError(c, 'auth.unauthorized', { resource: 'Dashboard' }) },
-        { error: tError(c, 'auth.sessionExpired', { time: new Date() }) }
+        { error: tError(c, 'auth.sessionExpired', { expiredAt: new Date() }) }
       ]
     });
 
@@ -197,6 +197,7 @@ export class I18nDemo {
    * @returns {Object} Complete demo results
    */
   static completeDemo(c) {
+    const startedAt = Date.now();
     const language = c.get('language') || 'en';
 
     i18n_log(`Running complete i18n demo for language: ${language}`);
@@ -214,7 +215,7 @@ export class I18nDemo {
       summary: {
         message: t(c, 'success.operation.completed', {
           operationType: 'i18n_demo',
-          duration: 250
+          duration: Date.now() - startedAt
         }),
         userProfileMessage: t(c, 'success.user.profileUpdated', {
           userName: 'Demo User',
@@ -276,7 +277,7 @@ export const i18nTestUtils = {
   testContextual(c, key, contexts) {
     return contexts.map(context => ({
       context,
-      result: t(c, key, context)
+      result: t(c, key, { context })
     }));
   }
 };

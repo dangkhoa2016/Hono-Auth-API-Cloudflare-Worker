@@ -41,7 +41,7 @@ export const COUNTRY_LANGUAGE_MAP = {
 /**
  * Enhanced language detection using Hono languageDetector + Cloudflare
  * Uses Hono's built-in languageDetector middleware with custom enhancements
- * Priority: 1. Hono detector (query/cookie/header) 2. Manual Accept-Language parsing 3. Cloudflare country 4. Default
+ * Priority: 1. Hono detector (query/cookie/header) 2. Cloudflare country 3. Default
  * @param {Object} c - Hono context
  * @returns {Promise<string>} Detected language code
 */
@@ -50,52 +50,16 @@ export async function detectLanguage(c) {
   const defaultLanguage = getDefaultLanguage();
 
   try {
-    // 1. Use Hono's languageDetector middleware for standard detection
-    // This handles query parameter 'lang', cookies, and Accept-Language header
-    const honoLanguageMiddleware = languageDetector({
-      supportedLanguages,
-      fallbackLanguage: defaultLanguage
-    });
-
-    // Apply Hono's languageDetector middleware
-    await honoLanguageMiddleware(c, async () => {});
-
-    // Get the language that Hono detected
-    let detectedLanguage = c.get('language') || defaultLanguage;
-    i18nService_log(`Hono detected language: ${detectedLanguage}`);
-
-    // 2. Manual enhancement: Better Accept-Language header parsing
-    // This fixes edge cases where Hono's parser might miss valid languages
-    if (detectedLanguage === defaultLanguage) {
-      const acceptLanguage = c.req.header('Accept-Language');
-      if (acceptLanguage) {
-        const languages = acceptLanguage.split(',').map(lang => lang.split(';')[0].trim());
-        for (let lang of languages) {
-          let isSupport = supportedLanguages.includes(lang);
-          if (!isSupport) {
-            lang = lang.split('-')[0]; // Normalize to base language code (e.g., en-US -> en)
-            isSupport = supportedLanguages.includes(lang);
-          }
-
-          if (isSupport) {
-            detectedLanguage = lang;
-            i18nService_log(`Language detected from manual Accept-Language parsing: ${lang}`);
-            break; // Use the first supported language found
-          }
-        }
-      }
-    }
-
-    // 3. Cloudflare country enhancement: Use geolocation as fallback
-    if (detectedLanguage === defaultLanguage && c.req.cf) {
-      const countryCode = (c.req.cf.country || '').toLowerCase();
-      const mappedLang = COUNTRY_LANGUAGE_MAP[countryCode] || countryCode;
-
-      if (supportedLanguages.includes(mappedLang)) {
-        detectedLanguage = mappedLang;
-        i18nService_log(`Language enhanced from CF country code: ${c.req.cf.country} → ${mappedLang}`);
-      }
-    }
+    // Geolocation is only a fallback. A selected default language is still
+    // an explicit selection and must not be overridden by headers or country.
+    const country = c.req.cf?.country || c.req.raw?.cf?.country || '';
+    const countryCode = country.toLowerCase();
+    const mappedLanguage = COUNTRY_LANGUAGE_MAP[countryCode] || countryCode;
+    const fallbackLanguage = supportedLanguages.includes(mappedLanguage)
+      ? mappedLanguage : defaultLanguage;
+    const detector = languageDetector({ supportedLanguages, fallbackLanguage });
+    await detector(c, async () => {});
+    const detectedLanguage = c.get('language') || fallbackLanguage;
 
     i18nService_log(`Final detected language: ${detectedLanguage}`);
     return detectedLanguage;
@@ -342,67 +306,31 @@ function baseTranslate(lang, key, options = {}) {
     }
   };
 
-  const translation = i18next.t(key, enhancedOptions); // SINGLE DIRECT USAGE
-
   if (!i18next.exists(key, { lng: resolvedLang })) {
-    // Differentiate plural helper logging slightly
-    const isPluralForm = key.endsWith('_other');
-    const prefix = isPluralForm ? '❌ Missing plural translation detected' : '❌ Missing translation detected';
-    i18nService_log(`${prefix}: [${resolvedLang}] ${key}`);
     throw new MissingTranslationError(resolvedLang, key);
   }
 
-  // Interpolation validation: ensure that if the raw resource contains placeholders, user supplied them
-  try {
-    const { placeholders } = getRawResourceAndPlaceholders(resolvedLang, key);
-    // i18nService_log(`🔍 Interpolation analysis: [${resolvedLang}] ${key} -> ${placeholders.join(', ')}: ${rawString}`);
-    if (placeholders.length > 0) {
-      // Collect provided keys (exclude reserved keys)
-      const reserved = new Set(['lng', 'count', 'format', 'context', 'timestamp', 'interpolation']);
-      const providedKeys = new Set(Object.keys(options || {}).filter(k => !reserved.has(k)));
-
-      // Always treat count/context present in enhanced options as provided
-      if (typeof enhancedOptions.count !== 'undefined') { providedKeys.add('count'); }
-      if (typeof enhancedOptions.context !== 'undefined') { providedKeys.add('context'); }
-
-      const missing = placeholders.filter(ph => !providedKeys.has(ph));
-      if (missing.length > 0) {
-        // If placeholders still visible in final translation, it's certainly missing
-        const stillVisible = missing.filter(ph => translation.includes(`{{${ph}`));
-        if (stillVisible.length === missing.length) {
-          i18nService_log(`❌ Missing interpolation values detected: [${resolvedLang}] ${key} -> ${missing.map(ph => `{{${ph}}}`).join(', ')}`);
-          throw new MissingInterpolationError(resolvedLang, key, missing);
-        }
-      }
-    }
-  } catch (interpErr) {
-    i18nService_log(`❌ Interpolation error: [${resolvedLang}] ${key} -> ${interpErr.message}`);
-    if (interpErr instanceof MissingInterpolationError) {throw interpErr;} // propagate intended error
-    // Silent fail for non-critical resource lookup issues (namespaced or nested keys)
+  // Validate the selected context/plural resource before a formatter can turn
+  // an absent value into misleading output such as "Invalid Date" or "NaN".
+  const { placeholders } = getRawResourceAndPlaceholders(resolvedLang, key, enhancedOptions);
+  const values = { ...options.interpolation?.defaultVariables, ...options };
+  const missing = placeholders.filter(ph => {
+    const value = ph.split('.').reduce((entry, part) => entry?.[part], values);
+    return value === undefined || value === null;
+  });
+  if (missing.length) {
+    throw new MissingInterpolationError(resolvedLang, key, missing);
   }
+  const translation = i18next.t(key, enhancedOptions);
 
   return translation;
 }
 
 // Helper: get raw resource string and extract interpolation placeholders from original (pre-render) value
-function getRawResourceAndPlaceholders(lang, key) {
-  // Determine namespace & pure key
-  let ns = i18next.options.defaultNS || (Array.isArray(i18next.options.ns) ? i18next.options.ns[0] : 'translation');
-  let pureKey = key;
-  if (key.includes(':')) {
-    const parts = key.split(':');
-    ns = parts[0];
-    pureKey = parts.slice(1).join(':');
-  }
-
-  // For plural variant keys (_other etc.) keep as-is
-  const raw = i18next.getResource(lang, ns, pureKey);
+function getRawResourceAndPlaceholders(lang, key, options = {}) {
+  const raw = i18next.t(key, { ...options, lng: lang, skipInterpolation: true });
   const rawString = typeof raw === 'string' ? raw : '';
-  const placeholderRegex = /\{\{\s*([^{}\s]+)\s*}}/g;
-  const placeholders = [];
-  let match;
-  while ((match = placeholderRegex.exec(rawString)) !== null) {
-    placeholders.push(match[1]);
-  }
+  const placeholders = [...rawString.matchAll(/\{\{\s*-?\s*([^{},]+?)(?:,[^{}]*)?\s*}}/g)]
+    .map(match => match[1].trim());
   return { rawString, placeholders };
 }
