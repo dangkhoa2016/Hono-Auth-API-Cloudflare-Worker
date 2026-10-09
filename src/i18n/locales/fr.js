@@ -580,6 +580,7 @@ export default {
         'historyFailed': "Échec de la récupération de l'historique des alertes pour {{actor}} (Raison: {{reason}}, Opération: {{operation}})",
         'rulesFailed': "Échec de la récupération des règles d'alerte pour {{actor}} (Raison: {{reason}}, Opération: {{operation}})",
         'sendFailed': "Échec de l'envoi de l'alerte manuelle pour {{actor}} (Raison: {{reason}}, Opération: {{operation}})",
+        "configFailed": "Échec de la configuration des alertes pour {{actor}} (Raison: {{reason}}, Opération: {{operation}})",
         'statusFailed': "Échec de la récupération du statut du système d'alerte pour {{actor}} (Raison: {{reason}}, Opération: {{operation}})",
         'testFailed': "Échec du test du système d'alerte pour {{actor}} (Raison: {{reason}}, Opération: {{operation}})",
         'toggleFailed': "Échec de la bascule de la règle d'alerte pour {{actor}} (Raison: {{reason}}, Opération: {{operation}})"
@@ -590,6 +591,7 @@ export default {
       'dashboard': {
         'cacheClearFailed': "Échec de la suppression du cache du tableau de bord pour {{actor}} (Raison: {{reason}}, Opération: {{operation}})",
         'exportFailed': "Échec de l'exportation du tableau de bord pour {{actor}} (Raison: {{reason}}, Opération: {{operation}})",
+        "liveFailed": "Échec de la récupération du tableau de bord en direct pour {{actor}} (Raison: {{reason}}, Opération: {{operation}})",
         'healthCheckFailed': "Échec de la vérification de santé du tableau de bord pour {{actor}} (Raison: {{reason}}, Opération: {{operation}})",
         'overviewFailed': "Échec de la récupération de l'aperçu du tableau de bord pour {{actor}} (Raison: {{reason}}, Opération: {{operation}})",
         'performanceFailed': "Échec de la récupération du tableau de bord de performance pour {{actor}} (Raison: {{reason}}, Opération: {{operation}})",
@@ -603,6 +605,7 @@ export default {
       'monitoring': {
         'eventsFailed': "Échec de la récupération des événements de surveillance récents pour {{actor}} (Raison: {{reason}}, Opération: {{operation}})",
         'simulateFailed': "Échec de la simulation de l'événement de surveillance pour {{actor}} (Raison: {{reason}}, Opération: {{operation}})",
+        "unsupportedMode": "La surveillance continue n'est pas prise en charge sur ce déploiement : une instance Worker ne peut pas conserver une minuterie d'interrogation entre les requêtes. Utilisez plutôt les endpoints de surveillance et de tableau de bord à la demande.",
         'startFailed': "Échec du démarrage de la surveillance pour {{actor}} (Raison: {{reason}}, Opération: {{operation}})",
         'statusFailed': "Échec de la récupération du statut de surveillance pour {{actor}} (Raison: {{reason}}, Opération: {{operation}})",
         'stopFailed': "Échec de l'arrêt de la surveillance pour {{actor}} (Raison: {{reason}}, Opération: {{operation}})"
@@ -627,6 +630,7 @@ export default {
         'statusUpdateFailed': "Échec de la mise à jour du statut de l'incident de sécurité en raison d'une erreur serveur."
       },
       'monitoring': {
+        "notActive": "La surveillance de sécurité n'est pas active",
         'alreadyRunning': "La surveillance de sécurité est déjà en cours d’exécution"
       },
       'service': {
@@ -1042,11 +1046,14 @@ export default {
     'invalidRequest': "Requête invalide",
     'notFound': "Ressource non trouvée",
     'operationFailed': "{{operation}} a échoué : {{error}}",
+    'rateLimitUnavailable': 'Le service de limitation de debit est temporairement indisponible. Veuillez reessayer sous peu.',
     'serverError': "Erreur interne du serveur",
     'success': "Opération terminée avec succès",
     'welcome': "Bienvenue dans Hono Auth API v{{version}} ({{language}})"
   },
   'user': {
+    'emailSuggestion': 'Utilisez une autre adresse e-mail.',
+    'emailUpdateSuggestion': 'Choisissez une adresse e-mail qui n’est pas déjà utilisée.',
     'statusDisplay': {
       'active': "Actif",
       'inactive': "Inactif",

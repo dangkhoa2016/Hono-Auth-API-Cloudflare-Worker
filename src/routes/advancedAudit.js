@@ -111,7 +111,7 @@ advancedAudit.get('/analytics',
         'advancedAudit.analytics.failed',
         {
           actor: user?.full_name || user?.email || 'unknown',
-          reason: error.message || t(c, 'error.unknown'),
+          reason: t(c, 'system.serverError'),
           operation: 'retrieve analytics',
           timeframe: query?.timeframe || 'unknown'
         }
@@ -184,7 +184,7 @@ advancedAudit.get('/analytics/security',
         'advancedAudit.security.failed',
         {
           actor: user?.full_name || user?.email || 'unknown',
-          reason: error.message || t(c, 'error.unknown'),
+          reason: t(c, 'system.serverError'),
           operation: 'retrieve security analytics',
           timeframe: query?.timeframe || 'unknown',
           role: user?.role || 'unknown'
@@ -257,7 +257,7 @@ advancedAudit.get('/analytics/behavior',
         'advancedAudit.behavior.failed',
         {
           actor: user?.full_name || user?.email || 'unknown',
-          reason: error.message || t(c, 'error.unknown'),
+          reason: t(c, 'system.serverError'),
           operation: 'retrieve behavior analytics',
           timeframe: query?.timeframe || 'unknown',
           targetRole: query?.actorRole || 'all roles'
@@ -312,7 +312,7 @@ advancedAudit.get('/analytics/performance',
         'advancedAudit.performance.failed',
         {
           actor: user?.full_name || user?.email || 'unknown',
-          reason: error.message || t(c, 'error.unknown'),
+          reason: t(c, 'system.serverError'),
           operation: 'retrieve performance analytics',
           timeframe: query?.timeframe || 'unknown',
           role: user?.role || 'unknown'
@@ -379,7 +379,7 @@ advancedAudit.get('/compliance/report',
         'advancedAudit.compliance.failed',
         {
           actor: user?.full_name || user?.email || 'unknown',
-          reason: error.message || t(c, 'error.unknown'),
+          reason: t(c, 'system.serverError'),
           operation: 'generate compliance report',
           timeframe: query?.timeframe || 'unknown',
           format: query?.format || 'JSON'
@@ -427,7 +427,7 @@ advancedAudit.get('/archival/stats',
         'advancedAudit.archival.statsFailed',
         {
           actor: user?.full_name || user?.email || 'unknown',
-          reason: error.message || t(c, 'error.unknown'),
+          reason: t(c, 'system.serverError'),
           operation: 'retrieve archival statistics'
         }
       );
@@ -479,7 +479,7 @@ advancedAudit.post('/archival/run',
         'advancedAudit.archival.runFailed',
         {
           actor: user?.full_name || user?.email || 'unknown',
-          reason: error.message || t(c, 'error.unknown'),
+          reason: t(c, 'system.serverError'),
           operation: 'run archival process',
           cutoffDays: options?.cutoffDays || 'default'
         }
@@ -532,7 +532,7 @@ advancedAudit.post('/archival/restore',
         'advancedAudit.archival.restoreFailed',
         {
           actor: user?.full_name || user?.email || 'unknown',
-          reason: error.message || t(c, 'error.unknown'),
+          reason: t(c, 'system.serverError'),
           operation: 'restore archived logs',
           dateRange: `${options?.startDate || 'unknown'} to ${options?.endDate || 'unknown'}`
         }
@@ -587,7 +587,7 @@ advancedAudit.post('/truncate',
         'advancedAudit.truncate.failed',
         {
           actor: user?.full_name || user?.email || 'unknown',
-          reason: error.message || t(c, 'error.unknown'),
+          reason: t(c, 'system.serverError'),
           operation: 'archive and truncate audit logs',
           dateRange: `${options?.startDate || 'unknown'} to ${options?.endDate || 'unknown'}`,
           dryRun: options?.dryRun ? 'dry-run' : 'executed'
@@ -656,7 +656,7 @@ advancedAudit.get('/archive',
         'advancedAudit.archival.archiveOperationFailed',
         {
           actor: user?.full_name || user?.email || 'unknown',
-          reason: error.message || t(c, 'error.unknown'),
+          reason: t(c, 'system.serverError'),
           operation: 'perform archive GET operation',
           action: c.req.query('action') || 'default'
         }
@@ -740,7 +740,7 @@ advancedAudit.post('/archive',
         'advancedAudit.archival.archiveOperationFailed',
         {
           actor: user?.full_name || user?.email || 'unknown',
-          reason: error.message || t(c, 'error.unknown'),
+          reason: t(c, 'system.serverError'),
           operation: 'perform archive POST operation',
           action: body?.action || 'undefined'
         }
@@ -814,7 +814,7 @@ advancedAudit.get('/compliance',
         'advancedAudit.compliance.reportFailed',
         {
           actor: user?.full_name || user?.email || 'unknown',
-          reason: error.message || t(c, 'error.unknown'),
+          reason: t(c, 'system.serverError'),
           operation: 'generate compliance report',
           type: c.req.query('type') || 'general'
         }
@@ -874,7 +874,7 @@ advancedAudit.post('/compliance',
         'advancedAudit.compliance.customComplianceFailed',
         {
           actor: user?.full_name || user?.email || 'unknown',
-          reason: error.message || t(c, 'error.unknown'),
+          reason: t(c, 'system.serverError'),
           operation: 'create custom compliance report',
           reportName: body?.name || 'unnamed',
           reportType: body?.type || 'unknown'
@@ -992,7 +992,7 @@ advancedAudit.post('/export-advanced',
         'advancedAudit.export.failed',
         {
           actor: user?.full_name || user?.email || 'unknown',
-          reason: error.message || t(c, 'error.unknown'),
+          reason: t(c, 'system.serverError'),
           operation: 'advanced export',
           format: body?.format || 'json'
         }
@@ -1037,7 +1037,7 @@ advancedAudit.get('/middleware/stats',
         'advancedAudit.middleware.statsFailed',
         {
           actor: user?.full_name || user?.email || 'unknown',
-          reason: error.message || t(c, 'error.unknown'),
+          reason: t(c, 'system.serverError'),
           operation: 'retrieve middleware statistics',
           middlewareType: 'unified_audit'
         }
@@ -1143,7 +1143,7 @@ advancedAudit.post('/retention',
         'advancedAudit.retention.failed',
         {
           actor: user?.full_name || user?.email || 'unknown',
-          reason: error.message || t(c, 'error.unknown'),
+          reason: t(c, 'system.serverError'),
           operation: 'retention management',
           action: action || 'unknown'
         }

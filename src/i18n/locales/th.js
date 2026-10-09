@@ -580,6 +580,7 @@ export default {
         'historyFailed': "ไม่สามารถดึงประวัติการแจ้งเตือนสำหรับ {{actor}} ได้ (เหตุผล: {{reason}}, การดำเนินการ: {{operation}})",
         'rulesFailed': "ไม่สามารถดึงกฎการแจ้งเตือนสำหรับ {{actor}} ได้ (เหตุผล: {{reason}}, การดำเนินการ: {{operation}})",
         'sendFailed': "ไม่สามารถส่งการแจ้งเตือนด้วยตนเองสำหรับ {{actor}} ได้ (เหตุผล: {{reason}}, การดำเนินการ: {{operation}})",
+        "configFailed": "ไม่สามารถกำหนดค่าการแจ้งเตือนสำหรับ {{actor}} ได้ (เหตุผล: {{reason}}, การดำเนินการ: {{operation}})",
         'statusFailed': "ไม่สามารถดึงสถานะระบบการแจ้งเตือนสำหรับ {{actor}} ได้ (เหตุผล: {{reason}}, การดำเนินการ: {{operation}})",
         'testFailed': "ไม่สามารถทดสอบระบบการแจ้งเตือนสำหรับ {{actor}} ได้ (เหตุผล: {{reason}}, การดำเนินการ: {{operation}})",
         'toggleFailed': "ไม่สามารถสลับกฎการแจ้งเตือนสำหรับ {{actor}} ได้ (เหตุผล: {{reason}}, การดำเนินการ: {{operation}})"
@@ -590,6 +591,7 @@ export default {
       'dashboard': {
         'cacheClearFailed': "ไม่สามารถล้างแคชแดชบอร์ดสำหรับ {{actor}} ได้ (เหตุผล: {{reason}}, การดำเนินการ: {{operation}})",
         'exportFailed': "ไม่สามารถส่งออกแดชบอร์ดสำหรับ {{actor}} ได้ (เหตุผล: {{reason}}, การดำเนินการ: {{operation}})",
+        "liveFailed": "ไม่สามารถดึงแดชบอร์ดสดสำหรับ {{actor}} ได้ (เหตุผล: {{reason}}, การดำเนินการ: {{operation}})",
         'healthCheckFailed': "ไม่สามารถดำเนินการตรวจสอบสุขภาพแดชบอร์ดสำหรับ {{actor}} ได้ (เหตุผล: {{reason}}, การดำเนินการ: {{operation}})",
         'overviewFailed': "ไม่สามารถดึงภาพรวมแดชบอร์ดสำหรับ {{actor}} ได้ (เหตุผล: {{reason}}, การดำเนินการ: {{operation}})",
         'performanceFailed': "ไม่สามารถดึงแดชบอร์ดประสิทธิภาพสำหรับ {{actor}} ได้ (เหตุผล: {{reason}}, การดำเนินการ: {{operation}})",
@@ -603,6 +605,7 @@ export default {
       'monitoring': {
         'eventsFailed': "ไม่สามารถดึงเหตุการณ์การตรวจสอบล่าสุดสำหรับ {{actor}} ได้ (เหตุผล: {{reason}}, การดำเนินการ: {{operation}})",
         'simulateFailed': "ไม่สามารถจำลองเหตุการณ์การตรวจสอบสำหรับ {{actor}} ได้ (เหตุผล: {{reason}}, การดำเนินการ: {{operation}})",
+        "unsupportedMode": "การตรวจสอบต่อเนื่องไม่ได้รับการสนับสนุนบนการปรับใช้งานนี้: Worker isolate ไม่สามารถเก็บตัวจับเวลาการสอบถามระหว่างคำขอได้ โปรดใช้เอนด์พอยต์การตรวจสอบและแดชบอร์ดตามคำขอ",
         'startFailed': "ไม่สามารถเริ่มการตรวจสอบสำหรับ {{actor}} ได้ (เหตุผล: {{reason}}, การดำเนินการ: {{operation}})",
         'statusFailed': "ไม่สามารถดึงสถานะการตรวจสอบสำหรับ {{actor}} ได้ (เหตุผล: {{reason}}, การดำเนินการ: {{operation}})",
         'stopFailed': "ไม่สามารถหยุดการตรวจสอบสำหรับ {{actor}} ได้ (เหตุผล: {{reason}}, การดำเนินการ: {{operation}})"
@@ -627,6 +630,7 @@ export default {
         'statusUpdateFailed': "ไม่สามารถอัปเดตสถานะเหตุการณ์ความปลอดภัยได้เนื่องจากข้อผิดพลาดของเซิร์ฟเวอร์"
       },
       'monitoring': {
+        "notActive": "การตรวจสอบความปลอดภัยไม่ได้ใช้งานอยู่",
         'alreadyRunning': "การตรวจสอบความปลอดภัยกำลังทำงานอยู่แล้ว"
       },
       'service': {
@@ -1042,11 +1046,14 @@ export default {
     'invalidRequest': "คำขอไม่ถูกต้อง",
     'notFound': "ไม่พบทรัพยากร",
     'operationFailed': "{{operation}} ล้มเหลว: {{error}}",
+    'rateLimitUnavailable': 'บริการจำกัดอัตราการใช้งานไม่พร้อมใช้งานชั่วคราว กรุณาลองอีกครั้งในไม่ช้า',
     'serverError': "เกิดข้อผิดพลาดภายในเซิร์ฟเวอร์",
     'success': "ดำเนินการสำเร็จ",
     'welcome': "ยินดีต้อนรับสู่ Hono Auth API v{{version}} ({{language}})"
   },
   'user': {
+    'emailSuggestion': 'โปรดใช้ที่อยู่อีเมลอื่น',
+    'emailUpdateSuggestion': 'โปรดเลือกที่อยู่อีเมลที่ยังไม่มีผู้ใช้งาน',
     'statusDisplay': {
       'active': "ใช้งาน",
       'inactive': "ไม่ได้ใช้งาน",

@@ -172,7 +172,7 @@ admin.post('/users', requireAdmin, i18nValidatorsMiddleware.createUser(), async 
     if (!result.success) {
       if (result.error === 'EMAIL_EXISTS') {
         adminRoutes_log(`Admin user creation failed: email exists: ${userData.email}`);
-        return await handleStandardError(c, new Error('EMAIL_EXISTS'), 'Admin create user - email exists', adminRoutes_log, 'user.emailAlreadyExists', {
+        return await handleStandardError(c, new Error('EMAIL_EXISTS'), 'Admin create user - email exists', adminRoutes_log, 'user.emailExists', {
           email: userData.email,
           suggestion: t(c, 'user.emailSuggestion', { domain: userData.email.split('@')[1] })
         }, 409);
@@ -233,7 +233,7 @@ admin.put('/users/:id', requireOwnerOrAdmin('id'), i18nValidatorsMiddleware.upda
 
       if (result.error === 'EMAIL_EXISTS') {
         adminRoutes_log(`Admin user update failed: email exists: ${updateData.email}`);
-        return await handleStandardError(c, new Error('EMAIL_EXISTS'), 'Admin update user - email exists', adminRoutes_log, 'user.emailAlreadyExists', {
+        return await handleStandardError(c, new Error('EMAIL_EXISTS'), 'Admin update user - email exists', adminRoutes_log, 'user.emailExists', {
           email: updateData.email,
           userId: userId,
           suggestion: t(c, 'user.emailUpdateSuggestion')

@@ -290,7 +290,7 @@ kvAdmin.post('/configs/batch', i18nValidatorsMiddleware.configBatchUpdate('json'
         results[key] = { oldValue, newValue: value, status: 'updated' };
         kvAdminRoutes_log(`Batch update: ${key} = ${value} (was: ${oldValue})`);
       } else {
-        errors[key] = tError(c, 'updateFailed', { key });
+        errors[key] = tError(c, 'kv.updateFailed', { key });
       }
     } catch (error) {
       errors[key] = error.message;

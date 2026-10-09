@@ -580,6 +580,7 @@ export default {
         'historyFailed': "{{actor}}のアラート履歴取得に失敗しました (理由: {{reason}}, 操作: {{operation}})",
         'rulesFailed': "{{actor}}のアラートルール取得に失敗しました (理由: {{reason}}, 操作: {{operation}})",
         'sendFailed': "{{actor}}の手動アラート送信に失敗しました (理由: {{reason}}, 操作: {{operation}})",
+        "configFailed": "{{actor}}のアラート設定に失敗しました (理由: {{reason}}, 操作: {{operation}})",
         'statusFailed': "{{actor}}のアラートシステムステータス取得に失敗しました (理由: {{reason}}, 操作: {{operation}})",
         'testFailed': "{{actor}}のアラートシステムテストに失敗しました (理由: {{reason}}, 操作: {{operation}})",
         'toggleFailed': "{{actor}}のアラートルール切り替えに失敗しました (理由: {{reason}}, 操作: {{operation}})"
@@ -590,6 +591,7 @@ export default {
       'dashboard': {
         'cacheClearFailed': "{{actor}}のダッシュボードキャッシュクリアに失敗しました (理由: {{reason}}, 操作: {{operation}})",
         'exportFailed': "{{actor}}のダッシュボードエクスポートに失敗しました (理由: {{reason}}, 操作: {{operation}})",
+        "liveFailed": "{{actor}}のライブダッシュボード取得に失敗しました (理由: {{reason}}, 操作: {{operation}})",
         'healthCheckFailed': "{{actor}}のダッシュボードヘルスチェック実行に失敗しました (理由: {{reason}}, 操作: {{operation}})",
         'overviewFailed': "{{actor}}のダッシュボード概要取得に失敗しました (理由: {{reason}}, 操作: {{operation}})",
         'performanceFailed': "{{actor}}のパフォーマンスダッシュボード取得に失敗しました (理由: {{reason}}, 操作: {{operation}})",
@@ -603,6 +605,7 @@ export default {
       'monitoring': {
         'eventsFailed': "{{actor}}の最近のモニタリングイベント取得に失敗しました (理由: {{reason}}, 操作: {{operation}})",
         'simulateFailed': "{{actor}}のモニタリングイベントシミュレーションに失敗しました (理由: {{reason}}, 操作: {{operation}})",
+        "unsupportedMode": "このデプロイメントでは継続的モニタリングはサポートされていません。Worker の隔離環境はリクエスト間でポーリングタイマーを保持できないためです。オンデマンドのモニタリング・ダッシュボードエンドポイントをご利用ください。",
         'startFailed': "{{actor}}のモニタリング開始に失敗しました (理由: {{reason}}, 操作: {{operation}})",
         'statusFailed': "{{actor}}のモニタリングステータス取得に失敗しました (理由: {{reason}}, 操作: {{operation}})",
         'stopFailed': "{{actor}}のモニタリング停止に失敗しました (理由: {{reason}}, 操作: {{operation}})"
@@ -627,6 +630,7 @@ export default {
         'statusUpdateFailed': "サーバーエラーによりセキュリティインシデントのステータス更新に失敗しました。"
       },
       'monitoring': {
+        "notActive": "セキュリティ監視は実行されていません",
         'alreadyRunning': "セキュリティ監視は既に実行中です"
       },
       'service': {
@@ -1042,11 +1046,14 @@ export default {
     'invalidRequest': "無効なリクエスト",
     'notFound': "リソースが見つかりません",
     'operationFailed': "{{operation}} が失敗しました: {{error}}",
+    'rateLimitUnavailable': 'レート制限サービスは一時的に利用できません。しばらくしてからもう一度お試しください。',
     'serverError': "内部サーバーエラー",
     'success': "操作が正常に完了しました",
     'welcome': "Hono Auth API v{{version}} ({{language}}) へようこそ"
   },
   'user': {
+    'emailSuggestion': '別のメールアドレスを使用してください。',
+    'emailUpdateSuggestion': 'まだ使用されていないメールアドレスを選択してください。',
     'statusDisplay': {
       'active': "アクティブ",
       'inactive': "非アクティブ",

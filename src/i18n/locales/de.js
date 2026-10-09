@@ -580,6 +580,7 @@ export default {
         'historyFailed': "Fehler beim Abrufen des Alarmverlaufs aufgrund eines Serverfehlers",
         'rulesFailed': "Fehler beim Abrufen der Alarmregeln aufgrund eines Serverfehlers",
         'sendFailed': "Fehler beim Senden des manuellen Alarms aufgrund eines Serverfehlers",
+        "configFailed": "Fehler beim Konfigurieren von Alarmen für {{actor}} (Grund: {{reason}}, Vorgang: {{operation}})",
         'statusFailed': "Fehler beim Abrufen des Alarmsystemstatus aufgrund eines Serverfehlers",
         'testFailed': "Fehler beim Testen des Alarmsystems aufgrund eines Serverfehlers",
         'toggleFailed': "Fehler beim Umschalten der Alarmregel aufgrund eines Serverfehlers"
@@ -590,6 +591,7 @@ export default {
       'dashboard': {
         'cacheClearFailed': "Fehler beim Löschen des Dashboard-Caches aufgrund eines Serverfehlers",
         'exportFailed': "Fehler beim Exportieren des Dashboards aufgrund eines Serverfehlers",
+        "liveFailed": "Fehler beim Abrufen des Live-Dashboards aufgrund eines Serverfehlers",
         'healthCheckFailed': "Fehler beim Durchführen der Dashboard-Gesundheitsprüfung aufgrund eines Serverfehlers",
         'overviewFailed': "Fehler beim Abrufen der Dashboard-Übersicht aufgrund eines Serverfehlers",
         'performanceFailed': "Fehler beim Abrufen des Leistungs-Dashboards aufgrund eines Serverfehlers",
@@ -603,6 +605,7 @@ export default {
       'monitoring': {
         'eventsFailed': "Fehler beim Abrufen aktueller Überwachungsereignisse aufgrund eines Serverfehlers",
         'simulateFailed': "Fehler beim Simulieren des Überwachungsereignisses aufgrund eines Serverfehlers",
+        "unsupportedMode": "Kontinuierliche Überwachung wird in dieser Umgebung nicht unterstützt: Eine Worker-Isolation kann keinen Abfrage-Timer zwischen Anforderungen halten. Verwenden Sie stattdessen die On-Demand-Überwachungs- und Dashboard-Endpunkte.",
         'startFailed': "Fehler beim Starten der Überwachung aufgrund eines Serverfehlers",
         'statusFailed': "Fehler beim Abrufen des Überwachungsstatus aufgrund eines Serverfehlers",
         'stopFailed': "Fehler beim Stoppen der Überwachung aufgrund eines Serverfehlers"
@@ -627,6 +630,7 @@ export default {
         'statusUpdateFailed': "Fehler beim Aktualisieren des Sicherheitsvorfallstatus aufgrund eines Serverfehlers."
       },
       'monitoring': {
+        "notActive": "Sicherheitsüberwachung ist nicht aktiv",
         'alreadyRunning': "Sicherheitsüberwachung läuft bereits"
       },
       'service': {
@@ -1042,11 +1046,14 @@ export default {
     'invalidRequest': "Ungültige Anfrage",
     'notFound': "Ressource nicht gefunden",
     'operationFailed': "{{operation}} fehlgeschlagen: {{error}}",
+    'rateLimitUnavailable': 'Der Rate-Limit-Dienst ist voruebergehend nicht verfuegbar. Bitte versuchen Sie es in Kuerze erneut.',
     'serverError': "Interner Serverfehler",
     'success': "Vorgang erfolgreich abgeschlossen",
     'welcome': "Willkommen bei Hono Auth API v{{version}} ({{language}})"
   },
   'user': {
+    'emailSuggestion': 'Verwenden Sie eine andere E-Mail-Adresse.',
+    'emailUpdateSuggestion': 'Wählen Sie eine E-Mail-Adresse, die noch nicht verwendet wird.',
     'statusDisplay': {
       'active': "Aktiv",
       'inactive': "Inaktiv",
