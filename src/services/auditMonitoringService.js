@@ -6,7 +6,17 @@
 import { auditMonitoring_log } from '../utils/debug.js';
 import { createDatabaseService } from '../utils/serviceFactory.js';
 import { BaseService } from './baseService.js';
+import { UnsupportedOptionError } from '../utils/serviceErrors.js';
 import { ROLES, ROLE_COMBINATIONS } from '../constants/roles.js';
+
+/**
+ * The one sentence a caller is given when it asks for a polling loop.
+ * Kept in one place so the service and its capabilities object cannot drift.
+ * @returns {string} Human-readable refusal
+ */
+function getCapabilitiesText() {
+  return 'Continuous monitoring is not supported on this deployment: a Worker isolate cannot hold a polling timer between requests. Use the on-demand monitoring, threat and dashboard endpoints instead.';
+}
 
 /**
  * Real-time Event Stream Manager
@@ -453,56 +463,59 @@ export class AuditMonitoringService extends BaseService {
   }
 
   /**
-   * Start real-time monitoring
+   * What this deployment can actually do.
+   *
+   * `continuousMonitoring` is false, and it is published rather than omitted
+   * because a caller has to be able to tell "not supported here" from "not
+   * configured yet". The previous implementation claimed otherwise: `startMonitoring`
+   * set `monitoringActive = true` and armed a `setInterval`, and the route
+   * answered 200 with a `startedAt`. A Worker isolate has no long-lived timer -
+   * the interval is torn down with the request that armed it, and the next
+   * isolate starts with the flag back at false - so the 200 described a
+   * subsystem that could not exist, and the status endpoint reported the same
+   * in-memory flag as evidence.
+   *
+   * The snapshot, threat analysis, alert and dashboard paths below are all
+   * query-based and keep working; only the polling loop is refused.
+   * @returns {Object} Published capabilities
    */
-  async startMonitoring(intervalMs = 5000) {
-    if (this.monitoringActive) {
-      auditMonitoring_log('Monitoring already active');
-      return false;
-    }
+  getCapabilities() {
+    return {
+      continuousMonitoring: false,
+      // What an operator can use instead, stated explicitly so the 422 is not
+      // a dead end.
+      supportedModes: ['query-on-demand'],
+      realtimeEventStream: false,
+      reason: 'A Worker isolate cannot hold a polling timer between requests. Use the on-demand monitoring and dashboard endpoints.'
+    };
+  }
 
-    this.monitoringActive = true;
-    this.startTime = Date.now();
-    auditMonitoring_log(`Starting real-time monitoring with ${intervalMs}ms interval`);
-
-    // Initial setup - get the latest audit log ID
-    try {
-      const result = await this.databaseService.select(
-        'SELECT MAX(id) as maxId FROM audit_logs',
-        []
-      );
-      this.lastProcessedId = result?.[0]?.maxId || 0;
-      auditMonitoring_log(`Starting from audit log ID: ${this.lastProcessedId}`);
-    } catch (error) {
-      auditMonitoring_log(`Error getting initial audit log ID: ${error.message}`);
-      this.lastProcessedId = 0;
-    }
-
-    // Start monitoring interval
-    this.monitoringInterval = setInterval(async () => {
-      await this.processNewEvents();
-    }, intervalMs);
-
-    return true;
+  /**
+   * Refuse to start a monitoring loop.
+   *
+   * There is no configuration that makes this work: nothing here would be
+   * scheduled by a Worker without a platform feature that is deliberately not
+   * added. Failing loudly is the only honest answer, and it must happen before
+   * any state is touched - otherwise a "refused" start could still leave a
+   * timer armed and `monitoringActive` true.
+   * @param {number} [_intervalMs] - Requested poll interval, unused
+   * @throws {UnsupportedOptionError} Always, code UNSUPPORTED_MONITORING_MODE
+   */
+  startMonitoring(_intervalMs = 5000) {
+    auditMonitoring_log(`Refusing to start continuous monitoring: ${getCapabilitiesText()}`);
+    return Promise.reject(new UnsupportedOptionError(
+      getCapabilitiesText(),
+      'UNSUPPORTED_MONITORING_MODE',
+      { continuousMonitoring: false, supportedModes: ['query-on-demand'] }
+    ));
   }
 
   /**
    * Stop real-time monitoring
+   * Always false: no start can succeed, so there is never anything to stop.
    */
   stopMonitoring() {
-    if (!this.monitoringActive) {
-      auditMonitoring_log('Monitoring not active');
-      return false;
-    }
-
-    this.monitoringActive = false;
-    if (this.monitoringInterval) {
-      clearInterval(this.monitoringInterval);
-      this.monitoringInterval = null;
-    }
-
-    auditMonitoring_log('Real-time monitoring stopped');
-    return true;
+    return false;
   }
 
   /**
@@ -673,6 +686,7 @@ export class AuditMonitoringService extends BaseService {
         lastProcessedId: this.lastProcessedId,
         uptime: this.monitoringActive ? Date.now() - this.startTime : 0
       },
+      capabilities: this.getCapabilities(),
       eventStream: this.eventStream.getStreamStats(),
       threatDetection: this.threatDetection.getThreatStatus()
     };

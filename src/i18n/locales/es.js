@@ -580,6 +580,7 @@ export default {
         'historyFailed': "Error al recuperar el historial de alertas debido a un error del servidor",
         'rulesFailed': "Error al recuperar las reglas de alerta debido a un error del servidor",
         'sendFailed': "Error al enviar la alerta manual debido a un error del servidor",
+        "configFailed": "Error al configurar las alertas para {{actor}} (Motivo: {{reason}}, Operación: {{operation}})",
         'statusFailed': "Error al recuperar el estado del sistema de alertas debido a un error del servidor",
         'testFailed': "Error al probar el sistema de alertas debido a un error del servidor",
         'toggleFailed': "Error al alternar la regla de alerta debido a un error del servidor"
@@ -590,6 +591,7 @@ export default {
       'dashboard': {
         'cacheClearFailed': "Error al limpiar la caché del panel para {{actor}} (Motivo: {{reason}}, Operación: {{operation}})",
         'exportFailed': "Error al exportar el panel para {{actor}} (Motivo: {{reason}}, Operación: {{operation}})",
+        "liveFailed": "Error al recuperar el panel en vivo para {{actor}} (Motivo: {{reason}}, Operación: {{operation}})",
         'healthCheckFailed': "Error al realizar la verificación de salud del panel para {{actor}} (Motivo: {{reason}}, Operación: {{operation}})",
         'overviewFailed': "Error al recuperar la vista general del panel para {{actor}} (Motivo: {{reason}}, Operación: {{operation}})",
         'performanceFailed': "Error al recuperar el panel de rendimiento para {{actor}} (Motivo: {{reason}}, Operación: {{operation}})",
@@ -603,6 +605,7 @@ export default {
       'monitoring': {
         'eventsFailed': "Error al recuperar los eventos de monitoreo recientes para {{actor}} (Motivo: {{reason}}, Operación: {{operation}})",
         'simulateFailed': "Error al simular el evento de monitoreo debido a un error del servidor",
+        "unsupportedMode": "La supervisión continua no es compatible en este despliegue: un aislado de Worker no puede mantener un temporizador de sondeo entre solicitudes. Use los endpoints de supervisión y panel bajo demanda.",
         'startFailed': "Error al iniciar el monitoreo debido a un error del servidor",
         'statusFailed': "Error al recuperar el estado de monitoreo debido a un error del servidor",
         'stopFailed': "Error al detener el monitoreo debido a un error del servidor"
@@ -627,6 +630,7 @@ export default {
         'statusUpdateFailed': "Error al actualizar el estado del incidente de seguridad debido a un error del servidor."
       },
       'monitoring': {
+        "notActive": "La monitorización de seguridad no está activa",
         'alreadyRunning': "La monitorización de seguridad ya se está ejecutando"
       },
       'service': {
@@ -1042,11 +1046,14 @@ export default {
     'invalidRequest': "Solicitud inválida",
     'notFound': "Recurso no encontrado",
     'operationFailed': "{{operation}} falló: {{error}}",
+    'rateLimitUnavailable': 'El servicio de limite de frecuencia no esta disponible temporalmente. Intentelo de nuevo en un momento.',
     'serverError': "Error interno del servidor",
     'success': "Operación completada exitosamente",
     'welcome': "Bienvenido a Hono Auth API v{{version}} ({{language}})"
   },
   'user': {
+    'emailSuggestion': 'Utilice otra dirección de correo electrónico.',
+    'emailUpdateSuggestion': 'Elija una dirección de correo electrónico que aún no esté en uso.',
     'statusDisplay': {
       'active': "Activo",
       'inactive': "Inactivo",

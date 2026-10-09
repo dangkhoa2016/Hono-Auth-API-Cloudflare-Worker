@@ -580,6 +580,7 @@ export default {
         'historyFailed': 'Không thể truy xuất lịch sử cảnh báo cho {{actor}} (Lý do: {{reason}}, Thao tác: {{operation}})',
         'rulesFailed': 'Không thể truy xuất quy tắc cảnh báo cho {{actor}} (Lý do: {{reason}}, Thao tác: {{operation}})',
         'sendFailed': 'Không thể gửi cảnh báo thủ công cho {{actor}} (Lý do: {{reason}}, Thao tác: {{operation}})',
+        'configFailed': 'Không thể cấu hình cảnh báo cho {{actor}} (Lý do: {{reason}}, Thao tác: {{operation}})',
         'statusFailed': 'Không thể truy xuất trạng thái hệ thống cảnh báo cho {{actor}} (Lý do: {{reason}}, Thao tác: {{operation}})',
         'testFailed': 'Không thể test hệ thống cảnh báo cho {{actor}} (Lý do: {{reason}}, Thao tác: {{operation}})',
         'toggleFailed': 'Không thể bật/tắt quy tắc cảnh báo [#{{ruleId}}] cho {{actor}} (Lý do: {{reason}}, Thao tác: {{operation}})'
@@ -590,6 +591,7 @@ export default {
       'dashboard': {
         'cacheClearFailed': 'Không thể xóa cache dashboard do lỗi máy chủ',
         'exportFailed': 'Không thể xuất dashboard do lỗi máy chủ',
+        'liveFailed': 'Không thể truy xuất dashboard trực tiếp cho {{actor}} (Lý do: {{reason}}, Thao tác: {{operation}})',
         'healthCheckFailed': 'Không thể kiểm tra sức khỏe dashboard do lỗi máy chủ',
         'overviewFailed': 'Không thể truy xuất tổng quan dashboard cho {{actor}} (Lý do: {{reason}}, Thao tác: {{operation}})',
         'performanceFailed': 'Không thể truy xuất dashboard hiệu năng do lỗi máy chủ',
@@ -603,6 +605,7 @@ export default {
       'monitoring': {
         'eventsFailed': 'Không thể truy xuất sự kiện giám sát gần đây cho {{actor}} (Lý do: {{reason}}, Thao tác: {{operation}})',
         'simulateFailed': 'Không thể mô phỏng sự kiện giám sát cho {{actor}} (Lý do: {{reason}}, Thao tác: {{operation}})',
+        'unsupportedMode': 'Không hỗ trợ giám sát liên tục trên môi trường này: một đơn vị Worker không thể giữ bộ hẹn giờ polling giữa các yêu cầu. Hãy dùng các endpoint giám sát và dashboard theo yêu cầu.',
         'startFailed': 'Không thể bắt đầu giám sát cho {{actor}} (Lý do: {{reason}}, Thao tác: {{operation}})',
         'statusFailed': 'Không thể truy xuất trạng thái giám sát cho {{actor}} (Lý do: {{reason}}, Thao tác: {{operation}})',
         'stopFailed': 'Không thể dừng giám sát cho {{actor}} (Lý do: {{reason}}, Thao tác: {{operation}})'
@@ -627,6 +630,7 @@ export default {
         'statusUpdateFailed': 'Không thể cập nhật trạng thái sự cố bảo mật do lỗi máy chủ.'
       },
       'monitoring': {
+        'notActive': 'Giám sát bảo mật chưa được kích hoạt',
         'alreadyRunning': 'Giám sát bảo mật đã đang chạy'
       },
       'service': {
@@ -1042,11 +1046,14 @@ export default {
     'invalidRequest': 'Yêu cầu không hợp lệ',
     'notFound': 'Không tìm thấy tài nguyên',
     'operationFailed': '{{operation}} thất bại: {{error}}',
+    'rateLimitUnavailable': 'Dịch vụ giới hạn tần suất tạm thời không khả dụng. Vui lòng thử lại sau.',
     'serverError': 'Lỗi máy chủ nội bộ',
     'success': 'Hoàn thành thao tác thành công',
     'welcome': 'Chào mừng đến với Hono Auth API v{{version}} ({{language}})'
   },
   'user': {
+    'emailSuggestion': 'Hãy sử dụng địa chỉ email khác.',
+    'emailUpdateSuggestion': 'Hãy chọn địa chỉ email chưa được sử dụng.',
     'statusDisplay': {
       'active': 'Hoạt động',
       'inactive': 'Không hoạt động',

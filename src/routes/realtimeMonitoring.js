@@ -91,40 +91,54 @@ realtimeMonitoring.post('/monitoring/start',
   requireSuperAdmin,
   i18nValidatorsMiddleware.monitoringConfig(),
   async (c) => {
+    const { intervalMs = 5000, enableThreatDetection = true } = c.req.valid('json');
+    const monitoringService = createAuditMonitoringService(c.env);
+    const requestId = c.get('requestId') || c.req.header('cf-ray') || null;
+
+    // `startMonitoring` refuses every call: a Worker isolate cannot hold a
+    // polling timer between requests, so the loop it used to arm died with the
+    // request that created it while the route answered 200 with a `startedAt`.
+    // Nothing is scheduled on the way to this 422.
     try {
-      const { intervalMs = 5000, enableThreatDetection = true } = c.req.valid('json');
-      const monitoringService = createAuditMonitoringService(c.env);
-
-      const started = await monitoringService.startMonitoring(intervalMs);
-
-      if (started) {
-        realtimeMonitoringRoutes_log(`Monitoring started with ${intervalMs}ms interval`);
-        return c.json({
-          success: true,
-          message: tSuccess(c, 'realtimeMonitoring.monitoring.started', {
-            actor: c.get('user')?.fullName || 'System',
-            intervalMs,
-            features: enableThreatDetection ? 'threat detection enabled' : 'basic monitoring'
-          }),
-          data: {
-            intervalMs,
-            enableThreatDetection,
-            startedAt: new Date().toISOString()
-          }
-        });
-      } else {
-        return c.json({
-          success: false,
-          message: tError(c, 'security.monitoring.alreadyRunning')
+      await monitoringService.startMonitoring(intervalMs);
+    } catch (error) {
+      if (error?.code !== 'UNSUPPORTED_MONITORING_MODE') {
+        realtimeMonitoringRoutes_log(`Failed to start monitoring: ${error.name || 'Error'}`);
+        return await handleStandardError(c, error, 'Failed to start monitoring', realtimeMonitoringRoutes_log, 'realtimeMonitoring.monitoring.startFailed', {
+          actor: c.get('user')?.fullName || c.get('user')?.email || 'System',
+          reason: error.message,
+          operation: 'start_monitoring'
         });
       }
-    } catch (error) {
-      return await handleStandardError(c, error, 'Failed to start monitoring', realtimeMonitoringRoutes_log, 'realtimeMonitoring.monitoring.startFailed', {
-        actor: c.get('user')?.fullName || c.get('user')?.email || 'System',
-        reason: error.message,
-        operation: 'start_monitoring'
-      });
+
+      realtimeMonitoringRoutes_log(`Refused to start continuous monitoring: ${error.code}`);
+
+      return c.json({
+        success: false,
+        error: 'UNSUPPORTED_MONITORING_MODE',
+        code: 'UNSUPPORTED_MONITORING_MODE',
+        message: tError(c, 'realtimeMonitoring.monitoring.unsupportedMode'),
+        ...(requestId ? { requestId } : {}),
+        data: {
+          intervalMs,
+          enableThreatDetection,
+          capabilities: monitoringService.getCapabilities()
+        }
+      }, 422);
     }
+
+    // Unreachable while `startMonitoring` refuses every call. Kept so that
+    // enabling the mode later cannot fall through to a silent success: the
+    // capability has to be flipped together with a test that says what polling
+    // would then be scheduled on.
+    return c.json({
+      success: false,
+      error: 'UNSUPPORTED_MONITORING_MODE',
+      code: 'UNSUPPORTED_MONITORING_MODE',
+      message: tError(c, 'realtimeMonitoring.monitoring.unsupportedMode'),
+      ...(requestId ? { requestId } : {}),
+      data: { capabilities: monitoringService.getCapabilities() }
+    }, 422);
   }
 );
 

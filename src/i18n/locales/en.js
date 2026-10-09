@@ -580,6 +580,7 @@ export default {
         'historyFailed': 'Failed to retrieve alert history for {{actor}} (Reason: {{reason}}, Operation: {{operation}})',
         'rulesFailed': 'Failed to retrieve alert rules for {{actor}} (Reason: {{reason}}, Operation: {{operation}})',
         'sendFailed': 'Failed to send manual alert for {{actor}} (Reason: {{reason}}, Operation: {{operation}})',
+        'configFailed': 'Failed to configure alerts for {{actor}} (Reason: {{reason}}, Operation: {{operation}})',
         'statusFailed': 'Failed to retrieve alert system status for {{actor}} (Reason: {{reason}}, Operation: {{operation}})',
         'testFailed': 'Failed to test alert system for {{actor}} (Reason: {{reason}}, Operation: {{operation}})',
         'toggleFailed': 'Failed to toggle alert rule [#{{ruleId}}] for {{actor}} (Reason: {{reason}}, Operation: {{operation}})'
@@ -590,6 +591,7 @@ export default {
       'dashboard': {
         'cacheClearFailed': 'Failed to clear dashboard cache due to server error',
         'exportFailed': 'Failed to export dashboard due to server error',
+        'liveFailed': 'Failed to retrieve live dashboard for {{actor}} (Reason: {{reason}}, Operation: {{operation}})',
         'healthCheckFailed': 'Failed to perform dashboard health check due to server error',
         'overviewFailed': 'Failed to retrieve dashboard overview for {{actor}} (Reason: {{reason}}, Operation: {{operation}})',
         'performanceFailed': 'Failed to retrieve performance dashboard due to server error',
@@ -603,6 +605,7 @@ export default {
       'monitoring': {
         'eventsFailed': 'Failed to retrieve recent monitoring events for {{actor}} (Reason: {{reason}}, Operation: {{operation}})',
         'simulateFailed': 'Failed to simulate monitoring event for {{actor}} (Reason: {{reason}}, Operation: {{operation}})',
+        'unsupportedMode': 'Continuous monitoring is not supported on this deployment: a Worker isolate cannot hold a polling timer between requests. Use the on-demand monitoring and dashboard endpoints.',
         'startFailed': 'Failed to start monitoring for {{actor}} (Reason: {{reason}}, Operation: {{operation}})',
         'statusFailed': 'Failed to retrieve monitoring status for {{actor}} (Reason: {{reason}}, Operation: {{operation}})',
         'stopFailed': 'Failed to stop monitoring for {{actor}} (Reason: {{reason}}, Operation: {{operation}})'
@@ -627,6 +630,7 @@ export default {
         'statusUpdateFailed': 'Failed to update security incident status due to server error.'
       },
       'monitoring': {
+        'notActive': 'Security monitoring is not active',
         'alreadyRunning': 'Security monitoring is already running'
       },
       'service': {
@@ -1042,11 +1046,14 @@ export default {
     'invalidRequest': 'Invalid request',
     'notFound': 'Resource not found',
     'operationFailed': '{{operation}} failed: {{error}}',
+    'rateLimitUnavailable': 'Rate limit service is temporarily unavailable. Please try again shortly.',
     'serverError': 'Internal server error',
     'success': 'Operation completed successfully',
     'welcome': 'Welcome to Hono Auth API v{{version}} ({{language}})'
   },
   'user': {
+    'emailSuggestion': 'Use a different email address.',
+    'emailUpdateSuggestion': 'Choose an email address that is not already in use.',
     'statusDisplay': {
       'active': 'Active',
       'inactive': 'Inactive',
