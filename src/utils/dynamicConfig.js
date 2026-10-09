@@ -298,6 +298,51 @@ export async function getJwtSettings(env) {
 }
 
 /**
+ * How strictly the auth version claim is enforced (T6/B08).
+ *
+ * `observe` tolerates a token that predates the claim and logs it; `enforce`
+ * refuses it. The default is `observe` so a rollout is a deliberate step, and
+ * `expiresAt` gives that window a deadline.
+ *
+ * There is deliberately no third mode. A version that is present and disagrees
+ * with the row is a revoked session in every mode, so an "off" switch would
+ * behave exactly like `observe` while promising something it cannot deliver.
+ *
+ * @param {Object} env - Hono Environment context
+ * @returns {Promise<{mode: string, expiresAt: string|null, expired: boolean, valid: boolean}>}
+ */
+export async function getSessionRevocationSettings(env) {
+  const raw = await getStringConfig(env, 'AUTH_VERSION_ENFORCEMENT', 'observe');
+  const mode = String(raw).trim().toLowerCase();
+  const valid = ['observe', 'enforce'].includes(mode);
+
+  const expiresRaw = String(
+    await getStringConfig(env, 'AUTH_VERSION_ENFORCEMENT_EXPIRES_AT', '')
+  ).trim();
+  let expiresAt = null;
+  let expired = false;
+  if (expiresRaw) {
+    const parsed = new Date(expiresRaw);
+    if (!Number.isNaN(parsed.getTime())) {
+      expiresAt = parsed.toISOString();
+      expired = Date.now() > parsed.getTime();
+    }
+  }
+
+  return {
+    // An unusable value falls back to the transition state and reports itself
+    // as invalid: it must neither lock every legacy session out nor quietly
+    // stop reporting that the setting is wrong.
+    mode: valid ? mode : 'observe',
+    valid,
+    expiresAt,
+    // An expired transition window is enforcement: the point of a deadline is
+    // that somebody has to act on it.
+    expired
+  };
+}
+
+/**
  * Get token security configuration (dynamic)
  * @param {Object} env - Hono Environment context
  * @returns {Promise<Object>} Token security configuration

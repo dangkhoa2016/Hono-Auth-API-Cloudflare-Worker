@@ -42,6 +42,14 @@ export const DEFAULT_CONFIGS = {
   SECURITY_X_PERMITTED_CDP: 'none',
   SECURITY_HSTS: 'max-age=31536000; includeSubDomains; preload',
 
+  // Session revocation (T6/B08)
+  // 'observe' tolerates a token minted before the claim existed; 'enforce'
+  // refuses it. The transition state carries its own deadline so it cannot
+  // silently become permanent. There is no "off": a version that disagrees
+  // with the row is rejected in every mode.
+  AUTH_VERSION_ENFORCEMENT: 'observe',
+  AUTH_VERSION_ENFORCEMENT_EXPIRES_AT: '',
+
   // Token Security
   MAX_REFRESH_TOKENS_PER_USER: 5,
   REFRESH_TOKEN_REUSE_GRACE_SECONDS: 30,

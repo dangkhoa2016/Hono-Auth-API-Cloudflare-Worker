@@ -1,3 +1,4 @@
+import { getSessionRevocationSettings } from '../utils/dynamicConfig.js';
 import { redactText } from '../utils/sensitiveData.js';
 import { ServiceUnavailableError, codeForError, isServiceError, statusForError } from '../utils/serviceErrors.js';
 import bcrypt from 'bcryptjs';
@@ -321,7 +322,30 @@ export class AuthService extends BaseService {
       }
 
       const { payload, record } = validation;
+      // Refresh does not pass through access-token middleware. Apply the same
+      // legacy-version rollout before it can mint a new versioned session.
+      if (!Number.isSafeInteger(payload.auth_version) || payload.auth_version < 1) {
+        const revocation = await getSessionRevocationSettings(this.env);
+        if (revocation.mode === 'enforce' || revocation.expired) {
+          return { success: false, error: 'TOKEN_MISSING_AUTH_VERSION', statusCode: 401 };
+        }
+      }
+
       const user = await this.userService.findById(payload.user_id);
+
+      // A refresh token that predates the current version is dead, even if the
+      // revocation write has not landed yet. Password change and logout-all
+      // bump the version, so this is what stops an old refresh token from
+      // minting a fresh pair during the window between the two writes.
+      if (user && Number.isInteger(payload.auth_version) && payload.auth_version !== user.auth_version) {
+        authService_log(`Refresh token rejected: auth_version ${payload.auth_version} vs row ${user.auth_version}`);
+        await this.tokenService.revokeRefreshToken(record.jti, 'AUTH_VERSION_MISMATCH', { skipIfRevoked: true });
+        return {
+          success: false,
+          error: 'SESSION_REVOKED',
+          statusCode: 401
+        };
+      }
 
       if (!user || user.status !== 'active') {
         authService_log(`Refresh token failed: user not found or inactive: ${payload.user_id}`);
@@ -336,11 +360,49 @@ export class AuthService extends BaseService {
         };
       }
 
-      const tokens = await this.tokenService.rotateRefreshToken({
+      const rotation = await this.tokenService.rotateRefreshToken({
         record,
         user,
         metadata: requestContext
       });
+
+      if (!rotation.rotated) {
+        // Another request consumed this token first. Whether that is a harmless
+        // race or a stolen-token replay depends on the winner's grace window,
+        // which only the authoritative row knows.
+        const state = await this.tokenService.getRefreshRotationState(record.jti);
+        const { race } = await this.tokenService.classifyRotationLoss(state);
+
+        if (race) {
+          authService_log(`Refresh token ${record.jti} was already rotated by a concurrent request`);
+          return {
+            success: false,
+            error: 'REFRESH_ALREADY_ROTATED',
+            statusCode: 409
+          };
+        }
+
+        // Past the window the token is being replayed, not raced: that is a
+        // compromise signal, so the whole family goes. A consistent database
+        // should not reach here, since the window is written by the winner at
+        // the same moment the row is consumed; this stays as the fail-closed
+        // answer for a row that was already outside its window when the
+        // conditional update was tried.
+        authService_log(`Refresh token reuse detected for user ${user.id}`);
+        await this.tokenService.revokeAllTokensForUser(user.id, 'REFRESH_TOKEN_REUSE');
+        await this.tokenAuditService.logTokenAction('security_event', user.id, {
+          ipAddress,
+          userAgent: requestContext.userAgent,
+          metadata: { event: 'REFRESH_TOKEN_REUSE', refreshJti: record.jti }
+        });
+        return {
+          success: false,
+          error: 'REFRESH_TOKEN_REUSE',
+          statusCode: 401
+        };
+      }
+
+      const tokens = rotation.successor;
 
       await this.tokenAuditService.logTokenAction('refresh', user.id, {
         tokenJti: tokens.accessTokenPayload?.jti,
@@ -600,7 +662,25 @@ export class AuthService extends BaseService {
       }
     }
 
-    await this.tokenService.revokeAllTokensForUser(userId, 'USER_LOGOUT_ALL');
+    // The version bump is what makes the other devices' access tokens fail on
+    // their next request; revoking the refresh rows alone would leave them
+    // working until they expired on their own.
+    const bulkRevocation = await this.userService.revokeAllSessions(userId, 'USER_LOGOUT_ALL');
+
+    if (!bulkRevocation.success) {
+      await this.tokenAuditService.logTokenAction('logout_all', userId, {
+        tokenJti: accessPayload?.jti,
+        ipAddress: requestContext.ipAddress,
+        userAgent: requestContext.userAgent,
+        success: false,
+        errorMessage: bulkRevocation.error
+      });
+      return {
+        success: false,
+        error: bulkRevocation.error || 'USER_NOT_FOUND',
+        statusCode: 404
+      };
+    }
 
     if (accessPayload?.jti && accessPayload?.exp) {
       await this.tokenBlacklistService.addToBlacklist({
@@ -618,7 +698,9 @@ export class AuthService extends BaseService {
     });
 
     return {
-      success: true
+      success: true,
+      revokedCount: bulkRevocation.revokedCount,
+      authVersion: bulkRevocation.authVersion
     };
   }
 

@@ -1,8 +1,8 @@
-import { redactText } from '../utils/sensitiveData.js';
-import { codeForError, isServiceError, statusForError } from '../utils/serviceErrors.js';
 import { BaseService } from './baseService.js';
 import { tokenService_log, error_log } from '../utils/debug.js';
 import { createTokenPayload, signToken, verifyToken } from '../utils/jwt.js';
+import { codeForError, isServiceError, statusForError } from '../utils/serviceErrors.js';
+import { redactText } from '../utils/sensitiveData.js';
 
 const textEncoder = new TextEncoder();
 
@@ -44,6 +44,23 @@ export class TokenService extends BaseService {
     return await sha256Digest(token);
   }
 
+  /**
+   * The version a token is minted under.
+   *
+   * Missing means the caller loaded a user without selecting the column, which
+   * is a bug rather than a state to paper over: minting a token with no version
+   * produces a session that logout-all and password changes cannot reach.
+   * @param {Object} user - User row
+   * @returns {number} A positive integer version
+   */
+  _resolveAuthVersion(user) {
+    const version = Number(user?.auth_version);
+    if (!Number.isInteger(version) || version < 1) {
+      throw new Error(`Cannot issue a token: user ${user?.id} has no usable auth_version`);
+    }
+    return version;
+  }
+
   _generateJti() {
     const cryptoApi = tryGetCrypto();
     if (cryptoApi) {
@@ -54,76 +71,13 @@ export class TokenService extends BaseService {
 
   async issueTokenPair(user, metadata = {}, options = {}) {
     try {
-      const jwtConfig = await this.getJwtConfig();
-      const tokenSecurityConfig = await this.getTokenSecurityConfig();
-      const subjectPrefix = jwtConfig.subjectPrefix || 'user';
-      const subject = `${subjectPrefix}:${user.id}`;
-      const audienceClaim = Array.isArray(jwtConfig.audience)
-        ? (jwtConfig.audience.length === 1 ? jwtConfig.audience[0] : jwtConfig.audience)
-        : jwtConfig.audience;
-      const scopeValue = this._normalizeScopes(
-        metadata?.scopes ?? metadata?.scope ?? jwtConfig.defaultScope,
-        jwtConfig.scopeSeparator
-      );
-
-      const ipHash = metadata?.ipAddress
-        ? await TokenService.hashToken(metadata.ipAddress)
-        : null;
-      const userAgentHash = metadata?.userAgent
-        ? await TokenService.hashToken(metadata.userAgent)
-        : null;
-      const sessionId = metadata?.sessionId || metadata?.session_id;
-      const clientId = metadata?.clientId || metadata?.client_id;
-
-      const accessPayloadBase = {
-        sub: subject,
-        iss: jwtConfig.issuer,
-        aud: audienceClaim,
-        user_id: user.id,
-        full_name: user.full_name,
-        email: user.email,
-        role: user.role,
-        jti: this._generateJti()
-      };
-
-      if (scopeValue) {
-        accessPayloadBase.scope = scopeValue;
-      }
-
-      if (clientId) {
-        accessPayloadBase.client_id = clientId;
-      }
-
-      if (sessionId) {
-        accessPayloadBase.session_id = sessionId;
-      }
-
-      if (ipHash) {
-        const ipClaimKey = tokenSecurityConfig.enforceAccessTokenIpBinding ? 'ip_hash' : 'ip_hint';
-        accessPayloadBase[ipClaimKey] = ipHash;
-      }
-
-      if (userAgentHash) {
-        const uaClaimKey = tokenSecurityConfig.enforceAccessTokenUserAgentBinding ? 'ua_hash' : 'ua_hint';
-        accessPayloadBase[uaClaimKey] = userAgentHash;
-      }
-
-      const accessPayload = await createTokenPayload(accessPayloadBase, 'access', this.env);
-
-      const refreshPayloadBase = {
-        user_id: user.id,
-        jti: this._generateJti()
-      };
-
-      const refreshPayload = await createTokenPayload(refreshPayloadBase, 'refresh', this.env);
-
-      const accessToken = await signToken(accessPayload, jwtConfig.secret);
-      const refreshToken = await signToken(refreshPayload, jwtConfig.secret);
+      const issued = await this._buildTokenPair(user, metadata);
 
       await this._persistRefreshToken({
         userId: user.id,
-        refreshToken,
-        refreshPayload,
+        refreshToken: issued.refreshToken,
+        refreshTokenPayload: issued.refreshTokenPayload,
+        authVersion: issued.authVersion,
         metadata
       });
 
@@ -133,16 +87,100 @@ export class TokenService extends BaseService {
 
       tokenService_log(`Issued new token pair for user ${user.id}`);
 
-      return {
-        accessToken,
-        refreshToken,
-        accessTokenPayload: accessPayload,
-        refreshTokenPayload: refreshPayload
-      };
+      return issued;
     } catch (error) {
       error_log(`Failed to issue token pair: ${error.message}`);
       throw error;
     }
+  }
+
+  /**
+   * Signs an access/refresh pair and returns it without persisting anything.
+   *
+   * Split out from issueTokenPair because a rotation has to know the successor's
+   * jti before it writes the conditional consume, and a prepared pair must be
+   * discardable if that write loses.
+   * @param {Object} user - User row
+   * @param {Object} metadata - Request metadata for the bindings
+   * @returns {Promise<Object>} The pair, plus the version it was minted under
+   */
+  async _buildTokenPair(user, metadata = {}) {
+    const jwtConfig = await this.getJwtConfig();
+    const tokenSecurityConfig = await this.getTokenSecurityConfig();
+    const subjectPrefix = jwtConfig.subjectPrefix || 'user';
+    const subject = `${subjectPrefix}:${user.id}`;
+    const audienceClaim = Array.isArray(jwtConfig.audience)
+      ? (jwtConfig.audience.length === 1 ? jwtConfig.audience[0] : jwtConfig.audience)
+      : jwtConfig.audience;
+    const scopeValue = this._normalizeScopes(
+      metadata?.scopes ?? metadata?.scope ?? jwtConfig.defaultScope,
+      jwtConfig.scopeSeparator
+    );
+
+    const ipHash = metadata?.ipAddress
+      ? await TokenService.hashToken(metadata.ipAddress)
+      : null;
+    const userAgentHash = metadata?.userAgent
+      ? await TokenService.hashToken(metadata.userAgent)
+      : null;
+    const sessionId = metadata?.sessionId || metadata?.session_id;
+    const clientId = metadata?.clientId || metadata?.client_id;
+
+    // The version the token belongs to. A row without one would mint a token
+    // that no revocation can ever invalidate, so issuance refuses instead.
+    const authVersion = this._resolveAuthVersion(user);
+
+    const accessPayloadBase = {
+      sub: subject,
+      iss: jwtConfig.issuer,
+      aud: audienceClaim,
+      user_id: user.id,
+      full_name: user.full_name,
+      email: user.email,
+      role: user.role,
+      auth_version: authVersion,
+      jti: this._generateJti()
+    };
+
+    if (scopeValue) {
+      accessPayloadBase.scope = scopeValue;
+    }
+
+    if (clientId) {
+      accessPayloadBase.client_id = clientId;
+    }
+
+    if (sessionId) {
+      accessPayloadBase.session_id = sessionId;
+    }
+
+    if (ipHash) {
+      const ipClaimKey = tokenSecurityConfig.enforceAccessTokenIpBinding ? 'ip_hash' : 'ip_hint';
+      accessPayloadBase[ipClaimKey] = ipHash;
+    }
+
+    if (userAgentHash) {
+      const uaClaimKey = tokenSecurityConfig.enforceAccessTokenUserAgentBinding ? 'ua_hash' : 'ua_hint';
+      accessPayloadBase[uaClaimKey] = userAgentHash;
+    }
+
+    const accessPayload = await createTokenPayload(accessPayloadBase, 'access', this.env);
+
+    const refreshPayloadBase = {
+      user_id: user.id,
+      auth_version: authVersion,
+      jti: this._generateJti()
+    };
+
+    const refreshPayload = await createTokenPayload(refreshPayloadBase, 'refresh', this.env);
+
+    return {
+      accessToken: await signToken(accessPayload, jwtConfig.secret),
+      refreshToken: await signToken(refreshPayload, jwtConfig.secret),
+      accessTokenPayload: accessPayload,
+      refreshTokenPayload: refreshPayload,
+      authVersion
+    };
   }
 
   async validateRefreshToken(refreshToken, metadata = {}) {
@@ -176,7 +214,7 @@ export class TokenService extends BaseService {
       const record = await this.dbService.select(
         `SELECT id, user_id, token_hash, jti, issued_at, expires_at, revoked,
                 revoked_at, revocation_reason, replaced_by, reuse_detected_at,
-                reuse_ip, reuse_user_agent
+                reuse_ip, reuse_user_agent, consumed_at, rotation_grace_until
          FROM refresh_tokens
          WHERE jti = ?`,
         [payload.jti],
@@ -210,10 +248,30 @@ export class TokenService extends BaseService {
       }
 
       if (record.revoked) {
+        const { race } = await this.classifyRotationLoss(record);
+
+        if (race) {
+          // Another request rotated this token moments ago. That is a normal
+          // race between two honest callers, so it is retryable and is not
+          // recorded as reuse.
+          tokenService_log(`Refresh token ${record.jti} was rotated by a concurrent request`);
+          return {
+            success: false,
+            error: 'REFRESH_ALREADY_ROTATED',
+            reason: 'RECENT_ROTATION',
+            statusCode: 409,
+            payload,
+            record
+          };
+        }
+
         const revokedAt = record.revoked_at ? Date.parse(record.revoked_at) : null;
         const graceSeconds = tokenSecurityConfig.refreshTokenReuseGraceSeconds || 0;
-        const withinGrace = revokedAt && (Date.now() - revokedAt) <= graceSeconds * 1000;
+        const withinGrace = !record.consumed_at && revokedAt && (Date.now() - revokedAt) <= graceSeconds * 1000;
 
+        // Reached only when the token was revoked outright. Within the grace
+        // that still is not a race, so the client is told the token is stale
+        // rather than invited to retry one that can never work.
         await this._flagReuse(record, metadata, 'TOKEN_REVOKED');
 
         if (withinGrace) {
@@ -230,8 +288,11 @@ export class TokenService extends BaseService {
         await this.revokeAllTokensForUser(record.user_id, 'TOKEN_REUSE_DETECTED');
         return {
           success: false,
-          error: 'REFRESH_TOKEN_REVOKED',
-          reason: 'TOKEN_REVOKED',
+          // A token that was rotated and came back is reuse. One that was
+          // revoked outright is not, and reporting it as reuse would train
+          // clients to treat a plain logout as a compromise.
+          error: record.consumed_at ? 'REFRESH_TOKEN_REUSE' : 'REFRESH_TOKEN_REVOKED',
+          reason: record.consumed_at ? 'ROTATED_TOKEN_REPLAYED' : 'TOKEN_REVOKED',
           statusCode: 401,
           payload,
           record
@@ -330,16 +391,142 @@ export class TokenService extends BaseService {
   }
 
   async rotateRefreshToken({ record, user, metadata = {} }) {
-    try {
-      const tokens = await this.issueTokenPair(user, metadata, { skipQuota: true });
-      await this._markRefreshTokenRevoked(record.jti, 'ROTATED', tokens.refreshTokenPayload.jti);
-      await this._enforceTokenQuota(user.id);
-      tokenService_log(`Rotated refresh token for user ${user.id}`);
-      return tokens;
-    } catch (error) {
-      error_log(`Failed to rotate refresh token: ${error.message}`);
-      throw error;
+    // Sign the successor first so the conditional consume can name it. Nothing
+    // is returned to the caller until the transaction below commits, so a
+    // prepared token can never be handed out over a failed write.
+    const successor = await this._buildTokenPair(user, metadata);
+    const tokenHash = await TokenService.hashToken(successor.refreshToken);
+    const issuedAtIso = toIso(successor.refreshTokenPayload.iat);
+    const expiresAtIso = toIso(successor.refreshTokenPayload.exp);
+    const ipAddress = metadata?.ipAddress || null;
+    const userAgent = metadata?.userAgent || null;
+    const grace = await this._rotationGraceSeconds();
+    const now = nowIso();
+    const graceUntil = new Date(Date.now() + grace * 1000).toISOString();
+
+    // One transaction. The successor insert is written as INSERT ... WHERE
+    // EXISTS against the lineage marker this attempt just wrote, because a
+    // conditional UPDATE that matches nothing is not an error: D1 still commits
+    // the rest of the batch, so a plain INSERT here would leave an orphan
+    // successor row behind for every racer that lost.
+    const results = await this.dbService.batch([
+      {
+        query: `UPDATE refresh_tokens
+                SET revoked = 1,
+                    revoked_at = ?,
+                    revocation_reason = 'ROTATED',
+                    consumed_at = ?,
+                    rotation_grace_until = ?,
+                    replaced_by = ?,
+                    updated_at = CURRENT_TIMESTAMP
+                WHERE jti = ? AND revoked = 0`,
+        params: [now, now, graceUntil, successor.refreshTokenPayload.jti, record.jti]
+      },
+      {
+        query: `INSERT INTO refresh_tokens (
+          user_id, token_hash, jti, issued_at, expires_at, auth_version,
+          ip_address, user_agent, created_at, updated_at
+        )
+        SELECT ?, ?, ?, ?, ?, ?, ?, ?, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP
+        WHERE EXISTS (
+          SELECT 1 FROM refresh_tokens
+          WHERE jti = ? AND replaced_by = ? AND consumed_at IS NOT NULL
+        )`,
+        params: [
+          user.id,
+          tokenHash,
+          successor.refreshTokenPayload.jti,
+          issuedAtIso,
+          expiresAtIso,
+          successor.authVersion,
+          ipAddress,
+          userAgent,
+          record.jti,
+          successor.refreshTokenPayload.jti
+        ]
+      }
+    ]);
+
+    const consumed = Number(results?.[0]?.meta?.changes ?? 0);
+    const created = Number(results?.[1]?.meta?.changes ?? 0);
+    if (consumed !== 1 || created !== 1) {
+      // The loser wrote no lineage marker, so the insert matched nothing. The
+      // prepared pair is dropped here and is never returned to the caller.
+      tokenService_log(`Refresh token ${record.jti} was already rotated; no successor created`);
+      return { rotated: false, successor: null };
     }
+
+    await this._enforceTokenQuota(user.id);
+    tokenService_log(`Rotated refresh token for user ${user.id}`);
+    return { rotated: true, successor, graceUntil };
+  }
+
+  /**
+   * How long a losing racer may be told "someone else already rotated this".
+   *
+   * The window exists so two tabs refreshing at once get a retryable answer
+   * instead of a logout. It is not permission to replay: past the window the
+   * same token is treated as a reuse.
+   * @returns {Promise<number>} Grace in seconds
+   */
+  async _rotationGraceSeconds() {
+    const config = await this.getTokenSecurityConfig();
+    const seconds = Number(config.refreshTokenReuseGraceSeconds);
+    return Number.isFinite(seconds) && seconds > 0 ? seconds : 0;
+  }
+
+  /**
+   * Revoke a refresh token.
+   * Reports success only when the write is confirmed. `null` from the database
+   * layer means the state is unknown, which is never reported as revoked.
+   * @returns {Promise<{revoked: boolean, reason: string, changes: number}>}
+   */
+  /**
+   * Decides whether a token that can no longer be used is a lost race or a replay.
+   *
+   * Both callers must agree, or the same event answers 409 on one path and 401
+   * with a family revocation on the other, so the rule lives here only.
+   *
+   * The window applies to a consumed token and nothing else. A token revoked by
+   * a logout or a password change is dead from the first moment, so calling
+   * that a race would answer "retry" for a token that can never work again.
+   * @param {Object} record - Refresh row, with the rotation markers
+   * @returns {Promise<{race: boolean, graceUntil: string|null}>} Classification
+   */
+  async classifyRotationLoss(record) {
+    if (!record?.consumed_at) {
+      return { race: false, graceUntil: null };
+    }
+
+    const tokenSecurityConfig = await this.getTokenSecurityConfig();
+    const graceSeconds = Number(tokenSecurityConfig.refreshTokenReuseGraceSeconds) || 0;
+    const deadlineMs = record.rotation_grace_until
+      ? Date.parse(record.rotation_grace_until)
+      : Date.parse(record.revoked_at || '') + graceSeconds * 1000;
+
+    const race = graceSeconds > 0 && Number.isFinite(deadlineMs) && Date.now() <= deadlineMs;
+
+    return {
+      race,
+      graceUntil: Number.isFinite(deadlineMs) ? new Date(deadlineMs).toISOString() : null
+    };
+  }
+
+  /**
+   * Re-reads a refresh row authoritatively to classify a lost rotation race.
+   *
+   * The copy the caller holds was read before the winner committed, so it
+   * cannot answer whether the grace window is still open.
+   * @param {string} jti - Refresh token jti
+   * @returns {Promise<Object|null>} Rotation markers, or null if the row is gone
+   */
+  getRefreshRotationState(jti) {
+    return this.dbService.selectAuthoritative(
+      `SELECT jti, user_id, revoked, consumed_at, rotation_grace_until, replaced_by
+         FROM refresh_tokens WHERE jti = ?`,
+      [jti],
+      true
+    );
   }
 
   async revokeRefreshToken(jti, reason = 'MANUAL_REVOKE', options = {}) {
@@ -406,25 +593,39 @@ export class TokenService extends BaseService {
     }
   }
 
-  async _persistRefreshToken({ userId, refreshToken, refreshPayload, metadata }) {
+  async _persistRefreshToken({ userId, refreshToken, refreshTokenPayload, authVersion, metadata }) {
     const tokenHash = await TokenService.hashToken(refreshToken);
-    const issuedAtIso = toIso(refreshPayload.iat);
-    const expiresAtIso = toIso(refreshPayload.exp);
+    const issuedAtIso = toIso(refreshTokenPayload.iat);
+    const expiresAtIso = toIso(refreshTokenPayload.exp);
     const ipAddress = metadata?.ipAddress || null;
     const userAgent = metadata?.userAgent || null;
 
-    await this.dbService.insert(
+    const result = await this.dbService.insert(
       `INSERT INTO refresh_tokens (
-        user_id, token_hash, jti, issued_at, expires_at,
+        user_id, token_hash, jti, issued_at, expires_at, auth_version,
         ip_address, user_agent, created_at, updated_at
-      ) VALUES (?, ?, ?, ?, ?, ?, ?, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP)`,
-      [userId, tokenHash, refreshPayload.jti, issuedAtIso, expiresAtIso, ipAddress, userAgent]
+      ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP)`,
+      [
+        userId,
+        tokenHash,
+        refreshTokenPayload.jti,
+        issuedAtIso,
+        expiresAtIso,
+        authVersion,
+        ipAddress,
+        userAgent
+      ]
     );
+
+    if (!result || result.success !== true) {
+      throw new Error('Refresh token could not be persisted');
+    }
+    return result;
   }
 
   async _markRefreshTokenRevoked(jti, reason, replacedByJti = null) {
     const now = nowIso();
-    await this.dbService.update(
+    const result = await this.dbService.update(
       `UPDATE refresh_tokens
        SET revoked = 1,
            revoked_at = ?,
@@ -434,6 +635,7 @@ export class TokenService extends BaseService {
        WHERE jti = ?`,
       [now, reason, replacedByJti, jti]
     );
+    return Number(result?.changes ?? 0) > 0;
   }
 
   async _flagReuse(record, metadata, reason) {

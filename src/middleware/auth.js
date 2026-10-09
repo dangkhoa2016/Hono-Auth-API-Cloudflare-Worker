@@ -1,19 +1,21 @@
-import { describeAuthScheme, redactText } from '../utils/sensitiveData.js';
-import { codeForError, isServiceError, statusForError } from '../utils/serviceErrors.js';
 import { authMiddleware_log, authError_log } from '../utils/debug.js';
 import { createAuthService, createUserService, createKvConfigService } from '../utils/serviceFactory.js';
 import { handleStandardError } from '../utils/errorHandler.js';
 import { getClientIP } from '../utils/auditHelpers.js';
+import { codeForError, isServiceError, statusForError, ServiceUnavailableError } from '../utils/serviceErrors.js';
+import { describeAuthScheme, redactText } from '../utils/sensitiveData.js';
+import { getSessionRevocationSettings } from '../utils/dynamicConfig.js';
 
 /**
  * JWT token authentication middleware with i18n support
  * @param {Object} c - Hono context
  * @param {Function} next - Next function
  * @returns {Promise} Response or next()
-*/
+ */
 export const authMiddleware = async (c, next) => {
   const authorization = c.req.header('Authorization');
 
+  // Never log the raw header: it carries the bearer token itself.
   authMiddleware_log(`Authorization header ${authorization ? `present (${describeAuthScheme(authorization)})` : 'missing'}`);
 
   if (!authorization || !authorization.startsWith('Bearer ')) {
@@ -60,37 +62,108 @@ export const authMiddleware = async (c, next) => {
   c.set('accessToken', token);
   c.set('accessPayload', payload);
 
-  // Get user information from database to have role
+  // Authorization decisions come from the database, every request.
+  //
+  // The identity cache is still useful for the fields a route merely displays,
+  // but role, status and auth version decide what a request may do, and those
+  // three were being answered from a cache with a 300-second TTL. A session
+  // revoked by logout-all, a password change or a role downgrade therefore kept
+  // working for up to five minutes, and the version check below only ever ran on
+  // a cache miss, where the lookup did not even select the column.
   try {
-    let userDetails = null;
-    const cacheKey = `user:cache:${payload.user_id}`;
+    const userService = createUserService(c.env);
+    const securityState = await userService.findSecurityState(payload.user_id);
 
-    // Try to get from cache first
+    if (!securityState) {
+      authError_log(`User not found in database: ${payload.user_id}`);
+      return await handleStandardError(c, new Error('USER_NOT_FOUND'), 'Auth middleware: user not found', authError_log, 'auth.userNotFound', {}, 401);
+    }
+
+    const revocation = await getSessionRevocationSettings(c.env);
+    // Only a token that predates the claim needs a transition policy. A token
+    // that carries a version and disagrees with the row is revoked, full stop:
+    // there is no rollout in which that token should keep working, and a
+    // mismatch is a positive statement that something changed.
+    const enforceLegacy = revocation.mode === 'enforce' || revocation.expired;
+
+    if (!revocation.valid) {
+      authError_log(
+        `AUTH_VERSION_ENFORCEMENT is "${revocation.mode}", which is not a published mode; using the transition state`
+      );
+    }
+
+    // A token minted before the claim existed cannot be compared with anything.
+    // Treating it as current would make every legacy token immortal, so
+    // enforcement refuses it under its own published code.
+    const tokenVersion = Number(payload.auth_version);
+    const hasVersion = Number.isInteger(tokenVersion) && tokenVersion > 0;
+    const currentVersion = Number(securityState.auth_version);
+    if (!Number.isSafeInteger(currentVersion) || currentVersion < 1) {
+      throw new ServiceUnavailableError('Stored session version is unusable');
+    }
+
+
+    if (!hasVersion) {
+      authError_log(`Token for user ${payload.user_id} carries no auth_version claim`);
+      if (enforceLegacy) {
+        return await handleStandardError(
+          c,
+          new Error('TOKEN_MISSING_AUTH_VERSION'),
+          'Auth middleware: token predates auth version enforcement',
+          authError_log,
+          'auth.tokenInvalid',
+          { reason: 'TOKEN_MISSING_AUTH_VERSION' },
+          401,
+          { code: 'TOKEN_MISSING_AUTH_VERSION' }
+        );
+      }
+    } else if (Number.isInteger(currentVersion) && currentVersion > 0 && tokenVersion !== currentVersion) {
+      authError_log(
+        `Auth version mismatch for user ${payload.user_id} (token ${tokenVersion}, current ${currentVersion}), session revoked`
+      );
+      return await handleStandardError(
+        c,
+        new Error('SESSION_REVOKED'),
+        'Auth middleware: session revoked',
+        authError_log,
+        'auth.tokenInvalid',
+        { reason: 'SESSION_REVOKED' },
+        401,
+        { code: 'SESSION_REVOKED' }
+      );
+    }
+
+    // Account status gates the request too, and it has to be the current value.
+    if (securityState.status !== 'active') {
+      authError_log(`User account not active: ${payload.user_id}, status: ${securityState.status}`);
+      const statusKeyMap = {
+        inactive: 'auth.accountInactive',
+        suspended: 'auth.accountSuspended'
+      };
+      const statusKey = statusKeyMap[securityState.status] || 'auth.accountNotActive';
+      return await handleStandardError(c, new Error('ACCOUNT_NOT_ACTIVE'), 'Auth middleware: account not active', authError_log, statusKey, { status: securityState.status }, 401);
+    }
+
+    // Display fields may come from the cache; the three decisions above may not.
+    const cacheKey = `user:cache:${payload.user_id}`;
     const kvConfigService = createKvConfigService(c.env);
+    let displayFields = null;
     if (kvConfigService.kv) {
       try {
-        userDetails = await kvConfigService.getRaw(cacheKey, 'json');
-        if (userDetails) {
-          authMiddleware_log(`User details loaded from cache: ${payload.user_id}`);
+        displayFields = await kvConfigService.getRaw(cacheKey, 'json');
+        if (displayFields) {
+          authMiddleware_log(`Display fields loaded from cache: ${payload.user_id}`);
         }
       } catch (e) {
         authError_log(`Error reading user cache: ${e.message}`);
       }
     }
 
-    // If not in cache, get from database
-    if (!userDetails) {
-      const userService = createUserService(c.env);
-      userDetails = await userService.findById(payload.user_id);
-
-      if (!userDetails) {
-        authError_log(`User not found in database: ${payload.user_id}`);
-        return await handleStandardError(c, new Error('USER_NOT_FOUND'), 'Auth middleware: user not found', authError_log, 'auth.userNotFound', {}, 401);
-      }
-
-      // Cache user details for 5 minutes (300 seconds)
+    if (!displayFields) {
+      const profile = await userService.findById(payload.user_id);
+      displayFields = { email: profile?.email, full_name: profile?.full_name };
       if (kvConfigService.kv) {
-        kvConfigService.putRaw(cacheKey, JSON.stringify(userDetails), { expirationTtl: 300 })
+        kvConfigService.putRaw(cacheKey, JSON.stringify(displayFields), { expirationTtl: 300 })
           .catch(e => authError_log(`Error caching user: ${e.message}`));
       }
     }
@@ -102,25 +175,17 @@ export const authMiddleware = async (c, next) => {
       ...payload,              // original JWT payload (contains user_id)
       id: payload.user_id,     // normalize id field
       user_id: payload.user_id,
-      email: userDetails.email,
-      fullName: userDetails.full_name,
-      full_name: userDetails.full_name, // retain original DB naming for compatibility
-      role: userDetails.role,
-      status: userDetails.status
+      email: displayFields.email,
+      fullName: displayFields.full_name,
+      full_name: displayFields.full_name, // retain original DB naming for compatibility
+      // The authoritative role, not the role in the token or the cache: a
+      // downgrade has to take effect on the next request.
+      role: securityState.role,
+      status: securityState.status,
+      auth_version: currentVersion
     };
 
-    // Check user status
-    if (userDetails.status !== 'active') {
-      authError_log(`User account not active: ${payload.user_id}, status: ${userDetails.status}`);
-      const statusKeyMap = {
-        inactive: 'auth.accountInactive',
-        suspended: 'auth.accountSuspended'
-      };
-      const statusKey = statusKeyMap[userDetails.status] || 'auth.accountNotActive';
-      return await handleStandardError(c, new Error('ACCOUNT_NOT_ACTIVE'), 'Auth middleware: account not active', authError_log, statusKey, { status: userDetails.status }, 401);
-    }
-
-    authMiddleware_log(`User role loaded: ${payload.user_id} -> ${userDetails.role}`);
+    authMiddleware_log(`User role loaded: ${payload.user_id} -> ${securityState.role}`);
 
     // Save user information and language to context
     c.set('user', userWithRole);
