@@ -1,0 +1,55 @@
+name: Bug report (English)
+description: Report a reproducible backend problem.
+title: "[Bug] "
+body:
+  - type: markdown
+    attributes:
+      value: >-
+        Issues are public. Do not include tokens, passwords, database exports or private data. Report
+        vulnerabilities using
+        [SECURITY.md](https://github.com/dangkhoa2016/Hono-Auth-API-Cloudflare-Worker/blob/main/.github/SECURITY.md).
+  - type: input
+    id: revision
+    attributes:
+      label: Commit or tag
+      description: Identify the affected revision.
+    validations:
+      required: true
+  - type: dropdown
+    id: environment
+    attributes:
+      label: Environment
+      options:
+        - Local Worker
+        - CI
+        - Staging
+        - Production
+        - Other
+    validations:
+      required: true
+  - type: textarea
+    id: reproduction
+    attributes:
+      label: Reproduction steps
+      description: Use fake data and a minimal redacted request.
+    validations:
+      required: true
+  - type: textarea
+    id: expected
+    attributes:
+      label: Expected behavior
+    validations:
+      required: true
+  - type: textarea
+    id: actual
+    attributes:
+      label: Actual behavior
+    validations:
+      required: true
+  - type: textarea
+    id: verification
+    attributes:
+      label: Checks run and redacted diagnostics
+      description: Give actual commands, status/code, request ID and results. State unverified items.
+    validations:
+      required: false

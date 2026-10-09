@@ -725,7 +725,7 @@ class AdvancedAuditComprehensiveTest {
 
   async countLiveLogsByMarker(marker) {
     const result = await this.dbService.select(
-      `SELECT COUNT(*) as count FROM audit_logs WHERE action = ? AND target_type = ? AND details LIKE ?`,
+      'SELECT COUNT(*) as count FROM audit_logs WHERE action = ? AND target_type = ? AND details LIKE ?',
       ['truncate_seed', 'truncate_test', `%${marker}%`],
       true
     );
@@ -735,7 +735,7 @@ class AdvancedAuditComprehensiveTest {
 
   async countLiveLogsByMarkerAndRange(marker, startDate, endDate) {
     const result = await this.dbService.select(
-      `SELECT COUNT(*) as count FROM audit_logs WHERE action = ? AND target_type = ? AND details LIKE ? AND timestamp BETWEEN ? AND ?`,
+      'SELECT COUNT(*) as count FROM audit_logs WHERE action = ? AND target_type = ? AND details LIKE ? AND timestamp BETWEEN ? AND ?',
       ['truncate_seed', 'truncate_test', `%${marker}%`, startDate, endDate],
       true
     );
@@ -745,7 +745,7 @@ class AdvancedAuditComprehensiveTest {
 
   async countArchivedLogsByMarker(marker) {
     const result = await this.dbService.select(
-      `SELECT COUNT(*) as count FROM audit_logs_archive WHERE action = ? AND target_type = ? AND details LIKE ?`,
+      'SELECT COUNT(*) as count FROM audit_logs_archive WHERE action = ? AND target_type = ? AND details LIKE ?',
       ['truncate_seed', 'truncate_test', `%${marker}%`],
       true
     );
@@ -755,11 +755,11 @@ class AdvancedAuditComprehensiveTest {
 
   async cleanupTruncateTestLogs(marker) {
     await this.dbService.delete(
-      `DELETE FROM audit_logs WHERE action = ? AND target_type = ? AND details LIKE ?`,
+      'DELETE FROM audit_logs WHERE action = ? AND target_type = ? AND details LIKE ?',
       ['truncate_seed', 'truncate_test', `%${marker}%`]
     );
     await this.dbService.delete(
-      `DELETE FROM audit_logs_archive WHERE action = ? AND target_type = ? AND details LIKE ?`,
+      'DELETE FROM audit_logs_archive WHERE action = ? AND target_type = ? AND details LIKE ?',
       ['truncate_seed', 'truncate_test', `%${marker}%`]
     );
   }

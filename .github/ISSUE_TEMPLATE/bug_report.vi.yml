@@ -1,0 +1,54 @@
+name: Báo lỗi (Tiếng Việt)
+description: Báo lỗi có thể tái hiện trong backend.
+title: "[Bug] "
+body:
+  - type: markdown
+    attributes:
+      value: >-
+        Issue là công khai. Không gửi token, mật khẩu, export database hoặc dữ liệu riêng tư. Báo lỗ hổng theo
+        [SECURITY.md](https://github.com/dangkhoa2016/Hono-Auth-API-Cloudflare-Worker/blob/main/.github/SECURITY.md).
+  - type: input
+    id: revision
+    attributes:
+      label: Commit hoặc tag
+      description: Gửi hash/tag đúng bản bị ảnh hưởng.
+    validations:
+      required: true
+  - type: dropdown
+    id: environment
+    attributes:
+      label: Môi trường
+      options:
+        - Local Worker
+        - CI
+        - Staging
+        - Production
+        - Other
+    validations:
+      required: true
+  - type: textarea
+    id: reproduction
+    attributes:
+      label: Bước tái hiện
+      description: Dùng dữ liệu giả và ví dụ request tối thiểu đã che thông tin.
+    validations:
+      required: true
+  - type: textarea
+    id: expected
+    attributes:
+      label: Kết quả mong muốn
+    validations:
+      required: true
+  - type: textarea
+    id: actual
+    attributes:
+      label: Kết quả thực tế
+    validations:
+      required: true
+  - type: textarea
+    id: verification
+    attributes:
+      label: Kiểm tra đã chạy và log đã che thông tin
+      description: Ghi đúng lệnh, status/code, request ID và kết quả. Phần chưa xác minh cần ghi rõ.
+    validations:
+      required: false

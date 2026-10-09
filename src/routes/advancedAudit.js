@@ -1219,9 +1219,9 @@ advancedAudit.post('/retention',
     let action;
     try {
       user = c.get('user');
-      try { body = await c.req.json(); } catch(e) { body = {}; }
+      try { body = await c.req.json(); } catch (e) { body = {}; }
       action = body.action || 'get_policy';
-      
+
       advancedAuditRoutes_log(`Retention POST request by ${user.role} ${user.id}: action=${action}`);
 
       // Dynamic import to avoid circular dependencies
@@ -1231,7 +1231,7 @@ advancedAudit.post('/retention',
 
       let result;
       switch (action) {
-      case 'set_policy':
+      case 'set_policy': {
         const setRes = await retentionService.setRetentionPolicy(body.policy || body, lang);
         if (!setRes.success) {
           throw new Error(JSON.stringify(setRes));
@@ -1243,10 +1243,11 @@ advancedAudit.post('/retention',
           simulation_results: { simulation: true }
         };
         break;
-        
-      case 'get_policy':
+      }
+
+      case 'get_policy': {
         const getRes = await retentionService.getRetentionPolicy(lang);
-        if (!getRes.success) throw new Error(JSON.stringify(getRes));
+        if (!getRes.success) {throw new Error(JSON.stringify(getRes));}
         result = {
           action,
           policy: getRes.policy,
@@ -1254,40 +1255,42 @@ advancedAudit.post('/retention',
           simulation_results: { simulation: true }
         };
         break;
+      }
 
-      case 'simulate_cleanup':
+      case 'simulate_cleanup': {
         const simRes = await retentionService.simulateCleanup({}, lang);
-        if (!simRes.success) throw new Error(JSON.stringify(simRes));
+        if (!simRes.success) {throw new Error(JSON.stringify(simRes));}
         result = {
           action,
           dry_run: true,
           simulation_results: simRes.simulation_results
         };
         break;
-        
+      }
+
       case 'run_cleanup':
         if (body.dryRun) {
-           const sim = await retentionService.simulateCleanup({}, lang);
-           if (!sim.success) throw new Error(JSON.stringify(sim));
-           result = {
-             action,
-             dry_run: true,
-             simulation_results: sim.simulation_results
-           };
+          const sim = await retentionService.simulateCleanup({}, lang);
+          if (!sim.success) {throw new Error(JSON.stringify(sim));}
+          result = {
+            action,
+            dry_run: true,
+            simulation_results: sim.simulation_results
+          };
         } else {
-           // Provide default options to circumvent confirmation required, or rely on test to provide them.
-           // Actually, the test says "run_cleanup" and doesn't specify dryRun=false, so body.dryRun might be undefined.
-           // wait! let me just pass body
-           const clnRes = await retentionService.runCleanup(false, body || {}, lang);
-           if (!clnRes.success) throw new Error(JSON.stringify(clnRes));
-           result = {
-             action,
-             dry_run: false,
-             simulation_results: clnRes.cleanup_results
-           };
+          // Provide default options to circumvent confirmation required, or rely on test to provide them.
+          // Actually, the test says "run_cleanup" and doesn't specify dryRun=false, so body.dryRun might be undefined.
+          // wait! let me just pass body
+          const clnRes = await retentionService.runCleanup(false, body || {}, lang);
+          if (!clnRes.success) {throw new Error(JSON.stringify(clnRes));}
+          result = {
+            action,
+            dry_run: false,
+            simulation_results: clnRes.cleanup_results
+          };
         }
         break;
-        
+
       default:
         throw new Error('INVALID_RETENTION_ACTION');
       }

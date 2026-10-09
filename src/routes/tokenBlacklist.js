@@ -56,7 +56,7 @@ tokenBlacklistRoutes.post('/', zValidator('json', createBlacklistSchema), async 
         [data.jti],
         true
       );
-      
+
       if (auditLog && auditLog.user_id) {
         data.userId = auditLog.user_id;
         adminRoutes_log(`Auto-detected userId=${data.userId} for jti=${data.jti}`);

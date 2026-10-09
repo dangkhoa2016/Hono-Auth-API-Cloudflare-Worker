@@ -12,48 +12,140 @@
     "sourceType": "module"
   },
   "rules": {
-    "indent": ["error", 2],
-    "linebreak-style": ["error", "unix"],
-    "quotes": ["error", "single"],
-    "semi": ["error", "always"],
-    "no-unused-vars": ["error", { "argsIgnorePattern": "^_" }],
-    "no-console": ["warn"],
-    "eqeqeq": ["error", "always"],
-    "curly": ["error"],
-    "no-var": ["error"],
-    "prefer-const": ["error"],
-    "prefer-arrow-callback": ["error"],
-    "arrow-spacing": ["error"],
-    "template-curly-spacing": ["error", "never"],
-    "object-curly-spacing": ["error", "always"],
-    "array-bracket-spacing": ["error", "never"],
-    "no-undef": ["error"],
-    "no-unreachable": ["error"],
-    "no-duplicate-imports": ["error"],
-    "no-empty": ["error"],
-    "no-irregular-whitespace": ["error"],
-    "no-async-promise-executor": ["error"],
-    "require-await": ["warn"],
-    "func-call-spacing": ["error", "never"],
-    "space-before-function-paren": ["error", {
-      "anonymous": "always",
-      "named": "never",
-      "asyncArrow": "always"
-    }],
-    "space-infix-ops": ["error"],
-    "keyword-spacing": ["error"],
-    "comma-spacing": ["error"],
-    "key-spacing": ["error"],
-    "no-trailing-spaces": ["error"],
-    "no-multiple-empty-lines": ["error", { "max": 2 }],
-    "eol-last": ["error"]
+    "indent": [
+      "error",
+      2
+    ],
+    "linebreak-style": [
+      "error",
+      "unix"
+    ],
+    "quotes": [
+      "error",
+      "single"
+    ],
+    "semi": [
+      "error",
+      "always"
+    ],
+    "no-unused-vars": [
+      "error",
+      {
+        "argsIgnorePattern": "^_"
+      }
+    ],
+    "no-console": [
+      "warn"
+    ],
+    "eqeqeq": [
+      "error",
+      "always"
+    ],
+    "curly": [
+      "error"
+    ],
+    "no-var": [
+      "error"
+    ],
+    "prefer-const": [
+      "error"
+    ],
+    "prefer-arrow-callback": [
+      "error"
+    ],
+    "arrow-spacing": [
+      "error"
+    ],
+    "template-curly-spacing": [
+      "error",
+      "never"
+    ],
+    "object-curly-spacing": [
+      "error",
+      "always"
+    ],
+    "array-bracket-spacing": [
+      "error",
+      "never"
+    ],
+    "no-undef": [
+      "error"
+    ],
+    "no-unreachable": [
+      "error"
+    ],
+    "no-duplicate-imports": [
+      "error"
+    ],
+    "no-empty": [
+      "error"
+    ],
+    "no-irregular-whitespace": [
+      "error"
+    ],
+    "no-async-promise-executor": [
+      "error"
+    ],
+    "require-await": [
+      "warn"
+    ],
+    "func-call-spacing": [
+      "error",
+      "never"
+    ],
+    "space-before-function-paren": [
+      "error",
+      {
+        "anonymous": "always",
+        "named": "never",
+        "asyncArrow": "always"
+      }
+    ],
+    "space-infix-ops": [
+      "error"
+    ],
+    "keyword-spacing": [
+      "error"
+    ],
+    "comma-spacing": [
+      "error"
+    ],
+    "key-spacing": [
+      "error"
+    ],
+    "no-trailing-spaces": [
+      "error"
+    ],
+    "no-multiple-empty-lines": [
+      "error",
+      {
+        "max": 2
+      }
+    ],
+    "eol-last": [
+      "error"
+    ]
   },
   "overrides": [
     {
-      "files": ["tests/**/*.js", "test-*.js", "*.test.js"],
+      "files": [
+        "tests/**/*.js",
+        "tests/**/*.mjs",
+        "test-*.js",
+        "*.test.js",
+        "*.test.mjs"
+      ],
       "rules": {
         "no-console": "off",
         "require-await": "off"
+      }
+    },
+    {
+      "files": [
+        "src/i18n/locales/**/*.js"
+      ],
+      "rules": {
+        "quotes": "off"
       }
     }
   ],

@@ -55,7 +55,7 @@ class TokenAuditAdminTests {
   async testListLogs() {
     this.logger.logSectionHeader('GET /api/admin/token-audit - List Logs');
 
-    const res = await this.client.get(`/api/admin/token-audit?page=1&limit=10`);
+    const res = await this.client.get('/api/admin/token-audit?page=1&limit=10');
 
     this.assert.assertStatus(res.status, 200, 'Should return 200 OK');
     this.assert.assertTrue(res.data.success, 'Response success should be true');
@@ -69,7 +69,7 @@ class TokenAuditAdminTests {
   async testGetLogDetails() {
     this.logger.logSectionHeader(`GET /api/admin/token-audit/${this.testLogId} - Get Details`);
 
-    if (!this.testLogId) return;
+    if (!this.testLogId) {return;}
 
     const res = await this.client.get(`/api/admin/token-audit/${this.testLogId}`);
 
@@ -83,7 +83,7 @@ class TokenAuditAdminTests {
   async testUpdateLog() {
     this.logger.logSectionHeader(`PUT /api/admin/token-audit/${this.testLogId} - Update Log`);
 
-    if (!this.testLogId) return;
+    if (!this.testLogId) {return;}
 
     const payload = {
       action: 'login_updated',
@@ -106,7 +106,7 @@ class TokenAuditAdminTests {
   async testDeleteLog() {
     this.logger.logSectionHeader(`DELETE /api/admin/token-audit/${this.testLogId} - Delete Log`);
 
-    if (!this.testLogId) return;
+    if (!this.testLogId) {return;}
 
     const res = await this.client.delete(`/api/admin/token-audit/${this.testLogId}`);
 

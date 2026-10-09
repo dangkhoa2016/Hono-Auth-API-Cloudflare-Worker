@@ -1,0 +1,8 @@
+blank_issues_enabled: true
+contact_links:
+  - name: Private security reporting / Báo bảo mật riêng
+    url: https://github.com/dangkhoa2016/Hono-Auth-API-Cloudflare-Worker/blob/main/.github/SECURITY.md
+    about: Use the documented private contact for vulnerabilities; do not post exploit details publicly.
+  - name: Setup and support / Cài đặt và hỗ trợ
+    url: https://github.com/dangkhoa2016/Hono-Auth-API-Cloudflare-Worker/blob/main/.github/SUPPORT.md
+    about: Read the setup and capability guidance before opening a public issue.

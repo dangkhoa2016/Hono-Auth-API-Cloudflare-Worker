@@ -1,0 +1,36 @@
+name: Feature request (English)
+description: Propose a focused capability or improvement.
+title: "[Feature] "
+body:
+  - type: markdown
+    attributes:
+      value: >-
+        Issues are public. Do not include tokens, passwords, database exports or private data. Report
+        vulnerabilities using
+        [SECURITY.md](https://github.com/dangkhoa2016/Hono-Auth-API-Cloudflare-Worker/blob/main/.github/SECURITY.md).
+  - type: textarea
+    id: problem
+    attributes:
+      label: Problem to solve
+    validations:
+      required: true
+  - type: textarea
+    id: proposal
+    attributes:
+      label: Proposed behavior
+    validations:
+      required: true
+  - type: textarea
+    id: acceptance
+    attributes:
+      label: Acceptance and verification
+      description: Describe observable results, including failure/unsupported outcomes where relevant.
+    validations:
+      required: true
+  - type: textarea
+    id: impact
+    attributes:
+      label: Impact and alternatives
+      description: Include API/client, migration, configuration or external integration implications.
+    validations:
+      required: false

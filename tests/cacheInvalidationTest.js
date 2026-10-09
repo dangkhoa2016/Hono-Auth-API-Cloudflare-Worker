@@ -2,16 +2,16 @@
 
 /**
  * Cache Invalidation Comprehensive Test Suite
- * 
- * Tests to verify that KV configuration cache is properly invalidated 
+ *
+ * Tests to verify that KV configuration cache is properly invalidated
  * after updates, ensuring frontend always gets latest values
- * 
+ *
  * Issues being tested:
  * 1. KVConfigService cache not invalidating after SET
  * 2. BaseService config cache persisting after updates
  * 3. Multiple service instances holding stale cache
  * 4. Cache invalidation for related keys
- * 
+ *
  * Test scenarios:
  * - Single key update and cache invalidation
  * - Batch updates and cache clearing
@@ -35,7 +35,7 @@ class CacheInvalidationTests {
 
     this.superAdminToken = '';
     this.testResults = [];
-    
+
     // Configuration keys to test
     this.testKeys = {
       'APP_URL': { type: 'string', testValue: 'https://test-cache-123.com' },
@@ -539,7 +539,7 @@ class CacheInvalidationTests {
         );
       }
 
-      this.logger.success(`✓ Cache consistent across all config retrieval methods`);
+      this.logger.success('✓ Cache consistent across all config retrieval methods');
     } catch (error) {
       this.logger.error(`[testCacheConsistencyWithKV] ${error.message}`);
       throw error;
@@ -631,7 +631,7 @@ class CacheInvalidationTests {
       const avgGet = times.reduce((sum, t) => sum + t.get, 0) / times.length;
 
       this.logger.success(
-        `✓ Cache invalidation performance acceptable ` +
+        '✓ Cache invalidation performance acceptable ' +
         `(Avg Update: ${avgUpdate}ms, Avg Get: ${avgGet}ms)`
       );
     } catch (error) {

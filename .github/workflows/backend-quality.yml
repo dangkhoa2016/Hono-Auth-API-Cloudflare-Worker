@@ -1,0 +1,24 @@
+name: Backend quality
+on:
+  push:
+  pull_request:
+permissions:
+  contents: read
+jobs:
+  local-quality:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    env:
+      WRANGLER_SEND_METRICS: 'false'
+      CI: 'true'
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-node@v7
+        with:
+          node-version: '24'
+          cache: npm
+      - run: npm ci --ignore-scripts --no-audit --no-fund
+      - run: npm run lint:check
+      # Canonical discovery includes migrations-upgrade.d1 and worker-smoke.
+      - run: npm run test:node
+      # Report tooling ships outside this repo and has separate artifact gates.
