@@ -1,3 +1,5 @@
+import { redactText } from '../utils/sensitiveData.js';
+import { codeForError, isServiceError, statusForError } from '../utils/serviceErrors.js';
 import { BaseService } from './baseService.js';
 import { tokenService_log, error_log } from '../utils/debug.js';
 import { createTokenPayload, signToken, verifyToken } from '../utils/jwt.js';
@@ -307,7 +309,17 @@ export class TokenService extends BaseService {
         record
       };
     } catch (error) {
-      error_log(`Error validating refresh token: ${error.message}`);
+      error_log(`Error validating refresh token: ${error.name || 'Error'}: ${redactText(error.message)}`);
+      // A dependency outage must not be reported as a generic 500: the caller
+      // has to be able to tell "token is bad" from "we could not check".
+      if (isServiceError(error) && statusForError(error) >= 500) {
+        return {
+          success: false,
+          error: codeForError(error),
+          reason: 'DEPENDENCY_UNAVAILABLE',
+          statusCode: statusForError(error)
+        };
+      }
       return {
         success: false,
         error: 'SERVER_ERROR',

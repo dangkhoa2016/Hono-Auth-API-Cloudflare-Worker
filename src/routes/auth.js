@@ -1,3 +1,4 @@
+import { serviceErrorFromResult } from '../utils/serviceErrors.js';
 import { Hono } from 'hono';
 import { createAuthService } from '../utils/serviceFactory.js';
 import { getClientIP, createSuccessResponse } from '../utils/helpers.js';
@@ -56,7 +57,7 @@ auth.post('/login', strictRateLimitMiddleware, i18nValidatorsMiddleware.login(),
 
       if (isServer) {
         // Standardize server-side failures (unexpected)
-        return await handleStandardError(c, new Error(result.error || 'LOGIN_FAILED'), 'Login service error', error_log, 'auth.loginFailed', {
+        return await handleStandardError(c, serviceErrorFromResult(result, 'LOGIN_FAILED'), 'Login service error', error_log, 'auth.loginFailed', {
           operation: t(c, 'auth.operations.login'),
           actor: email,
           reason: result.error
@@ -78,7 +79,7 @@ auth.post('/login', strictRateLimitMiddleware, i18nValidatorsMiddleware.login(),
         : {};
 
       // Directly map error key for standardized handler; statusCode carries original 4xx/429
-      return await handleStandardError(c, new Error(result.error || 'LOGIN_ERROR'), 'Login failed (client domain)', authRoutes_log, errorKey, i18nParams, statusCode);
+      return await handleStandardError(c, serviceErrorFromResult(result, 'LOGIN_ERROR'), 'Login failed (client domain)', authRoutes_log, errorKey, i18nParams, statusCode);
     }
 
     // Set user info in context for middleware audit logging
@@ -140,14 +141,14 @@ auth.post('/refresh_token', strictRateLimitMiddleware, i18nValidatorsMiddleware.
       const statusCode = result.statusCode || 500;
       const isServer = statusCode >= 500;
       if (isServer) {
-        return await handleStandardError(c, new Error(result.error || 'REFRESH_FAILED'), 'Token refresh service error', error_log, 'auth.refreshTokenFailed', {
+        return await handleStandardError(c, serviceErrorFromResult(result, 'REFRESH_FAILED'), 'Token refresh service error', error_log, 'auth.refreshTokenFailed', {
           operation: 'refreshToken',
           actor: 'refresh',
           reason: result.error
         }, statusCode);
       }
       // Direct error mapping for standardized handler
-      return await handleStandardError(c, new Error(result.error || 'REFRESH_ERROR'), 'Refresh token failed (client domain)', authRoutes_log, result.error === 'REFRESH_TOKEN_INVALID' ? 'auth.refreshTokenInvalid' : result.error === 'USER_NOT_FOUND' ? 'user.notFound' : 'auth.refreshFailedGeneric', {}, statusCode);
+      return await handleStandardError(c, serviceErrorFromResult(result, 'REFRESH_ERROR'), 'Refresh token failed (client domain)', authRoutes_log, result.error === 'REFRESH_TOKEN_INVALID' ? 'auth.refreshTokenInvalid' : result.error === 'USER_NOT_FOUND' ? 'user.notFound' : 'auth.refreshFailedGeneric', {}, statusCode);
     }
 
     // Set user info in context for middleware audit logging
@@ -192,7 +193,7 @@ auth.post('/logout', authMiddleware, i18nValidatorsMiddleware.logout(), async (c
 
     if (!result.success) {
       const statusCode = result.statusCode || 401;
-      return await handleStandardError(c, new Error(result.error || 'LOGOUT_FAILED'), 'Logout failed', authRoutes_log, 'auth.logoutFailed', {
+      return await handleStandardError(c, serviceErrorFromResult(result, 'LOGOUT_FAILED'), 'Logout failed', authRoutes_log, 'auth.logoutFailed', {
         reason: result.reason || result.error,
         ipAddress
       }, statusCode);
@@ -227,7 +228,7 @@ auth.post('/logout-all', authMiddleware, i18nValidatorsMiddleware.logoutAll(), a
 
     if (!result.success) {
       const statusCode = result.statusCode || 401;
-      return await handleStandardError(c, new Error(result.error || 'LOGOUT_ALL_FAILED'), 'Logout-all failed', authRoutes_log, 'auth.logoutFailed', {
+      return await handleStandardError(c, serviceErrorFromResult(result, 'LOGOUT_ALL_FAILED'), 'Logout-all failed', authRoutes_log, 'auth.logoutFailed', {
         reason: result.reason || result.error,
         ipAddress
       }, statusCode);
