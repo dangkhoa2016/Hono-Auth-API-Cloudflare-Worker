@@ -58,8 +58,15 @@ export async function verifyToken(token, secret) {
     jwt_log(`JWT token verified successfully for user: ${payload.user_id || 'unknown'}`);
     return payload;
   } catch (error) {
-    authError_log(`JWT verification failed: ${error.message}`);
-    return null;
+    // jsonwebtoken puts the offending token in the error message
+    // ("invalid JWT token: <token>"). Never log or forward that message.
+    authError_log(`JWT verification failed: ${error.name || 'JsonWebTokenError'}`);
+    const safeError = new Error('JWT verification failed');
+    safeError.name = error.name || 'JsonWebTokenError';
+    if (error.expiredAt) {
+      safeError.expiredAt = error.expiredAt;
+    }
+    throw safeError;
   }
 }
 

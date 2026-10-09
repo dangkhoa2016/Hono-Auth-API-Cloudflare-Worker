@@ -214,7 +214,37 @@ test('R1: SQL logging never emits bind values, only operation metadata', async (
   );
 });
 
+test('R1: auth middleware never logs the raw Authorization header (debug on and off)', async () => {
+  const { Hono } = await import('hono');
+  const { configureDebugNamespaces } = await import('../../src/utils/debug.js');
+  const { authMiddleware } = await import('../../src/middleware/auth.js');
 
+  const app = new Hono();
+  app.use('/api/protected', authMiddleware);
+  app.get('/api/protected', (c) => c.json({ ok: true }));
+
+  const env = createTestEnv({ DB: createRecordingDatabase() });
+  const authorization = `Bearer ${OPAQUE_BIND_MARKER}`;
+
+  await initTestI18n();
+  for (const namespaces of ['hono-auth-api:*', '']) {
+    configureDebugNamespaces(namespaces);
+    const capture = captureLogs();
+    let response;
+    try {
+      response = await app.request('http://127.0.0.1/api/protected', { headers: { Authorization: authorization } }, env);
+    } finally {
+      capture.restore();
+      configureDebugNamespaces('');
+    }
+    assert.equal(response.status, 401, 'an unverifiable token must still be rejected');
+    assert.equal(
+      capture.text.includes(OPAQUE_BIND_MARKER),
+      false,
+      `Authorization header leaked into log output (DEBUG=${namespaces || '<empty>'}):\n${capture.text}`
+    );
+  }
+});
 
 
 
@@ -322,7 +352,41 @@ test('A-01: describeAuthScheme still distinguishes known and unknown schemes', (
   assert.match(describeAuthScheme(SCHEME_MARKER), /^(unknown|opaque)/);
 });
 
+test('A-01: auth middleware log is clean for an unknown Authorization scheme', async () => {
+  const { Hono } = await import('hono');
+  const { configureDebugNamespaces } = await import('../../src/utils/debug.js');
+  const { authMiddleware } = await import('../../src/middleware/auth.js');
 
+  const app = new Hono();
+  app.use('/api/protected', authMiddleware);
+  app.get('/api/protected', (c) => c.json({ ok: true }));
+
+  const env = createTestEnv({ DB: createRecordingDatabase() });
+  await initTestI18n();
+
+  for (const namespaces of ['hono-auth-api:*', '']) {
+    configureDebugNamespaces(namespaces);
+    const capture = captureLogs();
+    let response;
+    try {
+      response = await app.request(
+        'http://127.0.0.1/api/protected',
+        { headers: { Authorization: `${SCHEME_MARKER} ${SCHEME_MARKER}` } },
+        env
+      );
+    } finally {
+      capture.restore();
+      configureDebugNamespaces('');
+    }
+
+    assert.equal(response.status, 401, `unknown scheme must be rejected (DEBUG=${namespaces || '<empty>'})`);
+    assert.equal(
+      capture.text.toLowerCase().includes(SCHEME_MARKER.toLowerCase()),
+      false,
+      `unknown auth scheme marker leaked into the log (DEBUG=${namespaces || '<empty>'}):\n${capture.text}`
+    );
+  }
+});
 
 /**
  * A-02: strict request metadata copied allowlisted values through
