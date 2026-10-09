@@ -4,6 +4,14 @@
 
 This guide explains how to test outbound email using the helper CLI `tools/emails/emailSendTesterCli.js` and how to set the required configuration for Brevo.
 
+## Account-link URL and email appearance
+
+Set `APP_URL` to the backend origin that serves `/api/auth/activate` and `/api/user/verify-email`, for example `https://api.example.com`. A frontend-only hostname cannot handle these API links. KV overrides environment settings, so check for an old `APP_URL` in KV as well as in the Worker variables.
+
+KV administration stores string values as JSON; the resolver decodes that storage layer once. Environment strings and legacy raw KV text remain supported. Email links use the URL API to avoid duplicate slashes and encode the token; invalid or credential-bearing base URLs are rejected.
+
+Both account-email templates provide solid table-cell background colors for the header and action button. Gradients are optional decoration, so text stays readable when an email client omits them. Use preview mode with fake data before sending a real message; a browser preview does not certify every Outlook version.
+
 ## Prerequisites (Brevo)
 - Set KV for development (example values):
 	- EMAIL_PROVIDER=brevo
@@ -47,4 +55,4 @@ node tools/emails/emailSendTesterCli.js --send --to you@example.com --auth-heade
 - `-h` help, `-v` verify, `-s` send, `-d` debug.
 
 ## Notes
-- When using Brevo, `EMAIL_PROVIDER_API_KEY` is mandatory. Debug mode will print endpoint, auth header, API key presence, and provider response body on failure.
+- When using Brevo, `EMAIL_PROVIDER_API_KEY` is mandatory. Debug results report key presence and provider status without exposing the key, token or provider response body.

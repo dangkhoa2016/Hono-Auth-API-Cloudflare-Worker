@@ -51,6 +51,22 @@ export function formatDateTime(date, locale) {
  */
 export { generateActivationToken } from '../utils/activationToken.js';
 
+function buildAccountEmailUrl(baseUrl, path, token) {
+  if (!token) {return '';}
+  try {
+    const base = new URL(baseUrl);
+    if (!['http:', 'https:'].includes(base.protocol) || base.username || base.password
+      || !/^(?:[a-z\d._-]+|\[[a-f\d:.]+\])$/i.test(base.hostname)) {
+      throw new Error('Invalid origin');
+    }
+    const url = new URL(path, base);
+    url.searchParams.set('token', token);
+    return url.href;
+  } catch {
+    throw new Error('Invalid account email base URL; configure APP_URL with the backend HTTP(S) origin');
+  }
+}
+
 /**
  * Build registration email content with i18n support
  * This is a standalone function that can be used by both EmailService and test tools
@@ -91,7 +107,7 @@ export async function buildRegistrationEmailContent({ user, context = {}, appNam
 
   // Build activation URL (token-only for security)
   const activationToken = user.activation_token || '';
-  const activationUrl = activationToken ? `${baseUrl}/api/auth/activate?token=${activationToken}` : '';
+  const activationUrl = buildAccountEmailUrl(baseUrl, '/api/auth/activate', activationToken);
 
   // Translation keys
   const subject = safeTl('emails.registration.subject', { appName }, `${appName} - Activate your account`);
@@ -153,7 +169,7 @@ export async function buildRegistrationEmailContent({ user, context = {}, appNam
         <table width="600" cellpadding="0" cellspacing="0" style="background-color: #ffffff; border-radius: 8px; box-shadow: 0 2px 8px rgba(0,0,0,0.1);">
           <!-- Header -->
           <tr>
-            <td style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); padding: 30px; text-align: center; border-radius: 8px 8px 0 0;">
+            <td bgcolor="#4338ca" style="background-color: #4338ca; background-image: linear-gradient(135deg, #4338ca 0%, #764ba2 100%); padding: 30px; text-align: center; border-radius: 8px 8px 0 0;">
               <h1 style="color: #ffffff; margin: 0; font-size: 24px;">${appName}</h1>
             </td>
           </tr>
@@ -170,9 +186,15 @@ export async function buildRegistrationEmailContent({ user, context = {}, appNam
               <table width="100%" cellpadding="0" cellspacing="0">
                 <tr>
                   <td align="center" style="padding: 20px 0;">
-                    <a href="${activationUrl}" style="display: inline-block; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: #ffffff; text-decoration: none; padding: 15px 40px; border-radius: 50px; font-size: 16px; font-weight: bold; box-shadow: 0 4px 15px rgba(102, 126, 234, 0.4);">
-                      ${activateButton}
-                    </a>
+                    <table role="presentation" border="0" cellpadding="0" cellspacing="0" align="center">
+                      <tr>
+                        <td bgcolor="#4338ca" style="background-color: #4338ca; border-radius: 50px;">
+                          <a href="${activationUrl}" style="display: inline-block; background-color: #4338ca; background-image: linear-gradient(135deg, #4338ca 0%, #764ba2 100%); color: #ffffff; text-decoration: none; padding: 15px 40px; border-radius: 50px; font-size: 16px; font-weight: bold; box-shadow: 0 4px 15px rgba(102, 126, 234, 0.4);">
+                            ${activateButton}
+                          </a>
+                        </td>
+                      </tr>
+                    </table>
                   </td>
                 </tr>
               </table>
@@ -263,7 +285,7 @@ export async function buildEmailChangeVerificationContent({ user, context = {}, 
 
   // Build verification URL
   const token = user.email_verification_token || '';
-  const verificationUrl = token ? `${baseUrl}/api/user/verify-email?token=${token}` : '';
+  const verificationUrl = buildAccountEmailUrl(baseUrl, '/api/user/verify-email', token);
 
   // Translation keys (fallback to English if keys missing)
   const subject = safeTl('emails.emailChange.subject', { appName }, `${appName} - Verify your new email address`);
@@ -327,7 +349,7 @@ export async function buildEmailChangeVerificationContent({ user, context = {}, 
         <table width="600" cellpadding="0" cellspacing="0" style="background-color: #ffffff; border-radius: 8px; box-shadow: 0 2px 8px rgba(0,0,0,0.1);">
           <!-- Header -->
           <tr>
-            <td style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); padding: 30px; text-align: center; border-radius: 8px 8px 0 0;">
+            <td bgcolor="#4338ca" style="background-color: #4338ca; background-image: linear-gradient(135deg, #4338ca 0%, #764ba2 100%); padding: 30px; text-align: center; border-radius: 8px 8px 0 0;">
               <h1 style="color: #ffffff; margin: 0; font-size: 24px;">${appName}</h1>
             </td>
           </tr>
@@ -344,9 +366,15 @@ export async function buildEmailChangeVerificationContent({ user, context = {}, 
               <table width="100%" cellpadding="0" cellspacing="0">
                 <tr>
                   <td align="center" style="padding: 20px 0;">
-                    <a href="${verificationUrl}" style="display: inline-block; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: #ffffff; text-decoration: none; padding: 15px 40px; border-radius: 50px; font-size: 16px; font-weight: bold; box-shadow: 0 4px 15px rgba(102, 126, 234, 0.4);">
-                      ${verifyButton}
-                    </a>
+                    <table role="presentation" border="0" cellpadding="0" cellspacing="0" align="center">
+                      <tr>
+                        <td bgcolor="#4338ca" style="background-color: #4338ca; border-radius: 50px;">
+                          <a href="${verificationUrl}" style="display: inline-block; background-color: #4338ca; background-image: linear-gradient(135deg, #4338ca 0%, #764ba2 100%); color: #ffffff; text-decoration: none; padding: 15px 40px; border-radius: 50px; font-size: 16px; font-weight: bold; box-shadow: 0 4px 15px rgba(102, 126, 234, 0.4);">
+                            ${verifyButton}
+                          </a>
+                        </td>
+                      </tr>
+                    </table>
                   </td>
                 </tr>
               </table>

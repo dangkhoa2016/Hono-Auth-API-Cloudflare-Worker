@@ -34,9 +34,9 @@ try {
 app.use('*', createI18nMiddleware); // Enhanced i18n middleware with Hono + Cloudflare
 
 app.use('*', envMiddleware);
-app.use('*', securityConfigGuardMiddleware);
 app.use('*', kvConfigMiddleware);
 app.use('*', debugConfigMiddleware);
+app.use('*', securityConfigGuardMiddleware);
 
 app.use('*', securityMiddleware);
 app.use('*', corsMiddleware);
