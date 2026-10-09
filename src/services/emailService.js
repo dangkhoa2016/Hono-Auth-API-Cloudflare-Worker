@@ -49,14 +49,7 @@ export function formatDateTime(date, locale) {
  * Generate activation token (64-char random string)
  * @returns {string} Random activation token
  */
-export function generateActivationToken() {
-  const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
-  let token = '';
-  for (let i = 0; i < 64; i++) {
-    token += chars.charAt(Math.floor(Math.random() * chars.length));
-  }
-  return token;
-}
+export { generateActivationToken } from '../utils/activationToken.js';
 
 /**
  * Build registration email content with i18n support

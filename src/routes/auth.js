@@ -315,6 +315,12 @@ auth.get('/activate', async (c) => {
 /**
  * Render activation result page (HTML)
  */
+function escapeActivationText(value) {
+  return String(value ?? '').replace(/[&<>"']/g, character => ({
+    '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', '\'': '&#39;'
+  })[character]);
+}
+
 function renderActivationPage({ success, alreadyActive, user, error, message, appName = 'Hono Auth API' }) {
   const title = success ? '✅ Account Activated' : '❌ Activation Failed';
   const fullTitle = `${appName} | ${title}`;
@@ -326,7 +332,7 @@ function renderActivationPage({ success, alreadyActive, user, error, message, ap
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>${fullTitle}</title>
+  <title>${escapeActivationText(fullTitle)}</title>
   <style>
     * { margin: 0; padding: 0; box-sizing: border-box; }
     body { 
@@ -403,14 +409,14 @@ function renderActivationPage({ success, alreadyActive, user, error, message, ap
     <h1>${success ? (alreadyActive ? 'Already Active' : 'Account Activated!') : 'Activation Failed'}</h1>
     ${user ? `
     <div class="user-info">
-      <p><strong>Email:</strong> ${user.email}</p>
-      <p><strong>Name:</strong> ${user.full_name}</p>
+      <p><strong>Email:</strong> ${escapeActivationText(user.email)}</p>
+      <p><strong>Name:</strong> ${escapeActivationText(user.full_name)}</p>
       <p><strong>Activated:</strong> ${new Date(user.activated_at).toLocaleString()}</p>
     </div>
     ` : ''}
-    <p>${message}</p>
+    <p>${escapeActivationText(message)}</p>
     <a href="/login" class="btn">${success ? 'Go to Login' : 'Back to Home'}</a>
-    ${error ? `<p class="error-code">Error: ${error}</p>` : ''}
+    ${error ? `<p class="error-code">Error: ${escapeActivationText(error)}</p>` : ''}
   </div>
 </body>
 </html>`;

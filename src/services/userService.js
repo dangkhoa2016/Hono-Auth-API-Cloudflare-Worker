@@ -1,3 +1,4 @@
+import { generateActivationToken } from '../utils/activationToken.js';
 import bcrypt from 'bcryptjs';
 import { userService_log, query_log, dbError_log } from '../utils/debug.js';
 import {
@@ -978,12 +979,7 @@ export class UserService extends BaseService {
    * @returns {string} 64 character random token
    */
   generateActivationToken() {
-    const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
-    let token = '';
-    for (let i = 0; i < 64; i++) {
-      token += chars.charAt(Math.floor(Math.random() * chars.length));
-    }
-    return token;
+    return generateActivationToken();
   }
 
   /**
@@ -1075,7 +1071,7 @@ export class UserService extends BaseService {
       // Check if token expired
       const now = new Date();
       const expiresAt = new Date(user.activation_token_expires_at);
-      if (now > expiresAt) {
+      if (!Number.isFinite(expiresAt.getTime()) || now >= expiresAt) {
         userService_log('Activation failed: token expired');
         return { success: false, error: 'TOKEN_EXPIRED', message: 'Activation token has expired' };
       }
@@ -1099,11 +1095,14 @@ export class UserService extends BaseService {
       // Activate the account
       const activatedAt = new Date().toISOString();
       const updateResult = await this.dbService.update(
-        'UPDATE users SET status = \'active\', activated_at = ?, activation_token = NULL WHERE id = ?',
-        [activatedAt, user.id]
+        `UPDATE users SET status = 'active', activated_at = ?, activation_token = NULL
+         WHERE id = ? AND activation_token = ? AND status = 'inactive'
+           AND disabled_by_admin = 0
+           AND julianday(activation_token_expires_at) > julianday(?)`,
+        [activatedAt, user.id, token, activatedAt]
       );
 
-      if (updateResult && updateResult.success) {
+      if (updateResult?.success && updateResult.changes === 1) {
         userService_log(`User activated successfully, ID: ${user.id}`);
         await this.invalidateUserCache(user.id);
         return {
