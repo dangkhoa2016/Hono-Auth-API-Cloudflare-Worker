@@ -50,7 +50,10 @@ export function createAuditSearchSchema(lang = 'en') {
     actorRole: builder.enum(getAllRoles(), 'actorRole').optional(),
     startDate: builder.string('startDate').optional(),
     endDate: builder.string('endDate').optional(),
-    sortBy: builder.string('sortBy', 0, 50).optional().default('created_at'),
+    // `audit_logs` has no `created_at` column; the time column is `timestamp`.
+    // `created_at` is still accepted as an alias and mapped by the service, but
+    // the default must be a column that exists or every search fails.
+    sortBy: builder.string('sortBy', 0, 50).optional().default('timestamp'),
     sortOrder: builder.enum(['asc', 'desc'], 'sortOrder').optional().default('desc'),
     searchFields: builder.string('searchFields').optional() // comma-separated fields to search in
   }, 'auditSearch').refine((data) => {
@@ -72,7 +75,12 @@ export function createAuditExportSchema(lang = 'en') {
   const dateRangeSchema = ValidationPatterns.createDateRangeSchema(lang);
 
   return builder.object({
-    format: builder.enum(['json', 'csv', 'xlsx'], 'format').default('json'),
+    // Not an enum, on purpose. An enum listing a format the backend cannot
+    // write (it listed `xlsx`) is a promise the export service cannot keep, and
+    // a rejected value only ever reaches the client as a bare 400. The string
+    // is validated by the service so the refusal can name the formats that do
+    // work.
+    format: builder.string('format').optional(),
     ...dateRangeSchema.shape,
     filters: builder.object({}).optional(), // Record type using builder
     includeDetails: builder.boolean('includeDetails').default(true),

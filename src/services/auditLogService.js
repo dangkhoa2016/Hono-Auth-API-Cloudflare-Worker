@@ -2,14 +2,22 @@
 import { BaseService } from './baseService.js';
 import { createKvConfigService } from '../utils/serviceFactory.js';
 import { auditService_log, error_log } from '../utils/debug.js';
+
+
 import { ROLES } from '../constants/roles.js';
 import {
-  buildAuditWhereClause,
   safeParseAuditJSON,
   generateAuditRequestId,
   getClientIP,
   sanitizeAuditDetails
 } from '../utils/auditHelpers.js';
+import {
+  buildScopedWhere,
+  normalizeAuditRequest,
+  resolveAuditScope,
+  auditResultCacheKey
+} from './auditScope.js';
+import { redactText, sanitizeAuditUrl } from '../utils/sensitiveData.js';
 
 /**
  * Unified Audit Service - Comprehensive audit logging and analytics service
@@ -103,10 +111,25 @@ export class AuditLogService extends BaseService {
       const performanceSettings = await this.kvConfig.getPerformanceSettings();
       const sanitizationLevel = performanceSettings.dataSanitizationLevel || 'standard';
 
-      // Apply dynamic sanitization based on configuration
+      // Apply dynamic sanitization based on configuration.
+      // Free-text columns go through the same sink-level redaction as the JSON
+      // columns: a producer must not be able to leak a credential by choosing a
+      // different column.
       auditEntry.details = sanitizeAuditDetails(auditEntry.details, sanitizationLevel);
       auditEntry.old_values = sanitizeAuditDetails(auditEntry.old_values, sanitizationLevel);
       auditEntry.new_values = sanitizeAuditDetails(auditEntry.new_values, sanitizationLevel);
+      if (typeof auditEntry.target_identifier === 'string') {
+        auditEntry.target_identifier = sanitizeAuditUrl(auditEntry.target_identifier);
+      }
+      if (typeof auditEntry.error_message === 'string') {
+        auditEntry.error_message = redactText(auditEntry.error_message, { maxString: 2048 });
+      }
+      if (typeof auditEntry.user_agent === 'string') {
+        auditEntry.user_agent = redactText(auditEntry.user_agent, { maxString: 512 });
+      }
+      if (typeof auditEntry.actor_email === 'string') {
+        auditEntry.actor_email = redactText(auditEntry.actor_email, { maxString: 256 });
+      }
 
       // Check if we should batch this entry based on performance settings
       if (performanceSettings.enableBatchProcessing) {
@@ -154,36 +177,31 @@ export class AuditLogService extends BaseService {
    * Search audit logs with advanced filtering and full-text search
    * Enhanced with role-based filtering and dynamic configuration
    */
-  async searchLogs(searchParams = {}) {
+  async searchLogs(searchParams = {}, principal = null) {
     try {
-      // Check cache first
-      const cacheKey = `search_${JSON.stringify(searchParams)}`;
+      const scope = resolveAuditScope(principal);
+
+      // Get dynamic configuration for search limits and performance
+      const performanceSettings = await this.kvConfig.getPerformanceSettings();
+      const featureFlags = await this.kvConfig.getFeatureFlags();
+      const maxLimit = performanceSettings.maxQueryResultLimit || 1000;
+
+      // Pagination and sort are normalized here instead of being left to the
+      // filter allowlist, which used to drop them and force page 1.
+      const request = normalizeAuditRequest(searchParams, scope, { maxLimit });
+      const { filters, pagination, sort } = request;
+      const { page, limit } = pagination;
+      const { query } = filters;
+
+      // Cache key covers scope, every filter, the page window and the sort.
+      const cacheKey = `search_${auditResultCacheKey(scope, request)}`;
       const cachedResult = this.getCached(cacheKey);
       if (cachedResult) {
         return cachedResult;
       }
 
-      // Get dynamic configuration for search limits and performance
-      const performanceSettings = await this.kvConfig.getPerformanceSettings();
-      const featureFlags = await this.kvConfig.getFeatureFlags();
-
-      const {
-        query,           // Search query for full-text search
-        action,
-        actor_id,
-        actor_role,
-        target_type,
-        start_date,
-        end_date,
-        status,
-        ip_address,
-        exclude_super_admin = false,
-        exclude_super_admin_actions = false,
-        page = 1,
-        limit = Math.min(searchParams.limit || 50, performanceSettings.maxQueryResultLimit || 1000),
-        sort_by = 'timestamp',
-        sort_order = 'DESC'
-      } = searchParams;
+      const sort_by = sort.field;
+      const sort_order = sort.direction;
 
       // Check if advanced search features are enabled
       if (!featureFlags.enableAdvancedSearch && query) {
@@ -193,19 +211,8 @@ export class AuditLogService extends BaseService {
         };
       }
 
-      // Build dynamic WHERE clause using shared utility
-      const { whereClause, params } = buildAuditWhereClause({
-        action,
-        actor_id,
-        actor_role,
-        target_type,
-        start_date,
-        end_date,
-        status,
-        ip_address,
-        exclude_super_admin,
-        exclude_super_admin_actions
-      });
+      // Build dynamic WHERE clause using shared utility, always scoped server-side
+      const { whereClause, params } = buildScopedWhere(filters, scope);
 
       // Add full-text search if query provided
       let finalWhereClause = whereClause;
@@ -270,8 +277,10 @@ export class AuditLogService extends BaseService {
             query: query || '',
             total_results: countResult.total,
             filters_applied: {
-              exclude_super_admin,
-              exclude_super_admin_actions
+              // Read from the normalized filters, which is where the
+              // server-owned policy flags actually live.
+              exclude_super_admin: filters.exclude_super_admin,
+              exclude_super_admin_actions: filters.exclude_super_admin_actions
             }
           }
         }
@@ -291,22 +300,25 @@ export class AuditLogService extends BaseService {
    * Get audit logs with filtering and pagination
    * Enhanced with role-based filtering and caching
    */
-  async getLogs(filters = {}, pagination = {}) {
+  async getLogs(filters = {}, pagination = {}, principal = null) {
     try {
-      // Check cache first
-      const cacheKey = `logs_${JSON.stringify(filters)}_${JSON.stringify(pagination)}`;
+      const scope = resolveAuditScope(principal);
+      // Page/limit/sort arrive in the second argument here, so they are
+      // normalized explicitly and cannot reach LIMIT/OFFSET/ORDER BY unchecked.
+      const request = normalizeAuditRequest({ ...(filters || {}), ...(pagination || {}) }, scope);
+      const { filters: normalizedFilters, pagination: normalizedPage, sort } = request;
+
+      // Cache key covers scope, every filter, the page window and the sort.
+      const cacheKey = `logs_${auditResultCacheKey(scope, request)}`;
       const cachedResult = this.getCached(cacheKey);
       if (cachedResult) {
         return cachedResult;
       }
 
-      const { whereClause, params } = buildAuditWhereClause(filters);
-      const {
-        page = 1,
-        limit = 50,
-        sort_by = 'timestamp',
-        sort_order = 'DESC'
-      } = pagination;
+      const { whereClause, params } = buildScopedWhere(normalizedFilters, scope);
+      const { page, limit } = normalizedPage;
+      const sort_by = sort.field;
+      const sort_order = sort.direction;
 
       const offset = (page - 1) * limit;
 
@@ -347,7 +359,7 @@ export class AuditLogService extends BaseService {
             limit,
             totalPages: Math.ceil(countResult.total / limit)
           },
-          filters_applied: filters
+          filters_applied: normalizedFilters
         }
       };
 
@@ -905,7 +917,7 @@ export class AuditLogService extends BaseService {
   /**
    * Export audit logs with role-based restrictions
    */
-  async exportLogs(exportOptions = {}) {
+  async exportLogs(exportOptions = {}, principal = null) {
     try {
       const {
         format,
@@ -919,7 +931,8 @@ export class AuditLogService extends BaseService {
       // Get logs with applied filters
       const result = await this.getLogs(
         { ...filters, exclude_super_admin, exclude_super_admin_actions },
-        { page: 1, limit: max_records }
+        { page: 1, limit: max_records },
+        resolveAuditScope(principal)
       );
 
       if (!result.success) {

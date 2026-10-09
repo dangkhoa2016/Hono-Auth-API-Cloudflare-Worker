@@ -47,15 +47,15 @@ advancedAudit.get('/analytics',
         analyticsService.getSecurityAnalytics({
           timeframe: query.timeframe,
           includeDetails: false
-        }),
+        }, user),
         analyticsService.getUserBehaviorAnalytics({
           timeframe: query.timeframe,
           includeDetails: false
-        }),
+        }, user),
         analyticsService.getPerformanceAnalytics({
           timeframe: query.timeframe,
           includeDetails: false
-        })
+        }, user)
       ]);
 
       const analytics = {
@@ -143,7 +143,7 @@ advancedAudit.get('/analytics/security',
       const analytics = await analyticsService.getSecurityAnalytics({
         timeframe: query.timeframe,
         includeDetails: query.includeDetails
-      });
+      }, user);
 
       // Filter data based on user role
       if (user.role !== ROLES.SUPER_ADMIN) {
@@ -218,7 +218,7 @@ advancedAudit.get('/analytics/behavior',
         timeframe: query.timeframe,
         actorRole: query.actorRole,
         includeInactive: query.includeDetails
-      });
+      }, user);
 
       // Filter data based on user role
       if (user.role !== ROLES.SUPER_ADMIN) {
@@ -289,7 +289,7 @@ advancedAudit.get('/analytics/performance',
 
       const analytics = await analyticsService.getPerformanceAnalytics({
         timeframe: query.timeframe
-      });
+      }, user);
 
       advancedAuditRoutes_log(`Performance analytics generated for ${user.role} ${user.id}`);
 
