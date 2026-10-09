@@ -28,6 +28,12 @@ export class BaseService {
     this.env = env;
     this.serviceName = serviceName;
 
+    // Config cache namespace shared with the other services of this same env, or
+    // null when this instance was constructed directly. When it is set, the
+    // invalidation generation below is what stops a fetch that started before a
+    // clear from being stored as if it were fresh.
+    this._configNamespace = null;
+
     // Initialize config cache
     this._configCache = new Map();
     this._cacheTimestamps = new Map();
@@ -76,7 +82,22 @@ export class BaseService {
 
     // Fetch new config
     serviceBase_log(`${this.serviceName}: Fetching fresh config for ${configKey}`);
+    const namespace = this._configNamespace;
+    const startGeneration = namespace ? namespace.generation : null;
+    const startToken = namespace ? namespace.generationToken : null;
     const config = await fetchFunction.call(this);
+
+    // A cache invalidation that landed while the fetch was in flight makes this
+    // value stale by definition. The caller still gets what the backend
+    // returned, because that is the answer the current request asked for, but it
+    // must not be stored: the next read has to go back to the backend, otherwise
+    // a clear that "succeeded" would leave the old value in place anyway.
+    if (namespace && (namespace.generation !== startGeneration || namespace.generationToken !== startToken)) {
+      serviceBase_log(
+        `${this.serviceName}: Discarded stale config for ${configKey}, fetched across an invalidation`
+      );
+      return config;
+    }
 
     // Cache the result
     this._configCache.set(configKey, config);
