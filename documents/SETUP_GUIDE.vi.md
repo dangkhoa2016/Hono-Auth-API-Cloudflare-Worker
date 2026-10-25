@@ -1,6 +1,6 @@
 # Cài đặt cục bộ
 
-[English](SETUP_GUIDE.md) | Tiếng Việt
+> 🌐 Language / Ngôn ngữ: [English](SETUP_GUIDE.md) | **Tiếng Việt**
 
 Dùng Node.js 24 (cùng major với CI), npm và `package-lock.json` đã commit. Lockfile ghim dependency; `npm ci` tái tạo dependency mà không cập nhật lockfile. Với nvm đã cài, chạy từ root repository:
 
@@ -50,7 +50,7 @@ Template chưa bind `CONFIG_KV`. Đọc cấu hình thông thường có thể d
 ## Kiểm chứng và môi trường từ xa
 
 ```bash
-npm run lint:check && npm run test:node
+npm run verify
 ```
 
 Node integration suites tự tạo fixture local dùng tạm. Bộ kiểm tra chuẩn không cần credentials triển khai từ xa. Xem [kiểm thử](TEST_GUIDE.vi.md), [Wrangler](WRANGLER_CONFIG_GUIDE.vi.md) và [nâng cấp/phát hành](UPGRADE_RELEASE.vi.md). `dev:staging` dùng tài nguyên từ xa, tách biệt với development local.

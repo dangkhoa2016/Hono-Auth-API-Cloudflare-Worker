@@ -1,13 +1,13 @@
 # Upgrade, verification and release
 
-English | [Tiếng Việt](UPGRADE_RELEASE.vi.md)
+> 🌐 Language / Ngôn ngữ: **English** | [Tiếng Việt](UPGRADE_RELEASE.vi.md)
 
 This is an operational checklist, not evidence that a release has occurred. The package version `1.0.0` alone does not identify a verified deployment. Record a commit and actual check results for each deployment.
 
 ## Prepare and verify the candidate
 
 1. Record the exact source commit, Node 24 version, npm version and lockfile. Install with `npm ci --ignore-scripts --no-audit --no-fund`.
-2. Run `npm run lint:check && npm run test:node`. Keep output and failure details. These cover canonical regression/integration tests, including local D1 migration and Worker checks; they do not run every legacy root-level test or external adapter.
+2. Run `npm run verify`. Keep output and failure details. These cover canonical regression/integration tests, including local D1 migration and Worker checks; they do not run every legacy root-level test or external adapter.
 3. Check changed docs, links and script names. Review [capabilities](CAPABILITIES.md), migration files and client impact. A successful parse/lint is not a remote integration check.
 4. Prepare separate staging resources/secrets. Confirm the Cloudflare account, Worker, D1 database and optional KV namespace in ignored `wrangler.toml`. Configure deployed variables and secrets as described in [Wrangler](WRANGLER_CONFIG_GUIDE.md).
 
@@ -47,6 +47,10 @@ npm run deploy:prod
 ```
 
 Production is the default Wrangler target. Repeat the focused smoke checks and monitor real failures. If verification fails, stop promotion and investigate. Additive migrations do not provide an automatic downgrade: choose a tested compatible Worker rollback or a forward repair; do not delete columns or reset shared data as a routine rollback.
+
+## Domain and account-email acceptance
+
+Verify DNS/HTTPS for the actual hostname, not only dashboard deployment status. Check backend `APP_URL` and frontend `FRONTEND_URL` against [Wrangler configuration](WRANGLER_CONFIG_GUIDE.md); verify CORS and the activation result's home button without using a real token. If email is enabled, follow [Brevo checks](MANUAL_SEND_EMAIL_GUIDE.md) and accept delivery/activation with a deliberately provisioned test account. Health and registration messages do not prove inbox delivery. Distinguish mock/local evidence from real provider/production verification.
 
 ## History and release evidence
 

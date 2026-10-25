@@ -1,13 +1,13 @@
 # Nâng cấp, kiểm chứng và phát hành
 
-[English](UPGRADE_RELEASE.md) | Tiếng Việt
+> 🌐 Language / Ngôn ngữ: [English](UPGRADE_RELEASE.md) | **Tiếng Việt**
 
 Đây là checklist vận hành, không phải bằng chứng đã phát hành. Phiên bản package `1.0.0` tự nó không xác định deployment đã kiểm chứng. Ghi commit và kết quả kiểm tra thực tế cho từng deployment.
 
 ## Chuẩn bị và kiểm chứng bản dự kiến
 
 1. Ghi commit source chính xác, phiên bản Node 24, npm và lockfile. Cài bằng `npm ci --ignore-scripts --no-audit --no-fund`.
-2. Chạy `npm run lint:check && npm run test:node`. Giữ output và chi tiết lỗi. Đây là regression/integration chuẩn, gồm migration D1 và Worker local; không chạy mọi test cũ ở root hay adapter bên ngoài.
+2. Chạy `npm run verify`. Giữ output và chi tiết lỗi. Đây là regression/integration chuẩn, gồm migration D1 và Worker local; không chạy mọi test cũ ở root hay adapter bên ngoài.
 3. Kiểm tra tài liệu đã đổi, liên kết và tên script. Rà soát [khả năng](CAPABILITIES.vi.md), migration và tác động client. Parse/lint thành công không phải kiểm chứng tích hợp từ xa.
 4. Chuẩn bị tài nguyên/secrets staging riêng. Xác nhận account Cloudflare, Worker, D1 và namespace KV tùy chọn trong `wrangler.toml` bị ignore. Cấu hình biến và secrets deployment theo [Wrangler](WRANGLER_CONFIG_GUIDE.vi.md).
 
@@ -47,6 +47,10 @@ npm run deploy:prod
 ```
 
 Production là đích Wrangler mặc định. Lặp lại smoke check trọng tâm và theo dõi lỗi thực tế. Nếu kiểm chứng thất bại, dừng promotion để điều tra. Migration bổ sung không cung cấp downgrade tự động: dùng Worker rollback đã kiểm tra tương thích hoặc sửa tiến; không xóa cột/reset dữ liệu dùng chung như rollback thông thường.
+
+## Nghiệm thu domain và email tài khoản
+
+Kiểm tra DNS/HTTPS của hostname thực tế, không chỉ trạng thái deployment trong dashboard. Đối chiếu `APP_URL` backend và `FRONTEND_URL` frontend với [cấu hình Wrangler](WRANGLER_CONFIG_GUIDE.vi.md); kiểm tra CORS và nút home trên trang kết quả bằng request không có token thật. Nếu bật email, làm [kiểm tra Brevo](MANUAL_SEND_EMAIL_GUIDE_vi.md) và nghiệm thu gửi/kích hoạt bằng tài khoản test có chủ đích. Health hoặc thông báo đăng ký không chứng minh email đến inbox. Tách bằng chứng mock/local khỏi kiểm tra provider/production thật.
 
 ## Xuất xứ lịch sử và bằng chứng phát hành
 

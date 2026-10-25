@@ -1,6 +1,6 @@
 # Local setup
 
-English | [Tiếng Việt](SETUP_GUIDE.vi.md)
+> 🌐 Language / Ngôn ngữ: **English** | [Tiếng Việt](SETUP_GUIDE.vi.md)
 
 Use Node.js 24 (the CI major version), npm and the committed `package-lock.json`. The lockfile pins dependencies; `npm ci` reproduces it without updating it. With nvm installed, run from the repository root:
 
@@ -50,7 +50,7 @@ The template does not bind `CONFIG_KV`. Ordinary config reads can use environmen
 ## Verification and remote environments
 
 ```bash
-npm run lint:check && npm run test:node
+npm run verify
 ```
 
 The Node integration suites provision their own disposable local fixtures. No remote deployment credentials are needed for canonical checks. See [testing](TEST_GUIDE.md), [Wrangler configuration](WRANGLER_CONFIG_GUIDE.md) and [upgrade/release](UPGRADE_RELEASE.md) for staging and production. `dev:staging` uses remote resources and is separate from local development.

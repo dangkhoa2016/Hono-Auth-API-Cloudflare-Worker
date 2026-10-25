@@ -1,15 +1,15 @@
 # Verification guide
 
-English | [Tiếng Việt](TEST_GUIDE.vi.md)
+> 🌐 Language / Ngôn ngữ: **English** | [Tiếng Việt](TEST_GUIDE.vi.md)
 
 The canonical automated entry points match [Backend quality CI](../.github/workflows/backend-quality.yml). Run them with Node 24 from the repository root:
 
 ```bash
 npm ci --ignore-scripts --no-audit --no-fund
-npm run lint:check && npm run test:node
+npm run verify
 ```
 
-`lint:check` rejects warnings in its configured paths. `test:node` discovers `tests/regression/*.test.mjs` and `tests/integration/*.test.mjs`; use the actual package script for the maintained invocation. The integration suites include disposable local D1/Worker behavior and migration upgrades. They need no remote account secrets. The lockfile and Node major should match CI; tests that exercise Wrangler/workerd require a platform supported by those installed tools.
+`verify` runs `lint:check`, `lint:tools`, `verify:docs` and `test:node` in sequence. `lint:check` rejects warnings in its configured paths. `lint:tools` checks the supported password-reset command/helper and docs checker; it is not a claim that every historical tool is maintained. `verify:docs` checks README/document relative file targets and package script references; it does not validate external URLs or every historical example. `test:node` discovers `tests/regression/*.test.mjs` and `tests/integration/*.test.mjs`; use the actual package script for the maintained invocation. The integration suites include disposable local D1/Worker behavior and migration upgrades. They need no remote account secrets. The lockfile and Node major should match CI; tests that exercise Wrangler/workerd require a platform supported by those installed tools.
 
 For focused diagnosis, `npm run test:regression` runs regression tests only. Prefer a focused existing test while investigating, then run the canonical checks for the final candidate. Preserve actual results; do not equate the number of test files with coverage.
 

@@ -147,6 +147,21 @@
       "rules": {
         "quotes": "off"
       }
+    },
+    {
+      "files": [
+        "tools/database/reset_superadmin_user_password.js",
+        "tools/database/superadminPasswordReset.js",
+        "tools/check-docs.mjs"
+      ],
+      "env": {
+        "node": true,
+        "browser": false
+      },
+      "rules": {
+        "no-console": "error",
+        "require-await": "error"
+      }
     }
   ],
   "globals": {

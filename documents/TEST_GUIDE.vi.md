@@ -1,15 +1,15 @@
 # Hướng dẫn kiểm chứng
 
-[English](TEST_GUIDE.md) | Tiếng Việt
+> 🌐 Language / Ngôn ngữ: [English](TEST_GUIDE.md) | **Tiếng Việt**
 
 Các entrypoint tự động chuẩn khớp [CI Backend quality](../.github/workflows/backend-quality.yml). Chạy bằng Node 24 từ root repository:
 
 ```bash
 npm ci --ignore-scripts --no-audit --no-fund
-npm run lint:check && npm run test:node
+npm run verify
 ```
 
-`lint:check` từ chối warning trong các đường dẫn được cấu hình. `test:node` tìm `tests/regression/*.test.mjs` và `tests/integration/*.test.mjs`; dùng package script thực tế để lấy lệnh được duy trì. Integration suites gồm hành vi D1/Worker local dùng tạm và nâng cấp migration, không cần secret account từ xa. Lockfile và major Node cần khớp CI; test dùng Wrangler/workerd cần nền tảng mà công cụ đã cài hỗ trợ.
+`verify` lần lượt chạy `lint:check`, `lint:tools`, `verify:docs` và `test:node`. `lint:check` từ chối warning trong các đường dẫn được cấu hình. `lint:tools` kiểm tra command/helper reset mật khẩu được hỗ trợ và docs checker; không khẳng định mọi tool lịch sử đều được duy trì. `verify:docs` kiểm tra đích file tương đối và tham chiếu package script trong README/tài liệu; không xác minh URL bên ngoài hoặc mọi ví dụ lịch sử. `test:node` tìm `tests/regression/*.test.mjs` và `tests/integration/*.test.mjs`; dùng package script thực tế để lấy lệnh được duy trì. Integration suites gồm hành vi D1/Worker local dùng tạm và nâng cấp migration, không cần secret account từ xa. Lockfile và major Node cần khớp CI; test dùng Wrangler/workerd cần nền tảng mà công cụ đã cài hỗ trợ.
 
 Để chẩn đoán tập trung, `npm run test:regression` chỉ chạy regression. Dùng test có sẵn liên quan trong lúc điều tra, rồi chạy checks chuẩn cho bản cuối. Giữ kết quả thật; số file test không tương đương coverage.
 
