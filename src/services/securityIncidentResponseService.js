@@ -6,6 +6,9 @@
 import { securityIncident_log } from '../utils/debug.js';
 import { createDatabaseService } from '../utils/serviceFactory.js';
 import { BaseService } from './baseService.js';
+import { UnsupportedOptionError } from '../utils/serviceErrors.js';
+import { RESPONSE_ACTIONS } from '../constants/incidentResponseActions.js';
+import { writeOperationalEvent } from '../utils/operationalLog.js';
 
 /**
  * Incident Severity Levels
@@ -31,14 +34,7 @@ const INCIDENT_STATUS = {
 /**
  * Response Action Types
 */
-const RESPONSE_ACTIONS = {
-  LOG_ALERT: 'log_alert',
-  BLOCK_IP: 'block_ip',
-  DISABLE_USER: 'disable_user',
-  ESCALATE: 'escalate',
-  NOTIFY_ADMIN: 'notify_admin',
-  QUARANTINE: 'quarantine'
-};
+
 
 /**
  * Incident Response Engine
@@ -134,8 +130,7 @@ class IncidentResponseEngine {
    */
   initializeResponseActions() {
     // Log alert action
-    this.addResponseAction(RESPONSE_ACTIONS.LOG_ALERT, (incident, params) => {
-      securityIncident_log(`addResponseAction incident: ${JSON.stringify(incident)}, params: ${JSON.stringify(params)}`);
+    this.addResponseAction(RESPONSE_ACTIONS.LOG_ALERT, (incident, _params) => {
       const logEntry = {
         timestamp: new Date().toISOString(),
         level: 'SECURITY_ALERT',
@@ -146,8 +141,7 @@ class IncidentResponseEngine {
         details: incident.metadata
       };
 
-      securityIncident_log(`🚨 SECURITY ALERT: ${JSON.stringify(logEntry, null, 2)}`);
-      securityIncident_log(`Alert logged for incident ${incident.id}`);
+      writeOperationalEvent(logEntry);
 
       return {
         success: true,
@@ -157,97 +151,28 @@ class IncidentResponseEngine {
       };
     });
 
-    // Block IP action (simulated)
-    this.addResponseAction(RESPONSE_ACTIONS.BLOCK_IP, (incident, params) => {
-      const sourceIp = incident.metadata?.sourceIp || incident.metadata?.ip_address;
-      const duration = params?.duration || 3600; // Default 1 hour
+    // External containment and delivery require real adapters. Refuse before
+    // touching state so an attempted response cannot claim an unperformed act.
+    for (const action of this.getCapabilities().unsupportedActions) {
+      this.addResponseAction(action, () => {
+        throw new UnsupportedOptionError(
+          'This incident action has no execution adapter in this deployment',
+          'UNSUPPORTED_INCIDENT_ACTION',
+          { action }
+        );
+      });
+    }
+  }
 
-      if (!sourceIp) {
-        throw new Error('No source IP found for blocking');
-      }
-
-      // In production, this would integrate with firewall/WAF
-      securityIncident_log(`IP blocked: ${sourceIp} for ${duration} seconds`);
-
-      return {
-        success: true,
-        action: RESPONSE_ACTIONS.BLOCK_IP,
-        result: `IP ${sourceIp} blocked for ${duration} seconds`,
-        blockedIp: sourceIp,
-        duration,
-        blockedAt: new Date().toISOString()
-      };
-    });
-
-    // Disable user action (simulated)
-    this.addResponseAction(RESPONSE_ACTIONS.DISABLE_USER, (incident, params) => {
-      const userId = incident.metadata?.actorId || incident.metadata?.userId;
-      const reason = params?.reason || 'security_incident';
-
-      if (!userId) {
-        throw new Error('No user ID found for disabling');
-      }
-
-      // In production, this would update user status in database
-      securityIncident_log(`User disabled: ${userId}, reason: ${reason}`);
-
-      return {
-        success: true,
-        action: RESPONSE_ACTIONS.DISABLE_USER,
-        result: `User ${userId} disabled due to ${reason}`,
-        disabledUser: userId,
-        reason,
-        disabledAt: new Date().toISOString()
-      };
-    });
-
-    // Escalate action
-    this.addResponseAction(RESPONSE_ACTIONS.ESCALATE, (incident, params) => {
-      const escalationLevel = params?.level || 'L2';
-
-      // In production, this would integrate with incident management system
-      securityIncident_log(`Incident escalated: ${incident.id} to ${escalationLevel}`);
-
-      return {
-        success: true,
-        action: RESPONSE_ACTIONS.ESCALATE,
-        result: `Incident escalated to ${escalationLevel}`,
-        escalationLevel,
-        escalatedAt: new Date().toISOString()
-      };
-    });
-
-    // Notify admin action
-    this.addResponseAction(RESPONSE_ACTIONS.NOTIFY_ADMIN, (incident, params) => {
-      const notificationMethod = params?.method || 'internal';
-
-      // In production, this would send notifications via email, Slack, etc.
-      securityIncident_log(`Admin notification sent for incident ${incident.id}`);
-
-      return {
-        success: true,
-        action: RESPONSE_ACTIONS.NOTIFY_ADMIN,
-        result: `Admin notification sent via ${notificationMethod}`,
-        method: notificationMethod,
-        notifiedAt: new Date().toISOString()
-      };
-    });
-
-    // Quarantine action
-    this.addResponseAction(RESPONSE_ACTIONS.QUARANTINE, (incident, params) => {
-      const scope = params?.scope || 'user_session';
-
-      // In production, this would isolate user sessions, limit access, etc.
-      securityIncident_log(`Quarantine applied: ${scope} for incident ${incident.id}`);
-
-      return {
-        success: true,
-        action: RESPONSE_ACTIONS.QUARANTINE,
-        result: `Quarantine applied to ${scope}`,
-        scope,
-        quarantinedAt: new Date().toISOString()
-      };
-    });
+  getCapabilities() {
+    return {
+      automaticContainment: false,
+      supportedActions: [RESPONSE_ACTIONS.LOG_ALERT],
+      unsupportedActions: [
+        RESPONSE_ACTIONS.BLOCK_IP, RESPONSE_ACTIONS.DISABLE_USER,
+        RESPONSE_ACTIONS.ESCALATE, RESPONSE_ACTIONS.NOTIFY_ADMIN, RESPONSE_ACTIONS.QUARANTINE
+      ]
+    };
   }
 
   /**
@@ -347,9 +272,11 @@ class IncidentResponseEngine {
             ...result
           });
 
-          actionHandler.executionCount++;
-          actionHandler.lastExecuted = new Date();
-          totalActionsExecuted++;
+          if (result?.success === true) {
+            actionHandler.executionCount++;
+            actionHandler.lastExecuted = new Date();
+            totalActionsExecuted++;
+          }
 
           securityIncident_log(`Response action executed: ${actionConfig.action} for incident ${incident.id}`);
         } catch (error) {
@@ -357,6 +284,9 @@ class IncidentResponseEngine {
             action: actionConfig.action,
             priority: actionConfig.priority,
             success: false,
+            status: error.code === 'UNSUPPORTED_INCIDENT_ACTION' ? 'unsupported' : 'failed',
+            code: error.code || 'INCIDENT_ACTION_FAILED',
+            statusCode: error.statusCode || 500,
             error: error.message
           });
 
@@ -367,8 +297,9 @@ class IncidentResponseEngine {
       responseResults.push({
         ruleId: rule.id,
         ruleName: rule.name,
-        status: 'executed',
-        actionsExecuted: actionResults.length,
+        status: actionResults.every(action => action.success) ? 'executed' : (actionResults.some(action => action.success) ? 'partial' : 'failed'),
+        actionsAttempted: actionResults.length,
+        actionsExecuted: actionResults.filter(action => action.success).length,
         actions: actionResults
       });
 
@@ -488,6 +419,7 @@ class IncidentManager {
       title: incidentData.title,
       description: incidentData.description,
       metadata: incidentData.metadata || {},
+      tags: incidentData.tags || [],
       detectedAt: now,
       updatedAt: now,
       assignee: null,
@@ -735,13 +667,9 @@ export class SecurityIncidentResponseService extends BaseService {
       // Add response results to incident
       await this.incidentManager.addResponseResults(incident.id, responseResults);
 
-      // Update incident status based on response
-      if (responseResults.actionsExecuted > 0) {
-        await this.incidentManager.updateIncidentStatus(incident.id, INCIDENT_STATUS.CONTAINED, {
-          actor: 'automated_response',
-          notes: `Automated response executed: ${responseResults.actionsExecuted} actions`
-        });
-      }
+      // Logging and attempted actions do not establish containment. Status
+      // changes remain explicit operator decisions until a real containment
+      // adapter can verify an enforced change.
 
       securityIncident_log(`Threat processed and incident created: ${incident.id}`);
 
@@ -835,6 +763,9 @@ export class SecurityIncidentResponseService extends BaseService {
         responseResults.push({
           action: actionConfig.action,
           success: false,
+          status: 'unsupported',
+          code: 'UNKNOWN_INCIDENT_ACTION',
+          statusCode: 422,
           error: 'Unknown action type'
         });
         continue;
@@ -847,28 +778,39 @@ export class SecurityIncidentResponseService extends BaseService {
           ...result
         });
 
-        actionHandler.executionCount++;
-        actionHandler.lastExecuted = new Date();
+        if (result?.success === true) {
+          actionHandler.executionCount++;
+          actionHandler.lastExecuted = new Date();
+        }
       } catch (error) {
         securityIncident_log(`Manual response action failed: ${actionConfig.action}, error: ${error.message}`);
         responseResults.push({
           action: actionConfig.action,
           success: false,
+          status: error.code === 'UNSUPPORTED_INCIDENT_ACTION' ? 'unsupported' : 'failed',
+          code: error.code || 'INCIDENT_ACTION_FAILED',
+          statusCode: error.statusCode || 500,
           error: error.message
         });
       }
     }
 
     // Add response results to incident
+    const completed = responseResults.filter(result => result.success === true).length;
+    const firstFailure = responseResults.find(result => result.success !== true);
     const manualResponseResults = {
+      success: completed === actions.length && completed > 0,
+      statusCode: completed > 0 ? 200 : (firstFailure?.statusCode || 422),
+      code: firstFailure?.code || null,
       incidentId,
       rulesApplied: 0,
       actionsExecuted: responseResults.filter(r => r.success).length,
       results: [{
         ruleId: 'manual',
         ruleName: 'Manual Response',
-        status: 'executed',
-        actionsExecuted: responseResults.length,
+        status: completed === actions.length ? 'executed' : (completed > 0 ? 'partial' : 'failed'),
+        actionsAttempted: responseResults.length,
+        actionsExecuted: completed,
         actions: responseResults
       }],
       executedAt: new Date().toISOString(),
@@ -884,10 +826,11 @@ export class SecurityIncidentResponseService extends BaseService {
   /**
    * Get comprehensive service status
    */
-  getServiceStatus() {
+  async getServiceStatus() {
     return {
-      incidents: this.incidentManager.getIncidentStats(),
+      incidents: await this.incidentManager.getIncidentStats(),
       responseEngine: this.responseEngine.getResponseStats(),
+      capabilities: this.responseEngine.getCapabilities(),
       constants: {
         severityLevels: INCIDENT_SEVERITY,
         statusTypes: INCIDENT_STATUS,

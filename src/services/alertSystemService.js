@@ -7,6 +7,8 @@ import { alertSystem_log } from '../utils/debug.js';
 import { BaseService } from './baseService.js';
 import { createKvConfigService } from '../utils/serviceFactory.js';
 import { ROLE_COMBINATIONS } from '../constants/roles.js';
+import { UnsupportedOptionError } from '../utils/serviceErrors.js';
+import { writeOperationalEvent } from '../utils/operationalLog.js';
 
 /**
  * Alert Channel Manager
@@ -67,7 +69,7 @@ class AlertChannelManager {
     this.addChannel('kv_storage', {
       name: 'KV Storage Alerts',
       type: 'kv_storage',
-      enabled: true,
+      enabled: false,
       config: { namespace: 'AUDIT_ALERTS' },
       handler: this.handleKVStorageAlert.bind(this)
     });
@@ -79,6 +81,7 @@ class AlertChannelManager {
   addChannel(channelId, channelConfig) {
     this.channels.set(channelId, {
       ...channelConfig,
+      handler: this.handlerForType(channelConfig.type),
       id: channelId,
       createdAt: new Date(),
       lastUsed: null
@@ -93,6 +96,20 @@ class AlertChannelManager {
     });
 
     alertSystem_log(`Alert channel added: ${channelId}`);
+  }
+
+  handlerForType(type) {
+    const handlers = {
+      console: this.handleConsoleAlert,
+      webhook: this.handleWebhookAlert,
+      email: this.handleEmailAlert,
+      kv_storage: this.handleKVStorageAlert
+    };
+    return (handlers[type] || this.handleUnavailableAlert).bind(this);
+  }
+
+  handleUnavailableAlert() {
+    throw new UnsupportedOptionError('This alert channel has no adapter', 'UNSUPPORTED_ALERT_CHANNEL');
   }
 
   /**
@@ -155,9 +172,8 @@ class AlertChannelManager {
    * Send alert through specified channels
    */
   async sendAlert(alert, channelIds = null) {
-    const targetChannels = channelIds
-      ? channelIds.map(id => this.channels.get(id)).filter(Boolean)
-      : Array.from(this.channels.values()).filter(c => c.enabled);
+    const targetIds = channelIds || Array.from(this.channels.values()).filter(channel => channel.enabled).map(channel => channel.id);
+    const targetChannels = targetIds.map(id => this.channels.get(id) || { id, unavailable: true });
 
     const results = [];
 
@@ -166,6 +182,15 @@ class AlertChannelManager {
       const stats = this.channelStats.get(channel.id);
 
       try {
+        if (channel.unavailable) {
+          throw new UnsupportedOptionError('Unknown alert channel', 'UNKNOWN_ALERT_CHANNEL');
+        }
+        if (!['console', 'webhook'].includes(channel.type)) {
+          throw new UnsupportedOptionError('This alert channel has no adapter', 'UNSUPPORTED_ALERT_CHANNEL');
+        }
+        if (!channel.enabled) {
+          throw new UnsupportedOptionError('This alert channel is disabled', 'ALERT_CHANNEL_DISABLED');
+        }
         await channel.handler(alert, channel.config);
 
         const responseTime = Date.now() - startTime;
@@ -183,14 +208,19 @@ class AlertChannelManager {
 
         alertSystem_log(`Alert sent successfully via ${channel.id}, response time: ${responseTime}ms`);
       } catch (error) {
-        stats.alertsSent++;
-        stats.errorCount++;
-        stats.lastError = error.message;
+        if (stats) {
+          stats.alertsSent++;
+          stats.errorCount++;
+          stats.lastError = error.message;
+        }
 
         results.push({
           channelId: channel.id,
           success: false,
-          error: error.message
+          status: error.statusCode === 422 ? 'unsupported' : 'failed',
+          code: error.code || 'ALERT_DELIVERY_FAILED',
+          statusCode: error.statusCode || 502,
+          error: error.statusCode === 422 ? error.message : 'Alert delivery failed'
         });
 
         alertSystem_log(`Alert failed via ${channel.id}: ${error.message}`);
@@ -204,19 +234,10 @@ class AlertChannelManager {
    * Console alert handler
    */
   handleConsoleAlert(alert, config) {
-    const logLevel = config.logLevel || 'info';
-    const message = `🚨 ALERT [${alert.severity.toUpperCase()}] ${alert.title}: ${alert.message}`;
-
-    switch (logLevel) {
-    case 'error':
-      alertSystem_log(`error: ${message}`);
-      break;
-    case 'warn':
-      alertSystem_log(`warn: ${message}`);
-      break;
-    default:
-      alertSystem_log(`log: ${message}`);
-    }
+    writeOperationalEvent({
+      event: 'audit_alert', alertId: alert.id, severity: alert.severity,
+      title: alert.title, message: alert.message, data: alert.data
+    }, config.logLevel || 'info');
   }
 
   /**
@@ -259,63 +280,16 @@ class AlertChannelManager {
   /**
    * Email alert handler (placeholder - would integrate with email service)
    */
-  handleEmailAlert(alert, config) {
-    // This is a placeholder implementation
-    // In production, integrate with email service like SendGrid, AWS SES, etc.
-
-    if (!config.toEmails || config.toEmails.length === 0) {
-      throw new Error('No email recipients configured');
-    }
-
-    const emailContent = {
-      to: config.toEmails,
-      from: config.fromEmail,
-      subject: `[AUDIT ALERT] ${alert.severity.toUpperCase()}: ${alert.title}`,
-      text: `
-Alert Details:
-- Title: ${alert.title}
-- Message: ${alert.message}
-- Severity: ${alert.severity}
-- Time: ${alert.timestamp}
-- Source: ${alert.source}
-
-Additional Data:
-${JSON.stringify(alert.data, null, 2)}
-
-This is an automated alert from the Hono Audit System.
-      `.trim()
-    };
-
-    // Simulate email sending (replace with actual email service)
-    alertSystem_log(`Email alert prepared: ${emailContent.subject}`);
-
-    // For now, just log the email content
-    // In production: await emailService.send(emailContent);
+  handleEmailAlert(_alert, _config) {
+    throw new UnsupportedOptionError(
+      'Email alert delivery has no adapter in this deployment', 'UNSUPPORTED_ALERT_CHANNEL'
+    );
   }
 
-  /**
-   * KV Storage alert handler (for Cloudflare Workers)
-   */
-  handleKVStorageAlert(alert, config) {
-    alertSystem_log(`Storing alert to KV: ${alert.id}: ${JSON.stringify(config)}`);
-    try {
-      // In Cloudflare Workers, you would use the KV namespace
-      // For now, we'll simulate storing the alert
-      const alertKey = `alert_${alert.id}_${Date.now()}`;
-      const alertData = {
-        ...alert,
-        storedAt: new Date().toISOString()
-      };
-      alertSystem_log(`Storing alert to KV: ${alertKey}: ${JSON.stringify(alertData)}`);
-
-      // Simulate KV storage (in production, use actual KV)
-      alertSystem_log(`Alert stored to KV: ${alertKey}`);
-
-      // In production:
-      // await env.AUDIT_ALERTS.put(alertKey, JSON.stringify(alertData));
-    } catch (error) {
-      throw new Error(`KV Storage error: ${error.message}`);
-    }
+  handleKVStorageAlert(_alert, _config) {
+    throw new UnsupportedOptionError(
+      'KV alert delivery has no adapter in this deployment', 'UNSUPPORTED_ALERT_CHANNEL'
+    );
   }
 
   /**
@@ -329,12 +303,14 @@ This is an automated alert from the Hono Audit System.
         name: channel.name,
         type: channel.type,
         enabled: channel.enabled,
+        supported: channel.type === 'console' || channel.type === 'webhook',
         stats,
         lastUsed: channel.lastUsed
       };
     });
 
     return {
+      capabilities: { supportedChannels: ['console', 'webhook'], unsupportedChannels: ['email', 'kv_storage', 'sms'] },
       totalChannels: this.channels.size,
       enabledChannels: channels.filter(c => c.enabled).length,
       channels
@@ -874,9 +850,18 @@ export class AlertSystemService extends BaseService {
     };
 
     const sendResults = await this.channelManager.sendAlert(alert, channelIds);
+    if (!sendResults.some(result => result.success === true)) {
+      const first = sendResults[0];
+      const error = new Error('No requested alert channel completed delivery');
+      error.code = first?.code || 'ALERT_DELIVERY_FAILED';
+      error.statusCode = first?.statusCode || 422;
+      throw error;
+    }
 
     const alertWithResults = {
       ...alert,
+      success: sendResults.every(result => result.success === true),
+      deliveryStatus: sendResults.every(result => result.success === true) ? 'completed' : 'partial',
       sendResults,
       processedAt: new Date().toISOString(),
       isManual: true
@@ -1161,7 +1146,7 @@ export class AlertSystemService extends BaseService {
     alertSystem_log('Alert system test completed');
 
     return {
-      success: true,
+      success: result.success,
       testAlert: result,
       systemStatus: this.getSystemStatus()
     };

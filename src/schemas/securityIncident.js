@@ -1,3 +1,4 @@
+import { RESPONSE_ACTIONS } from '../constants/incidentResponseActions.js';
 /**
  * Security Incident Response Validation Schemas
  * Unified basic and i18n-aware Zod schemas for incident management
@@ -53,7 +54,8 @@ export function createManualResponseSchema(lang = 'en') {
   const builder = createSchemaBuilder(lang);
 
   return builder.object({
-    action: builder.enum(['acknowledge', 'escalate', 'resolve', 'close'], 'action'),
+    action: builder.enum(Object.values(RESPONSE_ACTIONS), 'action'),
+    params: builder.object({}, 'params').passthrough().optional(),
     note: builder.description().optional(),
     actionTaken: builder.string('actionTaken', 0, 200).optional(),
     nextSteps: builder.string('nextSteps', 0, 500).optional()
