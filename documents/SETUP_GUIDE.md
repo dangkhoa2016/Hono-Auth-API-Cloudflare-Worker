@@ -1,274 +1,56 @@
-# Development Setup Guide
+# Local setup
 
-> 🌐 Language / Ngôn ngữ: **English** | [Tiếng Việt](SETUP_GUIDE.vi.md)
+English | [Tiếng Việt](SETUP_GUIDE.vi.md)
 
-## 🚀 Quick Start
+Use Node.js 24 (the CI major version), npm and the committed `package-lock.json`. The lockfile pins dependencies; `npm ci` reproduces it without updating it. With nvm installed, run from the repository root:
 
-### 1. Clone and install dependencies
 ```bash
-git clone <repository-url>
-cd hono-auth-api-cloudflare-worker
-npm install
-```
-
-### 2. Setup development environment
-│   ├── regularUserTest.js  # Regular User Role tests  
-│   ├── adminUserTest.js    # Admin functionality tests
-│   ├── superAdminUserTest.js    # Super Admin User Role tests
-```bash
-# Run automated setup script
-npm run setup:dev
-
-# Or manual setup:
+nvm install 24
+nvm use 24
+npm ci --ignore-scripts --no-audit --no-fund
+cp wrangler.toml.example wrangler.toml
 cp .dev.vars.development.example .dev.vars.development
-cp .dev.vars.test.example .dev.vars.test
-cp .dev.vars.staging.example .dev.vars.staging
-cp wrangler.toml.example wrangler.toml
 ```
 
-### 3. Configure .dev.vars files
-Edit the environment files with real values:
+Generate a local secret with `node -e "console.log(require('node:crypto').randomBytes(32).toString('hex'))"` and place it in `JWT_SECRET` in `.dev.vars.development`. Use a different secret for every environment. The copied placeholder is not a usable deployment secret. Keep `.dev.vars.*` and `wrangler.toml` out of version control.
 
-**Development (.dev.vars.development):**
+Set `DEBUG = ""` and `ENABLE_DETAILED_ERRORS = "false"` unless actively debugging. Keep email disabled for a first local run (`EMAIL_ENABLED = "false"`). Activation email requires separately configured provider credentials and an appropriate `APP_URL`; registration alone does not demonstrate email delivery. Review the complete [configuration example](../.dev.vars.complete.example) for supported settings, and the [capability guide](CAPABILITIES.md) for flags that do not provide a missing adapter.
+
+Use the maintained template compatibility date (`2025-06-01`) and flags. The application uses `WeakRef`; older compatibility settings such as `2024-01-01` can start a Worker that returns HTTP 500 for requests.
+
+## Local storage and server
+
+The [Wrangler template](../wrangler.toml.example) includes separate D1 development/test bindings with local placeholders; real Cloudflare database IDs are unnecessary for these local commands:
+
 ```bash
-JWT_SECRET = "your-development-jwt-secret-here"
-
-# Debug Configuration - adjust logging level
-DEBUG = "hono-auth-api:*"
-
-ENV = "development"
-```
-
-**Test (.dev.vars.test):**
-```bash
-JWT_SECRET = "your-test-jwt-secret-here"
-DEBUG = "hono-auth-api:*"
-RATE_LIMIT_DISABLED = "true"
-AUTO_ACTIVATE_USER_ON_REGISTER = "true"
-ENV = "test"
-```
-
-**Staging (.dev.vars.staging):**
-```bash
-JWT_SECRET = "your-staging-jwt-secret-here"
-DEBUG = "hono-auth-api:error:*,hono-auth-api:security:*"
-ENV = "staging"
-RATE_LIMIT_DISABLED = "true"
-```
-
-### 4. Setup database (Development/Test use local database)
-```bash
-# Development & Test environments use local database
-# No need to create separate database, just run migrations
-
-# Run migrations for development
 npm run db:migrate
-
-# Run migrations for test environment (if needed for testing)
-npm run db:migrate:test
-```
-
-**Note**: Development and Test environments use local D1 database, no real database IDs needed.
-
-### 5. Initialize KV configuration (Optional)
-```bash
-# Initialize KV configuration with default values
-npm run test:kv:setup
-
-# Test KV Admin functionality
-npm run test:kv_admin
-
-# Complete KV Admin testing
-npm run test:kv:scripts
-```
-
-**Note**: KV configuration is optional and only needed if you want to use dynamic configuration management. The application works without KV setup using environment variables as fallback.
-
-### 6. Run development server
-```bash
-# Development environment (port 8787)
 npm run dev
+```
 
-# Test environment (port 8788) 
+Wrangler stores local state under `.wrangler/`. Development listens on port 8787. Check the API info response with `curl http://localhost:8787/`. Migrations create the schema; they are separate from fixture resets.
+
+For a separate local live-test database:
+
+```bash
+cp .dev.vars.test.example .dev.vars.test
+npm run db:migrate:test
 npm run dev:test
-
-# Staging environment (port 8789) - requires real database
-npm run dev:staging
 ```
 
-### 6. Test the system
+Set a distinct test `JWT_SECRET` before starting; test listens on port 8788. The `RATE_LIMIT_DISABLED` setting in the test example is for isolated tests. Do not copy it into staging or production unchanged.
+
+`setup:dev` runs migrations and executes `tests/init/reset.sql`; `setup:test` also prepares test state. Inspect these scripts before using them on existing local data. Neither is needed for the minimal manual setup above.
+
+## Optional KV configuration
+
+The template does not bind `CONFIG_KV`. Ordinary config reads can use environment/default values without KV; KV administration needs a configured binding. If using KV, add a separate `CONFIG_KV` namespace to each named environment in your ignored `wrangler.toml`. Bindings are environment-specific. Never point local tests at production resources.
+
+`npm run test:kv:setup` targets the **test** environment and writes fixture config. It is not a development bootstrap step. A configured but unreachable KV binding is an availability failure, not a reason to silently accept stale/default security settings. Keep JWT and provider secrets in environment secret storage; do not put them in editable KV configuration.
+
+## Verification and remote environments
+
 ```bash
-# Interactive test menu (recommended)
-npm run test
-
-# Unified test suite (comprehensive testing)
-npm run test:unified
-
-# Quick smoke tests
-npm run test:unified:quick
-
-# Specific test contexts  
-npm run test:auth         # Authentication tests
-npm run test:system       # System tests
-npm run test:regular_user         # Regular User Role tests
-npm run test:admin_user        # Admin User Role tests
-npm run test:super_admin_user       # Super Admin User Role tests
-npm run test:kv_admin     # KV Admin configuration testing (super_admin only)
-npm run test:security     # Security tests
-npm run test:i18n  # i18n tests
-npm run test:validation   # Validation tests
-npm run test:zod_validation # Zod validation tests
-npm run test:performance  # Performance tests
-npm run test:integration  # Integration tests
-npm run test:role         # Role-based access control tests
-npm run test:xss          # XSS security tests
+npm run lint:check && npm run test:node
 ```
 
-## 🔒 Production Deployment
-
-### Staging Environment Setup (Optional)
-```bash
-# Setup staging environment
-npm run setup:staging
-
-# Create staging database (first time)
-npm run db:create:staging
-
-# Run staging migrations
-npm run db:migrate:staging
-
-# Deploy to staging
-npm run deploy:staging
-```
-
-### 1. Create production database
-```bash
-# Create production database (first time)
-npm run db:create:prod
-
-# Or manual command
-wrangler d1 create hono-auth-api-db
-```
-
-### 2. Set production secrets
-```bash
-# Set JWT secret for production
-npm run secret:put:prod
-
-# Or manual command
-wrangler secret put JWT_SECRET
-
-# Set staging secrets (if needed)
-npm run secret:put:staging
-```
-
-### 3. Setup wrangler.toml
-⚠️ **Security Note**: File `wrangler.toml` has been added to `.gitignore` to protect database IDs.
-
-Create `wrangler.toml` file from template:
-```bash
-cp wrangler.toml.example wrangler.toml
-```
-
-Update production database ID in `wrangler.toml`:
-```toml
-[[d1_databases]]
-binding = "DB"
-database_name = "hono-auth-api-db"
-database_id = "your-production-database-id"  # Replace with actual database ID
-migrations_dir = "migrations"
-```
-
-**Important**: Do not commit `wrangler.toml` file to git as it contains sensitive database IDs.
-
-### 4. Deploy
-```bash
-# Deploy to production
-npm run deploy
-
-# Deploy to staging (if needed)
-npm run deploy:staging
-
-# Run production migrations
-npm run db:migrate:prod
-```
-
-## 📁 File Structure
-
-```
-├── .dev.vars.development     # Development environment variables (NOT in git)
-├── .dev.vars.test           # Test environment variables (NOT in git)  
-├── .dev.vars.staging        # Staging environment variables (NOT in git)
-├── .dev.vars                # Default/production variables (NOT in git)
-├── .dev.vars.*.example      # Template files (in git)
-├── wrangler.toml.example    # Wrangler config template (in git)
-├── wrangler.toml            # Actual config with secrets (NOT in git)
-├── scripts/                 # Setup & development scripts
-│   ├── setup-dev.sh         # Development setup script
-│   ├── setup-test.sh        # Test environment setup
-│   ├── setup-staging.sh     # Staging setup
-├── tests/                   # Comprehensive testing framework
-│   ├── mainMenu.js          # Interactive test menu
-│   ├── unifiedTestSuite.js  # All-in-one comprehensive testing
-│   ├── systemTest.js        # System functionality tests
-│   ├── authTest.js          # Authentication tests
-│   ├── adminUserTest.js         # Admin functionality tests
-│   ├── regularUserTest.js   # Regular User Role tests
-│   ├── superAdminUserTest.js    # Super Admin User Role tests
-│   ├── kvAdminTest.js       # KV Admin configuration tests (super_admin only)
-│   ├── securityTest.js      # Security tests
-│   ├── comprehensiveI18nTest.js # Comprehensive i18n tests
-│   ├── validationTest.js    # Validation tests
-│   ├── zodValidationTest.js # Zod validation tests
-│   ├── performanceTest.js   # Performance tests
-│   ├── integrationTest.js   # Integration tests
-│   ├── roleTest.js          # Role-based access control tests
-│   ├── xssSecurityTest.js   # XSS security tests
-│   ├── scripts/             # Test automation scripts
-│   └── utils/               # Test utilities & helpers
-└── src/                     # Application code
-    ├── routes/              # API routes
-    ├── middleware/          # Middleware functions
-    ├── services/            # Business logic
-    ├── schemas/             # Zod validation schemas
-    ├── i18n/                # Dynamic i18n system
-    └── utils/               # Utility functions
-```
-
-## 🔐 Security Best Practices
-
-1. **Never commit sensitive data**:
-   - Database IDs
-   - JWT secrets
-   - API keys
-
-2. **Use different databases per environment**:
-   - Development: Local D1 database
-   - Test: Local D1 database  
-   - Staging: Remote D1 database (`984fa566-xxxx-49be-xxxx-a6561426124a`)
-   - Production: Remote D1 database (via secrets)
-
-3. **Environment separation**:
-   - `.dev.vars.*` for local environments
-   - Cloudflare secrets for production
-
-4. **Strong secrets**:
-   - Use random, long JWT secrets
-   - Rotate secrets regularly
-
-## 🚀 Multi-Environment Architecture
-
-| Environment | Purpose | Port | Database | Config File |
-|-------------|---------|------|----------|-------------|
-| **Development** | Local development | 8787 | Local D1 | .dev.vars.development |
-| **Test** | Automated testing | 8788 | Local D1 Test | .dev.vars.test |
-| **Staging** | Pre-production | 8789 | Remote D1 | .dev.vars.staging |
-| **Production** | Live application | - | Remote D1 | Secrets |
-
-## 📚 Related Documentation
-
-- [WRANGLER_CONFIG_GUIDE.md](./WRANGLER_CONFIG_GUIDE.md) - Wrangler configuration details
-- [DEBUG_DEVELOPMENT_GUIDE.md](./DEBUG_DEVELOPMENT_GUIDE.md) - Debug and development workflow
-- [ZOD_GUIDE.md](./ZOD_GUIDE.md) - Zod validation usage
-- [I18N_MASTER_GUIDE.md](./I18N_MASTER_GUIDE.md) - Internationalization system
-- [ROLE_COMPLETE_GUIDE.md](./ROLE_COMPLETE_GUIDE.md) - Role management
+The Node integration suites provision their own disposable local fixtures. No remote deployment credentials are needed for canonical checks. See [testing](TEST_GUIDE.md), [Wrangler configuration](WRANGLER_CONFIG_GUIDE.md) and [upgrade/release](UPGRADE_RELEASE.md) for staging and production. `dev:staging` uses remote resources and is separate from local development.
