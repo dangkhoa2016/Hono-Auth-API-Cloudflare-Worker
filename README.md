@@ -1,543 +1,310 @@
-# Hono Auth Worker
+# Hono Auth API Cloudflare Worker
 
-> 🌐 Language / Ngôn ngữ: **English** | [Tiếng Việt](README.vi.md)
+[![Backend quality (main)](https://github.com/dangkhoa2016/Hono-Auth-API-Cloudflare-Worker/actions/workflows/backend-quality.yml/badge.svg?branch=main)](https://github.com/dangkhoa2016/Hono-Auth-API-Cloudflare-Worker/actions/workflows/backend-quality.yml?query=branch%3Amain)
+[![MIT license](https://img.shields.io/badge/License-MIT-2563EB)](LICENSE)
+[![Hono 4](https://img.shields.io/badge/Hono-4-E36002?logo=hono&logoColor=white)](src/index.js)
+[![Node.js 24](https://img.shields.io/badge/Node.js-24-339933?logo=nodedotjs&logoColor=white)](.nvmrc)
 
-A comprehensive Cloudflare Workers project using the Hono.js framework (JavaScript) with D1 database to build a JWT authentication system with admin/role management, dynamic i18n system, comprehensive testing framework, and production-ready architecture.
+[![Cloudflare Workers](https://img.shields.io/badge/Deploy-Cloudflare_Workers-F38020?logo=cloudflareworkers&logoColor=white)](documents/WRANGLER_CONFIG_GUIDE.md)
+[![Cloudflare D1](https://img.shields.io/badge/Database-Cloudflare_D1-F38020?logo=cloudflare&logoColor=white)](migrations/)
+[![JWT authentication](https://img.shields.io/badge/Auth-JWT-000000?logo=jsonwebtokens&logoColor=white)](documents/CAPABILITIES.md)
 
-## ✨ Key Features
+🌐 Language / Ngôn ngữ: English | [Tiếng Việt](README.vi.md)
 
-- 🚀 **Hono.js Framework** (JavaScript) - Fast and lightweight
-- 🗄️ **Cloudflare D1 Database** - SQLite compatible with global distribution
-- 🔐 **JWT Authentication** with access & refresh tokens
-- 👑 **Admin & Role Management** - Complete role-based access control system
-- 🛡️ **Rate Limiting** for login attempts with IP-based tracking
-- 🔒 **bcrypt Password Hashing** with salt rounds
-- 🛡️ **Token Security Hardening** with access-token blacklist, refresh token rotation/audit, and logout-all enforcement
-- 📧 **Email Service Integration** - User activation via email with Brevo provider support
-- 🔐 **Account Activation System** - Secure 64-char token with 2-day expiry for email confirmation
-- 🌐 **RESTful API Endpoints** with consistent response format
-- 🌍 **Dynamic i18n System** - Fully automatic language detection and unlimited language support
-- 🎯 **Zod Validation** with comprehensive schema validation and i18n-aware error messages
-- 🌐 **Multilingual Validation System** - i18n-aware Zod validation with localized error messages
-- 🐛 **Debug Logging** with granular debug control
-- 🧪 **Comprehensive Testing Framework** with modular test suite and advanced testing tools
-- 🌍 **Multi-environment Support** (Dev, Test, Staging, Production)
-- 📦 **Modular Architecture** with clear separation of concerns
-- 🔧 **ESLint Integration** with comprehensive code quality rules
-- ⚙️ **KV Configuration Management** - Dynamic runtime configuration with super admin controls
-- 🚀 **Production Ready** deployment with Cloudflare Workers
-- 📊 **Enterprise Audit System** - Complete audit logging with 4 main route groups (50+ endpoints)
-  - 📋 **Core Audit Routes** (`/api/audit/*`) - Basic audit log access, search, and export
-  - 🚀 **Advanced Audit Routes** (`/api/advanced-audit/*`) - Analytics, archival, and compliance
-  - 🔴 **Real-time Monitoring Routes** (`/api/realtime-monitoring/*`) - Live monitoring and threat detection
-  - 🛡️ **Security Incident Routes** (`/api/security-incident/*`) - Incident management and response
-- 🌍 **i18n Validation System** - Multilingual validation with localized error messages for all API endpoints
-- 🔧 **Dynamic Configuration System** - Runtime configuration management with KV storage and admin controls
+Authentication, account administration and audit APIs built with **Hono**, **Cloudflare Workers** and **Cloudflare D1**. The project combines JWT access/refresh sessions, role-based access, localized validation and operational APIs in a JavaScript backend.
 
-## 📚 Documentation Organization
+Use it with your own HTTP client or the companion [Vue 3 browser application](https://github.com/dangkhoa2016/Vue-3-Browser-Hono-Auth-API-Cloudflare-Worker). The frontend is a separate repository; this Worker owns authentication, permissions, persistent data and server secrets.
 
-All guides live in [documents](./documents) with English and Vietnamese pairs (40 files total: 20 EN, 20 VI).
+[Overview](#overview) · [Features](#features) · [Architecture](#architecture) · [Quick start](#quick-start) · [API and authentication](#api-and-authentication) · [Configuration](#configuration) · [Vue frontend](#vue-frontend) · [Verification](#verification) · [Deployment](#deployment) · [Troubleshooting](#troubleshooting) · [Documentation](#documentation) · [Contributing](#contributing-and-support) · [License](#license-and-attribution)
 
-- **Core guides**: [SETUP_GUIDE.md](documents/SETUP_GUIDE.md), [ROLE_COMPLETE_GUIDE.md](documents/ROLE_COMPLETE_GUIDE.md), [DEBUG_DEVELOPMENT_GUIDE.md](documents/DEBUG_DEVELOPMENT_GUIDE.md), [I18N_MASTER_GUIDE.md](documents/I18N_MASTER_GUIDE.md), [ZOD_GUIDE.md](documents/ZOD_GUIDE.md), [SCHEMAS_GUIDE.md](documents/SCHEMAS_GUIDE.md), [ESLINT_GUIDE.md](documents/ESLINT_GUIDE.md), [WRANGLER_CONFIG_GUIDE.md](documents/WRANGLER_CONFIG_GUIDE.md), [DATABASE_SERVICE.md](documents/DATABASE_SERVICE.md), [DYNAMIC_CONFIG_GUIDE.md](documents/DYNAMIC_CONFIG_GUIDE.md), [MANUAL_SEND_EMAIL_GUIDE.md](documents/MANUAL_SEND_EMAIL_GUIDE.md), [DATABASE_INSPECTION_GUIDE.md](documents/DATABASE_INSPECTION_GUIDE.md)
-- **Feature guides**: [TOKEN_BLACKLIST_GUIDE.md](documents/TOKEN_BLACKLIST_GUIDE.md), [EMAIL_CHANGE_VERIFICATION_GUIDE.md](documents/EMAIL_CHANGE_VERIFICATION_GUIDE.md)
-- **Testing**: [TEST_GUIDE.md](documents/TEST_GUIDE.md) and [TEST_SCRIPTS.md](documents/TEST_SCRIPTS.md)
-- **Enterprise audit**: [ENTERPRISE_AUDIT_SYSTEM_COMPLETE_GUIDE.md](documents/ENTERPRISE_AUDIT_SYSTEM_COMPLETE_GUIDE.md), [AUDIT_API_REFERENCE.md](documents/AUDIT_API_REFERENCE.md), [AUDIT_KV_CONFIGURATION_GUIDE.md](documents/AUDIT_KV_CONFIGURATION_GUIDE.md)
-- **Token security**: [TOKEN_SECURITY_COMPREHENSIVE_GUIDE.md](documents/TOKEN_SECURITY_COMPREHENSIVE_GUIDE.md)
-- **Multi-language**: every guide above has a `_vi` twin.
+## Overview
 
-### 🎯 Quick Start
-1. **Setup**: [documents/SETUP_GUIDE.md](documents/SETUP_GUIDE.md) for multi-environment initialization
-2. **Develop**: [documents/DEBUG_DEVELOPMENT_GUIDE.md](documents/DEBUG_DEVELOPMENT_GUIDE.md) for wrangler/dev workflows and debug flags
-3. **Test**: [documents/TEST_GUIDE.md](documents/TEST_GUIDE.md) for the unified menu and audit/i18n suites
-4. **Deploy**: [documents/WRANGLER_CONFIG_GUIDE.md](documents/WRANGLER_CONFIG_GUIDE.md) for staging/production rollouts
+| Area | What the backend provides |
+| --- | --- |
+| Accounts | Registration, activation, profile management, password changes and verified email changes. |
+| Sessions | JWT access/refresh pairs, refresh rotation, token auditing, logout and account-wide session revocation. |
+| Authorization | `user`, `admin` and `super_admin` roles, with route-specific restrictions and data scopes. |
+| Validation and language | Zod request schemas and i18next responses, including language selection through `Accept-Language`. |
+| Audit | D1 event storage, scoped queries, analytics, archival/restore, retention and bounded CSV/JSON exports. |
+| Configuration | Environment settings, optional KV configuration, CORS, rate limits and configurable transactional email. |
+| Operations | On-demand monitoring, incident records, recorded response outcomes and console/configured-webhook alerts. |
 
-## Project Structure
+The [capability contract](documents/CAPABILITIES.md) identifies the exact supported behavior. Monitoring is query-on-demand; continuous monitoring and automatic containment are unavailable. Several incident actions and alert adapters explicitly return unsupported results. CSV/JSON exports are bounded to 10,000 rows/groups; Excel/PDF and advanced rendering options are unsupported. Application features and passing checks do not establish production readiness or compliance certification.
 
-- **src/**: application code
-  - `index.js` bootstraps the Hono app
-  - **constants/**: app constants, route constants (`authRoutes.js`, `adminRoutes.js`, `userRoutes.js`, `kvAdminRoutes.js`, `auditRoutes.js`, `realtimeMonitoringRoutes.js`, `securityIncidentRoutes.js`, `translationRoutes.js`, `systemRoutes.js`), role definitions, security settings, route registry and category mappings, KV keys
-  - **i18n/**: dynamic i18next config (`config.js`, `loader.js`, `service.js`, `index.js`) and locales (`en`, `vi`, `fr`, `es`, `de`, `ja`, `th`)
-  - **middleware/**: `auth.js`, `authorization.js`, `cors.js`, `debug.js`, `env.js`, `error.js`, `i18n.js`, `i18nValidator.js`, `kvConfig.js`, `rateLimit.js`, `routeDetector.js`, `security.js`, `securityConfigGuard.js`, `unifiedRequestMiddleware.js`
-  - **routes/**: `api.js` plus feature routers (`auth.js`, `user.js`, `admin.js`, `kvAdmin.js`, `audit.js`, `advancedAudit.js`, `realtimeMonitoring.js`, `securityIncident.js`, `translations.js`, `zodDemo.js`, `routeGroups.js`, `favicon.js`)
-  - **schemas/**: base/registry/definitions/validatorGenerator plus module schemas for auth, user, kv, audit, advancedAudit, auditRetention, realtimeMonitoring, securityIncident, i18n, zod demos
-  - **services/**: `baseService.js`, `authService.js`, `userService.js`, `databaseService.js`, `kvConfigService.js`, `rateLimitService.js`, audit services (log, analytics, archival, dashboard, export, monitoring, retention), `alertSystemService.js`, `securityIncidentResponseService.js`, token services (`tokenService.js`, `tokenBlacklistService.js`, `tokenAuditService.js`), email services (`emailService.js`, `emailSendTester.js` with multilingual email templates and Brevo integration)
-  - **utils/**: dynamic config helpers, debug utilities, audit helpers, jwt helpers, route scanner, service config/context/factory utilities, i18n demo helpers
-  - **assets/**: favicon and app icons
-- **tests/**: interactive menu (`mainMenu.js`), unified suite, RBAC suites, audit suites, i18n/validation/security/performance suites, token security tests, **account activation test suite (`activationTest.js`)**, email content/provider header tests (`emailContentTest.js`, `emailProviderHeaderTest.js`), login message format, route detection, plus `init/` data, `scripts/`, `utils/`, `config/`
-- **tools/**: operational scripts (`generate-password-hashes.js`, `clear-cache.js`, `reset-rate-limits.js`, `test-curl.sh`, `schema-registry-demo.js`) and subfolders for D1 management (`tools/d1`), KV config (`tools/kv`), i18n tooling, debug log harness, database usage examples, role metadata, and email utilities
-- **migrations/**: `0001_initial.sql` through `0010_add_email_verification.sql`, including audit/archive, security incident, token security, activation, and email verification tables
-- **scripts/**: environment setup scripts (dev/test/staging) and debug helpers
-- **documents/**: 40 Markdown guides (EN/VI) referenced above
-- **config templates**: `.dev.vars.*.example`, `wrangler.toml.example`; local `.dev.vars.*` and `wrangler.toml` stay untracked
+## Features
 
-## 🧪 Testing Framework
+- **Complete account workflows.** Register and activate accounts, manage profiles, change passwords and verify email changes. Passwords are hashed with bcrypt; activation and email delivery follow the configured account policies.
+- **Revocable JWT sessions.** Access/refresh token pairs, refresh rotation, single-session logout and account-wide revocation support multi-device account control. Authoritative database checks enforce the configured session-version policy before cached identity data is used. See the [session and upgrade contract](documents/UPGRADE_RELEASE.md).
+- **Role-based account administration.** Manage users, roles and account status with server-side policies for `user`, `admin` and `super_admin`. Account deletion removes session dependencies in one transaction while preserving historical audit metadata.
+- **Atomic administrator password resets.** Admin resets User accounts; Super Admin resets User/Admin accounts. A reset commits the new password hash, session-version increment, refresh-token revocation and audit event together. Self, peer and higher-role resets are refused. See the [password-reset guide](documents/ADMIN_PASSWORD_RESET.md).
+- **Scoped audit history.** Store events in D1, search and filter within role-based data scopes, inspect analytics and manage archive/restore and retention operations. Audit logging applies credential redaction. See the [audit API reference](documents/AUDIT_API_REFERENCE.md).
+- **Bounded CSV/JSON exports.** Export audit data with a 10,000-row/group ceiling, allowlisted aggregation and a CSV formula guard. Unsupported formats and rendering options return explicit errors rather than a misleading success response.
+- **Localized request validation.** Centralized Zod schemas validate API inputs, while i18next provides responses in English, Vietnamese, French, Spanish, German, Japanese and Thai, including language selection through `Accept-Language`.
+- **Cloudflare configuration and storage.** D1 migrations define persistent storage; optional Workers KV supplies administrative configuration. Configure CORS, rate limits, token settings and transactional email for each environment. See the [Wrangler configuration guide](documents/WRANGLER_CONFIG_GUIDE.md).
+- **Operational visibility with explicit outcomes.** Public health/version endpoints, administrative dashboards, on-demand monitoring and incident lifecycle records support diagnosis. Configured webhook alerts report delivery results; the [capability contract](documents/CAPABILITIES.md) distinguishes implemented operations from unavailable adapters.
+- **Reproducible local verification.** A locked npm dependency tree, ESLint checks, documentation validation and Node tests run through `npm run verify`. D1/workerd integration tests exercise migrations, access policies, concurrent sessions and transaction rollback. See the [verification guide](documents/TEST_GUIDE.md).
 
-The README keeps only the verified entry points below. The complete command matrix, test categories, role-by-role coverage, audit suites, troubleshooting, and automation scripts are maintained in [documents/TEST_GUIDE.md](./documents/TEST_GUIDE.md) and [documents/TEST_SCRIPTS.md](./documents/TEST_SCRIPTS.md).
+## Architecture
 
-### 🎯 Quick Start
+```mermaid
+flowchart LR
+    Client["Browser or HTTP client"] --> Worker["Cloudflare Worker / Hono"]
+    Worker --> Middleware["Language, configuration, security and CORS"]
+    Middleware --> Routes["Routes, validation and access policies"]
+    Routes --> Services["Account, session, configuration and audit services"]
+    Services --> D1[(D1 database)]
+    Services -. "optional configuration" .-> KV[(KV namespace)]
+    Services --> Email["Transactional email provider"]
+    Services --> Webhook["Configured alert webhook"]
+```
+
+Routes decide whether authentication and administrative permissions are required. Services implement the data and integration contracts; a frontend view or hidden navigation item is not an authorization boundary.
+
+| Component | Technology / source |
+| --- | --- |
+| Application runtime | Cloudflare Workers; [Hono 4 application](src/index.js) and [route groups](src/routes/routeGroups.js). |
+| Persistence | D1 binding `DB`, [append-only migrations](migrations/) and [service layer](src/services/). |
+| Authentication | `jsonwebtoken`, `bcryptjs` and [authentication middleware](src/middleware/auth.js). |
+| Validation / localization | Zod [schemas](src/schemas/) and [i18next resources](src/i18n/). |
+| Local tooling / CI | Node.js 24, npm lockfile, Wrangler, ESLint and the Node test runner. |
+
+Node 24 is the tooling version; deployed requests execute in the Workers runtime. Dependency versions are recorded in [package.json](package.json) and pinned by [package-lock.json](package-lock.json).
+
+## Quick start
+
+### 1. Prepare the workspace
+
+Install Git, Node.js **24** and npm. With nvm available:
 
 ```bash
-# Recommended: interactive test menu
-npm run test
-
-# Fast smoke check
-npm run test:quick
-
-# Full automated suite
-bash tests/scripts/run-all-tests.sh
-
-# Enterprise audit suite
-npm run test:audit:system
-
-# RBAC regression checks
-bash tests/scripts/test_all_roles.sh
-
-# i18n and multilingual validation
-npm run test:i18n
-npm run test:multilang_validation
-
-# Core validation and integration
-npm run test:validation
-npm run test:integration
+git clone https://github.com/dangkhoa2016/Hono-Auth-API-Cloudflare-Worker.git
+cd Hono-Auth-API-Cloudflare-Worker
+nvm install 24
+nvm use 24
+npm ci --ignore-scripts --no-audit --no-fund
+cp wrangler.toml.example wrangler.toml
+cp .dev.vars.development.example .dev.vars.development
 ```
 
-### 🔧 Canonical References
+Local development uses local D1 storage and the development placeholders in the template; a remote database ID is unnecessary for this path. Keep `wrangler.toml` and `.dev.vars.*` out of version control.
 
-- Use [documents/TEST_GUIDE.md](./documents/TEST_GUIDE.md) as the source of truth for all test commands and coverage details.
-- Use [documents/TEST_SCRIPTS.md](./documents/TEST_SCRIPTS.md) for shell runners, curl workflows, and troubleshooting.
-- Use [documents/SCHEMAS_GUIDE.md](./documents/SCHEMAS_GUIDE.md) for schema registry and validator tooling.
+### 2. Configure the local environment
 
-## Database Schema
-
-This section summarizes the core user/auth tables. For the full schema, including audit, token security, activation, and email verification tables, see [documents/DATABASE_SERVICE.md](./documents/DATABASE_SERVICE.md) and [documents/EMAIL_CHANGE_VERIFICATION_GUIDE.md](./documents/EMAIL_CHANGE_VERIFICATION_GUIDE.md).
-
-### `users` Table
-- `id` - Primary key (INTEGER)
-- `full_name` - Full name (TEXT)
-- `email` - Email (TEXT, unique)
-- `password` - Hashed password (TEXT)
-- `role` - User role: `user`, `admin`, `super_admin` (TEXT, default: 'user')
-- `status` - Status: `active`, `inactive`, `suspended` (TEXT, default: 'active')
-- `created_at` - Creation time (DATETIME)
-- `updated_at` - Update time (DATETIME)
-- `new_email` - Pending email change awaiting verification (TEXT, nullable)
-- `email_verification_token` - Verification token for email change confirmation (TEXT, nullable)
-- `email_verification_expires_at` - Expiry timestamp for email change verification (TEXT, nullable)
-
-### `failed_login_limits` Table
-- `id` - Primary key (INTEGER)
-- `ip_address` - IP address (TEXT)
-- `attempts_count` - Failed attempt count (INTEGER)
-- `last_attempt_at` - Last attempt time (DATETIME)
-
-## 👑 Admin & Role Management System
-
-The project includes a complete admin and role management system with features:
-
-### 🎭 **Role System:**
-- **`user`** - Regular users with basic permissions
-- **`admin`** - Admin users with user management capabilities  
-- **`super_admin`** - Full system access with unlimited permissions
-
-### 🔐 **Permission System:**
-- Role-based access control with hierarchy enforcement
-- Permission-based endpoint access
-- Self-protection mechanisms (cannot modify own role/delete own account)
-
-### 📊 **Admin API Endpoints:**
-```
-GET /api/admin/users              → User list (role-filtered)
-GET /api/admin/users/:id          → User details
-POST /api/admin/users             → Create user (role restrictions apply)
-PUT /api/admin/users/:id          → Update user (excluding role changes)
-DELETE /api/admin/users/:id       → Delete user (role restrictions apply)
-PUT /api/admin/users/:id/role     → Change user role (hierarchy enforcement)
-GET /api/admin/stats              → System statistics
-GET /api/admin/dashboard          → Admin dashboard (role-filtered data)
-GET /api/admin/system-health      → System health check with performance metrics
-```
-
-### 🛡️ **Security Features:**
-- Role hierarchy enforcement (admin cannot manage super_admin users)
-- Dedicated role change endpoint separate from regular updates
-- Role-based data filtering (admin sees limited data, super_admin sees all)
-- Self-protection (users cannot change own role or delete own account)
-- Input validation and SQL injection prevention
-
-### 📖 **Complete Documentation:**
-See the complete system details in [documents/ROLE_COMPLETE_GUIDE.md](./documents/ROLE_COMPLETE_GUIDE.md)
-
-### 🔍 **System Route Discovery (admin only):**
-- `GET /route-metadata` → Returns the full route registry with method, path, permissions, category, and i18n description
-- Access: `admin` and `super_admin`
-- Source of truth: registry-driven (no runtime scanning), useful for tooling, QA, and permission reviews
-
-## ⚙️ KV Configuration Management System
-
-The project includes a powerful **KV Configuration Management System** for dynamic runtime configuration control:
-
-### 🔑 **Key Features:**
-- **Dynamic Configuration** - Change application settings without deployment
-- **Super Admin Only** - Restricted to `super_admin` role for security
-- **Environment Comparison** - Compare KV vs ENV variables
-- **Batch Operations** - Update multiple configurations at once
-- **Cache Management** - Clear configuration cache when needed
-- **Default Fallback** - Automatic fallback to default values
-- **Validation** - Comprehensive input validation with Zod schemas
-
-### 🎯 **KV Admin API Endpoints:**
-```
-GET /api/kv-admin/configs              → Get all configurations
-GET /api/kv-admin/configs/defaults     → Get default configurations  
-GET /api/kv-admin/configs/env-comparison → Compare ENV vs KV values
-GET /api/kv-admin/configs/:key         → Get specific configuration
-PUT /api/kv-admin/configs/:key         → Update configuration
-POST /api/kv-admin/configs/batch       → Batch update configurations
-DELETE /api/kv-admin/configs/:key      → Reset configuration to default
-POST /api/kv-admin/configs/cache/clear → Clear configuration cache
-```
-
-### 🔧 **Supported Configuration Keys:**
-- **App Settings**: `APP_NAME`, `APP_VERSION`
-- **Debug Control**: `DEBUG`, `ENABLE_DETAILED_ERRORS`, `LOG_SQL_QUERIES`
-- **Rate Limiting**: `RATE_LIMIT_MAX_ATTEMPTS`, `RATE_LIMIT_LOCKOUT_DURATION`, `RATE_LIMIT_DISABLED`
-- **Pagination**: `DEFAULT_PAGE_SIZE`, `MAX_PAGE_SIZE`
-- **Security**: `SECURITY_HIGH_RISK_THRESHOLD`
-- **Performance**: `PERFORMANCE_GOOD_THRESHOLD`
-- **User Management**: `AUTO_ACTIVATE_USER_ON_REGISTER`
-- **CORS**: `CORS_ORIGIN`
-
-### 🛡️ **Security Features:**
-- **Role Restriction** - Only `super_admin` users can access
-- **Key Validation** - Only predefined keys can be modified
-- **Input Validation** - Zod schema validation for all inputs
-- **Audit Logging** - All configuration changes are logged
-- **Safe Defaults** - Always falls back to secure default values
-
-### 📊 **Example Usage:**
-```bash
-# Get all configurations
-curl -H "Authorization: Bearer <super_admin_token>" \
-     http://localhost:8787/api/kv-admin/configs
-
-# Update rate limit settings
-curl -X PUT -H "Authorization: Bearer <super_admin_token>" \
-     -H "Content-Type: application/json" \
-     -d '{"value": 10}' \
-     http://localhost:8787/api/kv-admin/configs/RATE_LIMIT_MAX_ATTEMPTS
-
-# Batch update multiple configs
-curl -X POST -H "Authorization: Bearer <super_admin_token>" \
-     -H "Content-Type: application/json" \
-     -d '{"configs": {"RATE_LIMIT_MAX_ATTEMPTS": 10, "DEFAULT_PAGE_SIZE": 20}}' \
-     http://localhost:8787/api/kv-admin/configs/batch
-```
-
-## 🔧 Dynamic Configuration Management
-
-The project features an **advanced dynamic configuration system** using `dynamicConfig.js` that eliminates the need to pass configuration parameters through service layers:
-
-### ✨ **Key Improvements:**
-- **🎯 Centralized Config**: All configuration accessed through `src/utils/dynamicConfig.js`
-- **🚀 Simplified APIs**: No need to pass `jwtSecret`, `isRateLimitDisabled` as parameters
-- **⚙️ Auto-Detection**: Services automatically get configuration from environment
-- **🔄 Fallback System**: KV → Environment Variables → Default Values
-- **🛡️ Type Safety**: Built-in validation and type conversion
-
-### 🔑 **Configuration Functions:**
-```javascript
-// JWT settings with automatic fallback
-const jwtSettings = await getJwtSettings(env);
-// Returns: { secret, accessTokenExpires, refreshTokenExpires }
-
-// Feature flags for development control  
-const featureFlags = await getFeatureFlags(env);
-// Returns: { disableRateLimiting, enableDetailedErrors, autoActivateUserOnRegister, ... }
-
-// App configuration
-const appConfig = await getAppSettings(env);
-// Returns: { name, version, environment }
-```
-
-### 🚀 **Before vs After**
-
-**Before (Manual Parameter Passing):**
-```javascript
-// Old way - parameters everywhere
-const authService = createAuthService(c.env);
-const jwtSecret = await getJwtSecret(c.env);
-const featureFlags = await getFeatureFlags(c.env);
-const result = await authService.login(email, password, ipAddress, jwtSecret, featureFlags.disableRateLimiting);
-```
-
-**After (Dynamic Configuration):**
-```javascript
-// New way - configuration handled internally
-const authService = createAuthService(c.env);
-const result = await authService.login(email, password, ipAddress);
-// AuthService automatically gets configuration using getJwtSettings() and getFeatureFlags()
-```
-
-### 🎯 **Supported Services:**
-- **AuthService**: Automatic JWT settings and rate limiting configuration
-- **UserService**: Feature flags for user management
-- **DatabaseService**: Performance and debug settings
-- **All Services**: Inherit from BaseService with cached configuration access
-
-## 🌍 Dynamic Internationalization System
-
-This project uses a **fully dynamic i18n system** with outstanding features including **multilingual validation error messages**:
-
-### ✨ **Key Features:**
-✅ **Fully Dynamic** - Automatic language detection from file system  
-✅ **Zero Hard-coding** - No hard-coded language lists  
-✅ **One-Command Addition** - Add new language with just 1 command  
-✅ **Unlimited Languages** - Support unlimited languages  
-✅ **Production Ready** - Complete error handling and fallback  
-✅ **Multilingual Validation** - i18n-aware Zod validation with localized error messages
-✅ **API-wide Coverage** - All API endpoints support multilingual error messages
-
-### 🎯 **Currently Supported Languages:**
-- **English (`en`)** - Default language
-- **Vietnamese (`vi`)** - Full translation support  
-- **French (`fr`)** - Complete validation error coverage
-- **Spanish (`es`)** - Complete validation error coverage
-- **German (`de`)** - Complete validation error coverage
-- **Japanese (`ja`)** - Complete validation error coverage
-- **Thai (`th`)** - Complete validation error coverage
-- *...and any other language you add!*
-
-### 🌐 **Multilingual Validation System:**
-The system provides **i18n-aware Zod validation** with localized error messages across all API endpoints:
-
-```javascript
-// Example: Login validation with Vietnamese error messages
-// Request with Accept-Language: vi
-{
-  "success": false,
-  "message": "Dữ liệu đầu vào không hợp lệ",
-  "errors": [
-    {
-      "field": "email",
-      "message": "Email không hợp lệ"
-    },
-    {
-      "field": "password", 
-      "message": "Mật khẩu phải có ít nhất 6 ký tự"
-    }
-  ]
-}
-
-// Same validation with English (Accept-Language: en)
-{
-  "success": false,
-  "message": "Invalid input data",
-  "errors": [
-    {
-      "field": "email",
-      "message": "Invalid email format"
-    },
-    {
-      "field": "password",
-      "message": "Password must be at least 6 characters"
-    }
-  ]
-}
-```
-
-### 📋 **API Endpoints with Multilingual Validation:**
-**Authentication Endpoints** (3 endpoints):
-- `POST /api/auth/login` - Login validation
-- `POST /api/user/register` - Registration validation  
-- `POST /api/auth/refresh_token` - Token refresh validation
-
-**User Management Endpoints** (4 endpoints):
-- `GET /api/user/profile` - Profile access validation
-- `POST /api/user/change-password` - Password change validation
-- `POST /api/user/upload` - File upload validation
-- `PUT /api/admin/users/:id` - User update validation
-
-**Admin Operations Endpoints** (6 endpoints):
-- All admin endpoints with comprehensive multilingual error handling
-
-**Audit System Endpoints** (4 endpoints):
-- All audit endpoints with localized validation messages
-
-**Security Incident Endpoints** (3 endpoints):
-- All security incident endpoints with multilingual support
-
-### 🚀 **Super Easy Language Addition:**
+Generate a secret locally:
 
 ```bash
-# Add German with 1 command
-node tools/i18n/add-language-demo.js de "German"
-
-# Add Japanese  
-node tools/i18n/add-language-demo.js ja "Japanese"
-
-# Edit auto-generated file, restart app → Done! 🎉
+node -e "console.log(require('node:crypto').randomBytes(32).toString('hex'))"
 ```
 
-### 🌐 **Language Detection Priority:**
-1. Query parameter `?lang=vi` (highest priority)
-2. `Accept-Language` header parsing
-3. Automatic fallback to default language
+Put the generated value in `.dev.vars.development`. A minimal configuration is:
 
-### 🧪 **Testing Tools:**
-```bash
-# Test entire system
-node tools/i18n/test-dynamic-i18n.js
-
-# Verify optimization
-node tools/i18n/final-verification.js
-
-# Add new language
-node tools/i18n/add-language-demo.js [code] "[Name]"
+```toml
+JWT_SECRET = "replace-with-the-generated-value"
+ENV = "development"
+DEBUG = ""
+ENABLE_DETAILED_ERRORS = "false"
+EMAIL_ENABLED = "false"
 ```
 
-### 📖 **Complete Documentation:**
-See the complete system details in [documents/I18N_MASTER_GUIDE.md](./documents/I18N_MASTER_GUIDE.md)
+Use a distinct secret for each environment. The example disables email and broad debug output; add provider settings only when testing email delivery. For a separately served browser client, set `CORS_ORIGIN` to its actual origin.
 
-## 🐛 Debug System Testing Tools
-
-### 🧪 **Comprehensive Debug Test Suite:**
-The project includes a comprehensive debug system testing suite located in `tools/debug_log/`:
+### 3. Apply migrations and start the Worker
 
 ```bash
-# Run comprehensive debug system tests
-npm run test:debug             # Run debug tests
-npm run test:debug:run         # Run with shell script
-
-# Direct execution
-node tools/debug_log/comprehensive_debug_test.js
-bash tools/debug_log/run_comprehensive_test.sh
-```
-
-### ✅ **Test Coverage:**
-- Basic debug system functionality
-- Color and formatting validation  
-- Pattern matching and namespace filtering
-- Enable/disable functionality testing
-- Environment variable support validation
-- Performance testing (1000+ debug instances)
-- Edge cases and error handling
-- Internal state inspection
-
-### 📖 **Debug Tools Documentation:**
-See complete debug test documentation:
-- **English**: [tools/debug_log/README.md](./tools/debug_log/README.md)
-- **Tiếng Việt**: [tools/debug_log/README_vi.md](./tools/debug_log/README_vi.md)
-
-## 🚀 Quick Start
-
-### Quick Setup
-```bash
-# 1. Environment setup
-npm run setup:dev
-
-# 2. Run database migrations
 npm run db:migrate
-
-# 3. Initialize KV configuration
-npm run test:kv:setup
-
-# 4. Start development server
 npm run dev
 ```
 
-### Available Commands
-```bash
-# Development
-npm run dev              # Development server (port 8787)
-npm run test             # Interactive test menu
-npm run lint             # Code quality check
+The development API listens at **http://localhost:8787** and persists local state under `.wrangler/`. In another terminal:
 
-# KV Configuration
-npm run test:kv:setup    # Initialize KV configuration
-npm run test:kv_admin    # Test KV Admin functionality  
-npm run test:kv:scripts          # Complete KV Admin testing
+```bash
+curl http://localhost:8787/
+curl http://localhost:8787/health
 ```
 
-## 📚 Comprehensive Documentation
+The root reports API information; `/health` is a health response, not an end-to-end check of every dependency. For a separate local test server, use `npm run db:migrate:test` and `npm run dev:test` with `.dev.vars.test`; its port is `8788`.
 
-Our complete documentation library covers every aspect of the system:
+### 4. Choose an account flow
 
-### 🎯 **Core System Documentation**
-- **[SETUP_GUIDE.md](./documents/SETUP_GUIDE.md)** - Complete environment setup with multi-environment support
-- **[DEBUG_DEVELOPMENT_GUIDE.md](./documents/DEBUG_DEVELOPMENT_GUIDE.md)** - Debug & development workflow with granular controls
-- **[DATABASE_SERVICE.md](./documents/DATABASE_SERVICE.md)** - Database service architecture & operations guide
-- **[DYNAMIC_CONFIG_GUIDE.md](./documents/DYNAMIC_CONFIG_GUIDE.md)** - Enterprise dynamic configuration management
-- **[WRANGLER_CONFIG_GUIDE.md](./documents/WRANGLER_CONFIG_GUIDE.md)** - Cloudflare Workers configuration management
+Accounts live in the selected D1 database. By default, newly registered accounts need activation. Disabling email does not activate an account; use a configured activation flow, an authorized administrator or, only for disposable local development, `AUTO_ACTIVATE_USER_ON_REGISTER = "true"`.
 
-### 🧪 **Testing & Quality Assurance**
-- **[TEST_GUIDE.md](./documents/TEST_GUIDE.md)** - Comprehensive testing framework with 40+ test suites
-- **[TEST_SCRIPTS.md](./documents/TEST_SCRIPTS.md)** - Test automation & shell scripts with RBAC testing
-- **[ESLINT_GUIDE.md](./documents/ESLINT_GUIDE.md)** - Code quality & linting standards
+The historical [initial migration](migrations/0001_initial.sql) inserts a bootstrap account, and [migration 0002](migrations/0002_add_role_column.sql) promotes user ID 1. These are source-visible bootstrap data, not private production credentials. Review and secure bootstrap accounts and sample records before exposing a remote deployment.
 
-### 👑 **Authentication & Authorization**
-- **[ROLE_COMPLETE_GUIDE.md](./documents/ROLE_COMPLETE_GUIDE.md)** - Complete admin & role management system
-- **[ZOD_GUIDE.md](./documents/ZOD_GUIDE.md)** - Validation & schema design patterns
-- **[SCHEMAS_GUIDE.md](./documents/SCHEMAS_GUIDE.md)** - Schema validation with i18n support
+`npm run setup:dev` and `npm run setup:test` also execute [fixture reset SQL](tests/init/reset.sql), which deletes/reseeds local data. They are not required for the manual quick start. Never run fixture resets against staging or production. The [password-reset CLI](tools/database/reset_superadmin_user_password.js) supports selected local super-admin accounts only; inspect `--help` before use.
 
-### 🌍 **Internationalization & Localization**
-- **[I18N_MASTER_GUIDE.md](./documents/I18N_MASTER_GUIDE.md)** - Complete dynamic i18n system with multilingual validation
+See the [setup guide](documents/SETUP_GUIDE.md) for storage, secrets, optional KV and fixture details.
 
-### 🏢 **Enterprise Features**
-- **[ENTERPRISE_AUDIT_SYSTEM_COMPLETE_GUIDE.md](./documents/ENTERPRISE_AUDIT_SYSTEM_COMPLETE_GUIDE.md)** - Complete enterprise audit system
-- **[AUDIT_API_REFERENCE.md](./documents/AUDIT_API_REFERENCE.md)** - API reference for 40+ audit endpoints
-- **[AUDIT_KV_CONFIGURATION_GUIDE.md](./documents/AUDIT_KV_CONFIGURATION_GUIDE.md)** - Advanced audit configuration
+## API and authentication
 
-### 🌍 **Vietnamese Documentation (Tài liệu Tiếng Việt)**
-Complete Vietnamese translations for all guides:
-- **[SETUP_GUIDE_vi.md](./documents/SETUP_GUIDE_vi.md)** - Hướng dẫn thiết lập hoàn chỉnh
-- **[ROLE_COMPLETE_GUIDE_vi.md](./documents/ROLE_COMPLETE_GUIDE_vi.md)** - Hệ thống quản lý admin & vai trò
-- **[DEBUG_DEVELOPMENT_GUIDE_vi.md](./documents/DEBUG_DEVELOPMENT_GUIDE_vi.md)** - Quy trình debug & phát triển
-- **[I18N_MASTER_GUIDE_vi.md](./documents/I18N_MASTER_GUIDE_vi.md)** - Hệ thống đa ngôn ngữ hoàn chỉnh
-- **[TEST_GUIDE_vi.md](./documents/TEST_GUIDE_vi.md)** - Framework kiểm thử toàn diện
-- **[DYNAMIC_CONFIG_GUIDE_vi.md](./documents/DYNAMIC_CONFIG_GUIDE_vi.md)** - Hệ thống cấu hình động
-- *...và tất cả 15 tài liệu khác bằng tiếng Việt*
+### Session flow
 
-### 📊 **Documentation Statistics**
-- **📄 Total Files**: 30 documentation files (15 English + 15 Vietnamese)
-- **📋 Complete Coverage**: Every system component fully documented
-- **🌍 Multilingual Support**: All guides available in both languages
-- **🔄 Up-to-date**: Continuously updated with latest features and improvements
-- **🎯 Comprehensive**: From basic setup to advanced enterprise features
+1. Register through `POST /api/user/register` or use an account provisioned for the selected backend. Complete activation when required.
+2. Send account credentials to `POST /api/auth/login`. A successful response contains `data.access_token`, `data.refresh_token`, expiration fields and user information.
+3. Send `Authorization: Bearer <access_token>` to protected routes such as `GET /api/user/profile` or `GET /api`.
+4. Refresh through `POST /api/auth/refresh_token` with the current `refresh_token`. Save **both** replacement tokens and coordinate concurrent refresh attempts.
+5. `POST /api/auth/logout` revokes the selected refresh session and blacklists the current access token. `POST /api/auth/logout-all` revokes the user's sessions. Both require the bearer token and a JSON `refresh_token`.
 
----
+Example login request; replace the illustrative credentials with your own account:
 
-*This project is production-ready and fully documented. Check the documents/ directory for comprehensive guides on all topics.*
+```http
+POST /api/auth/login HTTP/1.1
+Host: localhost:8787
+Content-Type: application/json
+Accept-Language: en
 
-## 🚀 Quick Start & Commands
-
-### Development Commands
-```bash
-# Basic development
-npm run dev                    # Start development server
-npm run dev:debug             # Start with full debug logging
-npm run dev:debug:validation  # Debug validation only
-npm run dev:debug:zod         # Debug Zod validation only  
-npm run dev:debug:i18n        # Debug i18n functionality only
-
-# Database setup
-npm run db:migrate            # Run database migrations
-npm run setup:dev             # Complete development setup
+{"email":"your-account@example.com","password":"your-account-password"}
 ```
 
-### Production Commands
-```bash
-# Production deployment
-npm run deploy                # Deploy to Cloudflare Workers
-npm run db:migrate:prod       # Run production migrations
-npm run secret:put:prod       # Set production secrets
+Refresh request body:
+
+```json
+{"refresh_token":"current-refresh-token"}
 ```
 
----
+Treat 401 as an authentication/session outcome and handle 429 using the returned retry information. Do not automatically replay a mutation after an ambiguous timeout. Client/session compatibility and `AUTH_VERSION_ENFORCEMENT` rollout are described in the [upgrade guide](documents/UPGRADE_RELEASE.md).
 
-*Status: ✅ COMPLETE & PRODUCTION READY*
+### Route map
 
-## Icon License and Attribution
+| Route | Purpose / access |
+| --- | --- |
+| `GET /`, `GET /health`, `GET /version` | Public API information, health and version. |
+| `GET /api` | Authenticated endpoint discovery, filtered for the user's role. |
+| `POST /api/user/register`, `GET /api/auth/activate` | Registration and account activation. |
+| `POST /api/auth/login`, `POST /api/auth/refresh_token` | Credential login and refresh-token rotation. |
+| `POST /api/auth/logout`, `POST /api/auth/logout-all` | Authenticated session revocation. |
+| `/api/user/*` | Profile, password and email-change operations; access depends on the route. |
+| `POST /api/admin/users/:id/reset-password` | Reset a lower-role account password, revoke all its sessions and record an audit in one transaction. [Guide](documents/ADMIN_PASSWORD_RESET.md). |
+| `/api/admin/*` | User/role administration, token blacklist and token audit under administrative policies. |
+| `/api/kv-admin/*` | Administrative configuration operations requiring the optional KV binding. |
+| `/api/audit/*`, `/api/advanced-audit/*` | Scoped audit operations, analytics, archive/retention and exports. |
+| `/api/realtime-monitoring/*`, `/api/security-incident/*` | On-demand monitoring, alert and incident APIs with explicit capability limits. |
 
-The project icons `src/assets/favicon.ico`, `src/assets/favicon.png`, and `src/assets/icon-192.png` were downloaded from [Microchip icon on Magnific](https://www.magnific.com/icon/microchip_5776925), by [jansenwebconcepts](https://www.magnific.com/author/jansenwebconcepts).
+This is an orientation map. Use authenticated `GET /api`, the [route source](src/routes/) and the [capability matrix](documents/CAPABILITIES.md) for operation-specific roles, payloads and limits. In particular, an admin role does not imply unrestricted access to every user or audit record.
 
-See [LICENSE-ICONS.md](LICENSE-ICONS.md) for the icon attribution and licensing notice.
+## Configuration
+
+| File / binding / setting | Purpose |
+| --- | --- |
+| `wrangler.toml` | Ignored operator configuration: Worker names, D1/asset bindings and environment selectors; start from [the template](wrangler.toml.example). |
+| `.dev.vars.development`, `.dev.vars.test` | Ignored local secrets/settings, based on their committed examples. |
+| `DB` | Required D1 binding; apply migrations `0001` through `0012`. |
+| `CONFIG_KV` | Optional configuration storage. Ordinary reads can use environment/default values; KV administration requires a binding. |
+| `ENV` | Application environment (`development`, `test`, `staging`, `production`); set it explicitly for each deployment target. |
+| `JWT_SECRET` | Token signing secret, unique per environment. Use deployed secret storage for remote Workers. |
+| `CORS_ORIGIN` | Allowed browser origins, for example `http://localhost:4173`; use the actual deployed frontend origin remotely. |
+| `APP_URL`, `EMAIL_ENABLED` | Account-email links and email policy; delivery additionally needs provider configuration. |
+| `AUTO_ACTIVATE_USER_ON_REGISTER` | Registration policy; default is activation required. Do not carry a local bypass into production unintentionally. |
+| `DEBUG`, `ENABLE_DETAILED_ERRORS` | Diagnostics; keep broad logging and detailed errors disabled outside focused troubleshooting. |
+
+The [complete variables example](.dev.vars.complete.example) inventories settings; the [Wrangler guide](documents/WRANGLER_CONFIG_GUIDE.md) explains how to apply them. A local `.dev.vars.*` file does **not** provision deployed secrets. Named environments need their own bindings; do not assume root bindings are inherited.
+
+## Vue frontend
+
+The [companion frontend](https://github.com/dangkhoa2016/Vue-3-Browser-Hono-Auth-API-Cloudflare-Worker) provides browser views for accounts, API discovery and administration. Its backend selection and mock mode are separate from Worker configuration.
+
+- In the frontend's **Settings** page (`/#/settings`), select the real backend's base URL. Endpoint definitions already include `/api/...`; do not add another `/api` suffix to the base URL.
+- Select real API mode and sign in with an account from that backend's D1 database. Frontend JSON fixtures do not provision deployed accounts.
+- Add the browser origin to `CORS_ORIGIN` and allow the headers used by the client, including `Authorization` and, when used, `Accept-Language`.
+- Keep JWT/provider secrets in the Worker. The browser receives session tokens and public configuration only.
+
+Follow the frontend repository's local launcher instructions when using its backend proxy.
+
+## Verification
+
+The canonical command matches [Backend quality CI](.github/workflows/backend-quality.yml):
+
+```bash
+npm run verify
+```
+
+| Command | What it checks |
+| --- | --- |
+| `npm run lint:check` | Application/test ESLint rules, with zero warnings allowed. |
+| `npm run lint:tools` | Supported password-reset command/helper and documentation-checker lint. |
+| `npm run verify:docs` | Relative file targets and package-script references in README/documentation. |
+| `npm run test:node` | Canonical regression/integration discovery, including disposable local D1, migration and Worker checks. |
+| `npm run test:regression` | Focused regression suites. |
+
+The canonical checks need no remote account secrets. Historical live-server and interactive suites are separate; `npm test` launches a menu and prepares local fixtures. A local pass does not verify provider delivery, production resources, throughput or every legacy tool. See the [verification guide](documents/TEST_GUIDE.md) and [command reference](documents/TEST_SCRIPTS.md).
+
+## Deployment
+
+Before publishing, configure the Cloudflare account, the selected Worker's D1/bindings, independent secrets, allowed origins and account/email policies. Review migration bootstrap/sample data, secure initial accounts and rehearse schema/session compatibility in staging. Keep rate limiting enabled unless testing a deliberately isolated scenario.
+
+| Target | Migration command | Deploy command |
+| --- | --- | --- |
+| Staging (`--env staging`) | `npm run db:migrate:staging` | `npm run deploy:staging` |
+| Production (default environment) | `npm run db:migrate:prod` | `npm run deploy:prod` |
+
+Set the application's environment explicitly in the corresponding Wrangler variables (merge these settings into your operator configuration):
+
+```toml
+[vars]
+ENV = "production"
+
+[env.staging.vars]
+ENV = "staging"
+```
+
+Wrangler's target selector does not populate application `ENV`. When neither `ENV` nor `ENVIRONMENT` is configured, the application falls back to `development`, which also affects environment-specific security behavior.
+
+These commands change remote resources. Set JWT through `npm run secret:put:staging` or `npm run secret:put:prod`, and provision other provider secrets for the same target. Production is the **default** Wrangler environment. `dev:staging` uses remote resources and is not an isolated local test server.
+
+Apply the complete migration sequence before code that requires it. In particular, `0011` preserves archive metadata and `0012` adds session revocation fields. Keep a recovery plan; additive migrations do not supply an automatic schema rollback.
+
+Verify health, login/rotated refresh pairs, permissions, revocation, audit/export and configured integrations after deployment. Record the commit, environment, migration state, deployment identifier and actual results. Follow the full [upgrade and release checklist](documents/UPGRADE_RELEASE.md).
+
+## Troubleshooting
+
+| Symptom | First checks |
+| --- | --- |
+| Worker starts but requests fail with `WeakRef` errors | Use the template's `2025-06-01` compatibility date and `nodejs_compat` flag. |
+| Missing D1 table/column | Confirm the selected environment and apply all migrations through `0012`. |
+| Login is rejected / protected route returns 401 | Check the selected backend, account status, token expiry and session revocation; send the access bearer token. |
+| Browser requests fail at CORS | Match the frontend's actual origin and required headers to the backend configuration. |
+| Registration succeeds but no activation email arrives | Inspect `email_notification`, activation policy, email enablement and provider configuration. Registration success alone does not confirm delivery. |
+| An operation returns 422 with an unsupported code | Check the capability contract; enabling a flag does not implement a missing adapter. |
+| Archive statistics return 503 `ARCHIVE_STATS_TIMEOUT` | Preserve the request ID and investigate availability; do not replace the failure with zero statistics. |
+
+## Documentation
+
+| Topic | English | Tiếng Việt |
+| --- | --- | --- |
+| Supported behavior and limits | [Capabilities](documents/CAPABILITIES.md) | [Khả năng](documents/CAPABILITIES.vi.md) |
+| Local development | [Setup](documents/SETUP_GUIDE.md) | [Cài đặt](documents/SETUP_GUIDE.vi.md) |
+| Environments and secrets | [Wrangler](documents/WRANGLER_CONFIG_GUIDE.md) | [Wrangler](documents/WRANGLER_CONFIG_GUIDE.vi.md) |
+| Maintained checks | [Verification](documents/TEST_GUIDE.md) | [Kiểm chứng](documents/TEST_GUIDE.vi.md) |
+| Test commands | [Scripts](documents/TEST_SCRIPTS.md) | [Lệnh kiểm thử](documents/TEST_SCRIPTS.vi.md) |
+| Migrations, rollout and provenance | [Upgrade/release](documents/UPGRADE_RELEASE.md) | [Nâng cấp/phát hành](documents/UPGRADE_RELEASE.vi.md) |
+| Audit overview | [Audit](documents/ENTERPRISE_AUDIT_SYSTEM_COMPLETE_GUIDE.md) | [Kiểm toán](documents/ENTERPRISE_AUDIT_SYSTEM_COMPLETE_GUIDE.vi.md) |
+
+Additional [topic references](documents/) cover roles, schemas, i18n, email and storage. Retained historical guides are labeled; old examples or readiness/coverage claims are not current operational guarantees. The history contains an imported baseline and curated commits with retained author dates; see the release guide for provenance and evidence boundaries.
+
+## Repository layout
+
+```text
+.github/         CI, contribution policies and issue/PR templates
+src/
+  index.js       Worker entry point
+  routes/        API handlers and route groups
+  middleware/    Authentication, authorization, security and request processing
+  services/      Accounts, sessions, configuration and audit implementations
+  schemas/       Zod request schemas and validation registry
+  i18n/          Language resources and localization services
+  assets/        Project icons
+migrations/      Ordered D1 schema/data migrations
+tests/           Regression, integration, fixtures and optional server suites
+tools/           Documentation and maintenance utilities
+```
+
+## Contributing and support
+
+Read [CONTRIBUTING.md](.github/CONTRIBUTING.md) before proposing a change. Use the [issue forms](https://github.com/dangkhoa2016/Hono-Auth-API-Cloudflare-Worker/issues/new/choose) for reproducible bugs or feature requests, and include the revision, environment, minimal steps and redacted output.
+
+Follow [SUPPORT.md](.github/SUPPORT.md) for questions, [SECURITY.md](.github/SECURITY.md) for private vulnerability reporting, and the [Code of Conduct](.github/CODE_OF_CONDUCT.md) when participating. English and Vietnamese contributions are welcome.
+
+## License and attribution
+
+Source code is available under the [MIT License](LICENSE), copyright **2026 Đăng Khoa <i.am@dangkhoa.dev>**.
+
+The icons `src/assets/favicon.ico`, `src/assets/favicon.png` and `src/assets/icon-192.png` come from the [Microchip icon on Magnific](https://www.magnific.com/icon/microchip_5776925), by [jansenwebconcepts](https://www.magnific.com/author/jansenwebconcepts). Their separate attribution and license notice remain in [LICENSE-ICONS.md](LICENSE-ICONS.md).
