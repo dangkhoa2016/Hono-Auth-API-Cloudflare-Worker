@@ -25,11 +25,17 @@ class TestClient {
    * @param {string} path - API path
    * @param {Object} data - Request body data
    * @param {Object} headers - Additional headers
+   * @param {Object} options - Per-request controls; explicit retries may repeat mutations
    * @returns {Promise<Object>} Response object with status and data
    */
   async request(method, path, data = null, headers = {}, options = {}) {
+    method = method.toUpperCase();
     const mergedOptions = { ...this.defaultOptions, ...options };
-    const { timeoutMs, retries, retryDelayMs, retryOnHttp5xx } = mergedOptions;
+    const { timeoutMs, retryDelayMs, retryOnHttp5xx } = mergedOptions;
+    // Only safe reads inherit retries. A caller intentionally repeating setup
+    // must opt in on that request, since a failed response may follow a write.
+    const safeRead = method === 'GET' || method === 'HEAD';
+    const retries = options.retries ?? (safeRead ? this.defaultOptions.retries : 0);
     const url = `${this.baseUrl}${path}`;
 
     const attemptRequest = async (attempt = 0) => {

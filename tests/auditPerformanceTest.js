@@ -1,28 +1,11 @@
 #!/usr/bin/env node
 
 /**
- * Audit System Performance Test Suite
- * Tests performance and scalability of audit endpoints
- *
- * Endpoints tested:
- * - GET /api/audit/logs - Large dataset pagination performance
- * - GET /api/audit/search - Search query performance with complex filters
- * - GET /api/audit/stats - Statistics calculation performance
- * - GET /api/audit/export - Large export operation performance
- * - GET /api/advanced-audit/analytics - Advanced analytics performance
- *
- * Test coverage:
- * - Response times under load (target: <2s for large queries)
- * - Concurrent request handling (10-100 simultaneous users)
- * - Large dataset processing (10K+ audit logs)
- * - Memory usage during operations
- * - Database query optimization effectiveness
- * - Pagination performance with large offsets
- * - Search index performance
- * - Export generation speed for large datasets
- * - Cache effectiveness for repeated queries
- * - System resource utilization monitoring
-*/
+ * Audit endpoint performance smoke checks against an explicitly prepared API.
+ * Measures bounded queries, CSV exports, and small concurrent request batches.
+ * These checks do not seed a large dataset or measure Worker memory, distributed
+ * load balancing, sustained load capacity, or cache effectiveness.
+ */
 
 import { TestClient } from './utils/testClient.js';
 import { TestLogger } from './utils/testLogger.js';
@@ -34,6 +17,10 @@ class AuditPerformanceTest {
     // Initialize in standard order
     this.logger = new TestLogger();
     this.client = new TestClient(TEST_CONFIG.baseUrl);
+    // Measure first attempts so retries cannot hide endpoint failures or latency.
+    this.client.defaultOptions.retries = 0;
+    this.responseTimeLimitMs = 2000;
+    this.batchTimeLimitMs = 10000;
     this.assert = TestAssertions;
 
     // Test-specific properties
@@ -71,12 +58,12 @@ class AuditPerformanceTest {
       this.testAuditArchivalPerformance,
       this.testRealtimeMonitoringPerformance,
       this.testSecurityIncidentPerformance,
-      this.testLargeDatasetHandling,
-      this.testAuditMemoryUsage,
+      this.testAuditPageSizeSmoke,
+      this.testAuditQuerySmoke,
       this.testAuditResponseTimes,
       this.testAuditThroughput,
-      this.testAuditStressTest,
-      this.testAuditLoadBalance,
+      this.testAuditConcurrentSmoke,
+      this.testAuditMixedEndpointSmoke,
       this.testI18nErrorMessagesAuditAccess,
       this.testI18nErrorMessagesAuditSearch,
       this.testI18nErrorMessagesAuditExport
@@ -119,22 +106,20 @@ class AuditPerformanceTest {
         throw new Error('Failed to get admin token');
       }
 
-      // Try to get super admin token
-      try {
-        const superAdminLogin = await this.client.post(API_ENDPOINTS.login, TEST_USERS.super_admin);
-
-        if (superAdminLogin.success && superAdminLogin.data.data.access_token) {
-          this.tokens.superAdmin = superAdminLogin.data.data.access_token;
-          this.logger.info('Super admin token acquired');
-        }
-      } catch (error) {
-        this.logger.info('Super admin user may not exist (using admin for tests)');
-        this.tokens.superAdmin = this.tokens.admin; // Fallback
-      }
+      const superAdminLogin = await this.client.post(API_ENDPOINTS.login, TEST_USERS.super_admin);
+      this.assert.assertEqual(superAdminLogin.status, 200, 'Super admin setup login should succeed');
+      this.assert.assertNotEmpty(superAdminLogin.data.data?.access_token, 'super admin access token');
+      this.tokens.superAdmin = superAdminLogin.data.data.access_token;
     } catch (error) {
       this.logger.error(`[setupAuthentication] Auth token setup failed: ${error.message}`);
       throw error;
     }
+  }
+
+  assertPerformance(response, responseTime, context, limitMs = this.responseTimeLimitMs) {
+    this.assert.assertEqual(response.status, 200, `${context} should succeed on its first attempt`);
+    this.assert.assertSuccess(response, context);
+    this.assert.assertTrue(responseTime < limitMs, `${context} should finish under ${limitMs}ms (${responseTime}ms)`);
   }
 
   async testAuditLogQueryPerformance() {
@@ -158,7 +143,7 @@ class AuditPerformanceTest {
           const endTime = Date.now();
           const responseTime = endTime - startTime;
 
-          this.assert.assertEqual(response.status, 200, `Query should succeed for limit ${limit}`);
+          this.assertPerformance(response, responseTime, `Query limit ${limit}`);
           times.push(responseTime);
         }
 
@@ -211,7 +196,7 @@ class AuditPerformanceTest {
           const endTime = Date.now();
           const responseTime = endTime - startTime;
 
-          this.assert.assertEqual(response.status, 200, `Search should succeed for query: ${query}`);
+          this.assertPerformance(response, responseTime, `Search query ${query}`);
           times.push(responseTime);
         }
 
@@ -253,7 +238,9 @@ class AuditPerformanceTest {
         const endTime = Date.now();
         const responseTime = endTime - startTime;
 
-        this.assert.assertEqual(response.status, 200, `Export should succeed for size ${size}`);
+        this.assertPerformance(response, responseTime, `CSV export limit ${size}`, this.batchTimeLimitMs);
+        this.assert.assertTrue(response.headers['content-type']?.includes('text/csv'), 'CSV export should identify its format');
+        this.assert.assertType(response.data, 'string', 'CSV export should deliver text');
 
         this.performanceMetrics.auditExport.push({
           size,
@@ -274,7 +261,7 @@ class AuditPerformanceTest {
     this.logger.info('Testing concurrent audit logging...');
 
     try {
-      // Reduced concurrency levels for stability
+      // Small concurrent login smoke batches; no sustained-load claim.
       const concurrencyLevels = [2, 5, 10];
 
       for (const concurrency of concurrencyLevels) {
@@ -307,7 +294,8 @@ class AuditPerformanceTest {
         this.logger.info(`${concurrency} concurrent: ${totalTime}ms, ${successCount}/${concurrency} success (${successRate.toFixed(1)}%)`);
 
         // Assert minimum success rate
-        this.assert.assertTrue(successRate >= 70, `Success rate should be at least 70% for ${concurrency} concurrent requests`);
+        this.assert.assertEqual(successCount, concurrency, 'Every concurrent login smoke request should succeed');
+        this.assert.assertTrue(totalTime < this.batchTimeLimitMs, 'Concurrent login smoke should finish within the batch budget');
       }
 
       this.logger.success('Concurrent audit logging test completed');
@@ -337,68 +325,40 @@ class AuditPerformanceTest {
 
       this.logger.info(`Monitoring status: ${responseTime}ms (status: ${response.status})`);
 
-      // Test dashboard performance if accessible
-      if (response.status === 200) {
-        const dashStartTime = Date.now();
-        const dashResponse = await this.client.get(API_ENDPOINTS.realtimeMonitoringDashboardOverview, {
-          Authorization: `Bearer ${this.tokens.superAdmin}`
-        });
-        const dashEndTime = Date.now();
-        const dashResponseTime = dashEndTime - dashStartTime;
-
-        this.performanceMetrics.realtimeMonitoring.push({
-          endpoint: 'dashboard',
-          responseTime: dashResponseTime,
-          status: dashResponse.status
-        });
-
-        this.logger.info(`Dashboard overview: ${dashResponseTime}ms (status: ${dashResponse.status})`);
-      }
+      this.assertPerformance(response, responseTime, 'Monitoring status');
+      const dashStartTime = Date.now();
+      const dashResponse = await this.client.get(API_ENDPOINTS.realtimeMonitoringDashboardOverview, {
+        Authorization: `Bearer ${this.tokens.superAdmin}`
+      });
+      const dashResponseTime = Date.now() - dashStartTime;
+      this.assertPerformance(dashResponse, dashResponseTime, 'Dashboard overview');
+      this.performanceMetrics.realtimeMonitoring.push({
+        endpoint: 'dashboard',
+        responseTime: dashResponseTime,
+        status: dashResponse.status
+      });
+      this.logger.info(`Dashboard overview: ${dashResponseTime}ms (status: ${dashResponse.status})`);
 
       this.logger.success('Real-time monitoring performance test completed');
     } catch (error) {
-      this.logger.info('[testRealtimeMonitoringPerformance] Real-time monitoring may require super admin access');
+      this.logger.error(`[testRealtimeMonitoringPerformance] ${error.message}`);
+      throw error;
     }
   }
 
-  async testLargeDatasetHandling() {
-    this.logger.info('Testing large dataset handling...');
-
-    try {
-      // Test large limit queries
-      const largeLimits = [1000, 2000, 5000];
-
-      for (const limit of largeLimits) {
-        try {
-          const startTime = Date.now();
-
-          const url = `${API_ENDPOINTS.auditLogs}?limit=${limit}`;
-          const response = await this.client.get(url, {
-            Authorization: `Bearer ${this.tokens.admin}`
-          });
-
-          const endTime = Date.now();
-          const responseTime = endTime - startTime;
-
-          if (response.status === 200) {
-            const recordCount = response.data.data ? response.data.data.logs?.length || 0 : 0;
-            this.logger.info(`${limit} limit: ${responseTime}ms, got ${recordCount} records`);
-
-            // Assert reasonable response time for large datasets
-            this.assert.assertTrue(responseTime < 10000, `Large dataset query should complete in under 10 seconds (${responseTime}ms)`);
-          } else {
-            this.logger.info(`${limit} limit: Status ${response.status}`);
-          }
-
-        } catch (error) {
-          this.logger.info(`${limit} limit: ${error.message}`);
-        }
-      }
-
-      this.logger.success('Large dataset handling test completed');
-    } catch (error) {
-      this.logger.error(`[testLargeDatasetHandling] Large dataset handling test failed: ${error.message}`);
-      throw error;
+  async testAuditPageSizeSmoke() {
+    this.logger.info('Testing supported audit page sizes with existing records...');
+    for (const limit of [10, 50, 100]) {
+      const startTime = Date.now();
+      const response = await this.client.get(`${API_ENDPOINTS.auditLogs}?limit=${limit}`, {
+        Authorization: `Bearer ${this.tokens.admin}`
+      });
+      const responseTime = Date.now() - startTime;
+      this.assertPerformance(response, responseTime, `Audit page size ${limit}`);
+      const logs = response.data.data?.logs;
+      this.assert.assertTrue(Array.isArray(logs), 'Audit page should contain a logs array');
+      this.assert.assertTrue(logs.length <= limit, 'Returned records should respect the requested page size');
+      this.logger.info(`Page limit ${limit}: ${responseTime}ms, got ${logs.length} records`);
     }
   }
 
@@ -407,12 +367,13 @@ class AuditPerformanceTest {
 
     try {
       const startTime = Date.now();
-      await this.client.get(API_ENDPOINTS.advancedAuditAnalytics, {
+      const response = await this.client.get(API_ENDPOINTS.advancedAuditAnalytics, {
         Authorization: `Bearer ${this.tokens.superAdmin}`
       });
       const endTime = Date.now();
       const responseTime = endTime - startTime;
 
+      this.assertPerformance(response, responseTime, 'Analytics');
       this.logger.info(`Analytics response time: ${responseTime}ms`);
       this.logger.success('Audit analytics performance test completed');
     } catch (error) {
@@ -426,7 +387,7 @@ class AuditPerformanceTest {
 
     try {
       const startTime = Date.now();
-      await this.client.post(API_ENDPOINTS.advancedAuditArchivalRun, {
+      const response = await this.client.post(API_ENDPOINTS.advancedAuditArchivalRun, {
         dryRun: true,
         batchSize: 100
       }, {
@@ -435,6 +396,7 @@ class AuditPerformanceTest {
       const endTime = Date.now();
       const responseTime = endTime - startTime;
 
+      this.assertPerformance(response, responseTime, 'Archival dry run', this.batchTimeLimitMs);
       this.logger.info(`Archival dry run response time: ${responseTime}ms`);
       this.logger.success('Audit archival performance test completed');
     } catch (error) {
@@ -448,44 +410,47 @@ class AuditPerformanceTest {
 
     try {
       const startTime = Date.now();
-      await this.client.get(API_ENDPOINTS.securityIncidents, {
+      const response = await this.client.get(API_ENDPOINTS.securityIncidents, {
         Authorization: `Bearer ${this.tokens.superAdmin}`
       });
       const endTime = Date.now();
       const responseTime = endTime - startTime;
 
+      this.assertPerformance(response, responseTime, 'Security incident list');
       this.logger.info(`Security incident list response time: ${responseTime}ms`);
       this.logger.success('Security incident performance test completed');
     } catch (error) {
-      this.logger.info(`[testSecurityIncidentPerformance] Security incident endpoints may not be accessible: ${error.message}`);
+      this.logger.error(`[testSecurityIncidentPerformance] ${error.message}`);
+      throw error;
     }
   }
 
-  async testAuditMemoryUsage() {
-    this.logger.info('Testing audit memory usage...');
+  async testAuditQuerySmoke() {
+    this.logger.info('Testing audit query smoke latency...');
 
     try {
-      // Test memory-intensive operations
+      // These requests measure HTTP latency, not Worker memory usage.
       const largeQueries = [
-        `${API_ENDPOINTS.auditLogs}?limit=500`,
-        `${API_ENDPOINTS.auditSearch}?query=*&limit=200`,
+        `${API_ENDPOINTS.auditLogs}?limit=100`,
+        `${API_ENDPOINTS.auditSearch}?query=*&limit=100`,
         `${API_ENDPOINTS.auditStats}?detailed=true`
       ];
 
       for (const query of largeQueries) {
         const startTime = Date.now();
-        await this.client.get(query, {
+        const response = await this.client.get(query, {
           Authorization: `Bearer ${this.tokens.admin}`
         });
         const endTime = Date.now();
         const responseTime = endTime - startTime;
 
+        this.assertPerformance(response, responseTime, `Query ${query}`);
         this.logger.info(`Query "${query.split('?')[0]}": ${responseTime}ms`);
       }
 
-      this.logger.success('Audit memory usage test completed');
+      this.logger.success('Audit query smoke completed');
     } catch (error) {
-      this.logger.error(`[testAuditMemoryUsage] Audit memory usage test failed: ${error.message}`);
+      this.logger.error(`[testAuditQuerySmoke] Audit query smoke failed: ${error.message}`);
       throw error;
     }
   }
@@ -506,10 +471,11 @@ class AuditPerformanceTest {
 
         for (let i = 0; i < iterations; i++) {
           const startTime = Date.now();
-          await this.client.get(endpoint.url, {
+          const response = await this.client.get(endpoint.url, {
             Authorization: `Bearer ${this.tokens.admin}`
           });
           const endTime = Date.now();
+          this.assertPerformance(response, endTime - startTime, endpoint.name);
           times.push(endTime - startTime);
         }
 
@@ -555,7 +521,10 @@ class AuditPerformanceTest {
         r.status === 'fulfilled' && r.value.status === 200
       ).length;
 
-      const throughput = (successCount / (totalTime / 1000)).toFixed(2);
+      const throughput = (successCount * 1000 / Math.max(totalTime, 1)).toFixed(2);
+      this.assert.assertEqual(successCount, totalRequests, 'Every paced throughput smoke request should succeed');
+      this.assert.assertTrue(totalTime < duration * 1000 + this.responseTimeLimitMs,
+        'Paced smoke should complete within the send window plus one response budget');
 
       this.logger.info(`Throughput: ${throughput} requests/second (${successCount}/${totalRequests} successful)`);
       this.logger.success('Audit throughput test completed');
@@ -565,126 +534,58 @@ class AuditPerformanceTest {
     }
   }
 
-  async testAuditStressTest() {
-    this.logger.info('Testing audit stress scenarios...');
-
-    try {
-      // Test with high concurrent load
-      const concurrentRequests = 5; // Reduced from 50/20 to avoid overwhelming local dev server and subsequent tests
-      const promises = [];
-
-      for (let i = 0; i < concurrentRequests; i++) {
-        const promise = this.client.get(API_ENDPOINTS.auditLogs + '?limit=20', {
-          Authorization: `Bearer ${this.tokens.admin}`
-        });
-        promises.push(promise);
-      }
-
-      const startTime = Date.now();
-      const results = await Promise.allSettled(promises);
-      const endTime = Date.now();
-      const totalTime = endTime - startTime;
-
-      const successCount = results.filter(r =>
-        r.status === 'fulfilled' && r.value.status === 200
-      ).length;
-
-      const successRate = (successCount / concurrentRequests) * 100;
-
-      this.logger.info(`Stress test: ${successCount}/${concurrentRequests} requests succeeded (${successRate.toFixed(1)}%) in ${totalTime}ms`);
-
-      // Assert minimum success rate under stress
-      // Reduced threshold for CI environment variability
-      this.assert.assertTrue(successRate >= 20, `Success rate under stress should be at least 20% (got ${successRate.toFixed(1)}%)`);
-
-      // Allow server to recover
-      await new Promise(resolve => setTimeout(resolve, 2000));
-
-      this.logger.success('Audit stress test completed');
-    } catch (error) {
-      this.logger.error(`[testAuditStressTest] Audit stress test failed: ${error.message}`);
-      throw error;
-    }
+  async testAuditConcurrentSmoke() {
+    this.logger.info('Testing five concurrent audit requests (smoke)...');
+    const concurrentRequests = 5;
+    const startTime = Date.now();
+    const promises = Array.from({ length: concurrentRequests }, () =>
+      this.client.get(API_ENDPOINTS.auditLogs + '?limit=20', {
+        Authorization: `Bearer ${this.tokens.admin}`
+      })
+    );
+    const results = await Promise.allSettled(promises);
+    const totalTime = Date.now() - startTime;
+    const successCount = results.filter(r => r.status === 'fulfilled' && r.value.status === 200).length;
+    this.logger.info(`Concurrent smoke: ${successCount}/${concurrentRequests} succeeded in ${totalTime}ms`);
+    this.assert.assertEqual(successCount, concurrentRequests, 'Every concurrent audit smoke request should succeed');
+    this.assert.assertTrue(totalTime < this.batchTimeLimitMs, 'Concurrent audit smoke should finish within the batch budget');
   }
 
-  async testAuditLoadBalance() {
-    this.logger.info('Testing audit load balancing...');
-
-    try {
-      // Safety timeout so the test doesn't hang if any endpoint stalls
-      const withTimeout = (promise, timeoutMs, endpoint) => new Promise(resolve => {
-        const timer = setTimeout(() => {
-          resolve({ status: 598, data: { error: `timeout after ${timeoutMs}ms at ${endpoint}` } });
-        }, timeoutMs);
-
-        promise
-          .then(response => {
-            clearTimeout(timer);
-            resolve(response);
-          })
-          .catch(error => {
-            clearTimeout(timer);
-            resolve({ status: 599, data: { error: error.message || 'request failed' } });
-          });
-      });
-
-      // Test multiple different endpoints simultaneously
-      const endpoints = [
-        API_ENDPOINTS.auditLogs + '?limit=10',
-        API_ENDPOINTS.auditStats,
-        API_ENDPOINTS.auditSearch + '?query=test&limit=5'
-      ];
-
-      const promises = [];
-
-      // Create requests to different endpoints
-      for (let i = 0; i < 10; i++) { // Reduced from 15 to 10
-        const endpoint = endpoints[i % endpoints.length];
-        const promise = withTimeout(
-          this.client.get(endpoint, {
-            Authorization: `Bearer ${this.tokens.admin}`
-          }),
-          4000,
-          endpoint
-        );
-        promises.push(promise);
-      }
-
-      const startTime = Date.now();
-      const results = await Promise.all(promises);
-      const endTime = Date.now();
-      const totalTime = endTime - startTime;
-
-      const successCount = results.filter(r => r.status === 200).length;
-
-      this.logger.info(`Load balance test: ${successCount}/${promises.length} requests succeeded in ${totalTime}ms`);
-
-      // Allow server to recover
-      await new Promise(resolve => setTimeout(resolve, 2000));
-
-      this.logger.success('Audit load balance test completed');
-    } catch (error) {
-      this.logger.error(`[testAuditLoadBalance] Audit load balance test failed: ${error.message}`);
-      throw error;
-    }
+  async testAuditMixedEndpointSmoke() {
+    this.logger.info('Testing mixed audit endpoints concurrently (smoke)...');
+    const endpoints = [
+      API_ENDPOINTS.auditLogs + '?limit=10',
+      API_ENDPOINTS.auditStats,
+      API_ENDPOINTS.auditSearch + '?query=test&limit=5'
+    ];
+    const requestCount = 10;
+    const startTime = Date.now();
+    const promises = Array.from({ length: requestCount }, (_, i) =>
+      this.client.get(endpoints[i % endpoints.length], {
+        Authorization: `Bearer ${this.tokens.admin}`
+      }, { timeoutMs: this.responseTimeLimitMs, retries: 0 })
+    );
+    const results = await Promise.allSettled(promises);
+    const totalTime = Date.now() - startTime;
+    const successCount = results.filter(r => r.status === 'fulfilled' && r.value.status === 200).length;
+    this.logger.info(`Mixed endpoint smoke: ${successCount}/${requestCount} succeeded in ${totalTime}ms`);
+    this.assert.assertEqual(successCount, requestCount, 'Every mixed endpoint smoke request should succeed');
+    this.assert.assertTrue(totalTime < this.batchTimeLimitMs, 'Mixed endpoint smoke should finish within the batch budget');
   }
 
   async testI18nErrorMessagesAuditAccess() {
     this.logger.info('Testing i18n error messages for audit access (unauthorized)...');
 
     try {
-      const unauthClient = new TestClient(TEST_CONFIG.baseUrl);
+      const unauthClient = new TestClient(this.client.baseUrl);
+      unauthClient.defaultOptions.retries = 0;
 
       for (const lang of TEST_LANGUAGES.slice(0, 3)) { // limit to first 3 languages for speed
         this.logger.info(`  Locale: ${lang}`);
         const response = await unauthClient.get(`${API_ENDPOINTS.auditLogs}?lang=${lang}`);
 
-        // Handle potential 500 error in test environment
-        if (response.status === 500) {
-          this.logger.warn(`Unauthorized audit access returned 500 instead of 401 for ${lang}. This indicates a potential issue but test will proceed.`);
-        } else {
-          this.assert.assertEqual(response.status, 401, `Unauthorized audit access should return 401 for ${lang}`);
-        }
+        this.assert.assertEqual(response.status, 401, `Unauthorized audit access should return 401 for ${lang}`);
+        this.assert.exists(response.data.error, `Should have error message for ${lang}`);
 
         if (response.data && typeof response.data === 'object' && 'error' in response.data) {
           this.assert.exists(response.data.error, `Should have error message for ${lang}`);
@@ -710,16 +611,12 @@ class AuditPerformanceTest {
 
       for (const lang of TEST_LANGUAGES.slice(0, 3)) {
         this.logger.info(`  Locale: ${lang}`);
-        const url = `${API_ENDPOINTS.auditSearch}?lang=${lang}&search=invalid_search_12345&searchFields=invalid_field`;
+        const url = `${API_ENDPOINTS.auditSearch}?lang=${lang}&limit=101`;
         const response = await this.client.get(url, { Authorization: `Bearer ${this.tokens.admin}` });
 
-        // Depending on implementation it may return 200 (no error) or validation error
-        if (response.status >= 400 && response.data && 'error' in response.data) {
-          this.assert.assertNotEmpty(response.data.error, `Error message should not be empty for ${lang}`);
-          this.logger.info(`    ${lang} -> ${response.data.error}`);
-        } else {
-          this.logger.info(`    ${lang} -> No localized error (status ${response.status})`);
-        }
+        this.assert.assertEqual(response.status, 400, `Invalid search page size should return 400 for ${lang}`);
+        this.assert.assertNotEmpty(response.data.error, `Error message for ${lang}`);
+        this.logger.info(`    ${lang} -> ${response.data.error}`);
       }
 
       this.logger.success('i18n audit search error messages processed');
@@ -740,14 +637,14 @@ class AuditPerformanceTest {
       for (const lang of TEST_LANGUAGES.slice(0, 3)) {
         this.logger.info(`  Locale: ${lang}`);
         const url = `${API_ENDPOINTS.auditExport}?lang=${lang}&format=invalid_format_xyz`;
-        const response = await this.client.get(url, { Authorization: `Bearer ${this.tokens.superAdmin || this.tokens.admin}` });
+        const response = await this.client.get(url, { Authorization: `Bearer ${this.tokens.superAdmin}` });
 
-        if (response.status >= 400 && response.data && 'error' in response.data) {
-          this.assert.assertNotEmpty(response.data.error, `Error message should not be empty for ${lang}`);
-          this.logger.info(`    ${lang} -> ${response.data.error}`);
-        } else {
-          this.logger.info(`    ${lang} -> Export request succeeded (status ${response.status})`);
-        }
+        this.assert.assertEqual(response.status, 422, `Unsupported export format should return 422 for ${lang}`);
+        this.assert.assertEqual(response.data.success, false, 'Refused export must not succeed');
+        this.assert.assertEqual(response.data.code, 'UNSUPPORTED_EXPORT_OPTION', 'Export refusal should carry a stable code');
+        this.assert.assertNotEmpty(response.data.message, `Export refusal message for ${lang}`);
+        this.assert.assertEqual(response.data.data, undefined, 'Refused export must not fabricate data');
+        this.logger.info(`    ${lang} -> ${response.data.code}`);
       }
 
       this.logger.success('i18n audit export error messages processed');
@@ -780,7 +677,7 @@ class AuditPerformanceTest {
     if (this.performanceMetrics.auditExport.length > 0) {
       this.logger.info('AUDIT EXPORT PERFORMANCE:');
       this.performanceMetrics.auditExport.forEach(metric => {
-        this.logger.info(`${metric.size} records: ${metric.responseTime}ms`);
+        this.logger.info(`Requested limit ${metric.size}: ${metric.responseTime}ms`);
       });
     }
 
@@ -819,30 +716,12 @@ class AuditPerformanceTest {
       this.logger.info(`Average search time: ${avgSearchTime.toFixed(1)}ms`);
     }
 
-    this.logger.info('PERFORMANCE RECOMMENDATIONS:');
-
-    if (avgQueryTime > 1000) {
-      this.logger.info('Query performance could be improved with database optimization');
-    } else if (avgQueryTime > 0) {
-      this.logger.info('Query performance is good');
+    const concurrentRequests = this.performanceMetrics.concurrentLogging.reduce((sum, metric) => sum + metric.concurrency, 0);
+    const concurrentSuccesses = this.performanceMetrics.concurrentLogging.reduce((sum, metric) => sum + metric.successCount, 0);
+    if (concurrentRequests > 0) {
+      this.logger.info(`Concurrent login smoke: ${concurrentSuccesses}/${concurrentRequests} requests succeeded on first attempt`);
     }
-
-    if (avgSearchTime > 2000) {
-      this.logger.info('Search performance could be improved with better indexing');
-    } else if (avgSearchTime > 0) {
-      this.logger.info('Search performance is good');
-    }
-
-    const totalConcurrentTests = this.performanceMetrics.concurrentLogging.length;
-    const successfulConcurrentTests = this.performanceMetrics.concurrentLogging.filter(m => m.successRate > 80).length;
-
-    if (totalConcurrentTests > 0 && successfulConcurrentTests === totalConcurrentTests) {
-      this.logger.info('Concurrent logging performance is excellent');
-    } else if (totalConcurrentTests > 0) {
-      this.logger.info('Some concurrent operations had low success rates');
-    }
-
-    this.logger.success('AUDIT SYSTEM PERFORMANCE TEST COMPLETED!');
+    this.logger.info('Smoke sample report complete; results describe this run and its existing dataset.');
   }
 }
 

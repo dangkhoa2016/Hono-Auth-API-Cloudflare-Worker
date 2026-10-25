@@ -81,7 +81,7 @@
  * - Advanced analytics with time ranges and metrics
  * - Archive management and data retention policies
  * - Compliance reporting (GDPR, SOX, ISO 27001, HIPAA, PCI-DSS)
- * - Advanced export with multiple formats and aggregation
+ * - JSON/CSV export and aggregation; unsupported formats/options refused
  * - Sensitive data protection and access control
  * - SQL injection and XSS protection testing
  * - Rate limiting and timeout scenario testing
@@ -105,6 +105,8 @@ class AdvancedAuditComprehensiveTest {
     // Initialize in standard order
     this.logger = new TestLogger();
     this.client = new TestClient(TEST_CONFIG.baseUrl);
+    // Preserve first-attempt failures in functional and latency checks.
+    this.client.defaultOptions.retries = 0;
     this.assert = TestAssertions;
 
     // Test-specific properties
@@ -858,57 +860,68 @@ class AdvancedAuditComprehensiveTest {
     await this.testExportWithOptions();
   }
 
-  async testAdvancedExportFormats() {
-    await this.runTest('Advanced Export Formats', async () => {
-      const formatTests = [
-        {
-          name: 'JSON Export',
-          format: 'json',
-          options: {
-            include_metadata: true,
-            compress: true,
-            encrypt: true
-          }
-        },
-        {
-          name: 'Excel Export',
-          format: 'excel',
-          options: {
-            include_charts: true,
-            multiple_sheets: true,
-            pivot_tables: true
-          }
-        },
-        {
-          name: 'CSV Export',
-          format: 'csv',
-          options: {
-            include_headers: true,
-            delimiter: ','
-          }
-        },
-        {
-          name: 'PDF Export',
-          format: 'pdf',
-          options: {
-            include_charts: true,
-            include_summary: true
-          }
-        }
-      ];
+  assertExportResponse(response, format) {
+    this.assert.assertStatus(response.status, 200, `${format} export should succeed`);
+    this.assert.assertSuccess(response, `${format} export should produce a payload`);
+    const payload = response.data.data;
+    this.assert.assertEqual(payload.format, format, 'Delivered format should match the request');
+    this.assert.assertEqual(payload.metadata.export_type, format, 'Metadata should identify the delivered format');
+    this.assert.assertTrue(Number.isInteger(payload.total_records) && payload.total_records >= 0,
+      'Export should report a nonnegative record count');
+    this.assert.assertEqual(payload.metadata.total_records, payload.total_records, 'Metadata count should agree');
+    if (format === 'json') {
+      this.assert.assertTrue(Array.isArray(payload.data), 'JSON export should contain rows');
+      this.assert.assertEqual(payload.data.length, payload.total_records, 'JSON count should match the delivered rows');
+      this.assert.assertEqual(payload.size,
+        Buffer.byteLength(JSON.stringify({ metadata: payload.metadata, data: payload.data }), 'utf8'),
+        'JSON size should count the delivered document bytes');
+    } else {
+      this.assert.assertType(payload.data, 'string', 'CSV export should contain text');
+      this.assert.assertEqual(payload.size, Buffer.byteLength(payload.data, 'utf8'), 'CSV size should count delivered bytes');
+      this.assert.assertTrue(payload.filename.endsWith('.csv'), 'CSV export should name a CSV file');
+      this.assert.assertTrue(Array.isArray(payload.metadata.columns), 'CSV export should describe its columns');
+      if (payload.total_records === 0) {
+        this.assert.assertEqual(payload.data, '', 'An empty CSV export should contain no fabricated records');
+      } else {
+        this.assert.assertEqual(payload.data.split('\r\n')[0], payload.metadata.columns.join(','),
+          'CSV header should name the exported columns');
+        this.assert.assertTrue(payload.data.includes('\r\n'), 'Nonempty CSV should include record data after the header');
+      }
+    }
+  }
 
-      for (const test of formatTests) {
+  assertUnsupportedExport(response) {
+    this.assert.assertStatus(response.status, 422, 'Unsupported export requests should be refused');
+    this.assert.assertEqual(response.data.success, false, 'Refusal must not report success');
+    this.assert.assertEqual(response.data.error, 'UNSUPPORTED_EXPORT_OPTION', 'Refusal should have a stable error');
+    this.assert.assertEqual(response.data.code, 'UNSUPPORTED_EXPORT_OPTION', 'Refusal should have a stable code');
+    this.assert.assertNotEmpty(response.data.requestId, 'requestId');
+    this.assert.assertNotEmpty(response.data.message, 'message');
+    this.assert.assertEqual(response.data.data, undefined, 'Refusal must not fabricate exported data');
+  }
+
+  async testAdvancedExportFormats() {
+    await this.runTest('Supported JSON/CSV Export Formats', async () => {
+      for (const format of ['json', 'csv']) {
         const response = await this.client.post(API_ENDPOINTS.advancedAuditExport, {
-          format: test.format,
-          options: test.options,
-          filters: {
-            time_range: '7d'
-          }
+          format,
+          options: format === 'json' ? { include_metadata: true } : {},
+          filters: { time_range: '7d' }
         }, {
           Authorization: `Bearer ${this.tokens.superAdmin}`
         });
+        this.assertExportResponse(response, format);
+      }
+    });
 
-        this.assert.assertStatus(response.status, 200, `Should handle ${test.name}`);
+    await this.runTest('Unsupported Export Formats', async () => {
+      for (const format of ['excel', 'pdf']) {
+        const response = await this.client.post(API_ENDPOINTS.advancedAuditExport, {
+          format
+        }, {
+          Authorization: `Bearer ${this.tokens.superAdmin}`
+        });
+        this.assertUnsupportedExport(response);
       }
     });
   }
@@ -947,7 +960,7 @@ class AdvancedAuditComprehensiveTest {
           Authorization: `Bearer ${this.tokens.superAdmin}`
         });
 
-        this.assert.assertStatus(response.status, 200, `Should handle ${test.name}`);
+        this.assertExportResponse(response, 'json');
       }
     });
   }
@@ -967,38 +980,37 @@ class AdvancedAuditComprehensiveTest {
         Authorization: `Bearer ${this.tokens.superAdmin}`
       });
 
-      this.assert.assertStatus(response.status, 200, 'Should handle aggregated export');
+      this.assertExportResponse(response, 'csv');
+      this.assert.assertEqual(response.data.data.metadata.columns.join(','),
+        'action,actor_email,count,first_occurrence,last_occurrence', 'Aggregated CSV should contain the requested projection');
     });
   }
 
   async testExportWithOptions() {
-    await this.runTest('Export with Advanced Options', async () => {
-      const optionTests = [
-        {
-          name: 'Compressed export',
-          options: { compress: true, encryption: 'aes256' }
-        },
-        {
-          name: 'Encrypted export',
-          options: { encrypt: true, password_protected: true }
-        },
-        {
-          name: 'Metadata included',
-          options: { include_metadata: true, include_schema: true }
-        }
-      ];
-
-      for (const test of optionTests) {
+    await this.runTest('Unsupported Compression and Encryption Options', async () => {
+      for (const option of ['compress', 'compression', 'encrypt']) {
         const response = await this.client.post(API_ENDPOINTS.advancedAuditExport, {
           format: 'json',
-          options: test.options,
-          filters: { time_range: '7d' }
+          options: { [option]: true }
         }, {
           Authorization: `Bearer ${this.tokens.superAdmin}`
         });
-
-        this.assert.assertStatus(response.status, 200, `Should handle ${test.name}`);
+        this.assertUnsupportedExport(response);
+        this.assert.assertEqual(response.data.availableOptions[option], false,
+          `${option} should be explicitly unavailable`);
       }
+    });
+
+    await this.runTest('JSON Export with Metadata', async () => {
+      const response = await this.client.post(API_ENDPOINTS.advancedAuditExport, {
+        format: 'json',
+        options: { include_metadata: true },
+        filters: { time_range: '7d' }
+      }, {
+        Authorization: `Bearer ${this.tokens.superAdmin}`
+      });
+      this.assertExportResponse(response, 'json');
+      this.assert.assertEqual(response.data.data.metadata.include_metadata, true, 'Metadata option should be applied');
     });
   }
 
@@ -1346,11 +1358,13 @@ class AdvancedAuditComprehensiveTest {
       const responseTime = endTime - startTime;
 
       this.assert.assertStatus(response.status, 200, 'Should collect performance metrics');
+      this.assert.assertTrue(responseTime < 2000, `Analytics smoke should finish under 2000ms (${responseTime}ms)`);
 
       this.logger.info(`⏱️  Advanced analytics response time: ${responseTime}ms`);
     });
 
-    await this.runTest('Large Dataset Processing', async () => {
+    await this.runTest('Bounded CSV Export Smoke', async () => {
+      const startTime = Date.now();
       const response = await this.client.post(API_ENDPOINTS.advancedAuditExport, {
         format: 'csv',
         filters: {
@@ -1360,10 +1374,12 @@ class AdvancedAuditComprehensiveTest {
         Authorization: `Bearer ${this.tokens.superAdmin}`
       });
 
-      this.assert.assertStatus(response.status, 200, 'Should handle large dataset processing');
+      this.assertExportResponse(response, 'csv');
+      this.assert.assertTrue(Date.now() - startTime < 10000, 'CSV export smoke should finish under 10000ms');
     });
 
     await this.runTest('Concurrent Advanced Operations', async () => {
+      const startTime = Date.now();
       const promises = [
         this.client.get(API_ENDPOINTS.advancedAuditAnalytics, {
           Authorization: `Bearer ${this.tokens.superAdmin}`
@@ -1378,11 +1394,11 @@ class AdvancedAuditComprehensiveTest {
 
       const results = await Promise.allSettled(promises);
       const successCount = results.filter(r =>
-        r.status === 'fulfilled' &&
-        (r.value.status === 200 || r.value.status === 403)
+        r.status === 'fulfilled' && r.value.status === 200
       ).length;
 
-      this.assert.assertTrue(successCount >= 2, 'Most concurrent operations should succeed');
+      this.assert.assertEqual(successCount, promises.length, 'Every concurrent smoke operation should succeed');
+      this.assert.assertTrue(Date.now() - startTime < 10000, 'Concurrent smoke operations should finish under 10000ms');
     });
   }
 
