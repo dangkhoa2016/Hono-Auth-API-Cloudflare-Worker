@@ -1,28 +1,11 @@
 #!/usr/bin/env node
 
 /**
- * Performance & Load Test Suite
- * Tests system performance and scalability across endpoints
- *
- * Endpoints tested:
- * - GET /health - Health check response time
- * - POST /api/auth/login - Authentication performance
- * - GET /api/admin/users - Large user list handling
- * - GET /api/audit/logs - Audit log pagination performance
- * - POST /api/user/upload - File upload speed
- * - GET /api/admin/stats - Statistics calculation performance
- * - Multiple concurrent requests across all endpoints
- *
- * Test coverage:
- * - Response time benchmarks (<500ms for most endpoints)
- * - Concurrent request handling (10-50 simultaneous requests)
- * - Large dataset processing capabilities
- * - Memory usage during operations
- * - Database query performance
- * - File upload performance testing
- * - Load testing with multiple concurrent users
- * - Performance degradation analysis
-*/
+ * HTTP performance smoke checks for health, login, profile, and metadata routes.
+ * Measures first-attempt latency, small concurrent batches, a short throughput
+ * sample, and this Node test process's heap growth. Does not seed large datasets,
+ * measure Worker memory, or establish sustained-load/caching guarantees.
+ */
 
 import { TestClient } from './utils/testClient.js';
 import { TestLogger } from './utils/testLogger.js';
@@ -34,6 +17,7 @@ class PerformanceTests {
     // Initialize in standard order
     this.logger = new TestLogger();
     this.client = new TestClient(TEST_CONFIG.baseUrl);
+    this.client.defaultOptions.retries = 0;
     this.assert = TestAssertions;
 
     // Test-specific properties
@@ -41,7 +25,7 @@ class PerformanceTests {
       responseTime: 1000, // 1 second max
       healthCheck: 250,   // 250ms max for health check (allows minor cold-start jitter)
       login: 500,         // 500ms max for login
-      concurrent: 100     // 100 concurrent requests
+      batch: 5000        // local smoke batch completion budget
     };
   }
 
@@ -54,11 +38,11 @@ class PerformanceTests {
       this.testLoginPerformance,
       this.testConcurrentRequests,
       this.testDatabasePerformance,
-      this.testMemoryUsage,
+      this.testClientHeapSmoke,
       this.testThroughput,
-      this.testLoadTesting,
-      this.testStressTesting,
-      this.testCachePerformance
+      this.testConcurrentSessionsSmoke,
+      this.testConcurrentBurstSmoke,
+      this.testRepeatedReadPerformance
     ];
 
     // Process tests using standard pattern
@@ -127,6 +111,7 @@ class PerformanceTests {
           return await this.client.get(endpoint.path);
         });
 
+        this.assert.assertEqual(measurement.result.status, 200, `${endpoint.path} should succeed`);
         results.push({
           endpoint: endpoint.path,
           responseTime: measurement.responseTime,
@@ -259,10 +244,11 @@ class PerformanceTests {
         `All ${concurrentRequests} concurrent requests should succeed`);
       this.assert.assertEqual(failed.length, 0, 'No concurrent requests should fail');
 
-      const avgTimePerRequest = totalTime / concurrentRequests;
+      this.assert.assertEqual(totalTime < this.performanceThresholds.batch, true,
+        'Concurrent smoke should finish within the batch budget');
       this.logger.info(`Concurrent Requests (${concurrentRequests} requests):`);
       this.logger.info(`Total time: ${totalTime}ms`);
-      this.logger.info(`Average per request: ${avgTimePerRequest.toFixed(2)}ms`);
+      this.logger.info(`Completed requests per second: ${(successful.length * 1000 / Math.max(totalTime, 1)).toFixed(2)}`);
       this.logger.info(`Successful: ${successful.length}`);
       this.logger.info(`Failed: ${failed.length}`);
       this.logger.success('Concurrent requests test completed successfully');
@@ -288,6 +274,8 @@ class PerformanceTests {
       });
 
       this.assert.assertEqual(loginMeasurement.result.status, 200, 'Database login should succeed');
+      this.assert.assertEqual(loginMeasurement.responseTime <= this.performanceThresholds.login, true,
+        'Database login should finish within the login latency budget');
 
       const token = loginMeasurement.result.data.data.access_token;
 
@@ -313,10 +301,10 @@ class PerformanceTests {
   }
 
   /**
-   * Test memory usage during operations
+   * Test this Node HTTP client process heap growth during requests
    */
-  async testMemoryUsage() {
-    this.logger.info('Testing memory usage during operations...');
+  async testClientHeapSmoke() {
+    this.logger.info('Testing HTTP client process heap growth...');
 
     try {
       // This is a basic test - in a real environment you'd use more sophisticated tools
@@ -328,12 +316,14 @@ class PerformanceTests {
         operations.push(this.client.get(API_ENDPOINTS.health));
       }
 
-      await Promise.all(operations);
+      const responses = await Promise.all(operations);
+      this.assert.assertEqual(responses.filter(response => response.status === 200).length, operations.length,
+        'Every request in the client heap smoke should succeed');
 
       const finalMemory = process.memoryUsage();
       const memoryIncrease = finalMemory.heapUsed - initialMemory.heapUsed;
 
-      this.logger.info('Memory Usage:');
+      this.logger.info('Node HTTP client process heap (not Worker memory):');
       this.logger.info(`Initial heap: ${(initialMemory.heapUsed / 1024 / 1024).toFixed(2)}MB`);
       this.logger.info(`Final heap: ${(finalMemory.heapUsed / 1024 / 1024).toFixed(2)}MB`);
       this.logger.info(`Increase: ${(memoryIncrease / 1024 / 1024).toFixed(2)}MB`);
@@ -344,7 +334,7 @@ class PerformanceTests {
 
       this.logger.success('Memory usage test completed successfully');
     } catch (error) {
-      this.logger.error(`[testMemoryUsage] Memory usage test failed: ${error.message}`);
+      this.logger.error(`[testClientHeapSmoke] Memory usage test failed: ${error.message}`);
       throw error;
     }
   }
@@ -428,11 +418,11 @@ class PerformanceTests {
     }
   }
 
-  async testLoadTesting() {
+  async testConcurrentSessionsSmoke() {
     try {
-      this.logger.info('Testing load testing performance...');
+      this.logger.info('Testing small concurrent session smoke batches...');
 
-      // Simulate moderate load
+      // Five synthetic sessions, three health requests each; a bounded smoke sample.
       const concurrentUsers = 5;
       const requestsPerUser = 3;
       const startTime = Date.now();
@@ -451,38 +441,38 @@ class PerformanceTests {
       const endTime = Date.now();
       const totalTime = endTime - startTime;
 
-      const successfulSessions = results.filter(r => r.status === 'fulfilled').length;
+      const successfulSessions = results.filter(r => r.status === 'fulfilled' &&
+        r.value.every(response => response.status === 200)).length;
+      const successfulRequests = results.reduce((count, result) => count +
+        (result.status === 'fulfilled' ? result.value.filter(response => response.status === 200).length : 0), 0);
       const totalRequests = concurrentUsers * requestsPerUser;
 
-      this.logger.info(`Load Test (${concurrentUsers} users, ${requestsPerUser} requests each):`);
+      this.logger.info(`Concurrent session smoke (${concurrentUsers} sessions, ${requestsPerUser} requests each):`);
       this.logger.info(`Total time: ${totalTime}ms`);
       this.logger.info(`Total requests: ${totalRequests}`);
       this.logger.info(`Successful sessions: ${successfulSessions}/${concurrentUsers}`);
-      this.logger.info(`Requests per second: ${((totalRequests / totalTime) * 1000).toFixed(2)}`);
+      this.logger.info(`Successful requests per second: ${(successfulRequests * 1000 / Math.max(totalTime, 1)).toFixed(2)}`);
 
-      this.assert.assertEqual(successfulSessions >= concurrentUsers * 0.9, true,
-        'At least 90% of user sessions should succeed');
+      this.assert.assertEqual(successfulSessions, concurrentUsers, 'Every smoke session should receive successful HTTP responses');
+      this.assert.assertEqual(totalTime < this.performanceThresholds.batch, true,
+        'Concurrent session smoke should finish within the batch budget');
 
-      this.logger.success('Load testing completed successfully');
+      this.logger.success('Concurrent session smoke completed successfully');
     } catch (error) {
-      this.logger.error(`[testLoadTesting] Load testing failed: ${error.message}`);
+      this.logger.error(`[testConcurrentSessionsSmoke] Concurrent session smoke failed: ${error.message}`);
       throw error;
     }
   }
 
-  async testStressTesting() {
+  async testConcurrentBurstSmoke() {
     try {
-      this.logger.info('Testing stress testing performance...');
+      this.logger.info('Testing twenty concurrent health requests (smoke)...');
 
-      // Allow server to recover from previous tests
-      await new Promise(resolve => setTimeout(resolve, 2000));
-
-      // Push the system harder
-      const concurrentRequests = 20; // Reduced from 50 to avoid overwhelming local dev server
+      const concurrentRequests = 20;
       const startTime = Date.now();
 
       const requests = Array(concurrentRequests).fill().map(() =>
-        this.client.get(API_ENDPOINTS.health).catch(e => e.response)
+        this.client.get(API_ENDPOINTS.health)
       );
 
       const results = await Promise.all(requests);
@@ -492,67 +482,65 @@ class PerformanceTests {
       const successful = results.filter(r => r && r.status === 200).length;
       const errors = results.filter(r => !r || r.status !== 200).length;
 
-      this.logger.info(`Stress Test (${concurrentRequests} concurrent requests):`);
+      this.logger.info(`Concurrent burst smoke (${concurrentRequests} requests):`);
       this.logger.info(`Total time: ${totalTime}ms`);
       this.logger.info(`Successful: ${successful}`);
       this.logger.info(`Errors: ${errors}`);
       this.logger.info(`Success rate: ${((successful / concurrentRequests) * 100).toFixed(1)}%`);
 
-      // Allow for some failures under stress, but not too many
-      this.assert.assertEqual(successful / concurrentRequests >= 0.8, true,
-        'At least 80% of requests should succeed under stress');
+      this.assert.assertEqual(successful, concurrentRequests, 'Every concurrent burst smoke request should succeed');
+      this.assert.assertEqual(totalTime < this.performanceThresholds.batch, true,
+        'Concurrent burst smoke should finish within the batch budget');
 
-      this.logger.success('Stress testing completed successfully');
+      this.logger.success('Concurrent burst smoke completed successfully');
     } catch (error) {
-      this.logger.error(`[testStressTesting] Stress testing failed: ${error.message}`);
+      this.logger.error(`[testConcurrentBurstSmoke] Concurrent burst smoke failed: ${error.message}`);
       throw error;
     }
   }
 
   /**
-   * Test cache performance and response caching
+   * Measure repeated reads without inferring that caching is implemented
    */
-  async testCachePerformance() {
-    this.logger.info('Testing cache performance...');
+  async testRepeatedReadPerformance() {
+    this.logger.info('Testing repeated health read performance...');
 
     try {
-      // Test if responses are cached (if caching is implemented)
+      // Repeated HTTP timings alone do not establish cache behavior.
       const endpoint = API_ENDPOINTS.health;
-      const requestOptions = { timeoutMs: 5000, retries: 2, retryDelayMs: 150 };
+      const requestOptions = { timeoutMs: 5000, retries: 0 };
 
       // Pre-warm once to avoid first-hit cold-start stalls
       try {
         await this.client.get(endpoint, {}, requestOptions);
       } catch (e) {
-        this.logger.warning('Cache warmup encountered a transient error, continuing with test');
+        this.logger.warning('Read warmup encountered a transient error, continuing with test');
       }
 
-      // First request (cold)
+      // First measured request after warmup
       const firstRequest = await this.measureResponseTime(async () => {
         return await this.client.get(endpoint, {}, requestOptions);
       });
 
-      // Second request (potentially cached)
+      // Second measured request
       const secondRequest = await this.measureResponseTime(async () => {
         return await this.client.get(endpoint, {}, requestOptions);
       });
 
-      this.logger.info('Cache Performance:');
+      this.logger.info('Repeated Read Performance:');
       this.logger.info(`First request: ${firstRequest.responseTime}ms`);
       this.logger.info(`Second request: ${secondRequest.responseTime}ms`);
-
-      if (secondRequest.responseTime < firstRequest.responseTime * 0.8) {
-        this.logger.info(`🎉 Potential caching detected (${((1 - secondRequest.responseTime / firstRequest.responseTime) * 100).toFixed(1)}% faster)`);
-      } else {
-        this.logger.info('📝 No significant caching detected');
-      }
 
       // Both requests should succeed regardless
       this.assert.assertEqual(firstRequest.result.status, 200, 'First request should succeed');
       this.assert.assertEqual(secondRequest.result.status, 200, 'Second request should succeed');
-      this.logger.success('Cache performance test completed successfully');
+      for (const measurement of [firstRequest, secondRequest]) {
+        this.assert.assertEqual(measurement.responseTime <= this.performanceThresholds.healthCheck, true,
+          'Repeated health reads should finish within the health latency budget');
+      }
+      this.logger.success('Repeated read performance test completed successfully');
     } catch (error) {
-      this.logger.error(`[testCachePerformance] Cache performance test failed: ${error.message}`);
+      this.logger.error(`[testRepeatedReadPerformance] Repeated read performance test failed: ${error.message}`);
       throw error;
     }
   }
