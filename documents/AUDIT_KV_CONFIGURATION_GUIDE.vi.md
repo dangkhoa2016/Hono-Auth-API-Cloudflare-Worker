@@ -1,3 +1,5 @@
+> **Phạm vi tham khảo lịch sử:** Nội dung bên dưới được giữ để tra cứu thiết kế và ví dụ cũ; lệnh, payload, số liệu test và tuyên bố “complete/enterprise/production-ready” chưa được xác minh lại toàn bộ cho phiên bản hiện tại. Dùng [contract khả năng](CAPABILITIES.vi.md), [cài đặt](SETUP_GUIDE.vi.md), [kiểm chứng](TEST_GUIDE.vi.md) và [nâng cấp/phát hành](UPGRADE_RELEASE.vi.md) cho vận hành hiện tại. Monitoring chỉ theo truy vấn; action ngăn chặn/escalation và adapter email/KV cảnh báo chưa hỗ trợ. Nếu ví dụ bên dưới mâu thuẫn, contract hiện hành được ưu tiên.
+
 # 🔧 **HƯỚNG DẪN CẤU HÌNH CLOUDFLARE KV CHO HỆ THỐNG AUDIT**
 
 > 🌐 Language / Ngôn ngữ: [English](AUDIT_KV_CONFIGURATION_GUIDE.md) | **Tiếng Việt**
@@ -481,7 +483,7 @@ const AUDIT_CONFIG_VALIDATION = {
 
 Hệ thống audit bao gồm các tùy chọn cấu hình i18n toàn diện để hỗ trợ triển khai đa ngôn ngữ và thông báo lỗi được bản địa hóa.
 
-Dùng [TEST_GUIDE_vi.md](./TEST_GUIDE_vi.md) làm nguồn chuẩn cho lệnh test, [TEST_SCRIPTS_vi.md](./TEST_SCRIPTS_vi.md) cho flow tự động hóa, và [../tests/scripts/CURL_COMMANDS_vi.md](../tests/scripts/CURL_COMMANDS_vi.md) cho các ví dụ curl rộng hơn. Guide này chỉ giữ lại các ví dụ KV Admin mang tính đại diện.
+Dùng [TEST_GUIDE_vi.md](./TEST_GUIDE.vi.md) làm nguồn chuẩn cho lệnh test, [TEST_SCRIPTS_vi.md](./TEST_SCRIPTS.vi.md) cho flow tự động hóa, và [../tests/scripts/CURL_COMMANDS_vi.md](../tests/scripts/CURL_COMMANDS_vi.md) cho các ví dụ curl rộng hơn. Guide này chỉ giữ lại các ví dụ KV Admin mang tính đại diện.
 
 ### **🌐 Các Khóa Cấu Hình i18n Được Đề Xuất**
 
@@ -505,7 +507,7 @@ curl -X PUT "http://localhost:8787/api/kv-admin/configs/AUDIT_SUPPORTED_LANGUAGE
   -d '{"value": "en,vi,fr,es,de,ja,th"}'
 ```
 
-Để xem thêm ví dụ request theo từng khóa hoặc batch update, xem [TEST_SCRIPTS_vi.md](./TEST_SCRIPTS_vi.md) và [../tests/scripts/CURL_COMMANDS_vi.md](../tests/scripts/CURL_COMMANDS_vi.md).
+Để xem thêm ví dụ request theo từng khóa hoặc batch update, xem [TEST_SCRIPTS_vi.md](./TEST_SCRIPTS.vi.md) và [../tests/scripts/CURL_COMMANDS_vi.md](../tests/scripts/CURL_COMMANDS_vi.md).
 
 ### **🌐 Tích hợp Dịch vụ i18n**
 

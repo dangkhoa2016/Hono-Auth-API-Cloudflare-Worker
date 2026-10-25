@@ -1,3 +1,5 @@
+> **Phạm vi tham khảo lịch sử:** Nội dung bên dưới được giữ để tra cứu thiết kế và ví dụ cũ; lệnh, payload, số liệu test và tuyên bố “complete/enterprise/production-ready” chưa được xác minh lại toàn bộ cho phiên bản hiện tại. Dùng [contract khả năng](CAPABILITIES.vi.md), [cài đặt](SETUP_GUIDE.vi.md), [kiểm chứng](TEST_GUIDE.vi.md) và [nâng cấp/phát hành](UPGRADE_RELEASE.vi.md) cho vận hành hiện tại. Monitoring chỉ theo truy vấn; action ngăn chặn/escalation và adapter email/KV cảnh báo chưa hỗ trợ. Nếu ví dụ bên dưới mâu thuẫn, contract hiện hành được ưu tiên.
+
 # Hướng Dẫn Toàn Diện Hệ Thống Quản Lý Vai Trò
 
 > 🌐 Language / Ngôn ngữ: [English](ROLE_COMPLETE_GUIDE.md) | **Tiếng Việt**
@@ -873,7 +875,7 @@ node tests/mainMenu.js         # Trực tiếp
 
 Ngoài JavaScript tests, còn có shell scripts để test qua CURL.
 
-Dùng [TEST_GUIDE_vi.md](./TEST_GUIDE_vi.md) làm nguồn chuẩn cho ma trận RBAC test đầy đủ. Dùng [TEST_SCRIPTS_vi.md](./TEST_SCRIPTS_vi.md) cho shell runner và [../tests/scripts/CURL_COMMANDS_vi.md](../tests/scripts/CURL_COMMANDS_vi.md) cho ví dụ request đầy đủ.
+Dùng [TEST_GUIDE_vi.md](./TEST_GUIDE.vi.md) làm nguồn chuẩn cho ma trận RBAC test đầy đủ. Dùng [TEST_SCRIPTS_vi.md](./TEST_SCRIPTS.vi.md) cho shell runner và [../tests/scripts/CURL_COMMANDS_vi.md](../tests/scripts/CURL_COMMANDS_vi.md) cho ví dụ request đầy đủ.
 
 ```bash
 # Các runner RBAC nên dùng
@@ -966,7 +968,7 @@ kvAdminRoutes_log(`Config updated: ${key} = ${value} (was: ${oldValue})`);
 
 ### 📊 **Ví dụ đại diện**
 
-Guide này chỉ giữ lại một vài ví dụ KV Admin đại diện. Để xem curl workflow đầy đủ và danh sách lệnh theo hướng test, xem [TEST_SCRIPTS_vi.md](./TEST_SCRIPTS_vi.md) và [../tests/scripts/CURL_COMMANDS_vi.md](../tests/scripts/CURL_COMMANDS_vi.md).
+Guide này chỉ giữ lại một vài ví dụ KV Admin đại diện. Để xem curl workflow đầy đủ và danh sách lệnh theo hướng test, xem [TEST_SCRIPTS_vi.md](./TEST_SCRIPTS.vi.md) và [../tests/scripts/CURL_COMMANDS_vi.md](../tests/scripts/CURL_COMMANDS_vi.md).
 
 #### **Lấy Tất cả Cấu hình**
 ```bash
@@ -992,7 +994,7 @@ curl -X POST -H "Authorization: Bearer <super_admin_token>" \
 
 ### 🧪 **Testing KV Admin**
 
-Dùng [TEST_GUIDE_vi.md](./TEST_GUIDE_vi.md) cho ma trận kiểm thử RBAC và KV Admin đầy đủ, và [TEST_SCRIPTS_vi.md](./TEST_SCRIPTS_vi.md) cho chi tiết tự động hóa.
+Dùng [TEST_GUIDE_vi.md](./TEST_GUIDE.vi.md) cho ma trận kiểm thử RBAC và KV Admin đầy đủ, và [TEST_SCRIPTS_vi.md](./TEST_SCRIPTS.vi.md) cho chi tiết tự động hóa.
 
 **Các entry point nhanh**:
 ```bash

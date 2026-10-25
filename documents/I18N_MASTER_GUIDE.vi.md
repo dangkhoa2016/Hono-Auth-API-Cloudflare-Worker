@@ -1,3 +1,5 @@
+> **Phạm vi tham khảo lịch sử:** Nội dung bên dưới được giữ để tra cứu thiết kế và ví dụ cũ; lệnh, payload, số liệu test và tuyên bố “complete/enterprise/production-ready” chưa được xác minh lại toàn bộ cho phiên bản hiện tại. Dùng [contract khả năng](CAPABILITIES.vi.md), [cài đặt](SETUP_GUIDE.vi.md), [kiểm chứng](TEST_GUIDE.vi.md) và [nâng cấp/phát hành](UPGRADE_RELEASE.vi.md) cho vận hành hiện tại. Monitoring chỉ theo truy vấn; action ngăn chặn/escalation và adapter email/KV cảnh báo chưa hỗ trợ. Nếu ví dụ bên dưới mâu thuẫn, contract hiện hành được ưu tiên.
+
 # 🌍 HONO AUTH WORKER - TÀI LIỆU CHÍNH THỨC i18n
 
 > 🌐 Language / Ngôn ngữ: [English](I18N_MASTER_GUIDE.md) | **Tiếng Việt**
@@ -237,7 +239,7 @@ const initI18n = async () => {
 
 ## 3. CÔNG CỤ QUẢN LÝ i18n
 
-Tài liệu này tập trung vào kiến trúc i18n, cách tích hợp và workflow vận hành. Phần tham chiếu đầy đủ cho lệnh tool được duy trì trong [tools/i18n/README_vi.md](../tools/i18n/README_vi.md). Phần ma trận test được duy trì trong [TEST_GUIDE_vi.md](./TEST_GUIDE_vi.md) và [TEST_SCRIPTS_vi.md](./TEST_SCRIPTS_vi.md).
+Tài liệu này tập trung vào kiến trúc i18n, cách tích hợp và workflow vận hành. Phần tham chiếu đầy đủ cho lệnh tool được duy trì trong [tools/i18n/README_vi.md](../tools/i18n/README_vi.md). Phần ma trận test được duy trì trong [TEST_GUIDE_vi.md](./TEST_GUIDE.vi.md) và [TEST_SCRIPTS_vi.md](./TEST_SCRIPTS.vi.md).
 
 ### 🛠️ **Công cụ Chính (`tools/i18n/master.js`)**
 
@@ -269,8 +271,8 @@ node tools/i18n/master.js verify
 ### 🛠️ **Tài liệu tham chiếu chi tiết cho tool**
 
 - Dùng [tools/i18n/README_vi.md](../tools/i18n/README_vi.md) cho toàn bộ command reference, workflow commands và direct-tool entry points.
-- Dùng [TEST_GUIDE_vi.md](./TEST_GUIDE_vi.md) khi tác vụ i18n gắn với API validation hoặc bộ test đa ngôn ngữ.
-- Dùng [TEST_SCRIPTS_vi.md](./TEST_SCRIPTS_vi.md) cho shell automation và hướng dẫn xử lý sự cố.
+- Dùng [TEST_GUIDE_vi.md](./TEST_GUIDE.vi.md) khi tác vụ i18n gắn với API validation hoặc bộ test đa ngôn ngữ.
+- Dùng [TEST_SCRIPTS_vi.md](./TEST_SCRIPTS.vi.md) cho shell automation và hướng dẫn xử lý sự cố.
 
 ### 📚 **Tài liệu Công cụ:**
 
@@ -1730,7 +1732,7 @@ DEBUG = "hono-auth-api:*"
 DEBUG = "hono-auth-api:i18n:*"
 
 # Khởi động development server với debug
-npm run dev:debug:i18n
+npm run dev:debug
 ```
 
 **Debug logs sẽ hiển thị:**

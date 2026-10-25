@@ -1,3 +1,5 @@
+> **Historical reference scope:** The material below is retained for design context and older examples; commands, payloads, test counts and “complete/enterprise/production-ready” claims have not all been revalidated against the current version. Use the current [capability contract](CAPABILITIES.md), [setup](SETUP_GUIDE.md), [verification](TEST_GUIDE.md) and [upgrade/release](UPGRADE_RELEASE.md) guides for operations. Monitoring is query-on-demand; incident containment/escalation actions and email/KV alert adapters are unavailable. Where an example below conflicts, the current contract takes precedence.
+
 # 🌍 HONO AUTH WORKER - MASTER i18n DOCUMENTATION
 
 > 🌐 Language / Ngôn ngữ: **English** | [Tiếng Việt](I18N_MASTER_GUIDE.vi.md)
@@ -1655,7 +1657,7 @@ DEBUG = "hono-auth-api:*"
 DEBUG = "hono-auth-api:i18n:*"
 
 # Start development server with debug
-npm run dev:debug:i18n
+npm run dev:debug
 ```
 
 **Debug logs will show:**

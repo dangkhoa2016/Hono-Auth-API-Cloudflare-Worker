@@ -1,3 +1,5 @@
+> **Phạm vi tham khảo lịch sử:** Nội dung bên dưới được giữ để tra cứu thiết kế và ví dụ cũ; lệnh, payload, số liệu test và tuyên bố “complete/enterprise/production-ready” chưa được xác minh lại toàn bộ cho phiên bản hiện tại. Dùng [contract khả năng](CAPABILITIES.vi.md), [cài đặt](SETUP_GUIDE.vi.md), [kiểm chứng](TEST_GUIDE.vi.md) và [nâng cấp/phát hành](UPGRADE_RELEASE.vi.md) cho vận hành hiện tại. Monitoring chỉ theo truy vấn; action ngăn chặn/escalation và adapter email/KV cảnh báo chưa hỗ trợ. Nếu ví dụ bên dưới mâu thuẫn, contract hiện hành được ưu tiên.
+
 # 🔐 HƯỚNG DẪN BẢO MẬT TOKEN
 
 > 🌐 Language / Ngôn ngữ: **English** | [Tiếng Việt](TOKEN_SECURITY_COMPREHENSIVE_GUIDE.vi.md)

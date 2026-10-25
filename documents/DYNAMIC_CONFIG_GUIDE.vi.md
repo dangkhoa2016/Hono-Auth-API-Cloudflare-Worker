@@ -1,3 +1,5 @@
+> **Phạm vi tham khảo lịch sử:** Nội dung bên dưới được giữ để tra cứu thiết kế và ví dụ cũ; lệnh, payload, số liệu test và tuyên bố “complete/enterprise/production-ready” chưa được xác minh lại toàn bộ cho phiên bản hiện tại. Dùng [contract khả năng](CAPABILITIES.vi.md), [cài đặt](SETUP_GUIDE.vi.md), [kiểm chứng](TEST_GUIDE.vi.md) và [nâng cấp/phát hành](UPGRADE_RELEASE.vi.md) cho vận hành hiện tại. Monitoring chỉ theo truy vấn; action ngăn chặn/escalation và adapter email/KV cảnh báo chưa hỗ trợ. Nếu ví dụ bên dưới mâu thuẫn, contract hiện hành được ưu tiên.
+
 # Hướng dẫn Quản lý Cấu hình Động
 
 > 🌐 Language / Ngôn ngữ: [English](DYNAMIC_CONFIG_GUIDE.md) | **Tiếng Việt**
@@ -10,7 +12,7 @@
 
 Hướng dẫn này bao gồm **Hệ thống Quản lý Cấu hình Động** được triển khai trong dự án Hono Auth Worker. Hệ thống này loại bỏ việc phải truyền tham số cấu hình qua các lớp service bằng cách cung cấp truy cập cấu hình tập trung và có cache với các tính năng cấp doanh nghiệp.
 
-Tài liệu này tập trung vào mô hình cấu hình, helper API và cách tích hợp trong code. Với lệnh test và runner vận hành, dùng [TEST_GUIDE_vi.md](./TEST_GUIDE_vi.md) và [TEST_SCRIPTS_vi.md](./TEST_SCRIPTS_vi.md). Với workflow endpoint KV Admin có phân quyền, dùng [ROLE_COMPLETE_GUIDE_vi.md](./ROLE_COMPLETE_GUIDE_vi.md).
+Tài liệu này tập trung vào mô hình cấu hình, helper API và cách tích hợp trong code. Với lệnh test và runner vận hành, dùng [TEST_GUIDE_vi.md](./TEST_GUIDE.vi.md) và [TEST_SCRIPTS_vi.md](./TEST_SCRIPTS.vi.md). Với workflow endpoint KV Admin có phân quyền, dùng [ROLE_COMPLETE_GUIDE_vi.md](./ROLE_COMPLETE_GUIDE.vi.md).
 
 ## 🎯 Lợi ích chính
 
@@ -818,7 +820,7 @@ curl -X PUT "/api/kv-admin/configs/SECURITY_CSP" \
   -d '{"value":"default-src '\''self'\''; script-src '\''self'\''"}' 
 ```
 
-Để xem thêm ví dụ request KV Admin và workflow có phân quyền, xem [ROLE_COMPLETE_GUIDE_vi.md](./ROLE_COMPLETE_GUIDE_vi.md) và [TEST_SCRIPTS_vi.md](./TEST_SCRIPTS_vi.md).
+Để xem thêm ví dụ request KV Admin và workflow có phân quyền, xem [ROLE_COMPLETE_GUIDE_vi.md](./ROLE_COMPLETE_GUIDE.vi.md) và [TEST_SCRIPTS_vi.md](./TEST_SCRIPTS.vi.md).
 
 ### Tích hợp vào ứng dụng
 
@@ -859,10 +861,10 @@ console.log('Current Security Headers:', securityConfig.headers);
 
 ## �🔗 Tài liệu Liên quan
 
-- [Hệ thống Quản lý Cấu hình KV](../README_vi.md#%EF%B8%8F-hệ-thống-quản-lý-cấu-hình-kv)
-- [Hướng dẫn Setup](./SETUP_GUIDE_vi.md) - Cấu hình môi trường
-- [Hướng dẫn Database Service](./DATABASE_SERVICE_vi.md) - Kiến trúc service
-- [Hướng dẫn Testing](./TEST_GUIDE_vi.md) - Testing với cấu hình động
+- [Hệ thống Quản lý Cấu hình KV](../README.vi.md#%EF%B8%8F-hệ-thống-quản-lý-cấu-hình-kv)
+- [Hướng dẫn Setup](./SETUP_GUIDE.vi.md) - Cấu hình môi trường
+- [Hướng dẫn Database Service](./DATABASE_SERVICE.vi.md) - Kiến trúc service
+- [Hướng dẫn Testing](./TEST_GUIDE.vi.md) - Testing với cấu hình động
 
 ---
 

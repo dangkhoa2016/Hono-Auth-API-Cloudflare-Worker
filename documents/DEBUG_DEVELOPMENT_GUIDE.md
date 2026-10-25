@@ -1,3 +1,5 @@
+> **Historical reference scope:** The material below is retained for design context and older examples; commands, payloads, test counts and “complete/enterprise/production-ready” claims have not all been revalidated against the current version. Use the current [capability contract](CAPABILITIES.md), [setup](SETUP_GUIDE.md), [verification](TEST_GUIDE.md) and [upgrade/release](UPGRADE_RELEASE.md) guides for operations. Monitoring is query-on-demand; incident containment/escalation actions and email/KV alert adapters are unavailable. Where an example below conflicts, the current contract takes precedence.
+
 # Complete Debug & Development Guide
 
 > 🌐 Language / Ngôn ngữ: **English** | [Tiếng Việt](DEBUG_DEVELOPMENT_GUIDE.vi.md)
@@ -285,7 +287,7 @@ npm run dev:staging:silent # --log-level none
 
 #### Debug Information Tool
 ```bash
-npm run debug:info       # Display debug configuration info
+npm run tool:debug       # Run the debug harness
 ```
 
 ### 2. Direct npm Scripts (Recommended)
@@ -317,7 +319,7 @@ npm run dev:staging:silent # Silent staging environment
 
 #### Debug Information Tool
 ```bash
-npm run debug:info       # Display debug configuration info
+npm run tool:debug       # Run the debug harness
 ```
 
 ### 3. VS Code Tasks
@@ -702,7 +704,7 @@ npm run test:unified
 npm run test:quick
 
 # Debug information
-npm run debug:info
+npm run tool:debug
 ```
 
 ## Summary
@@ -719,6 +721,6 @@ This approach ensures compatibility with `wrangler dev` while providing flexible
 For additional help:
 1. Check the application logs
 2. Review the debug namespace documentation in `src/utils/debug.js`
-3. Use the debug information tool: `npm run debug:info`
+3. Run the debug harness: `npm run tool:debug`
 4. Test debug configuration with different patterns
 5. Consult the comprehensive test framework for debugging specific functionality

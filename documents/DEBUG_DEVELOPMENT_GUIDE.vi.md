@@ -1,3 +1,5 @@
+> **Phạm vi tham khảo lịch sử:** Nội dung bên dưới được giữ để tra cứu thiết kế và ví dụ cũ; lệnh, payload, số liệu test và tuyên bố “complete/enterprise/production-ready” chưa được xác minh lại toàn bộ cho phiên bản hiện tại. Dùng [contract khả năng](CAPABILITIES.vi.md), [cài đặt](SETUP_GUIDE.vi.md), [kiểm chứng](TEST_GUIDE.vi.md) và [nâng cấp/phát hành](UPGRADE_RELEASE.vi.md) cho vận hành hiện tại. Monitoring chỉ theo truy vấn; action ngăn chặn/escalation và adapter email/KV cảnh báo chưa hỗ trợ. Nếu ví dụ bên dưới mâu thuẫn, contract hiện hành được ưu tiên.
+
 # Hướng Dẫn Debug & Development Hoàn Chỉnh
 
 > 🌐 Language / Ngôn ngữ: [English](DEBUG_DEVELOPMENT_GUIDE.md) | **Tiếng Việt**
@@ -285,7 +287,7 @@ npm run dev:staging:silent # --log-level none
 
 #### Debug Information Tool
 ```bash
-npm run debug:info       # Hiển thị thông tin cấu hình debug
+npm run tool:debug       # Chạy bộ kiểm tra debug
 ```
 
 ### 2. Direct npm Scripts (Khuyến nghị)
@@ -698,7 +700,7 @@ npm run test:unified
 npm run test:quick
 
 # Thông tin debug
-npm run debug:info
+npm run tool:debug
 ```
 
 ## Tóm Tắt
@@ -715,6 +717,6 @@ Cách tiếp cận này đảm bảo tương thích với `wrangler dev` trong k
 Để được trợ giúp thêm:
 1. Kiểm tra application logs
 2. Xem lại debug namespace documentation trong `src/utils/debug.js`
-3. Sử dụng debug information tool: `npm run debug:info`
+3. Chạy bộ kiểm tra debug: `npm run tool:debug`
 4. Test debug configuration với different patterns
 5. Tham khảo comprehensive test framework để debugging specific functionality

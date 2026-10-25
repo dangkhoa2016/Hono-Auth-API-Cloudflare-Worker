@@ -1,3 +1,5 @@
+> **Phạm vi tham khảo lịch sử:** Nội dung bên dưới được giữ để tra cứu thiết kế và ví dụ cũ; lệnh, payload, số liệu test và tuyên bố “complete/enterprise/production-ready” chưa được xác minh lại toàn bộ cho phiên bản hiện tại. Dùng [contract khả năng](CAPABILITIES.vi.md), [cài đặt](SETUP_GUIDE.vi.md), [kiểm chứng](TEST_GUIDE.vi.md) và [nâng cấp/phát hành](UPGRADE_RELEASE.vi.md) cho vận hành hiện tại. Monitoring chỉ theo truy vấn; action ngăn chặn/escalation và adapter email/KV cảnh báo chưa hỗ trợ. Nếu ví dụ bên dưới mâu thuẫn, contract hiện hành được ưu tiên.
+
 # Hướng dẫn Zod Validation - Hệ Thống Kiểm Toán Doanh Nghiệp
 
 > 🌐 Language / Ngôn ngữ: [English](ZOD_GUIDE.md) | **Tiếng Việt**
@@ -6,7 +8,7 @@
 
 Dự án đã được tích hợp với **Zod** - một thư viện validation schema ưu tiên TypeScript để cung cấp validation mạnh mẽ và type-safe cho tất cả API endpoints, bao gồm **Hệ Thống Kiểm Toán Doanh Nghiệp** toàn diện với 49+ endpoint qua 4 nhóm route.
 
-Tài liệu này tập trung vào kiến trúc validation, thiết kế schema và cách tích hợp vào route. Với ma trận lệnh test validation đầy đủ và các flow tự động hóa, dùng [TEST_GUIDE_vi.md](./TEST_GUIDE_vi.md) và [TEST_SCRIPTS_vi.md](./TEST_SCRIPTS_vi.md).
+Tài liệu này tập trung vào kiến trúc validation, thiết kế schema và cách tích hợp vào route. Với ma trận lệnh test validation đầy đủ và các flow tự động hóa, dùng [TEST_GUIDE_vi.md](./TEST_GUIDE.vi.md) và [TEST_SCRIPTS_vi.md](./TEST_SCRIPTS.vi.md).
 
 ## 🎯 Tại sao Sử dụng Zod?
 
@@ -935,8 +937,8 @@ function formatZodError(error) {
 
 - **[Zod Official Docs](https://zod.dev/)** - Complete Zod documentation
 - **[@hono/zod-validator](https://www.npmjs.com/package/@hono/zod-validator)** - Hono Zod middleware
-- **[Project Test Guide](./TEST_GUIDE_vi.md)** - Testing framework bao gồm validation tests
-- **[i18n Master Guide](./I18N_MASTER_GUIDE_vi.md)** - Internationalization system
+- **[Project Test Guide](./TEST_GUIDE.vi.md)** - Testing framework bao gồm validation tests
+- **[i18n Master Guide](./I18N_MASTER_GUIDE.vi.md)** - Internationalization system
 
 ### **Example Files**
 
@@ -983,6 +985,6 @@ npm run test:validation
 npm run test:multilang_validation
 ```
 
-Với ma trận lệnh đầy đủ, coverage theo endpoint và workflow xử lý sự cố, dùng [TEST_GUIDE_vi.md](./TEST_GUIDE_vi.md) và [TEST_SCRIPTS_vi.md](./TEST_SCRIPTS_vi.md). Tài liệu này giữ vai trò nguồn tham chiếu cho kiến trúc schema và các pattern tích hợp vào route.
+Với ma trận lệnh đầy đủ, coverage theo endpoint và workflow xử lý sự cố, dùng [TEST_GUIDE_vi.md](./TEST_GUIDE.vi.md) và [TEST_SCRIPTS_vi.md](./TEST_SCRIPTS.vi.md). Tài liệu này giữ vai trò nguồn tham chiếu cho kiến trúc schema và các pattern tích hợp vào route.
 
 Hệ thống validation hiện đã **sẵn sàng production** với comprehensive testing, documentation, và các tính năng bảo mật cấp doanh nghiệp. Tất cả endpoints mới nên sử dụng Zod schemas để có validation nhất quán, dễ bảo trì, và an toàn trên toàn bộ hệ sinh thái ứng dụng.
