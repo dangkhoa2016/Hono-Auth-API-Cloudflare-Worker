@@ -12,6 +12,7 @@ import { requireAdmin, requireSuperAdmin } from '../middleware/authorization.js'
 import { unifiedMiddlewares } from '../middleware/unifiedRequestMiddleware.js';
 import { handleStandardError } from '../utils/errorHandler.js';
 import { t, tError, tSuccess } from '../i18n/index.js';
+import { UnsupportedOptionError } from '../utils/serviceErrors.js';
 
 const realtimeMonitoring = new Hono();
 
@@ -471,7 +472,7 @@ realtimeMonitoring.post('/alerts/send',
 
       realtimeMonitoringRoutes_log(`Manual alert sent: ${result.id}`);
       return c.json({
-        success: true,
+        success: result.success,
         message: tSuccess(c, 'realtimeMonitoring.alerts.manualSent', {
           actor: c.get('user')?.fullName || 'System',
           alertId: result.id || 'unknown',
@@ -687,15 +688,10 @@ realtimeMonitoring.post('/alerts/channels',
       const alertService = createAlertSystemService(c.env);
       const channelManager = alertService.getChannelManager();
 
-      // Add custom handler (placeholder - in production, implement actual handlers)
-      const customHandler = (alert, config) => {
-        realtimeMonitoringRoutes_log(`Custom channel ${channelId}: ${alert.title}, config: ${JSON.stringify(config)}`);
-      };
-
-      channelManager.addChannel(channelId, {
-        ...channelData,
-        handler: customHandler
-      });
+      if (channelData.type !== 'webhook') {
+        throw new UnsupportedOptionError('This custom alert channel has no delivery adapter', 'UNSUPPORTED_ALERT_CHANNEL');
+      }
+      channelManager.addChannel(channelId, channelData);
 
       realtimeMonitoringRoutes_log(`Alert channel created: ${channelId}`);
       return c.json({
@@ -724,7 +720,7 @@ realtimeMonitoring.post('/alerts/test', requireSuperAdmin, async (c) => {
 
     realtimeMonitoringRoutes_log('Alert system test completed');
     return c.json({
-      success: true,
+      success: result.success,
       message: t(c, 'security.alerts.testCompleted'),
       data: result
     });

@@ -122,7 +122,7 @@ export function createManualAlertSchema(lang = 'en') {
     title: builder.name(),
     message: builder.description(true),
     severity: builder.enum(SCHEMA_CONFIG.SEVERITY_LEVELS, 'severity'),
-    channels: builder.array(builder.string('channel', 1), 'channels', 1).default(['system']) // Default to system channel
+    channels: builder.array(builder.string('channel', 1), 'channels', 1).optional()
   }, 'manualAlert');
 }
 

@@ -222,16 +222,22 @@ securityIncident.post('/incidents/:id/response', i18nValidatorsMiddleware.manual
     }
     securityIncidentRoutes_log(`Manual response executed for incident ${incidentId} by ${user.email}`);
     return c.json({
-      success: true,
+      success: responseResult.success,
+      code: responseResult.code,
       data: responseResult,
-      message: tSuccess(c, 'security.incident.responseExecuted', {
+      message: responseResult.success ? tSuccess(c, 'security.incident.responseExecuted', {
         incidentId,
         actor: user.fullName || user.email,
-        actionCount: actions.length,
-        actionType: responseData.type || 'manual',
+        actionCount: responseResult.actionsExecuted,
+        actionType: responseData.action,
         executedAt: new Date().toISOString()
+      }) : tError(c, 'security.incidents.responseExecuteFailed', {
+        incidentId,
+        actor: user.fullName || user.email,
+        reason: responseResult.code,
+        operation: t(c, 'endpoints.security_incident.incidentResponse')
       })
-    });
+    }, responseResult.statusCode);
   } catch (error) {
     if (error.message && /incident not found/i.test(error.message)) {
       return c.json({
@@ -289,7 +295,7 @@ securityIncident.get('/status', async (c) => {
   try {
     const securityService = createSecurityIncidentResponseService(c.env);
 
-    const status = securityService.getServiceStatus();
+    const status = await securityService.getServiceStatus();
 
     securityIncidentRoutes_log('Retrieved service status');
 
