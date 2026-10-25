@@ -1,7 +1,9 @@
+> **Historical reference scope:** The material below is retained for design context and older examples; commands, payloads, test counts and “complete/enterprise/production-ready” claims have not all been revalidated against the current version. Use the current [capability contract](CAPABILITIES.md), [setup](SETUP_GUIDE.md), [verification](TEST_GUIDE.md) and [upgrade/release](UPGRADE_RELEASE.md) guides for operations. Monitoring is query-on-demand; incident containment/escalation actions and email/KV alert adapters are unavailable. Where an example below conflicts, the current contract takes precedence.
+
 
 # 🔐 TOKEN SECURITY COMPREHENSIVE GUIDE
 
-> 🌐 Language / Ngôn ngữ: **English** | [Tiếng Việt](TOKEN_SECURITY_COMPREHENSIVE_GUIDE_vi.vi.md)
+> 🌐 Language / Ngôn ngữ: **English** | [Tiếng Việt](TOKEN_SECURITY_COMPREHENSIVE_GUIDE.vi.md)
 
 ## Scope
 Summarizes token security hardening: access/refresh lifecycle, blacklist, audit logging, and ops guidance.

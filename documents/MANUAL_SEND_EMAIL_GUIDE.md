@@ -1,58 +1,48 @@
-📖 **Language**: English | [Tiếng Việt](./MANUAL_SEND_EMAIL_GUIDE_vi.md)
+# Transactional account email and Brevo checks
 
-# Email Test Guide
+> 🌐 Language / Ngôn ngữ: **English** | [Tiếng Việt](MANUAL_SEND_EMAIL_GUIDE_vi.md)
 
-This guide explains how to test outbound email using the helper CLI `tools/emails/emailSendTesterCli.js` and how to set the required configuration for Brevo.
+This guide covers registration activation and email-address verification. It does not enable the unsupported email alert adapter described in [capabilities](CAPABILITIES.md).
 
-## Account-link URL and email appearance
+## Configure the selected environment
 
-Set `APP_URL` to the backend origin that serves `/api/auth/activate` and `/api/user/verify-email`, for example `https://api.example.com`. A frontend-only hostname cannot handle these API links. KV overrides environment settings, so check for an old `APP_URL` in KV as well as in the Worker variables.
+Use ignored `.dev.vars.development` for local testing and deployed Worker variables/secrets for remote environments. Wrangler local files do not provision deployed secrets. See [Wrangler configuration](WRANGLER_CONFIG_GUIDE.md).
 
-KV administration stores string values as JSON; the resolver decodes that storage layer once. Environment strings and legacy raw KV text remain supported. Email links use the URL API to avoid duplicate slashes and encode the token; invalid or credential-bearing base URLs are rejected.
+| Setting | Brevo value / purpose |
+| --- | --- |
+| `EMAIL_PROVIDER` | `brevo` |
+| `EMAIL_ENABLED` | `true` to permit outbound transactional email |
+| `EMAIL_CONFIRMATION_ENABLED` | `true` for registration confirmation |
+| `EMAIL_PROVIDER_ENDPOINT` | `https://api.brevo.com/v3/smtp/email` |
+| `EMAIL_PROVIDER_AUTH_HEADER` | `api-key` |
+| `EMAIL_PROVIDER_API_KEY` | Provider secret; store outside Git and editable KV |
+| `EMAIL_FROM_ADDRESS` | Sender verified with the provider for your domain |
+| `EMAIL_FROM_NAME` | Public sender display name |
+| `APP_URL` | Backend origin serving activation and email-verification APIs |
+| `FRONTEND_URL` | Environment-only frontend home URL for the activation result button |
 
-Both account-email templates provide solid table-cell background colors for the header and action button. Gradients are optional decoration, so text stays readable when an email client omits them. Use preview mode with fake data before sending a real message; a browser preview does not certify every Outlook version.
+Enter provider keys through secret input, for example `npx wrangler secret put EMAIL_PROVIDER_API_KEY --env staging`; omit the named environment only for the intended default production target. Do not paste secrets into command arguments, logs or KV administration. Keep local secret files ignored. Remove stale provider-key overrides from editable KV rather than relying on variable precedence to hide them.
 
-## Prerequisites (Brevo)
-- Set KV for development (example values):
-	- EMAIL_PROVIDER=brevo
-	- EMAIL_ENABLED=true
-	- EMAIL_CONFIRMATION_ENABLED=true
-	- EMAIL_PROVIDER_ENDPOINT=https://api.brevo.com/v3/smtp/email
-	- EMAIL_PROVIDER_AUTH_HEADER=api-key
-	- EMAIL_PROVIDER_API_KEY=<your_brevo_api_key>
-	- EMAIL_FROM_ADDRESS=no-reply@hono-api-cloudflare-worker.dangkhoa.dev
-	- EMAIL_FROM_NAME=Contact from Hono API
+KV values take precedence over environment settings for ordinary configuration. Check for old `APP_URL`, disabled email flags or stale sender/provider values in the selected namespace. KV administration JSON-encodes strings; the resolver decodes that storage layer once while supporting legacy raw strings. For example, `APP_URL=https://api.example.com` must point to the backend, not a frontend-only host.
 
-Example commands:
-```
-node tools/kv/kv-config-manager.js set EMAIL_PROVIDER "brevo" --env development
-node tools/kv/kv-config-manager.js set EMAIL_ENABLED true --env development
-node tools/kv/kv-config-manager.js set EMAIL_CONFIRMATION_ENABLED true --env development
-node tools/kv/kv-config-manager.js set EMAIL_PROVIDER_ENDPOINT "https://api.brevo.com/v3/smtp/email" --env development
-node tools/kv/kv-config-manager.js set EMAIL_PROVIDER_AUTH_HEADER "api-key" --env development
-node tools/kv/kv-config-manager.js set EMAIL_PROVIDER_API_KEY "xkeysib-..." --env development
-node tools/kv/kv-config-manager.js set EMAIL_FROM_ADDRESS "no-reply@hono-api-cloudflare-worker.dangkhoa.dev" --env development
-node tools/kv/kv-config-manager.js set EMAIL_FROM_NAME "Contact from Hono API" --env development
-```
+## Verify and preview locally
 
-## CLI Usage
-- Help: `node tools/emails/emailSendTesterCli.js -h`
-- Verify config: `node tools/emails/emailSendTesterCli.js --verify`
-- Send with preview (skip provider call):
-```
-node tools/emails/emailSendTesterCli.js --send --to you@example.com --name "Your Name" --locale vi --ip 203.0.113.10 --preview
-```
-- Send real with debug:
-```
-node tools/emails/emailSendTesterCli.js --send --to you@example.com --name "Your Name" --locale vi --ip 203.0.113.10 --base-url https://your-app.com --debug
-```
-- Override auth header or API key per run:
-```
-node tools/emails/emailSendTesterCli.js --send --to you@example.com --auth-header api-key --api-key xkeysib-... --debug
+After configuring the local development bindings and variables:
+
+```bash
+node tools/emails/emailSendTesterCli.js --verify --env development
+node tools/emails/emailSendTesterCli.js --send --to preview@example.com --name "Preview User" --locale en --base-url https://api.example.com --preview --env development
 ```
 
-## Short flags
-- `-h` help, `-v` verify, `-s` send, `-d` debug.
+The CLI uses Wrangler's platform proxy, defaults to `development` and is not an inspection of the deployed Worker's effective secrets. `--verify` checks configuration presence; it does not authenticate with Brevo or prove delivery. `--preview` builds content without a provider send, but output contains the generated activation link: use fake data and do not publish it. Its random token is not attached to a registered database user and cannot test activation end to end.
 
-## Notes
-- When using Brevo, `EMAIL_PROVIDER_API_KEY` is mandatory. Debug results report key presence and provider status without exposing the key, token or provider response body.
+A real CLI send removes `--preview` and requires a recipient you control plus valid provider configuration. It sends a test email; it does not register or activate a real user. Explicitly choose the environment and recipient. Avoid the legacy `--api-key` option because command arguments can expose secrets. Debug results report key presence and provider status without returning the provider body, but CLI output can still contain recipient/configuration metadata and must remain private.
+
+## Diagnose a registration email
+
+1. Confirm the exact backend environment, effective email flags, sender and `APP_URL`. A registration success message or healthy Worker does not prove provider acceptance or inbox delivery; inspect the registration result's `email_notification` and private server/provider diagnostics.
+2. Verify the Brevo key is active, the sender/domain is verified and sending is permitted in that provider account. Check provider events, suppression/bounce status and the recipient's spam folder. A configured key being present is not evidence that it is valid.
+3. Activation links use `/api/auth/activate`; email-change links use `/api/user/verify-email`. Links are built with the URL API to avoid duplicate slashes and encode tokens. Invalid or credential-bearing base URLs are rejected. The activation result button uses validated environment `FRONTEND_URL`, falling back to backend `/`; it does not transfer the token to the frontend or automatically redirect.
+4. Both templates use solid table-cell colors for header and action buttons; gradients are optional decoration. Preview both languages with gradients disabled. A browser preview does not certify every Outlook/mail-client version.
+
+Do not include real activation/verification tokens, passwords, recipient details or provider keys in screenshots, issue reports or public logs. Test real activation only with a deliberately provisioned test account; opening a real link can consume its token.

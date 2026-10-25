@@ -1,3 +1,5 @@
+> **Phạm vi tham khảo lịch sử:** Nội dung bên dưới được giữ để tra cứu thiết kế và ví dụ cũ; lệnh, payload, số liệu test và tuyên bố “complete/enterprise/production-ready” chưa được xác minh lại toàn bộ cho phiên bản hiện tại. Dùng [contract khả năng](CAPABILITIES.vi.md), [cài đặt](SETUP_GUIDE.vi.md), [kiểm chứng](TEST_GUIDE.vi.md) và [nâng cấp/phát hành](UPGRADE_RELEASE.vi.md) cho vận hành hiện tại. Monitoring chỉ theo truy vấn; action ngăn chặn/escalation và adapter email/KV cảnh báo chưa hỗ trợ. Nếu ví dụ bên dưới mâu thuẫn, contract hiện hành được ưu tiên.
+
 # Tài liệu cấu trúc Schemas
 
 > 🌐 Language / Ngôn ngữ: [English](SCHEMAS_GUIDE.md) | **Tiếng Việt**
@@ -246,7 +248,7 @@ node tools/schema-registry-demo.js category auth
 node tests/i18nValidatorExtensionTest.js
 ```
 
-Để xem đầy đủ ma trận lệnh test và workflow tự động hóa, dùng [TEST_GUIDE_vi.md](./TEST_GUIDE_vi.md) và [TEST_SCRIPTS_vi.md](./TEST_SCRIPTS_vi.md). Tài liệu này tập trung vào kiến trúc schema và cách sử dụng.
+Để xem đầy đủ ma trận lệnh test và workflow tự động hóa, dùng [TEST_GUIDE_vi.md](./TEST_GUIDE.vi.md) và [TEST_SCRIPTS_vi.md](./TEST_SCRIPTS.vi.md). Tài liệu này tập trung vào kiến trúc schema và cách sử dụng.
 
 ## Kiến trúc schema
 
@@ -537,7 +539,7 @@ node tools/schema-registry-demo.js category auth
 node tests/i18nValidatorExtensionTest.js
 ```
 
-Để xem ma trận lệnh đầy đủ, workflow tự động hóa, và các luồng test chi tiết, xem [TEST_GUIDE_vi.md](./TEST_GUIDE_vi.md) và [TEST_SCRIPTS_vi.md](./TEST_SCRIPTS_vi.md).
+Để xem ma trận lệnh đầy đủ, workflow tự động hóa, và các luồng test chi tiết, xem [TEST_GUIDE_vi.md](./TEST_GUIDE.vi.md) và [TEST_SCRIPTS_vi.md](./TEST_SCRIPTS.vi.md).
 
 ## Hướng dẫn sử dụng thực tế
 

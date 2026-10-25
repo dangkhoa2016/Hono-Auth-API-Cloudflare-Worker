@@ -1,3 +1,5 @@
+> **Historical reference scope:** The material below is retained for design context and older examples; commands, payloads, test counts and “complete/enterprise/production-ready” claims have not all been revalidated against the current version. Use the current [capability contract](CAPABILITIES.md), [setup](SETUP_GUIDE.md), [verification](TEST_GUIDE.md) and [upgrade/release](UPGRADE_RELEASE.md) guides for operations. Monitoring is query-on-demand; incident containment/escalation actions and email/KV alert adapters are unavailable. Where an example below conflicts, the current contract takes precedence.
+
 # 🌍 HONO AUTH WORKER - MASTER i18n DOCUMENTATION
 
 > 🌐 Language / Ngôn ngữ: **English** | [Tiếng Việt](I18N_MASTER_GUIDE.vi.md)
@@ -11,20 +13,19 @@
 
 ## 📋 TABLE OF CONTENTS
 
-1. [Overview and Introduction](#1-overview-and-introduction)
-2. [🆕 Enhanced System Architecture (V2.0)](#2-enhanced-system-architecture-v20)
-3. [System Architecture and Structure (Legacy)](#3-system-architecture-and-structure-legacy)
-4. [i18n Management Tools](#4-i18n-management-tools)
-5. [Basic Usage Guide](#5-basic-usage-guide)
-6. [🆕 Enhanced i18n Features](#6-enhanced-i18n-features)
-7. [Adding New Languages](#7-adding-new-languages)
-8. [API and Endpoints](#8-api-and-endpoints)
-9. [i18n Validator Extension](#9-i18n-validator-extension)
-10. [🆕 Admin Route i18n Implementation](#10-admin-route-i18n-implementation)
-11. [Implemented Optimizations](#11-implemented-optimizations)
-12. [Testing and Debugging](#12-testing-and-debugging)
-13. [Troubleshooting](#13-troubleshooting)
-14. [Consolidation Process](#14-consolidation-process)
+1. [OVERVIEW AND INTRODUCTION](#1-overview-and-introduction)
+2. [🆕 ENHANCED SYSTEM ARCHITECTURE (V2.0)](#2--enhanced-system-architecture-v20)
+3. [SYSTEM ARCHITECTURE AND STRUCTURE (LEGACY)](#3-system-architecture-and-structure-legacy)
+4. [i18n MANAGEMENT TOOLS](#3-i18n-management-tools)
+5. [BASIC USAGE GUIDE](#4-basic-usage-guide)
+6. [🆕 ENHANCED i18n FEATURES](#6--enhanced-i18n-features)
+7. [ADDING NEW LANGUAGES](#7-adding-new-languages)
+8. [API AND ENDPOINTS](#8-api-and-endpoints)
+9. [🆕 ADMIN ROUTE i18n IMPLEMENTATION](#10--admin-route-i18n-implementation)
+10. [i18n VALIDATOR EXTENSION](#9-i18n-validator-extension)
+11. [IMPLEMENTED OPTIMIZATIONS](#11-implemented-optimizations)
+12. [TESTING AND DEBUGGING](#12-testing-and-debugging)
+13. [TROUBLESHOOTING](#13-troubleshooting)
 
 ---
 
@@ -1655,7 +1656,7 @@ DEBUG = "hono-auth-api:*"
 DEBUG = "hono-auth-api:i18n:*"
 
 # Start development server with debug
-npm run dev:debug:i18n
+npm run dev:debug
 ```
 
 **Debug logs will show:**

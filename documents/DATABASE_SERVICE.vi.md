@@ -1,3 +1,5 @@
+> **Phạm vi tham khảo lịch sử:** Nội dung bên dưới được giữ để tra cứu thiết kế và ví dụ cũ; lệnh, payload, số liệu test và tuyên bố “complete/enterprise/production-ready” chưa được xác minh lại toàn bộ cho phiên bản hiện tại. Dùng [contract khả năng](CAPABILITIES.vi.md), [cài đặt](SETUP_GUIDE.vi.md), [kiểm chứng](TEST_GUIDE.vi.md) và [nâng cấp/phát hành](UPGRADE_RELEASE.vi.md) cho vận hành hiện tại. Monitoring chỉ theo truy vấn; action ngăn chặn/escalation và adapter email/KV cảnh báo chưa hỗ trợ. Nếu ví dụ bên dưới mâu thuẫn, contract hiện hành được ưu tiên.
+
 # DatabaseService - Tài Liệu Hoàn Chỉnh & Tham Khảo Nhanh
 
 > 🌐 Language / Ngôn ngữ: [English](DATABASE_SERVICE.md) | **Tiếng Việt**
@@ -1545,9 +1547,9 @@ class UserService {
 
 ## 🔗 Tài Liệu Liên Quan
 
-- **[Hướng Dẫn Setup Hoàn Chỉnh](./SETUP_GUIDE_vi.md)** - Setup và cấu hình project
-- **[Hướng Dẫn Testing](./TEST_GUIDE_vi.md)** - Testing framework và procedures
-- **[Hướng Dẫn Debug & Development](./DEBUG_DEVELOPMENT_GUIDE_vi.md)** - Development workflow
+- **[Hướng Dẫn Setup Hoàn Chỉnh](./SETUP_GUIDE.vi.md)** - Setup và cấu hình project
+- **[Hướng Dẫn Testing](./TEST_GUIDE.vi.md)** - Testing framework và procedures
+- **[Hướng Dẫn Debug & Development](./DEBUG_DEVELOPMENT_GUIDE.vi.md)** - Development workflow
 
 ---
 
@@ -1626,11 +1628,11 @@ Hướng dẫn toàn diện này bao gồm tất cả các khía cạnh của **
 DatabaseService không chỉ là một database wrapper đơn giản, mà là một **enterprise-grade service** được thiết kế cho production workloads với security, performance, và maintainability là ưu tiên hàng đầu.
 
 ### 🔗 **Tài Nguyên Liên Quan**
-- **[BaseService Architecture](./BASESERVICE_GUIDE.md)** - Core architecture patterns
-- **[Security Best Practices](./SECURITY_GUIDE.md)** - Comprehensive security guide  
-- **[Audit System Guide](./AUDIT_COMPLETE_GUIDE.md)** - Enterprise audit implementation
+- **[BaseService source](../src/services/baseService.js)** - Core architecture patterns
+- **[Current capability limits](./CAPABILITIES.vi.md)** - Current supported behavior
+- **[Audit System Guide](./ENTERPRISE_AUDIT_SYSTEM_COMPLETE_GUIDE.vi.md)** - Enterprise audit implementation
 - **[Dynamic Configuration](./DYNAMIC_CONFIG_GUIDE.md)** - Configuration management
-- **[Performance Optimization](./PERFORMANCE_GUIDE.md)** - Performance best practices
+- **[Verification scope](./TEST_GUIDE.vi.md)** - Performance best practices
 
 ---
 

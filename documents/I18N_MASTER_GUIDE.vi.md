@@ -1,3 +1,5 @@
+> **Phạm vi tham khảo lịch sử:** Nội dung bên dưới được giữ để tra cứu thiết kế và ví dụ cũ; lệnh, payload, số liệu test và tuyên bố “complete/enterprise/production-ready” chưa được xác minh lại toàn bộ cho phiên bản hiện tại. Dùng [contract khả năng](CAPABILITIES.vi.md), [cài đặt](SETUP_GUIDE.vi.md), [kiểm chứng](TEST_GUIDE.vi.md) và [nâng cấp/phát hành](UPGRADE_RELEASE.vi.md) cho vận hành hiện tại. Monitoring chỉ theo truy vấn; action ngăn chặn/escalation và adapter email/KV cảnh báo chưa hỗ trợ. Nếu ví dụ bên dưới mâu thuẫn, contract hiện hành được ưu tiên.
+
 # 🌍 HONO AUTH WORKER - TÀI LIỆU CHÍNH THỨC i18n
 
 > 🌐 Language / Ngôn ngữ: [English](I18N_MASTER_GUIDE.md) | **Tiếng Việt**
@@ -11,20 +13,19 @@
 
 ## 📋 MỤC LỤC
 
-1. [Tổng quan và Giới thiệu](#1-tổng-quan-và-giới-thiệu)
-2. [🆕 Kiến trúc Hệ thống Nâng cấp (V2.0)](#2-🆕-kiến-trúc-hệ-thống-nâng-cấp-v20)
-3. [Kiến trúc Hệ thống và Cấu trúc (Legacy)](#3-kiến-trúc-hệ-thống-và-cấu-trúc-legacy)
-4. [Công cụ Quản lý i18n](#4-công-cụ-quản-lý-i18n)
-5. [Hướng dẫn Sử dụng Cơ bản](#5-hướng-dẫn-sử-dụng-cơ-bản)
-6. [🆕 Tính năng i18n Nâng cấp](#6-🆕-tính-năng-i18n-nâng-cấp)
-7. [Thêm Ngôn ngữ Mới](#7-thêm-ngôn-ngữ-mới)
-8. [API và Endpoints](#8-api-và-endpoints)
-9. [Mở rộng i18n Validator](#9-mở-rộng-i18n-validator)
-10. [🆕 Triển khai i18n cho Admin Routes](#10-🆕-triển-khai-i18n-cho-admin-routes)
-11. [Tối ưu hóa Đã Triển khai](#11-tối-ưu-hóa-đã-triển-khai)
-12. [Testing và Debugging](#12-testing-và-debugging)
-13. [Khắc phục Sự cố](#13-khắc-phục-sự-cố)
-14. [Quy trình Hợp nhất](#14-quy-trình-hợp-nhất)
+1. [TỔNG QUAN VÀ GIỚI THIỆU](#1-tổng-quan-và-giới-thiệu)
+2. [🆕 KIẾN TRÚC HỆ THỐNG NÂNG CẤP (V2.0)](#2--kiến-trúc-hệ-thống-nâng-cấp-v20)
+3. [KIẾN TRÚC HỆ THỐNG VÀ CẤU TRÚC (LEGACY)](#3-kiến-trúc-hệ-thống-và-cấu-trúc-legacy)
+4. [CÔNG CỤ QUẢN LÝ i18n](#3-công-cụ-quản-lý-i18n)
+5. [HƯỚNG DẪN SỬ DỤNG CƠ BẢN](#5-hướng-dẫn-sử-dụng-cơ-bản)
+6. [🆕 TÍNH NĂNG i18n NÂNG CẤP](#6--tính-năng-i18n-nâng-cấp)
+7. [THÊM NGÔN NGỮ MỚI](#7-thêm-ngôn-ngữ-mới)
+8. [API VÀ ENDPOINTS](#8-api-và-endpoints)
+9. [🆕 TRIỂN KHAI i18n CHO ADMIN ROUTES](#10--triển-khai-i18n-cho-admin-routes)
+10. [MỞ RỘNG i18n VALIDATOR](#9-mở-rộng-i18n-validator)
+11. [TỐI ƯU HÓA ĐÃ TRIỂN KHAI](#11-tối-ưu-hóa-đã-triển-khai)
+12. [TESTING VÀ DEBUGGING](#12-testing-và-debugging)
+13. [KHẮC PHỤC SỰ CỐ](#13-khắc-phục-sự-cố)
 
 ---
 
@@ -237,7 +238,7 @@ const initI18n = async () => {
 
 ## 3. CÔNG CỤ QUẢN LÝ i18n
 
-Tài liệu này tập trung vào kiến trúc i18n, cách tích hợp và workflow vận hành. Phần tham chiếu đầy đủ cho lệnh tool được duy trì trong [tools/i18n/README_vi.md](../tools/i18n/README_vi.md). Phần ma trận test được duy trì trong [TEST_GUIDE_vi.md](./TEST_GUIDE_vi.md) và [TEST_SCRIPTS_vi.md](./TEST_SCRIPTS_vi.md).
+Tài liệu này tập trung vào kiến trúc i18n, cách tích hợp và workflow vận hành. Phần tham chiếu đầy đủ cho lệnh tool được duy trì trong [tools/i18n/README_vi.md](../tools/i18n/README_vi.md). Phần ma trận test được duy trì trong [TEST_GUIDE_vi.md](./TEST_GUIDE.vi.md) và [TEST_SCRIPTS_vi.md](./TEST_SCRIPTS.vi.md).
 
 ### 🛠️ **Công cụ Chính (`tools/i18n/master.js`)**
 
@@ -269,8 +270,8 @@ node tools/i18n/master.js verify
 ### 🛠️ **Tài liệu tham chiếu chi tiết cho tool**
 
 - Dùng [tools/i18n/README_vi.md](../tools/i18n/README_vi.md) cho toàn bộ command reference, workflow commands và direct-tool entry points.
-- Dùng [TEST_GUIDE_vi.md](./TEST_GUIDE_vi.md) khi tác vụ i18n gắn với API validation hoặc bộ test đa ngôn ngữ.
-- Dùng [TEST_SCRIPTS_vi.md](./TEST_SCRIPTS_vi.md) cho shell automation và hướng dẫn xử lý sự cố.
+- Dùng [TEST_GUIDE_vi.md](./TEST_GUIDE.vi.md) khi tác vụ i18n gắn với API validation hoặc bộ test đa ngôn ngữ.
+- Dùng [TEST_SCRIPTS_vi.md](./TEST_SCRIPTS.vi.md) cho shell automation và hướng dẫn xử lý sự cố.
 
 ### 📚 **Tài liệu Công cụ:**
 
@@ -444,10 +445,6 @@ const currentLang = getCurrentLanguage(c);
 const isSupported = isLanguageSupported('vi');
 ```
 
-// Kiểm tra nếu ngôn ngữ được hỗ trợ
-const isSupported = await isLanguageSupported('fr');
-console.log(isSupported); // true
-```
 
 ---
 
@@ -1730,7 +1727,7 @@ DEBUG = "hono-auth-api:*"
 DEBUG = "hono-auth-api:i18n:*"
 
 # Khởi động development server với debug
-npm run dev:debug:i18n
+npm run dev:debug
 ```
 
 **Debug logs sẽ hiển thị:**

@@ -1,3 +1,5 @@
+> **Phạm vi tham khảo lịch sử:** Nội dung bên dưới được giữ để tra cứu thiết kế và ví dụ cũ; lệnh, payload, số liệu test và tuyên bố “complete/enterprise/production-ready” chưa được xác minh lại toàn bộ cho phiên bản hiện tại. Dùng [contract khả năng](CAPABILITIES.vi.md), [cài đặt](SETUP_GUIDE.vi.md), [kiểm chứng](TEST_GUIDE.vi.md) và [nâng cấp/phát hành](UPGRADE_RELEASE.vi.md) cho vận hành hiện tại. Monitoring chỉ theo truy vấn; action ngăn chặn/escalation và adapter email/KV cảnh báo chưa hỗ trợ. Nếu ví dụ bên dưới mâu thuẫn, contract hiện hành được ưu tiên.
+
 # 🔍 **AUDIT SYSTEM API REFERENCE - TÀI LIỆU THAM KHẢO API**
 
 > 🌐 Language / Ngôn ngữ: [English](AUDIT_API_REFERENCE.md) | **Tiếng Việt**
@@ -931,7 +933,7 @@ npm run test:audit:comprehensive
 npm run test:multilang_validation
 ```
 
-Để xem đầy đủ ma trận kiểm thử audit, runner theo mode và hướng dẫn xử lý sự cố, dùng [TEST_GUIDE_vi.md](./TEST_GUIDE_vi.md) và [TEST_SCRIPTS_vi.md](./TEST_SCRIPTS_vi.md).
+Để xem đầy đủ ma trận kiểm thử audit, runner theo mode và hướng dẫn xử lý sự cố, dùng [TEST_GUIDE_vi.md](./TEST_GUIDE.vi.md) và [TEST_SCRIPTS_vi.md](./TEST_SCRIPTS.vi.md).
 
 ### **Test thủ công với cURL**
 
@@ -954,11 +956,11 @@ Xem lệnh cURL toàn diện trong:
 
 ## 🔗 **TÀI LIỆU LIÊN QUAN**
 
-- [Hướng dẫn Hoàn chỉnh Hệ thống Audit Doanh nghiệp](./ENTERPRISE_AUDIT_SYSTEM_COMPLETE_GUIDE_vi.md)
-- [Hướng dẫn Test](./TEST_GUIDE_vi.md)
-- [Hướng dẫn Quản lý Vai trò](./ROLE_COMPLETE_GUIDE_vi.md)
-- [Hướng dẫn Database Service](./DATABASE_SERVICE_vi.md)
-- [Hướng dẫn Thiết lập](./SETUP_GUIDE_vi.md)
+- [Hướng dẫn Hoàn chỉnh Hệ thống Audit Doanh nghiệp](./ENTERPRISE_AUDIT_SYSTEM_COMPLETE_GUIDE.vi.md)
+- [Hướng dẫn Test](./TEST_GUIDE.vi.md)
+- [Hướng dẫn Quản lý Vai trò](./ROLE_COMPLETE_GUIDE.vi.md)
+- [Hướng dẫn Database Service](./DATABASE_SERVICE.vi.md)
+- [Hướng dẫn Thiết lập](./SETUP_GUIDE.vi.md)
 
 ---
 

@@ -1,3 +1,5 @@
+> **Historical reference scope:** The material below is retained for design context and older examples; commands, payloads, test counts and “complete/enterprise/production-ready” claims have not all been revalidated against the current version. Use the current [capability contract](CAPABILITIES.md), [setup](SETUP_GUIDE.md), [verification](TEST_GUIDE.md) and [upgrade/release](UPGRADE_RELEASE.md) guides for operations. Monitoring is query-on-demand; incident containment/escalation actions and email/KV alert adapters are unavailable. Where an example below conflicts, the current contract takes precedence.
+
 # Dynamic Configuration Management Guide
 
 > 🌐 Language / Ngôn ngữ: **English** | [Tiếng Việt](DYNAMIC_CONFIG_GUIDE.vi.md)
@@ -859,7 +861,7 @@ console.log('Current Security Headers:', securityConfig.headers);
 
 ## �🔗 Related Documentation
 
-- [KV Configuration Management System](../README.md#%EF%B8%8F-kv-configuration-management-system)
+- [KV Configuration Management System](WRANGLER_CONFIG_GUIDE.md)
 - [Setup Guide](./SETUP_GUIDE.md) - Environment configuration
 - [Database Service Guide](./DATABASE_SERVICE.md) - Service architecture
 - [Testing Guide](./TEST_GUIDE.md) - Testing with dynamic configuration

@@ -1,3 +1,5 @@
+> **Historical reference scope:** The material below is retained for design context and older examples; commands, payloads, test counts and “complete/enterprise/production-ready” claims have not all been revalidated against the current version. Use the current [capability contract](CAPABILITIES.md), [setup](SETUP_GUIDE.md), [verification](TEST_GUIDE.md) and [upgrade/release](UPGRADE_RELEASE.md) guides for operations. Monitoring is query-on-demand; incident containment/escalation actions and email/KV alert adapters are unavailable. Where an example below conflicts, the current contract takes precedence.
+
 # 🔧 **AUDIT SYSTEM CLOUDFLARE KV CONFIGURATION GUIDE**
 
 > 🌐 Language / Ngôn ngữ: **English** | [Tiếng Việt](AUDIT_KV_CONFIGURATION_GUIDE.vi.md)
@@ -13,9 +15,9 @@
 
 1. [🎯 Overview](#-overview)
 2. [🔐 Security & Access Control](#-security--access-control)
-3. [🏗️ Current KV Configuration Keys](#-current-kv-configuration-keys)
+3. [🏗️ Current KV Configuration Keys](#️-current-kv-configuration-keys)
 4. [📊 Proposed Audit System KV Keys](#-proposed-audit-system-kv-keys)
-5. [🛠️ API Endpoints for KV Management](#-api-endpoints-for-kv-management)
+5. [🛠️ API Endpoints for KV Management](#️-api-endpoints-for-kv-management)
 6. [💾 Implementation Examples](#-implementation-examples)
 7. [🔄 Migration Strategy](#-migration-strategy)
 8. [📈 Monitoring & Best Practices](#-monitoring--best-practices)
