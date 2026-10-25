@@ -1,30 +1,13 @@
-import { DatabaseService } from '../../src/services/databaseService.js';
-import { getPlatformProxy } from 'wrangler';
-import { fileURLToPath } from 'node:url';
+import { pathToFileURL } from 'node:url';
+import { PasswordResetError, runLocalPasswordReset } from './superadminPasswordReset.js';
 
-(async () => {
-  const configPath = fileURLToPath(new URL('../../wrangler.toml', import.meta.url));
-  const { env } = await getPlatformProxy({ configPath, environment: 'test' });
-  // const { env } = await getPlatformProxy({ configPath, environment: 'development' });
-
-  if (!env?.DB) {
-    throw new Error('D1 binding DB is missing from getPlatformProxy environment');
-  }
-
-  const databaseService = new DatabaseService(env);
-
-  // Example get a user by ID
-  console.log('Getting user with ID 1');
-  let result = await databaseService.select('SELECT * FROM users WHERE id = ?', [1]);
-  console.log(result);
-
-  // reset superadmin user password
-  const defaultPassword = 'password123';
-  console.log(`Resetting superadmin user password to "${defaultPassword}"`);
-  result = await databaseService.execute('UPDATE users SET password = ? WHERE role = ?', [defaultPassword, 'superadmin'], 'run');
-  console.log(result);
-  process.exit(0);
-})().catch((error) => {
-  console.error('Error:', error);
-  process.exit(1);
-});
+// Importing the command must never open a database or change an account.
+if (process.argv[1] && import.meta.url === pathToFileURL(process.argv[1]).href) {
+  runLocalPasswordReset().catch((error) => {
+    const message = error instanceof PasswordResetError
+      ? error.message
+      : 'Local database operation failed; check the configuration and migrations. No success was confirmed.';
+    process.stderr.write(`Password reset failed: ${message}\n`);
+    process.exitCode = 1;
+  });
+}
