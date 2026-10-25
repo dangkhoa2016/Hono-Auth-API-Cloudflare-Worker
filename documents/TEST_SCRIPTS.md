@@ -5,7 +5,7 @@ English | [Tiếng Việt](TEST_SCRIPTS.vi.md)
 See the [current verification guide](TEST_GUIDE.md) for canonical checks, server-suite prerequisites, fixtures and evidence limits. The actual script list lives in [package.json](../package.json); historical test names do not identify CI coverage.
 
 ```bash
-npm run lint:check && npm run test:node
+npm run verify
 npm run test:regression
 npm run test:unified:help
 ```

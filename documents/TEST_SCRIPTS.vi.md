@@ -5,7 +5,7 @@
 Xem [hướng dẫn kiểm chứng hiện hành](TEST_GUIDE.vi.md) cho checks chuẩn, điều kiện chạy suite server, fixture và giới hạn bằng chứng. Danh sách script thực tế nằm trong [package.json](../package.json); không suy ra CI từ tên test lịch sử.
 
 ```bash
-npm run lint:check && npm run test:node
+npm run verify
 npm run test:regression
 npm run test:unified:help
 ```

@@ -7,7 +7,7 @@ This is an operational checklist, not evidence that a release has occurred. The 
 ## Prepare and verify the candidate
 
 1. Record the exact source commit, Node 24 version, npm version and lockfile. Install with `npm ci --ignore-scripts --no-audit --no-fund`.
-2. Run `npm run lint:check && npm run test:node`. Keep output and failure details. These cover canonical regression/integration tests, including local D1 migration and Worker checks; they do not run every legacy root-level test or external adapter.
+2. Run `npm run verify`. Keep output and failure details. These cover canonical regression/integration tests, including local D1 migration and Worker checks; they do not run every legacy root-level test or external adapter.
 3. Check changed docs, links and script names. Review [capabilities](CAPABILITIES.md), migration files and client impact. A successful parse/lint is not a remote integration check.
 4. Prepare separate staging resources/secrets. Confirm the Cloudflare account, Worker, D1 database and optional KV namespace in ignored `wrangler.toml`. Configure deployed variables and secrets as described in [Wrangler](WRANGLER_CONFIG_GUIDE.md).
 

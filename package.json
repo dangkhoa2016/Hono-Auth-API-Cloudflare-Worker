@@ -161,7 +161,10 @@
     "tool:i18n:cleanup:endpoints:fix": "node tools/i18n/cleanup-unused-keys.js --only-prefix endpoints. --fix --backup --prefix-stats",
     "tool:i18n:sort": "node tools/i18n/sort-i18n-keys.js",
     "tool:i18n:sort:fix": "node tools/i18n/sort-i18n-keys.js --fix --backup",
-    "tool:i18n:compare": "node tools/i18n/master.js compare"
+    "tool:i18n:compare": "node tools/i18n/master.js compare",
+    "lint:tools": "eslint --no-ignore tools/database/reset_superadmin_user_password.js tools/database/superadminPasswordReset.js tools/check-docs.mjs --max-warnings 0",
+    "verify:docs": "node tools/check-docs.mjs",
+    "verify": "npm run lint:check && npm run lint:tools && npm run verify:docs && npm run test:node"
   },
   "keywords": [
     "hono",

@@ -7,7 +7,7 @@
 ## Chuẩn bị và kiểm chứng bản dự kiến
 
 1. Ghi commit source chính xác, phiên bản Node 24, npm và lockfile. Cài bằng `npm ci --ignore-scripts --no-audit --no-fund`.
-2. Chạy `npm run lint:check && npm run test:node`. Giữ output và chi tiết lỗi. Đây là regression/integration chuẩn, gồm migration D1 và Worker local; không chạy mọi test cũ ở root hay adapter bên ngoài.
+2. Chạy `npm run verify`. Giữ output và chi tiết lỗi. Đây là regression/integration chuẩn, gồm migration D1 và Worker local; không chạy mọi test cũ ở root hay adapter bên ngoài.
 3. Kiểm tra tài liệu đã đổi, liên kết và tên script. Rà soát [khả năng](CAPABILITIES.vi.md), migration và tác động client. Parse/lint thành công không phải kiểm chứng tích hợp từ xa.
 4. Chuẩn bị tài nguyên/secrets staging riêng. Xác nhận account Cloudflare, Worker, D1 và namespace KV tùy chọn trong `wrangler.toml` bị ignore. Cấu hình biến và secrets deployment theo [Wrangler](WRANGLER_CONFIG_GUIDE.vi.md).
 
