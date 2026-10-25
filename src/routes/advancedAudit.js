@@ -625,23 +625,28 @@ advancedAudit.get('/archive',
         result = await archivalService.getArchivalPolicies();
         break;
       default:
-        // Guard against long-running stats queries that could trigger client aborts
-        result = await Promise.race([
-          archivalService.getArchivalStats(),
-          new Promise(resolve => setTimeout(() => resolve({ timedOut: true }), 5000))
-        ]);
-
-        if (result?.timedOut) {
-          advancedAuditRoutes_log('Archival stats timed out, returning fallback response');
-          result = {
-            generated_at: new Date().toISOString(),
-            main_table: {},
-            archive_table: {},
-            retention_policies: archivalService.retentionPolicies,
-            eligibility_by_category: {},
-            recommendations: ['Archival stats timed out; returning minimal response']
-          };
+      // The deadline bounds the response, not the underlying D1 work.
+      // A timed-out query is distinct from a successful query with no rows.
+      {
+        const timedOut = Symbol('archive statistics deadline');
+        let timer;
+        try {
+          result = await Promise.race([
+            archivalService.getArchivalStats(),
+            new Promise(resolve => {timer = setTimeout(() => resolve(timedOut), 5000);})
+          ]);
+        } finally {
+          clearTimeout(timer);
         }
+        if (result === timedOut) {
+          return c.json({
+            success: false,
+            code: 'ARCHIVE_STATS_TIMEOUT',
+            error: t(c, 'errors.system.serviceUnavailable', { reason: 'ARCHIVE_STATS_TIMEOUT' }),
+            requestId: c.get('requestId') || c.req.header('X-Request-ID') || null
+          }, 503);
+        }
+      }
       }
 
       advancedAuditRoutes_log(`Archive operation completed: ${action}`);
@@ -1278,9 +1283,8 @@ advancedAudit.post('/retention',
             simulation_results: sim.simulation_results
           };
         } else {
-          // Provide default options to circumvent confirmation required, or rely on test to provide them.
-          // Actually, the test says "run_cleanup" and doesn't specify dryRun=false, so body.dryRun might be undefined.
-          // wait! let me just pass body
+          // The service validates confirmation and retention policy before a
+          // destructive cleanup; forward the original request options.
           const clnRes = await retentionService.runCleanup(false, body || {}, lang);
           if (!clnRes.success) {throw new Error(JSON.stringify(clnRes));}
           result = {
