@@ -12,6 +12,7 @@ Dùng các tài liệu này để cài đặt, review và vận hành phiên b�
 - [Kiểm chứng chuẩn](TEST_GUIDE.vi.md)
 - [Phạm vi script test](TEST_SCRIPTS.vi.md)
 - [Nâng cấp, staging và phát hành](UPGRADE_RELEASE.vi.md)
+- [Reset mật khẩu quản trị](ADMIN_PASSWORD_RESET.vi.md)
 - [Cấu hình ESLint hiện hành](ESLINT_GUIDE.vi.md)
 - [Email tài khoản và Brevo](MANUAL_SEND_EMAIL_GUIDE_vi.md)
 - [Tổng quan audit và contract](ENTERPRISE_AUDIT_SYSTEM_COMPLETE_GUIDE.vi.md)

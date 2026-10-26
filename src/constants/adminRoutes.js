@@ -11,6 +11,16 @@ import { PERMISSION_PRESETS } from './roles.js';
 */
 const ADMIN_ROUTES = [
   {
+    method: 'POST',
+    path: '/api/admin/users/:id/reset-password',
+    metadata: {
+      category: 'admin',
+      i18nKey: 'adminPasswordReset.endpoint',
+      permissions: PERMISSION_PRESETS.ADMIN,
+      description: 'Reset a lower-role account password and revoke all its sessions'
+    }
+  },
+  {
     method: 'GET',
     path: '/api/admin/users',
     metadata: {

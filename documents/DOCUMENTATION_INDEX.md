@@ -12,6 +12,7 @@ Use these guides to set up, review and operate the current version.
 - [Canonical verification](TEST_GUIDE.md)
 - [Test script scope](TEST_SCRIPTS.md)
 - [Upgrades, staging and release](UPGRADE_RELEASE.md)
+- [Administrative password reset](ADMIN_PASSWORD_RESET.md)
 - [Current ESLint configuration](ESLINT_GUIDE.md)
 - [Transactional email and Brevo](MANUAL_SEND_EMAIL_GUIDE.md)
 - [Audit overview and contract](ENTERPRISE_AUDIT_SYSTEM_COMPLETE_GUIDE.md)
