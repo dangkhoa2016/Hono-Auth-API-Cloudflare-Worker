@@ -5,6 +5,17 @@
 */
 
 export default {
+  adminPasswordReset: {
+    "passwordPolicy": "Mật khẩu cần ít nhất 8 ký tự và tối đa 72 byte UTF-8.",
+    "passwordMismatch": "Mật khẩu nhập lại không khớp.",
+    "invalidInput": "Thông tin đặt lại mật khẩu không hợp lệ.",
+    "forbidden": "Bạn chỉ được đặt lại mật khẩu tài khoản khác có quyền thấp hơn.",
+    "notFound": "Không tìm thấy người dùng.",
+    "conflict": "Tài khoản hoặc quyền của bạn đã thay đổi. Hãy tải lại trước khi thử lại.",
+    "success": "Đã đặt lại mật khẩu và kết thúc mọi phiên của người dùng này.",
+    "failed": "Không thể hoàn tất việc đặt lại mật khẩu.",
+    "endpoint": "Đặt lại mật khẩu người dùng"
+  },
   'admin': {
     'accessLevel': {
       'full': 'quyền truy cập đầy đủ hệ thống',

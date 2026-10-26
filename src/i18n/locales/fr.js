@@ -5,6 +5,17 @@
 */
 
 export default {
+  adminPasswordReset: {
+    "passwordPolicy": "Use at least 8 characters and at most 72 UTF-8 bytes.",
+    "passwordMismatch": "Passwords do not match.",
+    "invalidInput": "Invalid password reset input.",
+    "forbidden": "You may reset only another account with a lower role.",
+    "notFound": "User not found.",
+    "conflict": "The account or your permissions changed. Reload before trying again.",
+    "success": "Password reset. All sessions for this user have ended.",
+    "failed": "Password reset could not be completed.",
+    "endpoint": "Reset a user password"
+  },
   'admin': {
     'accessLevel': {
       'full': "accès complet au système",

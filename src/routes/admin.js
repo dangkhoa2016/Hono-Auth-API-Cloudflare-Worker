@@ -33,6 +33,26 @@ admin.use('*', unifiedMiddlewares.auto());
 // USER MANAGEMENT ENDPOINTS
 // =============================================================================
 
+// Credential recovery is separate from profile editing and never accepts a role change.
+admin.post('/users/:id/reset-password', requireAdmin, i18nValidatorsMiddleware.adminPasswordReset(), async (c) => {
+  const rawId = c.req.param('id');
+  const userId = Number(rawId);
+  if (!/^[1-9]\d*$/.test(rawId) || !Number.isSafeInteger(userId)) {
+    return c.json({ success: false, code: 'INVALID_INPUT', message: t(c, 'adminPasswordReset.invalidInput') }, 400);
+  }
+  try {
+    const { newPassword } = c.req.valid('json');
+    const result = await createUserService(c.env).resetPasswordByAdmin(userId, newPassword, c.get('user'));
+    if (!result.success) {
+      const keys = { FORBIDDEN: 'forbidden', USER_NOT_FOUND: 'notFound', RESET_CONFLICT: 'conflict', INVALID_INPUT: 'invalidInput' };
+      return c.json({ success: false, code: result.error, message: t(c, `adminPasswordReset.${keys[result.error]}`) }, result.status);
+    }
+    return c.json(createSuccessResponse(result.data, t(c, 'adminPasswordReset.success')));
+  } catch {
+    return c.json({ success: false, code: 'PASSWORD_RESET_FAILED', message: t(c, 'adminPasswordReset.failed') }, 500);
+  }
+});
+
 // GET /admin/users - Get users list (admin only)
 admin.get('/users', requireAdmin, i18nValidatorsMiddleware.userListQuery('query'), async (c) => {
   const currentUser = c.get('user');
@@ -292,6 +312,11 @@ admin.delete('/users/:id', requireDeletePermission, async (c) => {
       if (result.error === 'USER_NOT_FOUND') {
         adminRoutes_log(`Admin user deletion failed: user not found: ${userId}`);
         return await handleStandardError(c, new Error('NOT_FOUND'), 'Admin delete user - not found', adminRoutes_log, 'user.notFoundById', { userId }, 404);
+      }
+
+      if (result.error === 'CANNOT_DELETE_USER') {
+        return await handleStandardError(c, new Error('FORBIDDEN'), 'Admin delete user - protected account', adminRoutes_log,
+          'auth.forbidden', { operation: t(c, 'admin.operations.deleteUser', { userId }) }, 403);
       }
 
       if (result.error === 'CANNOT_DELETE_SUPER_ADMIN') {

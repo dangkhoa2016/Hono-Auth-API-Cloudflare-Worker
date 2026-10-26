@@ -40,6 +40,7 @@ export const SCHEMA_CATEGORIES = {
     creatorModule: './admin.js',
     creatorFunction: 'createAdminI18nSchemas',
     schemas: {
+      adminPasswordResetSchema: { validatorName: 'adminPasswordReset', defaultTarget: 'json' },
       roleChangeSchema: { validatorName: 'roleChange', defaultTarget: 'json' },
       adminStatsQuerySchema: { validatorName: 'adminStats', defaultTarget: 'query' },
       systemHealthSchema: { validatorName: 'systemHealth', defaultTarget: 'query' },

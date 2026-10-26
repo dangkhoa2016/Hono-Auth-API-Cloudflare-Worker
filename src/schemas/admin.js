@@ -4,6 +4,8 @@
  */
 
 import { createSchemaBuilder } from './base.js';
+import { z } from 'zod';
+import { tl } from '../i18n/index.js';
 import { getAllRoles, getAllUserStatuses, DEFAULT_USER_STATUS } from '../constants/roles.js';
 
 // ============================================================================
@@ -11,10 +13,21 @@ import { getAllRoles, getAllUserStatuses, DEFAULT_USER_STATUS } from '../constan
 // ============================================================================
 
 /**
- * Create role change schema with i18n support
+ * Create a strict password reset schema without trimming credential values
  * @param {string} lang - Language code (default: 'en')
  * @returns {Object} Zod schema with translated messages
  */
+export function createAdminPasswordResetSchema(lang = 'en') {
+  return z.strictObject({
+    newPassword: z.string().min(8, tl(lang, 'adminPasswordReset.passwordPolicy'))
+      .refine(value => new TextEncoder().encode(value).length <= 72, tl(lang, 'adminPasswordReset.passwordPolicy')),
+    confirmPassword: z.string()
+  }).refine(data => data.newPassword === data.confirmPassword, {
+    message: tl(lang, 'adminPasswordReset.passwordMismatch'), path: ['confirmPassword']
+  });
+}
+
+/** Create role change schema with i18n support. */
 export function createRoleChangeSchema(lang = 'en') {
   const builder = createSchemaBuilder(lang);
 
@@ -93,6 +106,7 @@ export function createAdminUserUpdateSchema(lang = 'en') {
  */
 export function createAdminI18nSchemas(lang = 'en') {
   return {
+    adminPasswordResetSchema: createAdminPasswordResetSchema(lang),
     roleChangeSchema: createRoleChangeSchema(lang),
     adminStatsQuerySchema: createAdminStatsQuerySchema(lang),
     systemHealthSchema: createSystemHealthSchema(lang),

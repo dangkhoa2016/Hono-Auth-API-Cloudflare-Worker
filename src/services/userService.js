@@ -6,7 +6,9 @@ import {
   DEFAULT_USER_STATUS,
   ROLES,
   USER_STATUSES,
-  canManageUser
+  canManageUser,
+  hasHigherRole,
+  isValidRole
 } from '../constants/roles.js';
 import { BaseService } from './baseService.js';
 import { createKvConfigService } from '../utils/serviceFactory.js';
@@ -198,20 +200,24 @@ export class UserService extends BaseService {
         {
           query: 'DELETE FROM users WHERE id = ?',
           params: [id]
+        },
+        {
+          query: 'SELECT CASE WHEN changes() = 1 THEN 1 ELSE abs(-9223372036854775808) END AS deletion_verified',
+          params: []
         }
       ]);
 
-      const removed = Number(results?.[2]?.meta?.changes ?? 0);
-      if (removed !== 1) {
-        userService_log(`Failed to delete user, ID: ${id}`);
-        return false;
-      }
+      // The SQL assertion verifies exactly one directly deleted user. D1's
+      // meta.changes also counts cascaded token-audit deletions, so it can be
+      // greater than one even though precisely one account was removed.
 
       userService_log(
         `User deleted successfully, ID: ${id}; cleared `
         + `${Number(results?.[0]?.meta?.changes ?? 0)} refresh tokens`
       );
-      await this.invalidateUserCache(id);
+      // The row is already durably gone. A cache outage must not turn a
+      // successful deletion into a failure; authorization bypasses this cache.
+      try { await this.invalidateUserCache(id); } catch { /* best effort */ }
       return true;
     } catch (error) {
       dbError_log(`Error deleting user: ${error.message}`);
@@ -439,6 +445,76 @@ export class UserService extends BaseService {
       authVersion: user?.auth_version ?? null,
       revokedCount: Number(results?.at(-1)?.meta?.changes ?? 0)
     };
+  }
+
+  /** Reset a lower-role account; authorization and all security writes commit together. */
+  async resetPasswordByAdmin(userId, newPassword, actor) {
+    const actorId = Number(actor?.user_id ?? actor?.id);
+    const actorVersion = Number(actor?.auth_version);
+    if (!Number.isSafeInteger(userId) || userId < 1 || typeof newPassword !== 'string'
+        || newPassword.length < 8 || new TextEncoder().encode(newPassword).length > 72) {
+      return { success: false, error: 'INVALID_INPUT', status: 400 };
+    }
+    if (!Number.isSafeInteger(actorId) || actorId === userId
+        || !['admin', 'super_admin'].includes(actor?.role) || !Number.isSafeInteger(actorVersion)) {
+      return { success: false, error: 'FORBIDDEN', status: 403 };
+    }
+    const target = await this.dbService.selectAuthoritative(
+      'SELECT id, role, password FROM users WHERE id = ?', [userId], true
+    );
+    if (!target) {
+      return { success: false, error: 'USER_NOT_FOUND', status: 404 };
+    }
+    if (!isValidRole(target.role) || !hasHigherRole(actor.role, target.role)) {
+      return { success: false, error: 'FORBIDDEN', status: 403 };
+    }
+    const config = await this.getBcryptConfig();
+    const nextHash = await bcrypt.hash(newPassword, config.saltRounds);
+    try {
+      await this.dbService.batch([
+        {
+          query: `UPDATE users SET password = ?, auth_version = auth_version + 1,
+                    updated_at = CURRENT_TIMESTAMP
+                  WHERE id = ? AND password = ? AND role = ?
+                    AND EXISTS (SELECT 1 FROM users AS actor WHERE actor.id = ?
+                      AND actor.status = 'active' AND actor.role = ? AND actor.auth_version = ?)`,
+          params: [nextHash, userId, target.password, target.role, actorId, actor.role, actorVersion]
+        },
+        {
+          query: 'SELECT CASE WHEN changes() = 1 THEN 1 ELSE abs(-9223372036854775808) END AS reset_verified',
+          params: []
+        },
+        {
+          query: `UPDATE refresh_tokens SET revoked = 1, revoked_at = ?,
+                    revocation_reason = 'ADMIN_PASSWORD_RESET', updated_at = CURRENT_TIMESTAMP
+                  WHERE user_id = ? AND revoked = 0`,
+          params: [new Date().toISOString(), userId]
+        },
+        {
+          query: `SELECT CASE WHEN NOT EXISTS (SELECT 1 FROM refresh_tokens WHERE user_id = ? AND revoked = 0)
+                  THEN 1 ELSE abs(-9223372036854775808) END AS revocation_verified`,
+          params: [userId]
+        },
+        {
+          // Deliberately allowlisted metadata: never pass credentials or request bodies here.
+          query: `INSERT INTO audit_logs (action, actor_id, actor_role, target_type, target_id, details, status)
+                  VALUES ('ADMIN_PASSWORD_RESET', ?, ?, 'USER', ?, ?, 'SUCCESS')`,
+          params: [actorId, actor.role, String(userId), JSON.stringify({ sessionsRevoked: true })]
+        },
+        {
+          query: 'SELECT CASE WHEN changes() = 1 THEN 1 ELSE abs(-9223372036854775808) END AS audit_verified',
+          params: []
+        }
+      ]);
+    } catch (error) {
+      if (/integer overflow/i.test(error.message)) {
+        return { success: false, error: 'RESET_CONFLICT', status: 409 };
+      }
+      throw error;
+    }
+    // A cache outage after the durable commit must not report a failed reset.
+    try { await this.invalidateUserCache(userId); } catch { /* security reads bypass this cache */ }
+    return { success: true, data: { userId, sessionsRevoked: true } };
   }
 
   async updatePassword(id, newPassword) {
@@ -745,10 +821,11 @@ export class UserService extends BaseService {
         };
       }
 
-      // Perform deletion
-      const result = await this.dbService.delete('DELETE FROM users WHERE id = ?', [userId]);
+      // Clear session dependencies and detach historical audit references in
+      // the same transaction, then invalidate the cached identity.
+      const result = await this.delete(userId);
 
-      if (result && result.success) {
+      if (result) {
         userService_log(`User deleted by admin successfully: ${userId} by user: ${currentUser.user_id}`);
         return {
           success: true

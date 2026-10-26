@@ -174,7 +174,8 @@ export function createUnifiedRequestMiddleware(
     if (['POST', 'PUT', 'PATCH'].includes(method)) {
       try {
         const contentType = c.req.header('content-type') || '';
-        const useAllowlist = CREDENTIAL_ROUTE_TYPES.has(routeType);
+        const useAllowlist = CREDENTIAL_ROUTE_TYPES.has(routeType)
+          || /^\/api\/admin\/users\/[^/]+\/reset-password$/.test(path);
 
         if (contentType.includes('application/json')) {
           // Read body once and cache for downstream validators (Zod) which also call c.req.json()
@@ -205,8 +206,9 @@ export function createUnifiedRequestMiddleware(
         } else if (contentType.includes('multipart/form-data')) {
           handleMiddleware_log('📝 Request Body: [Multipart Form Data - Content not logged for security]');
         }
-      } catch (e) {
-        handleMiddleware_log(`❌ Error parsing request body: ${e.message}`);
+      } catch {
+        // Parser diagnostics include source excerpts, which may contain credentials.
+        handleMiddleware_log('❌ Error parsing request body: invalid or unreadable body');
       }
     }
 
