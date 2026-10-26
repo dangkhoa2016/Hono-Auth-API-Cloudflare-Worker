@@ -1,8 +1,19 @@
-> **Historical reference scope:** The material below is retained for design context and older examples; commands, payloads, test counts and “complete/enterprise/production-ready” claims have not all been revalidated against the current version. Use the current [capability contract](CAPABILITIES.md), [setup](SETUP_GUIDE.md), [verification](TEST_GUIDE.md) and [upgrade/release](UPGRADE_RELEASE.md) guides for operations. Monitoring is query-on-demand; incident containment/escalation actions and email/KV alert adapters are unavailable. Where an example below conflicts, the current contract takes precedence.
-
-# 🔧 ESLint Guide
+# ESLint configuration
 
 > 🌐 Language / Ngôn ngữ: **English** | [Tiếng Việt](ESLINT_GUIDE.vi.md)
+
+## Current ESLint 10 configuration
+
+`eslint.config.js` is the active flat-config entry point. It imports the rule/override data from `.eslintrc.json` and translates the patterns retained in `.eslintignore.legacy` into global ignores. ESLint no longer discovers those legacy files itself. The ignore file was renamed to preserve its policy without ESLint's obsolete-file warning.
+
+The configuration uses direct development dependencies `@eslint/js` and `globals`, preserves the existing test allowances, locale quote policy and strict Node operator-tool rules, and keeps ignored catch variables as before. Two newly recommended rules (`no-useless-assignment`, `preserve-caught-error`) remain disabled to avoid mixing runtime edits into this tooling migration; existing rules remain active. Browser-only globals are unavailable in Node operator tools.
+
+Use `npm run lint:check`, `npm run lint:tools` and `npm run verify`. Configuration regression tests exercise enforcement, globals, overrides and ignore boundaries. The legacy examples below describe the input policy and older CLI usage; this section defines the current loader. [ESLint migration guide](https://eslint.org/docs/latest/use/migrate-to-10.0.0).
+
+> The examples below are historical; old ignore filenames and config loading are not current operating instructions. Use the current section above and the [verification guide](TEST_GUIDE.md).
+
+## Historical policy and CLI examples
+
 
 ## 📋 Overview
 
