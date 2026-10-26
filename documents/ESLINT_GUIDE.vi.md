@@ -1,5 +1,14 @@
 > **Phạm vi tham khảo lịch sử:** Nội dung bên dưới được giữ để tra cứu thiết kế và ví dụ cũ; lệnh, payload, số liệu test và tuyên bố “complete/enterprise/production-ready” chưa được xác minh lại toàn bộ cho phiên bản hiện tại. Dùng [contract khả năng](CAPABILITIES.vi.md), [cài đặt](SETUP_GUIDE.vi.md), [kiểm chứng](TEST_GUIDE.vi.md) và [nâng cấp/phát hành](UPGRADE_RELEASE.vi.md) cho vận hành hiện tại. Monitoring chỉ theo truy vấn; action ngăn chặn/escalation và adapter email/KV cảnh báo chưa hỗ trợ. Nếu ví dụ bên dưới mâu thuẫn, contract hiện hành được ưu tiên.
 
+
+## Cấu hình ESLint 10 hiện tại
+
+`eslint.config.js` là đầu vào flat config đang được sử dụng. File này đọc dữ liệu rule/override từ `.eslintrc.json` và chuyển các pattern giữ trong `.eslintignore.legacy` thành global ignores. ESLint không tự đọc các file legacy này nữa. File ignore được đổi tên để giữ chính sách cũ mà không phát sinh cảnh báo file lỗi thời.
+
+Cấu hình dùng hai dev dependency trực tiếp `@eslint/js` và `globals`, giữ ngoại lệ dành cho test, quy tắc dấu nháy của locale và kiểm tra nghiêm cho công cụ Node; biến catch không dùng vẫn được chấp nhận như trước. Hai rule mới trong recommended (`no-useless-assignment`, `preserve-caught-error`) chưa bật để tránh trộn sửa runtime vào lần nâng công cụ này; các rule hiện có vẫn hoạt động. Công cụ Node không được dùng nhầm global chỉ có ở trình duyệt.
+
+Chạy `npm run lint:check`, `npm run lint:tools` và `npm run verify`. Test cấu hình kiểm tra rule, global, override và phạm vi bỏ qua. Các ví dụ legacy bên dưới mô tả dữ liệu chính sách và CLI cũ; mục này xác định cơ chế tải hiện tại. [Hướng dẫn migrate ESLint](https://eslint.org/docs/latest/use/migrate-to-10.0.0).
+
 # Hướng Dẫn Cấu Hình ESLint & Style Guide
 
 > 🌐 Language / Ngôn ngữ: [English](ESLINT_GUIDE.md) | **Tiếng Việt**
